@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { deviceSensors, energySummary, fieldPowers, findConsumers, flowColor, FLOW_COLORS, flowSegments, meterPosition, powerSensorFor, proposeEnergySensors, readPower, solarCurvePath, solarDayFromStats } from "./energy.ts";
+import { deviceSensors, energySummary, fieldPowers, findConsumers, flowColor, FLOW_COLORS, flowSegments, gridPoint, hubPoint, inverterToGrid, meterPosition, powerSensorFor, proposeEnergySensors, readPower, solarCurvePath, solarDayFromStats } from "./energy.ts";
 import { proposeField, roofFaces } from "./solar.ts";
 import type { Building, Room } from "./model.ts";
 import { emptyBuilding, newFloor } from "./model.ts";
@@ -13,7 +13,7 @@ function rect(id: string, x0: number, z0: number, x1: number, z1: number): Room 
   return { id, name: id, area_id: null, points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]], floor_material: "wood" };
 }
 
-function hassWith(states: HassEntity[], entities: Record<string, { entity_id: string; device_id?: string }> = {}): HomeAssistant {
+function hassWith(states: HassEntity[], entities: Record<string, { entity_id: string; device_id?: string; area_id?: string }> = {}): HomeAssistant {
   return {
     language: "de",
     connection: {} as HomeAssistant["connection"],
@@ -56,6 +56,9 @@ test("a placed device reports power through a sensor of the same device", () => 
   const hass = hassForHouse();
   assert.equal(powerSensorFor(hass, "switch.tv"), "sensor.tv_power");
   assert.equal(powerSensorFor(hass, "sensor.fridge_power"), "sensor.fridge_power");
+  // a motion sensor on the same device never carries that meter (#337)
+  hass.entities!["binary_sensor.tv_motion"] = { entity_id: "binary_sensor.tv_motion", device_id: "d1" } as never;
+  assert.equal(powerSensorFor(hass, "binary_sensor.tv_motion"), null);
   const consumers = findConsumers(hass, house());
   assert.deepEqual(
     consumers.map((c) => [c.id, c.power]),
@@ -266,7 +269,8 @@ test("today's solar statistics add up over the sensors: energy, peak and the cur
     "sensor.pv2": [slot(100, 500), slot(101, 500), slot(102, -5)],
   };
   const day = solarDayFromStats(rows, now);
-  assert.equal(day.curve.length, 12 * 12 + 3 + 1);
+  // up to now, less the last minutes the recorder has no mean for yet
+  assert.equal(day.curve.length, 12 * 12 + 1);
   assert.equal(day.curve[100], 1500);
   assert.equal(day.curve[101], 2500);
   assert.equal(day.curve[102], 0);
@@ -276,7 +280,7 @@ test("today's solar statistics add up over the sensors: energy, peak and the cur
   const path = solarCurvePath(day.curve, day.peak);
   assert.ok(path.line.startsWith("M0.0 42.0"));
   assert.ok(path.area.endsWith("L0 44 Z"));
-  assert.ok(path.endX > 110 && path.endX < 115);
+  assert.ok(path.endX > 108 && path.endX < 115);
 });
 
 test("a battery with separate charging and discharging sensors: the charging is taken off", () => {
@@ -301,4 +305,115 @@ test("a meter with separate import and export sensors: the export is taken off",
   hass.states["sensor.export"] = power("sensor.export", "0");
   hass.states["sensor.import"] = power("sensor.import", "420");
   assert.equal(energySummary(hass, b, []).grid, 420);
+});
+
+test("a grid connection mounted on a wall: the grid cable starts at its height (#256)", () => {
+  const b = house();
+  const furn = (id: string, type: string, x: number, z: number, extra: Record<string, unknown> = {}) => ({ id, type, x, z, rotation: 0, w: 0.4, d: 0.2, h: 0.5, variant: null, ...extra }) as Building["floors"][0]["furniture"][0];
+  b.floors[0].furniture.push(furn("m", "meter", 0.5, 0.3, { power: "sensor.grid" }), furn("gp", "grid_point", -2, 0.3, { mount_y: 2 }));
+  assert.equal(gridPoint(b)?.height, 2);
+  const hass = hassWith([power("sensor.grid", "500")]);
+  const consumers = findConsumers(hass, b);
+  const summary = energySummary(hass, b, consumers);
+  const grid = flowSegments({ building: b, consumers, summary }).filter((s) => s.kind === "grid");
+  const top = Math.max(...grid.flatMap((s) => [s.a[1], s.b[1]]));
+  assert.ok(top >= 2 - 1e-6, `grid cable reaches ${top}`);
+});
+
+test("a consumer in a room's corner gets its cable square to the wall, not slant (#256)", () => {
+  const hass = hassForHouse();
+  const b = house();
+  // the fridge right in the corner of room b, between the wall and the cable's ring
+  b.floors[0].placements[1] = { entity_id: "sensor.fridge_power", x: 7.97, z: 0.02, y: null };
+  const consumers = findConsumers(hass, b);
+  const segs = flowSegments({ building: b, consumers, summary: energySummary(hass, b, consumers) }).filter((s) => s.floorId === "eg" && s.kind === "consumer");
+  assert.ok(segs.length > 0);
+  for (const s of segs) assert.ok(Math.abs(s.a[0] - s.b[0]) < 1e-6 || Math.abs(s.a[2] - s.b[2]) < 1e-6, `slant piece ${s.a} → ${s.b}`);
+});
+
+test("rooms drawn with a small gap between them still get their cables (#731)", () => {
+  const hass = hassForHouse();
+  const b = house();
+  // the second room drawn 30 cm apart, no shared wall
+  b.floors[0].rooms = [rect("a", 0, 0, 4, 3), rect("b", 4.3, 0, 8, 3)];
+  b.floors = [b.floors[0]];
+  const consumers = findConsumers(hass, b);
+  const segs = flowSegments({ building: b, consumers, summary: energySummary(hass, b, consumers) });
+  const inB = segs.filter((s) => s.floorId === "eg" && s.kind === "consumer" && Math.max(s.a[0], s.b[0]) > 4.3);
+  assert.ok(inB.length > 0, "a cable reaches the devices in the second room");
+  // rooms far apart (a detached garage) are not wired through the garden
+  b.floors[0].rooms = [rect("a", 0, 0, 4, 3), rect("b", 8, 0, 12, 3)];
+  b.floors[0].placements = [{ entity_id: "sensor.fridge_power", x: 10, z: 0.5, y: null }];
+  const far = findConsumers(hass, b);
+  const farSegs = flowSegments({ building: b, consumers: far, summary: energySummary(hass, b, far) });
+  assert.equal(farSegs.filter((s) => s.kind === "consumer").length, 0);
+});
+
+test("two lights on one device each take their own meter: PowerCalc's by its name, else one of the light's room (#743)", () => {
+  const hass = hassWith(
+    [st("light.bad_decke", "on"), st("light.buero", "on"), power("sensor.buero_power_x", "9"), power("sensor.bad_decke_power", "12")],
+    {
+      "light.bad_decke": { entity_id: "light.bad_decke", device_id: "act", area_id: "bad" },
+      "light.buero": { entity_id: "light.buero", device_id: "act", area_id: "buero" },
+      "sensor.buero_power_x": { entity_id: "sensor.buero_power_x", device_id: "act", area_id: "buero" },
+      "sensor.bad_decke_power": { entity_id: "sensor.bad_decke_power", device_id: "act", area_id: "bad" },
+    },
+  );
+  assert.equal(powerSensorFor(hass, "light.bad_decke"), "sensor.bad_decke_power");
+  assert.equal(powerSensorFor(hass, "light.buero"), "sensor.buero_power_x");
+});
+
+test("a cable hub set by hand wins over the meter cabinet, but only when switched on (#841)", () => {
+  const b = house();
+  const furn = (id: string, type: string, x: number, z: number, extra: Record<string, unknown> = {}) => ({ id, type, x, z, rotation: 0, w: 0.5, d: 0.2, h: 0.65, variant: null, ...extra }) as Building["floors"][0]["furniture"][0];
+  b.floors[0].furniture.push(furn("m", "meter", 7.5, 0.3, { power: "sensor.grid" }));
+  // an older plan with its meter spot and a meter cabinet added later: the cabinet stays the hub
+  assert.deepEqual(meterPosition(b), { floor_id: "eg", x: 7.5, z: 0.3 });
+  assert.equal(hubPoint(b), false);
+  b.energy.hub_point = true;
+  assert.equal(hubPoint(b), true);
+  assert.deepEqual(meterPosition(b), { floor_id: "eg", x: 0.5, z: 1.5 });
+  // the consumer tree starts at the hub
+  const hass = hassForHouse();
+  const consumers = findConsumers(hass, b);
+  const segs = flowSegments({ building: b, consumers, summary: energySummary(hass, b, consumers) });
+  assert.ok(segs.some((s) => s.kind === "consumer" && s.a[0] === 0.5 && s.a[2] === 1.5));
+  // switched on, but the point lies on a floor that is gone: the cabinet again
+  b.energy.meter = { floor_id: "gone", x: 1, z: 1 };
+  assert.equal(hubPoint(b), false);
+  assert.deepEqual(meterPosition(b), { floor_id: "eg", x: 7.5, z: 0.3 });
+});
+
+test("an inverter's cable ends at the grid point when told so, else at the meter (#841)", () => {
+  const b = house();
+  b.energy = { ...b.energy, meter: null, grid: null, solar: null };
+  const furn = (id: string, type: string, x: number, z: number, extra: Record<string, unknown> = {}) => ({ id, type, x, z, rotation: 0, w: 0.5, d: 0.2, h: 0.65, variant: null, ...extra }) as Building["floors"][0]["furniture"][0];
+  b.floors[0].furniture.push(furn("m", "meter", 0.5, 0.3, { power: "sensor.grid" }), furn("inv", "inverter", 7, 0.3, { power: "sensor.pv1" }), furn("gp", "grid_point", 10, 1.5));
+  const hass = hassWith([power("sensor.grid", "-300"), power("sensor.pv1", "1200")]);
+  const end = () => {
+    const summary = energySummary(hass, b, []);
+    const feed = flowSegments({ building: b, consumers: [], summary }).filter((s) => s.key === "inv:inv");
+    return feed[feed.length - 1].b;
+  };
+  assert.equal(inverterToGrid(b, "inv"), false);
+  assert.deepEqual(end(), [0.5, 1.5, 0.3]);
+  b.floors[0].furniture[1].cable_to = "grid";
+  assert.equal(inverterToGrid(b, "inv"), true);
+  const auto = end();
+  assert.deepEqual([auto[0], auto[2]], [10, 1.5]);
+  assert.ok(auto[1] < 0.1);
+  // laid by hand: along its points, then on to the grid point
+  b.settings.roof.cables = [{ id: "inv:inv", floor_id: "eg", points: [[7, 2]], height: 0.03 }];
+  const hand = end();
+  assert.deepEqual([hand[0], hand[2]], [10, 1.5]);
+});
+
+test("PV from the strings when the plant's sensor tells nothing or reads 0 while they make power (#Deye/Solarman)", async () => {
+  const { pvWithStrings } = await import("./energy.ts");
+  assert.equal(pvWithStrings(null, 1200), 1200);
+  assert.equal(pvWithStrings(0, 1200), 1200);
+  // a real reading wins; tiny string values (night, standby) do not override 0
+  assert.equal(pvWithStrings(900, 1200), 900);
+  assert.equal(pvWithStrings(0, 20), 0);
+  assert.equal(pvWithStrings(450, null), 450);
 });

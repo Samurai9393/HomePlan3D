@@ -1,9 +1,9 @@
 // Devices of a room: which entities belong to an area, what kind they are, how they are placed and
 // what their state looks like. Pure functions (no Lit, no three.js) so they can be tested directly.
 
-import type { EntityRef, Floor, LampMount, Opening, Placement, Room, Vec2 } from "./model.ts";
-import { centroid, pointInPolygon } from "./model.ts";
-import { packScreen } from "./packs.ts";
+import type { Building, Furniture, EntityRef, FenceGate, Floor, LampMount, Opening, Placement, RoofWindow, Room, Vec2 } from "./model.ts";
+import { centroid, outdoorZones, pointInPolygon } from "./model.ts";
+import { isRobotVacuum, packMotion, packScreen } from "./packs.ts";
 import type { HassEntity, HomeAssistant } from "./types.ts";
 
 export type DeviceKind =
@@ -61,9 +61,15 @@ const SENSOR_CLASSES = new Set([
   "nitrogen_dioxide",
   "moisture",
   "sound_pressure",
+  // water values of a pool or a pond (D600): pH, and conductivity for salt
+  "ph",
+  "conductivity",
 ]);
-/** Sensors without a class still count when their unit is a meter's (e.g. older meter readers). */
-const METER_UNITS = new Set(["m³", "m3", "L", "l", "kWh", "Wh", "MWh", "lx"]);
+/**
+ * Sensors without a class still count when their unit is a meter's (e.g. older meter readers) or a water value's:
+ * redox / ORP in mV, salt or chlorine in mg/L or ppm, conductivity in µS/cm (D600).
+ */
+const METER_UNITS = new Set(["m³", "m3", "L", "l", "kWh", "Wh", "MWh", "lx", "mV", "mg/L", "mg/l", "ppm", "µS/cm", "μS/cm", "mS/cm"]);
 const BINARY_CLASSES = new Set(["door", "window", "opening", "garage_door", "motion", "occupancy", "presence", "smoke", "moisture", "gas", "carbon_monoxide"]);
 
 /** Order in lists and panels. */
@@ -85,11 +91,81 @@ export function isPlaceable(kind: DeviceKind | null): boolean {
   return kind !== null && kind !== "scene" && kind !== "script";
 }
 
+/** Covers that have no slats, whatever their features say (KNX reports tilt buttons for roller shutters, #704). */
+const NO_SLATS = new Set(["shutter", "garage", "gate", "door", "curtain", "awning", "window", "shade"]);
+
+/**
+ * Open/close-tilt buttons for a cover: only when it has slats – it reports a tilt position, or it is no roller
+ * shutter, garage door, curtain … (those never have slats, even when an integration announces the features).
+ */
+export function coverTiltButtons(st: HassEntity | undefined): boolean {
+  if (!st) return false;
+  const features = ((st.attributes.supported_features as number) ?? 0) | 0;
+  if (!(features & 48)) return false;
+  return typeof st.attributes.current_tilt_position === "number" || !NO_SLATS.has(String(st.attributes.device_class ?? ""));
+}
+
+/**
+ * How a cover opens, closes or stops (#920). A blind with slats only – it turns its slats but has no open and close
+ * of its own – does it by its tilt: open/close tilt when it has them, else the tilt position 100 / 0. Every other
+ * cover, and one that reports no features, as always.
+ */
+export function coverCall(st: HassEntity | undefined, what: "open" | "close" | "stop"): { service: string; data: Record<string, unknown> } {
+  const f = ((st?.attributes.supported_features as number) ?? 0) | 0;
+  const tiltOnly = f !== 0 && !(f & 3) && (f & (16 | 32 | 128)) !== 0;
+  if (!tiltOnly) return { service: what === "open" ? "open_cover" : what === "close" ? "close_cover" : "stop_cover", data: {} };
+  if (what === "stop") return { service: "stop_cover_tilt", data: {} };
+  if (f & (what === "open" ? 16 : 32)) return { service: what === "open" ? "open_cover_tilt" : "close_cover_tilt", data: {} };
+  return { service: "set_cover_tilt_position", data: { tilt_position: what === "open" ? 100 : 0 } };
+}
+
+/** Several covers at once: one call per kind of cover (roller shutters by open/close, slat-only blinds by their tilt). */
+export function coverCalls(hass: HomeAssistant, ids: readonly string[], what: "open" | "close" | "stop"): { service: string; data: Record<string, unknown> }[] {
+  const groups = new Map<string, { service: string; data: Record<string, unknown>; ids: string[] }>();
+  for (const id of ids) {
+    const c = coverCall(hass.states[id], what);
+    const key = `${c.service}|${JSON.stringify(c.data)}`;
+    const g = groups.get(key) ?? { ...c, ids: [] };
+    g.ids.push(id);
+    groups.set(key, g);
+  }
+  return [...groups.values()].map((g) => ({ service: g.service, data: { ...g.data, entity_id: g.ids } }));
+}
+
+/**
+ * A device's area: its own, else that of the device it is a channel of. Home Assistant 2026.11 moves the entities
+ * of Tuya multi-channel devices, Z-Wave endpoints and ZHA groups onto child devices, often without an area of their
+ * own; clients are to take the parent's then. Older versions have no parent: the device's own area as before.
+ */
+export function deviceAreaId(hass: HomeAssistant, deviceId: string | null | undefined): string | null {
+  const seen = new Set<string>();
+  let id = deviceId;
+  // a parent chain that runs in a circle ends instead of looping
+  while (id && !seen.has(id)) {
+    seen.add(id);
+    const device = hass.devices?.[id];
+    if (!device) return null;
+    if (device.area_id) return device.area_id;
+    id = device.parent_device_id;
+  }
+  return null;
+}
+
+/** An entity's area: its own, else its device's (or that device's parent's, see deviceAreaId). */
 export function entityAreaId(hass: HomeAssistant, entityId: string): string | null {
   const entry = hass.entities?.[entityId];
   if (!entry) return null;
   if (entry.area_id) return entry.area_id;
-  return (entry.device_id && hass.devices?.[entry.device_id]?.area_id) || null;
+  return deviceAreaId(hass, entry.device_id);
+}
+
+/**
+ * Hidden or disabled in Home Assistant's entity registry: never picked or listed automatically – only where the plan
+ * names it by hand (a placed device, a linked entity) it stays (#645).
+ */
+export function hiddenInHa(hass: HomeAssistant, entityId: string): boolean {
+  const entry = hass.entities?.[entityId];
+  return !!entry && (!!entry.hidden || !!entry.hidden_by || !!entry.disabled_by);
 }
 
 /** Whether an entity is shown at all: visible, no config/diagnostic entity, and a kind we handle. */
@@ -97,12 +173,16 @@ export function isRelevant(hass: HomeAssistant, entityId: string): boolean {
   const kind = kindOf(entityId);
   if (!kind) return false;
   const entry = hass.entities?.[entityId];
-  if (entry?.hidden || entry?.entity_category) return false;
+  if (hiddenInHa(hass, entityId) || entry?.entity_category) return false;
   const st = hass.states[entityId];
   if (!st) return false;
   const dc = st.attributes.device_class as string | undefined;
-  if (kind === "sensor") return dc ? SENSOR_CLASSES.has(dc) : METER_UNITS.has(String(st.attributes.unit_of_measurement ?? ""));
-  if (kind === "binary") return !!dc && BINARY_CLASSES.has(dc);
+  const unit = String(st.attributes.unit_of_measurement ?? "");
+  // a redox / ORP probe often reports as a voltage in mV (#814); a mains voltage in V stays out
+  if (kind === "sensor") return dc ? SENSOR_CLASSES.has(dc) || (dc === "voltage" && unit === "mV") : METER_UNITS.has(unit);
+  // a binary sensor without a class is mostly noise of an integration – unless its own entity was given an
+  // area by hand (a "storm" flag of a home automation bus, #243): then it is meant to be seen
+  if (kind === "binary") return dc ? BINARY_CLASSES.has(dc) : !!entry?.area_id;
   return true;
 }
 
@@ -124,6 +204,8 @@ interface Registry {
   unassigned: string[];
   /** Domains of each device's visible, non-config entities (to tell a 3D printer from a thermometer). */
   domains: Map<string, Set<string>>;
+  /** Devices whose entities lie in several areas (hubs). */
+  hubs: Set<string>;
 }
 
 /** Sensor classes that never make a marker, even without an area (diagnostics of the device itself). */
@@ -133,7 +215,7 @@ const NOISE_CLASSES = new Set(["battery", "signal_strength", "timestamp", "date"
 function isLooseSensor(hass: HomeAssistant, entityId: string): boolean {
   if (kindOf(entityId) !== "sensor") return false;
   const entry = hass.entities?.[entityId];
-  if (entry?.hidden || entry?.entity_category) return false;
+  if (hiddenInHa(hass, entityId) || entry?.entity_category) return false;
   const st = hass.states[entityId];
   if (!st || !st.attributes.unit_of_measurement) return false;
   if (NOISE_CLASSES.has(String(st.attributes.device_class ?? ""))) return false;
@@ -153,11 +235,14 @@ function registryOf(hass: HomeAssistant): Registry {
   const power = new Map<string, string[]>();
   const unassigned: string[] = [];
   const domains = new Map<string, Set<string>>();
+  // the areas a device's entities lie in: a hub (one MQTT or KNX device for a whole house) spans several
+  const deviceAreas = new Map<string, Set<string>>();
   for (const id of Object.keys(hass.entities ?? {})) {
     const entry = hass.entities![id];
     const device = entry.device_id;
+    if (device && entry.area_id) (deviceAreas.get(device) ?? deviceAreas.set(device, new Set()).get(device)!).add(entry.area_id);
     if (device && isPower(hass, id)) (power.get(device) ?? power.set(device, []).get(device)!).push(id);
-    if (device && !entry.hidden && !entry.entity_category) (domains.get(device) ?? domains.set(device, new Set()).get(device)!).add(domainOf(id));
+    if (device && !hiddenInHa(hass, id) && !entry.entity_category) (domains.get(device) ?? domains.set(device, new Set()).get(device)!).add(domainOf(id));
     const relevant = isRelevant(hass, id);
     const area = entityAreaId(hass, id);
     if (!area) {
@@ -183,7 +268,8 @@ function registryOf(hass: HomeAssistant): Registry {
       return ka - kb || entityName(hass, a, areaName).localeCompare(entityName(hass, b, areaName));
     });
   }
-  registry = { entities: hass.entities, devices: hass.devices, states: hass.states, stateCount: Object.keys(hass.states).length, areas, power, unassigned, domains };
+  const hubs = new Set([...deviceAreas].filter(([, set]) => set.size > 1).map(([device]) => device));
+  registry = { entities: hass.entities, devices: hass.devices, states: hass.states, stateCount: Object.keys(hass.states).length, areas, power, unassigned, domains, hubs };
   return registry;
 }
 
@@ -222,7 +308,8 @@ const NOT_ROOM_NAME =
 /** Whether a sensor measures the room itself (not a device's inner temperature). */
 export function isRoomClimateSensor(hass: HomeAssistant, entityId: string): boolean {
   const device = hass.entities?.[entityId]?.device_id;
-  const domains = device ? registryOf(hass).domains.get(device) : undefined;
+  // a hub's entities are spread over the house: its lights and switches say nothing about this sensor (#243)
+  const domains = device && !registryOf(hass).hubs.has(device) ? registryOf(hass).domains.get(device) : undefined;
   if (domains && [...domains].some((d) => NOT_A_ROOM_SENSOR.has(d))) return false;
   return !NOT_ROOM_NAME.test(`${entityId} ${hass.states[entityId]?.attributes.friendly_name ?? ""}`);
 }
@@ -242,7 +329,28 @@ export function roomClimateSensors(hass: HomeAssistant, floor: Floor | null, roo
   const here = placed.filter((p) => inRoom(p.x, p.z)).map((p) => p.entity_id);
   const elsewhere = new Set(placed.filter((p) => !inRoom(p.x, p.z)).map((p) => p.entity_id));
   const ids = [...new Set([...areaEntities(hass, room.area_id).filter((id) => !elsewhere.has(id)), ...here])];
-  return ids.filter((id) => id.startsWith("sensor.") && hass.states[id]?.attributes.device_class === dc && isRoomClimateSensor(hass, id));
+  // outside (an outdoor area acting as a room, #100) the "outdoor" sensors are just the right ones
+  const sensors = ids.filter((id) => id.startsWith("sensor.") && hass.states[id]?.attributes.device_class === dc && (room.outdoor || isRoomClimateSensor(hass, id)));
+  if (sensors.length) return sensors;
+  // no sensor of its own: a thermostat of the room tells its temperature (and humidity) too (#478)
+  const attr = CLIMATE_ATTRS[key];
+  return attr ? ids.filter((id) => id.startsWith("climate.") && typeof hass.states[id]?.attributes[attr] === "number") : [];
+}
+
+/** What a thermostat (climate entity) reports of a room's climate. */
+export const CLIMATE_ATTRS: Partial<Record<ClimateKey, string>> = { temperature: "current_temperature", humidity: "current_humidity" };
+
+/** A room climate value of a sensor (its state) or of a thermostat (its current_temperature / current_humidity). */
+export function climateReading(hass: HomeAssistant, id: string, key: ClimateKey): number {
+  const st = hass.states[id];
+  if (id.startsWith("climate.")) {
+    const attr = CLIMATE_ATTRS[key];
+    const v = attr ? Number(st?.attributes[attr]) : Number.NaN;
+    // a thermostat reports in Home Assistant's unit
+    return key === "temperature" ? toCelsius(v, tempUnit(hass)) : v;
+  }
+  const v = Number(st?.state);
+  return key === "temperature" ? toCelsius(v, st?.attributes.unit_of_measurement) : v;
 }
 
 /** Average of a room climate value (null when no sensor reports one). */
@@ -266,24 +374,34 @@ export function fromCelsius(hass: HomeAssistant, celsius: number): number {
 /** Average of the room's climate sensors; temperatures always in °C, whatever unit a sensor reports. */
 export function roomClimateValue(hass: HomeAssistant, floor: Floor | null, room: Room, key: ClimateKey): number | null {
   const values = roomClimateSensors(hass, floor, room, key)
-    .map((id) => {
-      const v = Number(hass.states[id]?.state);
-      return key === "temperature" ? toCelsius(v, hass.states[id]?.attributes.unit_of_measurement) : v;
-    })
+    .map((id) => climateReading(hass, id, key))
     .filter((v) => Number.isFinite(v));
   return values.length ? values.reduce((a, b) => a + b, 0) / values.length : null;
 }
 
 /** Power sensors of a device, in registry order (a shared array: do not change it). */
+/** Whether a device is a hub whose entities lie in several areas (one MQTT/KNX device for a whole house). */
+export function isHubDevice(hass: HomeAssistant, deviceId: string): boolean {
+  return !!hass.entities && registryOf(hass).hubs.has(deviceId);
+}
+
 export function powerSensorsOf(hass: HomeAssistant, deviceId: string): string[] {
   if (!hass.entities) return [];
   return registryOf(hass).power.get(deviceId) ?? [];
 }
 
 /** Friendly name without a leading area name ("Wohnzimmer Deckenlicht" in the Wohnzimmer -> "Deckenlicht"). */
-export function entityName(hass: HomeAssistant, entityId: string, areaName?: string): string {
+export function entityName(hass: HomeAssistant, entityId: string, areaName?: string, dropDevice = false): string {
   const st = hass.states[entityId];
-  const name = (st?.attributes.friendly_name as string | undefined) ?? hass.entities?.[entityId]?.name ?? entityId;
+  const entry = hass.entities?.[entityId];
+  let name = (st?.attributes.friendly_name as string | undefined) ?? entry?.name ?? entityId;
+  // Home Assistant 2026.11: friendly_name is the legacy "device + entity" name; where the device stands apart
+  // (the room panel), show the entity's own name as Home Assistant's dialogs do ("switch_living_a Ceiling light" -> "Ceiling light")
+  if (dropDevice && entry?.name && entry.device_id) {
+    const dev = hass.devices?.[entry.device_id];
+    const devName = (dev?.name_by_user || dev?.name || "").trim();
+    if (devName && name.toLowerCase() === `${devName} ${entry.name}`.toLowerCase()) name = entry.name;
+  }
   if (areaName && name.length > areaName.length + 1 && name.toLowerCase().startsWith(areaName.toLowerCase() + " ")) {
     const rest = name.slice(areaName.length + 1);
     return rest.charAt(0).toUpperCase() + rest.slice(1);
@@ -291,21 +409,60 @@ export function entityName(hass: HomeAssistant, entityId: string, areaName?: str
   return name;
 }
 
+/**
+ * Whether a radiator heats by its own sensor (D637): a valve's work state ("opened", "heating", "on"), a binary
+ * sensor, or an opening in percent (above 0); null when the sensor says nothing usable.
+ */
+export function heatSensorOn(hass: HomeAssistant, ref: EntityRef | undefined): boolean | null {
+  if (!ref || ref === "none") return null;
+  const st = hass.states[ref];
+  if (!st || isUnavailable(st)) return null;
+  const s = st.state.toLowerCase();
+  if (["on", "open", "opened", "heating", "heat", "true", "active", "running"].includes(s)) return true;
+  if (["off", "closed", "idle", "false", "inactive", "standby"].includes(s)) return false;
+  const v = Number(s);
+  return Number.isFinite(v) ? v > 0 : null;
+}
+
+/**
+ * A charger's status text read as charging and plugged in. Whole words only: "not_charging", "ready_to_charge" and
+ * "charger_free" are no charging, "disconnected" and "unplugged" no car at the cable.
+ */
+export function chargerStatus(raw: string): { charging: boolean; plugged: boolean } {
+  const s = raw.toLowerCase().trim().replace(/[\s-]+/g, "_");
+  const not = /(^|_)(not|no|nicht|kein|keine|un|dis)_?(charging|charge|connected|plugged|verbunden|angesteckt)/.test(s);
+  const free = /charger_free|^available$|^idle$|frei|abgesteckt|no_car|kein_fahrzeug/.test(s);
+  const charging = !not && !/ready_to_charge|charger_|complete|finish|charged|fertig|beendet|voll$|full/.test(s) && /(^|_)(charging|charge|laden|lädt|ladend|lade)($|_)/.test(s);
+  const plugged = charging || (!not && !free && /connect|plug|ready|insert|angesteckt|verbunden|wait|paused|suspend|preparing|complete|finish|charged|fertig|full|voll/.test(s));
+  return { charging, plugged };
+}
+
 export function isUnavailable(st: HassEntity | undefined): boolean {
   return !st || st.state === "unavailable" || st.state === "unknown";
 }
 
 /** States of a status sensor (a 3D printer, a washing machine's programme) that mean "it is working". */
-const WORKING_STATES = new Set(["running", "printing", "prepare", "preparing", "slicing", "heating", "busy", "working", "active", "washing", "rinsing", "spinning", "drying", "cleaning", "in_progress", "in progress", "on"]);
+const WORKING_STATES = new Set(["run", "cooking", "running", "printing", "prepare", "preparing", "slicing", "heating", "busy", "working", "active", "washing", "rinsing", "spinning", "drying", "cleaning", "in_progress", "in progress", "on"]);
 
 /** Whether an entity is a status sensor (enum states such as running / idle / finish) that furniture can follow. */
 export function isStatusSensor(st: HassEntity | undefined): boolean {
   return !!st && st.entity_id.startsWith("sensor.") && st.attributes.device_class === "enum";
 }
 
+/**
+ * A robot vacuum at work: "cleaning", and the states some integrations report instead ("room_cleaning",
+ * "segment_cleaning", "zone_cleaning", "sweeping", "mopping" …) (#470).
+ */
+export function vacuumCleaning(state: string | undefined): boolean {
+  if (!state) return false;
+  return state === "cleaning" || /clean|sweep|mop/.test(state.toLowerCase());
+}
+
 /** "Active" drives the glow of a device marker: light on, cover open, heating, playing, window open … */
 export function isActive(st: HassEntity | undefined): boolean {
   if (!st) return false;
+  // a robot vacuum (the pack's robot with its dock): busy while cleaning or on its way back
+  if (st.entity_id.startsWith("vacuum.")) return vacuumCleaning(st.state) || st.state === "returning";
   switch (kindOf(st.entity_id)) {
     case "light":
     case "switch":
@@ -328,6 +485,66 @@ export function isActive(st: HassEntity | undefined): boolean {
   }
 }
 
+/**
+ * A cooktop's operating state (Home Connect and others: "run" cooking, "ready" switched on, "inactive" off):
+ * the burners glow while it cooks, faintly while it is ready, not at all when it is off.
+ */
+export function cooktopLevel(st: HassEntity | undefined, running: boolean): number {
+  if (!st || isUnavailable(st)) return running ? 1 : 0;
+  const s = String(st.state).toLowerCase();
+  if (running || s === "run" || s === "cooking" || s === "on") return 1;
+  if (s === "ready" || s === "standby" || s === "pause" || s === "paused") return 0.3;
+  return 0;
+}
+
+/**
+ * An air conditioner by its mode: red heating, blue cooling, green automatic, yellow drying, white fan only –
+ * bright while it works (hvac_action), dimmer while it only stands by in that mode; null when off.
+ */
+export function climateModeGlow(st: HassEntity | undefined): { color: [number, number, number]; level: number } | null {
+  if (!st || isUnavailable(st)) return null;
+  const mode = String(st.state).toLowerCase();
+  if (mode === "off") return null;
+  const action = String(st.attributes.hvac_action ?? "").toLowerCase();
+  const color: [number, number, number] =
+    mode === "heat" ? [1, 0.32, 0.12] : mode === "cool" ? [0.3, 0.65, 1] : mode === "dry" ? [1, 0.85, 0.3] : mode === "fan_only" ? [0.85, 0.92, 1] : [0.3, 1, 0.5];
+  const working = ["heating", "cooling", "drying", "fan"].includes(action);
+  return { color, level: working || !action ? 1 : 0.45 };
+}
+
+/**
+ * A lamp that only shows one colour of its light (#mail 10.10.): the glow stays when the light's colour is close to
+ * the chosen one (hue within 30°, both clearly coloured), else the lamp stays dark.
+ */
+export function onlyColor<T extends { color: [number, number, number] }>(glow: T | null, hex: string | null | undefined): T | null {
+  if (!glow || !hex || !/^#[0-9a-f]{6}$/i.test(hex)) return glow;
+  const want = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255) as [number, number, number];
+  const hs = (c: readonly number[]): [number, number] => {
+    const max = Math.max(...c);
+    const min = Math.min(...c);
+    const d = max - min;
+    if (max <= 0 || d / max < 0.25) return [-1, 0];
+    const h = max === c[0] ? ((c[1] - c[2]) / d + 6) % 6 : max === c[1] ? (c[2] - c[0]) / d + 2 : (c[0] - c[1]) / d + 4;
+    return [h * 60, d / max];
+  };
+  const [hw] = hs(want);
+  const [hl] = hs(glow.color);
+  // a white (unsaturated) choice matches a white light, a colour only a colour
+  if (hw < 0 || hl < 0) return hw < 0 && hl < 0 ? glow : null;
+  const diff = Math.abs(hw - hl);
+  return Math.min(diff, 360 - diff) <= 30 ? glow : null;
+}
+
+/**
+ * A lamp drawn in a fixed colour (#977): the light still says on/off and how bright, the colour is the chosen one –
+ * a warm white fixture whose entity reports colours, or a lamp that should simply look a certain way in the plan.
+ */
+export function fixedGlowColor<T extends { color: [number, number, number] }>(glow: T | null, hex: string | null | undefined): T | null {
+  if (!glow || !hex || !/^#[0-9a-f]{6}$/i.test(hex)) return glow;
+  const color = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255) as [number, number, number];
+  return { ...glow, color };
+}
+
 /** Colour (0..1 channels) and level (0..1) of a light that is on; null when off. */
 export function lightGlow(st: HassEntity | undefined, colorFrom?: HassEntity | undefined): { color: [number, number, number]; level: number } | null {
   if (!st || st.state !== "on") return null;
@@ -345,6 +562,17 @@ export function lightGlow(st: HassEntity | undefined, colorFrom?: HassEntity | u
     color = [1, 0.71, 0.28]; // warm neon amber (#ffb547)
   }
   return { color, level };
+}
+
+/**
+ * Whether a light can show colours at all. An "effect" on a white-only light is a mood or a scene (Loxone's
+ * LightController names the mood there, #977), not a colour loop – nothing to animate. A light that does not say
+ * its colour modes is taken as able.
+ */
+export function colorCapable(st: HassEntity): boolean {
+  const modes = st.attributes.supported_color_modes;
+  if (!Array.isArray(modes) || !modes.length) return true;
+  return modes.some((m) => ["hs", "rgb", "rgbw", "rgbww", "xy"].includes(String(m)));
 }
 
 /** Rough black-body colour for 2000–6500 K, tuned to stay warm and readable on the dark floor. */
@@ -469,6 +697,8 @@ export interface OpeningEntities {
   /** A sensor with the blind's position while it moves (0–100 % or 0–1, open = high). */
   position?: string | null;
   positionInverted?: boolean;
+  /** The cover reports its slats' tilt the other way round (0 = open). */
+  slatInvert?: boolean;
   /** A sensor with the sash's tilt angle (degrees), with the angle that counts as fully tilted, an offset and the sign. */
   tiltAngle?: string | null;
   tiltMax?: number | null;
@@ -476,6 +706,10 @@ export interface OpeningEntities {
   tiltInvert?: boolean;
   /** A door without a sensor is drawn closed. */
   shut?: boolean;
+  /** A door's smart lock. */
+  lock?: string | null;
+  /** The contacts report the other way round (on = closed). */
+  contactInvert?: boolean;
 }
 
 /** Pairs openings with entities in order; with `shared`, a single entity serves all openings. */
@@ -495,6 +729,31 @@ function pair(openings: Opening[], ids: string[], shared = false): Map<string, s
  */
 export function openingEntities(hass: HomeAssistant, floors: readonly Floor[]): Map<string, OpeningEntities> {
   const out = new Map<string, OpeningEntities>();
+  const pick = (ref: string | null, auto: string | undefined) => (ref === "none" ? null : (ref ?? auto ?? null));
+  const link = (o: Opening, autoC?: string, autoK?: string): OpeningEntities => {
+    const cover = pick(o.cover, autoC);
+    return {
+      cover,
+      // a window with a handle sensor gets no plain contact assigned automatically
+      contact: o.sensor === "handle" && o.contact == null ? null : pick(o.contact, autoK),
+      tilt: o.tilt === "none" ? null : o.tilt,
+      contact2: o.leaves === 2 && o.contact2 && o.contact2 !== "none" ? o.contact2 : null,
+      // a smart lock on a door, or on a terrace door (a window down to the floor, #645)
+      lock: (o.type === "door" || (o.type === "window" && o.sill <= 0.01)) && o.lock && o.lock !== "none" ? o.lock : null,
+      tilt2: o.leaves === 2 && o.tilt2 && o.tilt2 !== "none" ? o.tilt2 : null,
+      // the blind's position sensor only counts with a blind: one left behind after the drive was set to "none" (or
+      // from a window turned into a door) would otherwise lower a roller shutter over a plain door (#682)
+      position: cover && kindOf(cover) === "cover" && o.position && o.position !== "none" ? o.position : null,
+      positionInverted: !!o.position_inverted,
+      ...(o.slat_invert ? { slatInvert: true } : {}),
+      tiltAngle: o.tilt_angle && o.tilt_angle !== "none" ? o.tilt_angle : null,
+      tiltMax: o.tilt_max ?? null,
+      tiltOffset: o.tilt_offset ?? null,
+      tiltInvert: !!o.tilt_invert,
+      shut: !!o.shut,
+      ...(o.contact_invert ? { contactInvert: true } : {}),
+    };
+  };
   for (const floor of floors) {
     for (const room of floor.rooms) {
       const own = floor.openings.filter((o) => o.room_id === room.id).sort((a, b) => a.edge - b.edge || a.offset - b.offset);
@@ -511,27 +770,15 @@ export function openingEntities(hass: HomeAssistant, floors: readonly Floor[]): 
       const autoDoor = pair(doors, ids.filter((id) => kindOf(id) === "binary" && cls(id) === "door"));
       const autoGarageCover = pair(garages, ids.filter((id) => kindOf(id) === "cover" && GARAGE_COVERS.has(cls(id) ?? "")));
       const autoGarageContact = pair(garages, ids.filter((id) => kindOf(id) === "binary" && cls(id) === "garage_door"));
-      const pick = (ref: string | null, auto: string | undefined) => (ref === "none" ? null : (ref ?? auto ?? null));
       for (const o of own) {
         const autoC = o.type === "window" ? autoCover : o.type === "garage" ? autoGarageCover : null;
         const autoK = o.type === "window" ? autoWindow : o.type === "garage" ? autoGarageContact : autoDoor;
-        out.set(o.id, {
-          cover: pick(o.cover, autoC?.get(o.id)),
-          // a window with a handle sensor gets no plain contact assigned automatically
-          contact: o.sensor === "handle" && o.contact == null ? null : pick(o.contact, autoK.get(o.id)),
-          tilt: o.tilt === "none" ? null : o.tilt,
-          contact2: o.leaves === 2 && o.contact2 && o.contact2 !== "none" ? o.contact2 : null,
-          tilt2: o.leaves === 2 && o.tilt2 && o.tilt2 !== "none" ? o.tilt2 : null,
-          position: o.position && o.position !== "none" ? o.position : null,
-          positionInverted: !!o.position_inverted,
-          tiltAngle: o.tilt_angle && o.tilt_angle !== "none" ? o.tilt_angle : null,
-          tiltMax: o.tilt_max ?? null,
-          tiltOffset: o.tilt_offset ?? null,
-          tiltInvert: !!o.tilt_invert,
-          shut: !!o.shut,
-        });
+        out.set(o.id, link(o, autoC?.get(o.id), autoK.get(o.id)));
       }
     }
+    // an opening in a free wall that stands outside every room (outer walls drawn with the wall tool, rooms
+    // without walls of their own) has no area to look in: only the entities chosen by hand drive it (#367)
+    for (const o of floor.openings) if (!out.has(o.id)) out.set(o.id, link(o));
   }
   return out;
 }
@@ -558,6 +805,17 @@ export function windowPosition(st: HassEntity | undefined): "open" | "tilted" | 
   return null;
 }
 
+/** Lock states that leave the door unlocked (Nuki's "open" is unlatched). */
+const LOCK_OPEN_STATES = new Set(["unlocked", "unlocking", "open", "opening"]);
+
+/**
+ * A garage door's drive that only gives a pulse (#677): a switch the opener turns off again by itself, or a button.
+ * It is pressed on a tap; the door's state comes from its contact.
+ */
+export function isPulseDrive(id: string | null | undefined): boolean {
+  return !!id && /^(switch|button|input_button)\./.test(id);
+}
+
 /** Door leaves without a contact sensor stand half open, so the doorway stays readable. */
 export const DOOR_DEFAULT_OPEN = 0.5;
 
@@ -569,10 +827,20 @@ export function openingState(
   hass: HomeAssistant,
   e: OpeningEntities,
   type: Opening["type"] = "window",
-): { open: number; open2: number; tilt: number; tilt2: number; cover: number | null; sensed: boolean } {
+): { open: number; open2: number; tilt: number; tilt2: number; cover: number | null; slats?: number | null; sensed: boolean; unlocked?: boolean } {
+  // a drive that only gives a pulse (a switch, a button) reports nothing about the door: the contact does (#677)
+  if (e.cover && isPulseDrive(e.cover)) e = { ...e, cover: null, position: null };
+  // the door's smart lock: unlocked (or unlatched) gives the leaf a soft glow at its edge (#682)
+  const lockSt = e.lock ? hass.states[e.lock] : undefined;
+  const lockOpen = !!lockSt && LOCK_OPEN_STATES.has(lockSt.state) ? { unlocked: true } : {};
   const on = (id: string | null | undefined) => !!id && hass.states[id]?.state === "on";
   const known = (id: string | null | undefined) => !!id && !!hass.states[id] && !isUnavailable(hass.states[id]);
-  const pos = (id: string | null | undefined) => (id ? windowPosition(hass.states[id]) : null);
+  const raw = (id: string | null | undefined) => (id ? windowPosition(hass.states[id]) : null);
+  // "Kontakt umkehren": a contact that reports open as closed and the other way round (#329); tilted stays tilted
+  const pos = (id: string | null | undefined) => {
+    const p = raw(id);
+    return e.contactInvert && id && id !== e.tilt && id !== e.tilt2 && p !== "tilted" && p ? (p === "open" ? "closed" : "open") : p;
+  };
   // the second leaf of a double door or window stays closed without a sensor; it tilts like the first
   const tilted2 = on(e.tilt2) || pos(e.tilt2) === "tilted" || pos(e.contact2) === "tilted";
   const open2 = pos(e.contact2) === "open" && !tilted2 ? 1 : 0;
@@ -597,18 +865,55 @@ export function openingState(
     if (typeof pos === "number") cover = 1 - Math.min(100, Math.max(0, pos)) / 100;
     else cover = c.state === "closed" ? 1 : c.state === "opening" || c.state === "closing" ? 0.5 : 0;
   } else if (e.cover) cover = 0;
+  // a venetian blind or Raffstore: how far its slats stand open (1 = level, 0 = shut)
+  const slatsOpen = c && !isUnavailable(c) ? slatTilt(c, !!e.slatInvert) : null;
+  const slats = slatsOpen === null ? {} : { slats: slatsOpen / 100 };
   if (type === "door") {
-    // a door with a roller shutter (front door, French window, sliding door): the blind comes down over it
     const p = pos(e.contact);
-    return { open: p === null ? (e.shut ? 0 : DOOR_DEFAULT_OPEN) : p === "closed" ? 0 : 1, open2: pos(e.contact2) === "open" ? 1 : 0, tilt: 0, tilt2: 0, cover, sensed: p !== null || cover !== null };
+    // a cover that is a gate, garage door or door is the door itself (a sliding gate on a sliding door): it moves the
+    // leaf – as far as its position says – and no blind is drawn (#544); the contact still wins when there is one
+    if (cover !== null && c && DOOR_COVERS.has(String(c.attributes.device_class ?? ""))) {
+      const leaf = p === null ? 1 - cover : p === "closed" ? 0 : 1;
+      return { open: leaf, open2: pos(e.contact2) === "open" ? 1 : 0, tilt: 0, tilt2: 0, cover: null, sensed: true, ...lockOpen };
+    }
+    // a door with a roller shutter (front door, French window, sliding door): the blind comes down over it
+    return { open: p === null ? (e.shut ? 0 : DOOR_DEFAULT_OPEN) : p === "closed" ? 0 : 1, open2: pos(e.contact2) === "open" ? 1 : 0, tilt: 0, tilt2: 0, cover, ...slats, sensed: p !== null || cover !== null, ...lockOpen };
   }
   if (type === "garage") {
-    // a garage door without a cover shows its contact: open or closed
-    const sensed = cover !== null || known(e.contact);
-    if (cover === null) cover = known(e.contact) ? (on(e.contact) ? 0 : 1) : 1;
+    // a garage door without a cover shows its contact: open or closed (read like a door's, so text states and
+    // a window_state attribute count too)
+    const p = pos(e.contact);
+    const sensed = cover !== null || p !== null;
+    if (cover === null) cover = p === null || p === "closed" ? 1 : 0;
     return { open: 0, open2: 0, tilt: 0, tilt2: 0, cover, sensed };
   }
-  return { open, open2, tilt: tiltFrac, tilt2: tilted2 ? 1 : 0, cover, sensed: known(e.contact) || known(e.tilt) || Number.isFinite(angleRaw) };
+  return { open, open2, tilt: tiltFrac, tilt2: tilted2 ? 1 : 0, cover, ...slats, sensed: known(e.contact) || known(e.tilt) || Number.isFinite(angleRaw), ...lockOpen };
+}
+
+/**
+ * Whether an opening stands open, as the 3D view draws it: a sash or leaf turned, a garage door up. A garage door's
+ * `cover` says how far it is DOWN (1 = closed), so it stands open below 0.98 – read the other way round it counted
+ * every closed garage door as open (#1261). Without a sensor a garage door is closed. A tilted window is not "open".
+ */
+export function openingOpen(s: ReturnType<typeof openingState>, type: Opening["type"]): boolean {
+  if (type === "garage") return (s.cover ?? 1) < 0.98;
+  return s.open > 0.02 || s.open2 > 0.02;
+}
+
+/**
+ * How far the slats of a cover stand open (0–100, 100 = level), as it reports them – or turned round for an
+ * integration that reports 0 for open slats. Null for a cover without slats.
+ */
+export function slatTilt(st: HassEntity | undefined, invert = false): number | null {
+  const t = st?.attributes.current_tilt_position;
+  if (typeof t !== "number" || !Number.isFinite(t)) return null;
+  const v = Math.min(100, Math.max(0, t));
+  return invert ? 100 - v : v;
+}
+
+/** Whether a window of the plan turns this cover's slats round ("Invert slats"). */
+export function slatsInverted(building: Building | null | undefined, entityId: string): boolean {
+  return !!building?.floors.some((f) => f.openings.some((o) => o.cover === entityId && o.slat_invert));
 }
 
 /**
@@ -642,7 +947,9 @@ export function groupByDevice(hass: HomeAssistant, ids: readonly string[]): Devi
   const byDevice = new Map<string, string[]>();
   const order: string[] = [];
   for (const id of ids) {
-    const device = hass.entities?.[id]?.device_id ?? `entity:${id}`;
+    // a camera is never folded under another entity of its device: a UniFi camera names all its entities, so its
+    // status light or motion sensor would become the main one and the camera land behind "+N more" (#517)
+    const device = kindOf(id) === "camera" ? `camera:${id}` : (hass.entities?.[id]?.device_id ?? `entity:${id}`);
     let list = byDevice.get(device);
     if (!list) {
       byDevice.set(device, (list = []));
@@ -683,6 +990,8 @@ const FURNITURE_NAMES: Record<string, RegExp> = {
   island: /(kochfeld|herd|induktion|cooktop)/i,
   sink: /(spülmaschine|geschirrspül|dishwasher)/i,
   radiator: /(heiz|radiator|thermostat|climate|hk|trv)/i,
+  ac_unit: /(klima|air ?con|aircon|airco|split|\bac\b|clim)/i,
+  awning: /(markise|awning|sonnensegel|beschattung|store|zonnescherm)/i,
 };
 const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall"]);
 
@@ -721,9 +1030,73 @@ export function confirmEntities(hass: HomeAssistant, floors: readonly Floor[]): 
     for (const f of floor.furniture) {
       const e = f.confirm ? links.get(f.id)?.entity : null;
       if (e && e !== "none") out.add(e);
+      // a wall switch or socket asks before switching any of its gangs
+      if (f.confirm) for (const g of f.gangs ?? []) if (g.entity && g.entity !== "none") out.add(g.entity);
     }
   }
   return out;
+}
+
+/** An awning's cover right now: how far it is out (0 … 1, when known) and whether it is running out or in. */
+export interface AwningState {
+  /** Position 0 (in) … 1 (fully out); null while only "opening"/"closing" is known. */
+  out: number | null;
+  /** Running: +1 out, -1 in, 0 standing. */
+  moving: -1 | 0 | 1;
+  /** Seconds for a full run (to move along while no position is reported). */
+  time: number;
+  /** `moving` tells where it stands, not a run (a gate's contact): seen for the first time, it stands there at once. */
+  settled?: boolean;
+}
+
+/**
+ * Awnings: their cover's position (or that of a separate position sensor), and whether they run. A cover that only
+ * reports open/closed and opening/closing moves along in 3D at its set run time.
+ */
+export function awningStates(hass: HomeAssistant, floors: readonly Floor[]): Map<string, AwningState> {
+  const out = new Map<string, AwningState>();
+  for (const floor of floors)
+    for (const f of floor.furniture) {
+      // a motorised curtain or roll-down screen from a pack follows its cover the same way (#511)
+      if (f.type !== "awning" && !packMotion(f.type)) continue;
+      const id = f.entity && f.entity !== "none" ? f.entity : null;
+      const st = id ? hass.states[id] : undefined;
+      const time = f.awning_time ?? 20;
+      if (!st || isUnavailable(st)) {
+        out.set(f.id, { out: 0, moving: 0, time });
+        continue;
+      }
+      const flip = (v: number) => (f.awning_invert ? 1 - v : v);
+      // a live position sensor (0–100 % or 0–1, like a blind's) wins over the cover's own position
+      const live = livePosition(hass, f.awning_position && f.awning_position !== "none" ? f.awning_position : null);
+      const raw = st.attributes.current_position;
+      const moving: -1 | 0 | 1 = st.state === "opening" ? (f.awning_invert ? -1 : 1) : st.state === "closing" ? (f.awning_invert ? 1 : -1) : 0;
+      if (live !== null) out.set(f.id, { out: flip(live), moving: 0, time });
+      else if (typeof raw === "number" && Number.isFinite(raw)) out.set(f.id, { out: flip(Math.min(1, Math.max(0, raw / 100))), moving: 0, time });
+      else if (moving) out.set(f.id, { out: null, moving, time });
+      // without a position: open (a cover) or on (a switch that drives it) is fully out
+      else out.set(f.id, { out: flip(st.state === "open" || st.state === "on" ? 1 : 0), moving: 0, time });
+    }
+  for (const floor of floors) for (const a of floor.outdoor ?? []) if (a.type === "fence") for (const g of a.gates ?? []) out.set(g.id, gateState(hass, g));
+  return out;
+}
+
+/**
+ * A fence gate (#818), by the awnings' rules: a cover's position, or its opening and closing at the run time; a
+ * switch or input_boolean that is on stands open. A contact wins: it says open or shut, and the leaf runs there.
+ */
+export function gateState(hass: HomeAssistant, g: FenceGate): AwningState {
+  const time = g.time ?? (g.kind === "slide" ? 15 : 4);
+  const ref = (id: EntityRef | null | undefined) => (id && id !== "none" ? hass.states[id] : undefined);
+  const contact = ref(g.contact);
+  if (contact && !isUnavailable(contact)) return { out: null, moving: contact.state === "on" || contact.state === "open" ? 1 : -1, time, settled: true };
+  const st = ref(g.entity);
+  if (!st || isUnavailable(st)) return { out: null, moving: -1, time, settled: true };
+  const raw = st.attributes.current_position;
+  if (typeof raw === "number" && Number.isFinite(raw)) return { out: Math.min(1, Math.max(0, raw / 100)), moving: 0, time };
+  if (st.state === "opening") return { out: null, moving: 1, time };
+  if (st.state === "closing") return { out: null, moving: -1, time };
+  return { out: null, moving: st.state === "open" || st.state === "on" ? 1 : -1, time, settled: true };
 }
 
 /** Smart fridges: which of their doors stand open now (a door sensor reporting "on" or "open"). */
@@ -747,6 +1120,7 @@ const LAMP_NAMES: Record<string, RegExp> = {
   lamp_bollard: /(weg|garten|garden|path|poller|außen|aussen|outdoor)/i,
   lamp_garden: /(garten|garden|spot|außen|aussen|outdoor|baum|tree)/i,
   lamp_pendant: /(pendel|pendant|hänge|esstisch|dining)/i,
+  lamp_fan: /(ventilator|fan|lüfter|luefter|decke|ceiling)/i,
   lamp_floor: /(steh|floor)/i,
   lamp_table: /(tisch|nacht|table|bedside|lese|reading)/i,
   lamp_wall: /(wand|wall)/i,
@@ -778,12 +1152,16 @@ function devicePower(hass: HomeAssistant, id: string): string | null {
 export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[]): Map<string, FurnitureLinks> {
   const out = new Map<string, FurnitureLinks>();
   for (const floor of floors) {
-    const used = new Set<string>(floor.furniture.flatMap((f) => [f.entity, f.power]).filter((v): v is string => !!v && v !== "none"));
+    // entities set by hand and devices placed in the plan (an Echo Show in the corner) are taken
+    const used = new Set<string>([...floor.furniture.flatMap((f) => [f.entity, f.power]), ...floor.placements.map((p) => p.entity_id)].filter((v): v is string => !!v && v !== "none"));
     for (const f of floor.furniture) {
       const lamp = f.type in LAMP_NAMES;
-      const pattern = lamp ? LAMP_NAMES[f.type] : FURNITURE_NAMES[f.type];
+      const pattern = lamp ? LAMP_NAMES[f.type] : (FURNITURE_NAMES[f.type] ?? (isRobotVacuum(f.type) ? FURNITURE_NAMES.robot_vacuum : undefined));
       if (!pattern && f.entity == null && f.power == null) continue;
-      const room = floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points));
+      // an awning hangs outside: the terrace or garden area it stands over counts as its room (#688)
+      const room =
+        floor.rooms.find((r) => r.points.length >= 3 && pointInPolygon([f.x, f.z], r.points)) ??
+        (f.type === "awning" ? outdoorZones(floor).find((z) => pointInPolygon([f.x, f.z], z.points)) : undefined);
       const ids = room ? primaryEntities(hass, areaEntities(hass, room.area_id)) : [];
       const name = (id: string) => `${id} ${entityName(hass, id)}`;
       let entity: string | null = f.entity === "none" ? null : (f.entity ?? null);
@@ -792,16 +1170,23 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
         if (lamp) {
           const lights = free.filter((id) => kindOf(id) === "light");
           entity = lights.find((id) => pattern.test(name(id))) ?? lights[0] ?? null;
-        } else if (f.type === "robot_vacuum") {
+        } else if (isRobotVacuum(f.type)) {
           // vacuums are no device kind of their own: look them up in the room's area directly
           const area = room?.area_id ?? null;
-          entity = Object.keys(hass.entities ?? {}).find((id) => id.startsWith("vacuum.") && !used.has(id) && entityAreaId(hass, id) === area) ?? null;
-        } else if (f.type === "radiator") {
+          entity = Object.keys(hass.entities ?? {}).find((id) => id.startsWith("vacuum.") && !used.has(id) && !hiddenInHa(hass, id) && entityAreaId(hass, id) === area) ?? null;
+        } else if (f.type === "radiator" || f.type === "ac_unit") {
           const climates = free.filter((id) => kindOf(id) === "climate");
           entity = climates.find((id) => pattern.test(name(id))) ?? climates[0] ?? null;
         } else if (isMediaFurniture(f.type)) {
           const media = free.filter((id) => kindOf(id) === "media");
-          entity = media.find((id) => hass.states[id]?.attributes.device_class === "tv") ?? media.find((id) => pattern?.test(name(id))) ?? media[0] ?? null;
+          // a TV takes the TV (or any player of the room); a monitor or a smart speaker model only one whose name fits
+          entity =
+            media.find((id) => hass.states[id]?.attributes.device_class === "tv") ??
+            media.find((id) => pattern?.test(name(id))) ??
+            (MEDIA_FURNITURE.has(f.type) ? (media[0] ?? null) : null);
+        } else if (f.type === "awning") {
+          // an awning runs on a cover (#688): one whose name says awning, else none (a roller blind is no awning)
+          entity = free.find((id) => id.startsWith("cover.") && (pattern?.test(name(id)) || hass.states[id]?.attributes.device_class === "awning")) ?? null;
         } else if (pattern) {
           entity = free.find((id) => ["switch", "media", "fan"].includes(kindOf(id) ?? "") && pattern.test(name(id))) ?? null;
         }
@@ -820,6 +1205,22 @@ export function furnitureEntities(hass: HomeAssistant, floors: readonly Floor[])
     }
   }
   return out;
+}
+
+/** An access point's status (D582): online, offline, or null when nothing says (unknown). */
+export function apOnline(st: HassEntity | undefined): boolean | null {
+  if (!st) return null;
+  const s = String(st.state).toLowerCase();
+  if (s === "unavailable") return false;
+  if (s === "unknown" || s === "") return null;
+  return !["off", "disconnected", "offline", "not_home", "disabled", "down", "isolated"].includes(s);
+}
+
+/** How fast a ceiling fan's blades turn (0–1): its percentage while it is on, a middle speed when it reports none. */
+export function fanSpeed(st: HassEntity | undefined): number {
+  if (!st || st.state !== "on") return 0;
+  const pct = st.attributes.percentage;
+  return typeof pct === "number" && Number.isFinite(pct) ? Math.max(0, Math.min(1, pct / 100)) : 0.6;
 }
 
 /** Glow colour of a TV screen for the app that is running (brand colours of common apps). */
@@ -841,7 +1242,7 @@ export function appColor(st: HassEntity | undefined): [number, number, number] |
  * with their entities, blinds and contacts of its doors and windows) plus the ones picked for the
  * panel. `more` are the other entities of the room's area, offered on request.
  */
-export function roomPanelEntities(hass: HomeAssistant, floor: Floor, room: Room): { shown: string[]; more: string[] } {
+export function roomPanelEntities(hass: HomeAssistant, floor: Floor, room: Room, roofWindows: readonly RoofWindow[] = []): { shown: string[]; more: string[] } {
   const inRoom = (x: number, z: number) => pointInPolygon([x, z], room.points);
   const furniture = furnitureEntities(hass, [floor]);
   const openings = openingEntities(hass, [floor]);
@@ -852,6 +1253,8 @@ export function roomPanelEntities(hass: HomeAssistant, floor: Floor, room: Room)
       const e = openings.get(o.id);
       return e ? [e.cover, e.contact, e.tilt, e.contact2] : [];
     }),
+    // the roof windows over the room (#482)
+    ...roofWindows.flatMap((w) => [w.window, w.cover, w.contact, w.tilt]),
     ...(room.panel ?? []),
   ].filter((id): id is string => !!id && !!hass.states[id]);
   // entities the editor hid for this room stay out of the panel altogether
@@ -862,6 +1265,123 @@ export function roomPanelEntities(hass: HomeAssistant, floor: Floor, room: Room)
 }
 
 const ROOM_KEYS = /(^|_)(current_room|current_segment|aktueller_raum|current_area)($|_)/;
+
+// ------------------------------------------------------------------ Auto Pro: the car on a parking spot
+
+/** The car's entities, every role resolved: the chosen one, else one found on the car's device. */
+export interface CarEntities {
+  soc: string | null;
+  range: string | null;
+  charging: string | null;
+  plugged: string | null;
+  lock: string | null;
+  climate: string | null;
+  tracker: string | null;
+}
+
+const CAR_ROLE_PATTERNS: Record<keyof CarEntities, RegExp> = {
+  soc: /(^|_)(soc|state_of_charge|battery_level|battery|ladestand|ladezustand|akku)($|_)/,
+  range: /(^|_)(range|reichweite|remaining_range)($|_)/,
+  charging: /(charging|charge_power|ladeleistung|laden|charger_power|lade)/,
+  plugged: /(plug|cable|connected|stecker|kabel|angeschlossen)/,
+  lock: /(lock|verriegel|schloss)/,
+  climate: /(climat|preheat|precondition|hvac|heiz|klima|standheizung)/,
+  tracker: /./,
+};
+
+/** The entities of the car's Home Assistant device: the chosen device entity's siblings, else the presence entity's. */
+export function carEntities(hass: HomeAssistant, f: Pick<Furniture, "entity" | "car">): CarEntities {
+  const c = f.car ?? {};
+  const pick = (ref: string | null | undefined) => (ref && ref !== "none" ? ref : null);
+  const seed = pick(c.device) ?? pick(f.entity);
+  const device = seed ? hass.entities?.[seed]?.device_id : null;
+  const siblings = device && hass.entities ? Object.values(hass.entities).filter((e) => e.device_id === device).map((e) => e.entity_id) : [];
+  const key = (id: string) => `${id} ${(hass.states[id]?.attributes.friendly_name as string | undefined) ?? ""} ${hass.entities?.[id]?.translation_key ?? ""}`.toLowerCase().replace(/[\s-]+/g, "_");
+  const find = (role: keyof CarEntities, domains: string[], extra?: (id: string) => boolean) =>
+    siblings.find((id) => domains.includes(id.split(".")[0]) && CAR_ROLE_PATTERNS[role].test(key(id)) && (!extra || extra(id))) ?? null;
+  const unit = (id: string) => String(hass.states[id]?.attributes.unit_of_measurement ?? "");
+  const dc = (id: string) => String(hass.states[id]?.attributes.device_class ?? "");
+  return {
+    soc: pick(c.soc) ?? siblings.find((id) => id.startsWith("sensor.") && dc(id) === "battery") ?? find("soc", ["sensor"], (id) => unit(id) === "%"),
+    range: pick(c.range) ?? find("range", ["sensor"], (id) => /km|mi/.test(unit(id))) ?? find("range", ["sensor"]),
+    charging: pick(c.charging) ?? find("charging", ["sensor"], (id) => /^k?W$/.test(unit(id))) ?? find("charging", ["binary_sensor", "switch"]),
+    plugged: pick(c.plugged) ?? siblings.find((id) => id.startsWith("binary_sensor.") && dc(id) === "plug") ?? find("plugged", ["binary_sensor"]),
+    lock: pick(c.lock) ?? siblings.find((id) => id.startsWith("lock.")) ?? find("lock", ["binary_sensor"]),
+    climate: pick(c.climate) ?? siblings.find((id) => id.startsWith("climate.")) ?? find("climate", ["switch", "binary_sensor"]),
+    tracker: pick(c.tracker) ?? siblings.find((id) => id.startsWith("device_tracker.")) ?? null,
+  };
+}
+
+/** What the car reports right now (null for anything it does not tell). */
+export interface CarState {
+  entities: CarEntities;
+  soc: number | null;
+  range: number | null;
+  rangeUnit: string;
+  /** Charging power in W when a power sensor reports it. */
+  chargingW: number | null;
+  charging: boolean;
+  plugged: boolean | null;
+  locked: boolean | null;
+  climateOn: boolean | null;
+  /** Where the car is when not at home (the tracker's zone), null at home or unknown. */
+  away: string | null;
+}
+
+/**
+ * Whether the car's lock entity says locked (null when it cannot tell): a lock, a binary_sensor of class lock
+ * ("on" means unlocked, as in Home Assistant), a text sensor like BMW's door lock state ("LOCKED", "SECURED",
+ * "UNLOCKED", "SELECTIVE_LOCKED", #369) or a switch or helper that is "on" while locked.
+ */
+export function carLocked(st: HassEntity): boolean | null {
+  const id = st.entity_id;
+  const state = String(st.state).toLowerCase().trim();
+  if (id.startsWith("lock.")) return state === "locked";
+  if (id.startsWith("binary_sensor.")) return st.attributes.device_class === "lock" ? state === "off" : state === "on";
+  if (id.startsWith("sensor.")) {
+    if (/^(locked|secured|double_locked|verriegelt|gesichert|abgeschlossen)$/.test(state)) return true;
+    if (/^(unlocked|unsecured|selective_locked|partially_locked|open|entriegelt|offen|unverriegelt)$/.test(state)) return false;
+    return null;
+  }
+  return state === "on";
+}
+
+export function carState(hass: HomeAssistant, f: Pick<Furniture, "entity" | "car">): CarState {
+  const e = carEntities(hass, f);
+  const st = (id: string | null) => (id ? hass.states[id] : undefined);
+  const num = (id: string | null) => {
+    const v = Number(st(id)?.state);
+    return id && Number.isFinite(v) ? v : null;
+  };
+  const soc = num(e.soc);
+  const range = num(e.range);
+  const chargeSt = st(e.charging);
+  const chargeUnit = String(chargeSt?.attributes.unit_of_measurement ?? "");
+  const chargingW = chargeSt && /^k?W$/.test(chargeUnit) ? (num(e.charging) ?? 0) * (chargeUnit === "kW" ? 1000 : 1) : null;
+  const charging = chargingW !== null ? chargingW > 50 : !!chargeSt && ["on", "charging", "laden"].includes(chargeSt.state.toLowerCase());
+  const plugSt = st(e.plugged);
+  const lockSt = st(e.lock);
+  const climSt = st(e.climate);
+  const trackSt = st(e.tracker);
+  const trackState = trackSt?.state.toLowerCase() ?? "";
+  return {
+    entities: e,
+    soc: soc !== null ? Math.max(0, Math.min(100, soc)) : null,
+    range,
+    rangeUnit: String(st(e.range)?.attributes.unit_of_measurement ?? "km"),
+    chargingW,
+    charging,
+    plugged: plugSt ? plugSt.state === "on" : null,
+    locked: lockSt ? carLocked(lockSt) : null,
+    climateOn: climSt ? (climSt.entity_id.startsWith("climate.") ? climSt.state !== "off" && climSt.state !== "unavailable" : climSt.state === "on") : null,
+    away: trackSt && trackState !== "home" && !isUnavailable(trackSt) ? (trackState === "not_home" ? "" : trackSt.state) : null,
+  };
+}
+
+/** Every entity a car's state hangs on (to watch for changes). */
+export function carWatched(hass: HomeAssistant, floors: readonly Floor[]): string[] {
+  return floors.flatMap((fl) => fl.furniture.filter((f) => f.type === "parking" && f.car).flatMap((f) => Object.values(carEntities(hass, f)))).filter((id): id is string => !!id);
+}
 
 /** The sensor naming the room a robot vacuum cleans: the chosen one, else one of the vacuum's device. */
 export function robotRoomSensor(hass: HomeAssistant, vacuum: string | null, chosen: string | null | undefined): string | null {
@@ -888,10 +1408,98 @@ export function roomKey(name: string): string {
 
 /** The room a robot reports (sensor state, else the vacuum's current_room attribute), matched by room or area name. */
 export function robotRoom<R extends { name: string; area_id?: string | null }>(hass: HomeAssistant, rooms: readonly R[], vacuum: string | null, sensor: string | null): R | null {
-  const raw = sensor ? hass.states[sensor]?.state : vacuum ? hass.states[vacuum]?.attributes.current_room : undefined;
+  const attrs = vacuum ? hass.states[vacuum]?.attributes : undefined;
+  // the sensor first; when it names no room of the plan, what the vacuum itself says (#470)
+  for (const raw of [sensor ? hass.states[sensor]?.state : undefined, attrs?.current_room, attrs?.room, attrs?.current_segment]) {
+    const room = roomNamed(hass, rooms, raw);
+    if (room) return room;
+  }
+  return null;
+}
+
+/** The room a robot's name for it means ("Küche", "kitchen", the area's id). */
+export function roomNamed<R extends { name: string; area_id?: string | null }>(hass: HomeAssistant, rooms: readonly R[], raw: unknown): R | null {
   if (typeof raw !== "string" || !raw || raw === "unknown" || raw === "unavailable") return null;
   const want = roomKey(raw);
   if (!want) return null;
   const names = (r: R) => [r.name, r.area_id ?? "", (r.area_id && hass.areas?.[r.area_id]?.name) || ""].map(roomKey).filter(Boolean);
   return rooms.find((r) => names(r).includes(want)) ?? rooms.find((r) => names(r).some((n) => n.length >= 3 && (n.includes(want) || want.includes(n)))) ?? null;
+}
+
+/** Covers that are doors rather than blinds: a central "close all" leaves them alone. */
+const DOOR_COVERS = new Set(["garage", "gate", "door"]);
+
+/**
+ * Lights and blinds of a floor for the central "all on / all off" (#145): the main entities of its
+ * rooms' areas (without the ones a room hides), placed devices and linked furniture. Garage doors and
+ * gates are no blinds and stay out.
+ */
+export function floorControls(hass: HomeAssistant, floor: Floor): { lights: string[]; covers: string[] } {
+  const lights = new Set<string>();
+  const covers = new Set<string>();
+  const add = (id: string | null | undefined) => {
+    if (!id || id === "none" || !hass.states[id]) return;
+    const kind = kindOf(id);
+    if (kind === "light") lights.add(id);
+    else if (kind === "cover" && !DOOR_COVERS.has(String(hass.states[id].attributes.device_class ?? ""))) covers.add(id);
+  };
+  for (const room of floor.rooms) {
+    const hidden = new Set(room.hidden ?? []);
+    for (const id of primaryEntities(hass, areaEntities(hass, room.area_id))) if (!hidden.has(id)) add(id);
+  }
+  for (const pl of floor.placements) add(pl.entity_id);
+  for (const f of floor.furniture) add(f.entity);
+  return { lights: [...lights], covers: [...covers] };
+}
+
+/** The thermostats of a floor (a page of the phone bar): from its rooms' areas, placed devices and linked furniture. */
+export function floorClimates(hass: HomeAssistant, floor: Floor): string[] {
+  const out = new Set<string>();
+  const add = (id: string | null | undefined) => {
+    if (id && id.startsWith("climate.") && hass.states[id]) out.add(id);
+  };
+  for (const room of floor.rooms) {
+    const hidden = new Set(room.hidden ?? []);
+    for (const id of areaEntities(hass, room.area_id)) if (!hidden.has(id)) add(id);
+  }
+  for (const pl of floor.placements) add(pl.entity_id);
+  for (const f of floor.furniture) add(f.entity);
+  return [...out];
+}
+
+/** The service a favourite runs when tapped: scenes and scripts start, buttons are pressed, the rest toggles. */
+export function favoriteCall(entityId: string): [domain: string, service: string] {
+  const domain = entityId.split(".")[0];
+  if (domain === "scene" || domain === "script") return [domain, "turn_on"];
+  if (domain === "automation") return [domain, "trigger"];
+  if (domain === "button" || domain === "input_button") return [domain, "press"];
+  return ["homeassistant", "toggle"];
+}
+
+/**
+ * Opens a path inside Home Assistant without a reload, the way its own navigate() does: the new history entry
+ * names the page it came from (`from`), so a subview's ← goes back here instead of to the dashboard's first view (#1171).
+ */
+export function haNavigate(path: string): void {
+  if (path === location.pathname + location.search) return;
+  history.pushState({ from: location.pathname }, "", path);
+  window.dispatchEvent(new CustomEvent("location-changed", { bubbles: true, composed: true, detail: { replace: false } }));
+}
+
+/**
+ * Run an own button (D143) from an element inside the dashboard: navigate, more-info, a service, or a
+ * DOM event – "ll-custom" is what Home Assistant's fire-dom-event sends, and browser_mod listens for it.
+ */
+export function runButton(hass: HomeAssistant, from: HTMLElement, b: { action: string; target?: string | null; data?: Record<string, unknown> | null }): void {
+  const target = b.target?.trim() ?? "";
+  if (b.action === "navigate" && target) {
+    haNavigate(target);
+  } else if (b.action === "more_info" && target) {
+    from.dispatchEvent(new CustomEvent("hass-more-info", { detail: { entityId: target }, bubbles: true, composed: true }));
+  } else if (b.action === "service" && target.includes(".")) {
+    const [domain, service] = target.split(".", 2);
+    void hass.callService(domain, service, b.data ?? {});
+  } else if (b.action === "fire_dom_event") {
+    from.dispatchEvent(new CustomEvent("ll-custom", { detail: b.data ?? {}, bubbles: true, composed: true }));
+  }
 }

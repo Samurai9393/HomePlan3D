@@ -13,7 +13,7 @@ test("a lamp switched by a relay takes colour and brightness from its colour ent
   // the bulb unavailable: the relay's own (plain) glow
   assert.deepEqual(lightGlow(relay as never, { ...bulb, state: "unavailable" } as never)!.color, [1, 0.71, 0.28]);
 });
-import { appColor, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, entityName, fridgeDoors, furnitureEntities, groupByDevice, isActive, kindOf, lightGlow, openingEntities, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey } from "./devices.ts";
+import { chargerStatus, slatTilt, slatsInverted, coverTiltButtons, isPulseDrive, isRelevant, apOnline, fanSpeed, climateModeGlow, cooktopLevel, onlyColor, fixedGlowColor, colorCapable, appColor, carLocked, areaEntities, otherAreaEntities, roomClimateSensors, roomClimateValue, unassignedEntities, autoPlace, entityName, fridgeDoors, furnitureEntities, groupByDevice, isActive, kindOf, lightGlow, openingEntities, openingOpen, openingState, powerSensorsOf, primaryEntities, roomPanelEntities, windowPosition, confirmEntities, robotRoom, robotRoomSensor, roomKey, vacuumCleaning } from "./devices.ts";
 import type { Floor, Opening, Room } from "./model.ts";
 import { centroid, newFloor, pointInPolygon } from "./model.ts";
 import type { HomeAssistant } from "./types.ts";
@@ -68,6 +68,17 @@ test("entity names drop the area prefix", () => {
   const hass = hassWith();
   assert.equal(entityName(hass, "light.decke", "Wohnzimmer"), "Decke");
   assert.equal(entityName(hass, "light.stehlampe", "Wohnzimmer"), "Stehlampe");
+});
+
+test("the room panel drops the device name Home Assistant 2026.11 puts in front of a renamed entity (#1181)", () => {
+  const hass = {
+    states: { "light.sw_l1": { entity_id: "light.sw_l1", state: "on", attributes: { friendly_name: "switch_living_a Ceiling light" } } },
+    entities: { "light.sw_l1": { entity_id: "light.sw_l1", name: "Ceiling light", device_id: "d1" } },
+    devices: { d1: { id: "d1", name: "switch_living_a", name_by_user: null } },
+  } as unknown as Parameters<typeof entityName>[0];
+  assert.equal(entityName(hass, "light.sw_l1", undefined, true), "Ceiling light");
+  // elsewhere (editor lists) the full name stays
+  assert.equal(entityName(hass, "light.sw_l1"), "switch_living_a Ceiling light");
 });
 
 test("kinds, active states and light glow", () => {
@@ -137,10 +148,10 @@ test("doors and windows get blinds and contacts of their room's area, or the one
   };
   const links = openingEntities(hass, [floor]);
   // the only blind of the area serves every window without its own choice; sensors go one per window
-  assert.deepEqual(links.get("w1"), { cover: "cover.rollo", contact: "binary_sensor.f1", tilt: null, contact2: null, tilt2: null, position: null, positionInverted: false, tiltAngle: null, tiltMax: null, tiltOffset: null, tiltInvert: false, shut: false });
-  assert.deepEqual(links.get("w2"), { cover: "cover.rollo", contact: "binary_sensor.f2", tilt: null, contact2: null, tilt2: null, position: null, positionInverted: false, tiltAngle: null, tiltMax: null, tiltOffset: null, tiltInvert: false, shut: false });
-  assert.deepEqual(links.get("w3"), { cover: null, contact: "binary_sensor.tuer", tilt: null, contact2: null, tilt2: null, position: null, positionInverted: false, tiltAngle: null, tiltMax: null, tiltOffset: null, tiltInvert: false, shut: false });
-  assert.deepEqual(links.get("d"), { cover: null, contact: "binary_sensor.tuer", tilt: null, contact2: null, tilt2: null, position: null, positionInverted: false, tiltAngle: null, tiltMax: null, tiltOffset: null, tiltInvert: false, shut: false });
+  assert.deepEqual(links.get("w1"), { cover: "cover.rollo", contact: "binary_sensor.f1", tilt: null, contact2: null, tilt2: null, position: null, positionInverted: false, tiltAngle: null, tiltMax: null, tiltOffset: null, tiltInvert: false, shut: false, lock: null });
+  assert.deepEqual(links.get("w2"), { cover: "cover.rollo", contact: "binary_sensor.f2", tilt: null, contact2: null, tilt2: null, position: null, positionInverted: false, tiltAngle: null, tiltMax: null, tiltOffset: null, tiltInvert: false, shut: false, lock: null });
+  assert.deepEqual(links.get("w3"), { cover: null, contact: "binary_sensor.tuer", tilt: null, contact2: null, tilt2: null, position: null, positionInverted: false, tiltAngle: null, tiltMax: null, tiltOffset: null, tiltInvert: false, shut: false, lock: null });
+  assert.deepEqual(links.get("d"), { cover: null, contact: "binary_sensor.tuer", tilt: null, contact2: null, tilt2: null, position: null, positionInverted: false, tiltAngle: null, tiltMax: null, tiltOffset: null, tiltInvert: false, shut: false, lock: null });
 });
 
 test("a position sensor drives the blind live, as a percentage or a fraction", () => {
@@ -167,6 +178,37 @@ test("opening states: open, tilted and blind position", () => {
   assert.deepEqual(stateOf(hass, { cover: null, contact: "binary_sensor.k", tilt: null }), { open: 1, open2: 0, tilt: 0, tilt2: 0, cover: null });
   assert.deepEqual(stateOf(hass, { cover: "cover.p", contact: "binary_sensor.k", tilt: "binary_sensor.t" }), { open: 0, open2: 0, tilt: 1, tilt2: 0, cover: 0.75 });
   assert.deepEqual(stateOf(hass, { cover: "cover.rollo", contact: null, tilt: null }), { open: 0, open2: 0, tilt: 0, tilt2: 0, cover: 0 });
+});
+
+test("a garage door counts as open when its cover is up, not when it is down (#1261)", () => {
+  const hass = hassWith();
+  const add = (id: string, state: string, attributes: Record<string, unknown>) => {
+    hass.entities![id] = { entity_id: id, area_id: "wohnen" };
+    hass.states[id] = { entity_id: id, state, attributes };
+  };
+  add("cover.tor", "closed", { device_class: "garage" });
+  const e = { cover: "cover.tor", contact: null, tilt: null };
+  // a closed garage door: "cover" is fully down, so it is NOT one of the open doors
+  assert.equal(openingState(hass, e, "garage").cover, 1);
+  assert.equal(openingOpen(openingState(hass, e, "garage"), "garage"), false);
+  hass.states["cover.tor"] = { entity_id: "cover.tor", state: "open", attributes: { device_class: "garage" } };
+  assert.equal(openingOpen(openingState(hass, e, "garage"), "garage"), true);
+  hass.states["cover.tor"] = { entity_id: "cover.tor", state: "open", attributes: { device_class: "garage", current_position: 40 } };
+  assert.equal(openingOpen(openingState(hass, e, "garage"), "garage"), true);
+  // a contact instead of a cover: "off" (closed) is not open, "on" is
+  add("binary_sensor.tor", "off", { device_class: "garage_door" });
+  const c = { cover: null, contact: "binary_sensor.tor", tilt: null };
+  assert.equal(openingOpen(openingState(hass, c, "garage"), "garage"), false);
+  hass.states["binary_sensor.tor"] = { entity_id: "binary_sensor.tor", state: "on", attributes: { device_class: "garage_door" } };
+  assert.equal(openingOpen(openingState(hass, c, "garage"), "garage"), true);
+  // without any sensor a garage door counts as closed, as the 3D view draws it
+  assert.equal(openingOpen(openingState(hass, { cover: null, contact: null, tilt: null }, "garage"), "garage"), false);
+  // a window keeps its own reading: open by its contact, a tilted one is not "open"
+  add("binary_sensor.fenster", "on", { device_class: "window" });
+  const w = { cover: null, contact: "binary_sensor.fenster", tilt: null };
+  assert.equal(openingOpen(openingState(hass, w, "window"), "window"), true);
+  hass.states["binary_sensor.fenster"] = { entity_id: "binary_sensor.fenster", state: "off", attributes: { device_class: "window" } };
+  assert.equal(openingOpen(openingState(hass, w, "window"), "window"), false);
 });
 
 test("garage doors use garage covers and contacts; door leaves follow their contact or stand half open", () => {
@@ -212,6 +254,21 @@ test("entities are grouped by device; the entity without a name of its own is th
   assert.deepEqual(primaryEntities(hass, ids).length, groups.length);
 });
 
+test("a camera is never folded under another entity of its device, even when every entity has a name (#517)", () => {
+  const hass = hassWith();
+  const add = (id: string, name: string) => {
+    hass.entities![id] = { entity_id: id, area_id: "wohnen", device_id: "unifi_cam", name };
+    hass.states[id] = { entity_id: id, state: "on", attributes: { friendly_name: name } };
+  };
+  add("switch.binnen_status_light", "Status light");
+  add("binary_sensor.binnen_motion", "Motion");
+  add("camera.binnen_high_resolution_channel", "High resolution channel");
+  const groups = groupByDevice(hass, ["switch.binnen_status_light", "binary_sensor.binnen_motion", "camera.binnen_high_resolution_channel"]);
+  assert.ok(groups.some((g) => g.primary === "camera.binnen_high_resolution_channel"));
+  // the rest of the device stays one group
+  assert.equal(groups.length, 2);
+});
+
 test("furniture finds its entities in the room's area: the TV, and power sensors by device or name", () => {
   const hass = hassWith();
   const add = (id: string, state: string, attributes: Record<string, unknown>, device?: string) => {
@@ -235,6 +292,27 @@ test("furniture finds its entities in the room's area: the TV, and power sensors
   assert.equal(links.get("desk"), undefined);
   assert.deepEqual(appColor(hass.states["media_player.fernseher"]), [0.9, 0.04, 0.08]);
   assert.equal(appColor({ entity_id: "media_player.x", state: "off", attributes: {} }), null);
+});
+
+test("an awning over the terrace takes the terrace area's awning cover, never a roller blind (#688)", () => {
+  const hass = hassWith();
+  const add = (id: string, attributes: Record<string, unknown>) => {
+    hass.entities![id] = { entity_id: id, area_id: "terrasse" };
+    hass.states[id] = { entity_id: id, state: "closed", attributes };
+  };
+  add("cover.rollladen_terrasse", { friendly_name: "Rollladen Terrassentür", device_class: "shutter" });
+  add("cover.markise", { friendly_name: "Markise", device_class: "awning" });
+  const awning = { id: "aw", type: "awning", x: 5, z: 5, rotation: 0, w: 3, d: 2.5, h: 0.22, variant: null, entity: null, power: null };
+  const floor: Floor = {
+    ...newFloor("f", "F", 0),
+    rooms: [],
+    outdoor: [{ id: "t", type: "terrace", points: [[4, 4], [8, 4], [8, 8], [4, 8]], area_id: "terrasse" }] as Floor["outdoor"],
+    furniture: [awning, { ...awning, id: "aw2", x: 6 }],
+  };
+  const links = furnitureEntities(hass, [floor]);
+  assert.deepEqual(links.get("aw"), { entity: "cover.markise", power: null });
+  // a second awning finds no other awning cover: it stays unlinked instead of taking the roller blind
+  assert.equal(links.get("aw2"), undefined);
 });
 
 test("lamps take a light of their room, preferring one whose name fits", () => {
@@ -387,6 +465,41 @@ test("an opening state knows whether a sensor reports it", () => {
   assert.equal(openingState(hass, { ...none, cover: "cover.tor" }, "garage").sensed, true);
 });
 
+test("a gate on a sliding door moves the leaf and draws no blind; a roller shutter on a door stays a blind (#544)", () => {
+  const hass = {
+    states: {
+      "cover.gate": { entity_id: "cover.gate", state: "open", attributes: { device_class: "gate", current_position: 40 } },
+      "cover.shutter": { entity_id: "cover.shutter", state: "open", attributes: { device_class: "shutter", current_position: 40 } },
+    },
+  } as unknown as HomeAssistant;
+  const none = { cover: null, contact: null, tilt: null, contact2: null, tilt2: null };
+  const gate = openingState(hass, { ...none, cover: "cover.gate" }, "door");
+  assert.equal(gate.cover, null);
+  assert.ok(Math.abs(gate.open - 0.4) < 1e-9);
+  const shutter = openingState(hass, { ...none, cover: "cover.shutter" }, "door");
+  assert.ok(Math.abs((shutter.cover ?? 0) - 0.6) < 1e-9);
+});
+
+test("a garage door reads its contact like a door, and an inverted contact flips open and closed (#329)", () => {
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  const hass = {
+    states: {
+      "binary_sensor.tor": st("binary_sensor.tor", "on", { device_class: "garage_door" }),
+      "sensor.tor_text": st("sensor.tor_text", "open"),
+      "binary_sensor.tuer": st("binary_sensor.tuer", "off", { device_class: "door" }),
+    },
+  } as unknown as HomeAssistant;
+  const none = { cover: null, contact: null, tilt: null, contact2: null, tilt2: null };
+  assert.equal(openingState(hass, { ...none, contact: "binary_sensor.tor" }, "garage").cover, 0);
+  assert.equal(openingState(hass, { ...none, contact: "sensor.tor_text" }, "garage").cover, 0);
+  assert.equal(openingState(hass, { ...none, contact: "binary_sensor.tor", contactInvert: true }, "garage").cover, 1);
+  assert.equal(openingState(hass, none, "garage").cover, 1);
+  assert.equal(openingState(hass, none, "garage").sensed, false);
+  assert.equal(openingState(hass, { ...none, contact: "binary_sensor.tuer" }, "door").open, 0);
+  assert.equal(openingState(hass, { ...none, contact: "binary_sensor.tuer", contactInvert: true }, "door").open, 1);
+  assert.equal(openingState(hass, { ...none, contact: "binary_sensor.tuer", contactInvert: true }, "window").open, 1);
+});
+
 test("room climate skips device temperatures, honours a chosen sensor and placed sensors", () => {
   const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
   const temp = (id: string, v: string, name: string) => st(id, v, { device_class: "temperature", unit_of_measurement: "°C", friendly_name: name });
@@ -456,7 +569,13 @@ test("a robot vacuum's current room is found on its device and matched by room o
   assert.equal(robotRoom(hass, rooms, "vacuum.robbi", "sensor.robbi_room")?.id, "c");
   hass.states["sensor.robbi_room"].state = "Keller";
   assert.equal(robotRoom(hass, rooms, "vacuum.robbi", "sensor.robbi_room"), null);
+  // the sensor names no room of the plan: what the vacuum itself says counts (#470)
+  hass.states["vacuum.robbi"].attributes.current_room = "Wohnzimmer";
+  assert.equal(robotRoom(hass, rooms, "vacuum.robbi", "sensor.robbi_room")?.id, "a");
   assert.equal(roomKey("Büro"), roomKey("Buero"));
+  // integrations that report their own cleaning states
+  for (const s of ["cleaning", "room_cleaning", "segment_cleaning", "Sweeping", "mopping"]) assert.equal(vacuumCleaning(s), true, s);
+  for (const s of ["docked", "returning", "idle", undefined]) assert.equal(vacuumCleaning(s), false, String(s));
 });
 
 test("a window marked 'ask first' puts its blind on the confirm list", () => {
@@ -468,6 +587,33 @@ test("a window marked 'ask first' puts its blind on the confirm list", () => {
   assert.equal(confirmEntities(hass, [floor]).has("cover.rollo"), false);
   floor.openings = [o("w1", { confirm: true })];
   assert.equal(confirmEntities(hass, [floor]).has("cover.rollo"), true);
+});
+
+test("an access point is online, offline or unknown by what its status entity says (D582)", () => {
+  const st = (state: string) => ({ entity_id: "binary_sensor.ap", state, attributes: {} }) as unknown as Parameters<typeof apOnline>[0];
+  for (const s of ["on", "connected", "online", "home", "12"]) assert.equal(apOnline(st(s)), true, s);
+  for (const s of ["off", "disconnected", "not_home", "unavailable"]) assert.equal(apOnline(st(s)), false, s);
+  assert.equal(apOnline(st("unknown")), null);
+  assert.equal(apOnline(undefined), null);
+});
+
+test("a ceiling fan's blades turn with its percentage, at a middle speed without one, not at all when off", () => {
+  const st = (state: string, attributes: Record<string, unknown> = {}) => ({ entity_id: "fan.decke", state, attributes }) as unknown as Parameters<typeof fanSpeed>[0];
+  assert.equal(fanSpeed(st("on", { percentage: 33 })), 0.33);
+  assert.equal(fanSpeed(st("on")), 0.6);
+  assert.equal(fanSpeed(st("on", { percentage: 250 })), 1);
+  assert.equal(fanSpeed(st("off", { percentage: 66 })), 0);
+  assert.equal(fanSpeed(undefined), 0);
+});
+
+test("a wall switch marked 'ask first' puts every gang's entity on the confirm list", () => {
+  const hass = hassWith();
+  const sw = { id: "ws", type: "wall_switch", x: 1, z: 0, rotation: 0, w: 0.156, d: 0.012, h: 0.085, variant: null, gangs: [{ entity: "light.flur" }, { entity: "switch.garten" }], confirm: true };
+  const floor: Floor = { ...newFloor("f", "F", 0), furniture: [sw] };
+  const out = confirmEntities(hass, [floor]);
+  assert.ok(out.has("light.flur") && out.has("switch.garten"));
+  floor.furniture = [{ ...sw, confirm: false }];
+  assert.equal(confirmEntities(hass, [floor]).has("light.flur"), false);
 });
 
 test("a status sensor (a 3D printer) counts as active while it prints", () => {
@@ -518,4 +664,388 @@ test("a door with a roller shutter shows the blind at the cover's position", () 
   assert.ok(st.sensed);
   // without a cover a door has no blind
   assert.equal(openingState(hass, { cover: null, contact: null, tilt: null }, "door").cover, null);
+});
+
+test("the central menu switches a floor's lights and blinds, not its garage door (#145)", async () => {
+  const { floorControls, favoriteCall } = await import("./devices.ts");
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  const hass = {
+    language: "de",
+    states: {
+      "light.decke": st("light.decke", "on"),
+      "light.stehlampe": st("light.stehlampe", "off"),
+      "cover.rollo": st("cover.rollo", "open", { device_class: "shutter" }),
+      "cover.garage": st("cover.garage", "closed", { device_class: "garage" }),
+    },
+    entities: {
+      "light.decke": { entity_id: "light.decke", area_id: "wz" },
+      "cover.rollo": { entity_id: "cover.rollo", area_id: "wz" },
+      "cover.garage": { entity_id: "cover.garage", area_id: "wz" },
+    },
+    devices: {},
+    areas: { wz: { area_id: "wz", name: "Wohnzimmer" } },
+  } as unknown as HomeAssistant;
+  const floor = { ...newFloor("eg", "EG", 0), rooms: [{ id: "r", name: "WZ", area_id: "wz", points: [[0, 0], [4, 0], [4, 4], [0, 4]] as [number, number][], floor_material: "wood" as const }] };
+  floor.placements = [{ entity_id: "light.stehlampe", x: 1, z: 1, y: null }];
+  const c = floorControls(hass, floor);
+  assert.deepEqual(c.lights.sort(), ["light.decke", "light.stehlampe"]);
+  assert.deepEqual(c.covers, ["cover.rollo"]);
+  assert.deepEqual(favoriteCall("scene.party"), ["scene", "turn_on"]);
+  assert.deepEqual(favoriteCall("button.klingel"), ["button", "press"]);
+  assert.deepEqual(favoriteCall("switch.bewaesserung"), ["homeassistant", "toggle"]);
+});
+
+test("own buttons call a service or fire the DOM event browser_mod listens for (D143)", async () => {
+  const { runButton } = await import("./devices.ts");
+  const calls: unknown[][] = [];
+  const hass = { callService: (...a: unknown[]) => (calls.push(a), Promise.resolve()) } as unknown as HomeAssistant;
+  const el = new EventTarget() as unknown as HTMLElement;
+  const events: { type: string; detail: unknown }[] = [];
+  for (const type of ["ll-custom", "hass-more-info"]) el.addEventListener(type, (e) => events.push({ type, detail: (e as CustomEvent).detail }));
+  runButton(hass, el, { action: "service", target: "script.turn_on", data: { entity_id: "script.party" } });
+  assert.deepEqual(calls, [["script", "turn_on", { entity_id: "script.party" }]]);
+  const popup = { browser_mod: { service: "browser_mod.popup", data: { title: "Rollos" } } };
+  runButton(hass, el, { action: "fire_dom_event", data: popup });
+  runButton(hass, el, { action: "more_info", target: "cover.wohnzimmer" });
+  assert.deepEqual(events, [
+    { type: "ll-custom", detail: popup },
+    { type: "hass-more-info", detail: { entityId: "cover.wohnzimmer" } },
+  ]);
+});
+
+test("a desk's monitor does not take the room's smart speaker, a placed device stays its own", async () => {
+  const { furnitureEntities } = await import("./devices.ts");
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  const hass = {
+    language: "de",
+    states: { "media_player.echo_show_buero": st("media_player.echo_show_buero", "playing", { friendly_name: "Echo Show Büro" }) },
+    entities: { "media_player.echo_show_buero": { entity_id: "media_player.echo_show_buero", area_id: "buero" } },
+    devices: {},
+    areas: { buero: { area_id: "buero", name: "Büro" } },
+  } as unknown as HomeAssistant;
+  const room = { id: "r", name: "Büro", area_id: "buero", points: [[0, 0], [4, 0], [4, 3], [0, 3]] as [number, number][], floor_material: "wood" as const };
+  const desk = { id: "d", type: "desk", x: 2, z: 1, w: 1.4, d: 0.7, h: 0.75, rotation: 0, variant: null };
+  const tv = { id: "t", type: "tv_wall", x: 1, z: 0.1, w: 1.2, d: 0.08, h: 0.7, rotation: 0, variant: null };
+  // the desk alone: no media player by chance
+  const one = furnitureEntities(hass, [{ ...newFloor("eg", "EG", 0), rooms: [room], furniture: [desk] }]);
+  assert.equal(one.get("d")?.entity ?? null, null);
+  // a TV takes the room's player, unless that player is placed as a device of its own
+  const two = furnitureEntities(hass, [{ ...newFloor("eg", "EG", 0), rooms: [room], furniture: [tv] }]);
+  assert.equal(two.get("t")?.entity, "media_player.echo_show_buero");
+  const placed = furnitureEntities(hass, [{ ...newFloor("eg", "EG", 0), rooms: [room], furniture: [tv], placements: [{ entity_id: "media_player.echo_show_buero", x: 3.8, z: 2.8, y: null }] }]);
+  assert.equal(placed.get("t")?.entity ?? null, null);
+});
+
+test("a hub device for a whole house (MQTT): room sensors count, power sensors stay in their area (#243)", async () => {
+  const { powerSensorFor } = await import("./energy.ts");
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  const hass = {
+    language: "en",
+    areas: { living: { area_id: "living", name: "Living" }, kitchen: { area_id: "kitchen", name: "Kitchen" } },
+    devices: { hub: { id: "hub", area_id: null } },
+    entities: {
+      "light.living": { entity_id: "light.living", device_id: "hub", area_id: "living" },
+      "switch.kitchen": { entity_id: "switch.kitchen", device_id: "hub", area_id: "kitchen" },
+      "sensor.living_temp": { entity_id: "sensor.living_temp", device_id: "hub", area_id: "living" },
+      "sensor.kitchen_power": { entity_id: "sensor.kitchen_power", device_id: "hub", area_id: "kitchen" },
+    },
+    states: {
+      "light.living": st("light.living", "on"),
+      "switch.kitchen": st("switch.kitchen", "on"),
+      "sensor.living_temp": st("sensor.living_temp", "21.5", { device_class: "temperature", unit_of_measurement: "°C" }),
+      "sensor.kitchen_power": st("sensor.kitchen_power", "120", { device_class: "power", unit_of_measurement: "W" }),
+    },
+  } as unknown as HomeAssistant;
+  const room: Room = { id: "r", name: "Living", area_id: "living", points: [[0, 0], [3, 0], [3, 3], [0, 3]], floor_material: "wood" };
+  const floor = { ...newFloor("eg", "EG", 0), rooms: [room] };
+  // the hub also has lights and switches, yet its room thermometer is the room's temperature
+  assert.deepEqual(roomClimateSensors(hass, floor, room, "temperature"), ["sensor.living_temp"]);
+  // the kitchen meter belongs to the kitchen switch, not to the living room light
+  assert.equal(powerSensorFor(hass, "switch.kitchen"), "sensor.kitchen_power");
+  assert.equal(powerSensorFor(hass, "light.living"), null);
+});
+
+test("carLocked reads locks, lock binary sensors, text sensors and switches (#369)", () => {
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes }) as never;
+  assert.equal(carLocked(st("lock.auto", "locked")), true);
+  assert.equal(carLocked(st("lock.auto", "unlocked")), false);
+  // a binary_sensor of class lock is "on" while unlocked, as in Home Assistant
+  assert.equal(carLocked(st("binary_sensor.auto_tueren", "on", { device_class: "lock" })), false);
+  assert.equal(carLocked(st("binary_sensor.auto_tueren", "off", { device_class: "lock" })), true);
+  // BMW reports the door lock state as text
+  assert.equal(carLocked(st("sensor.118i_zustand_der_turen", "LOCKED")), true);
+  assert.equal(carLocked(st("sensor.118i_zustand_der_turen", "SECURED")), true);
+  assert.equal(carLocked(st("sensor.118i_zustand_der_turen", "UNLOCKED")), false);
+  assert.equal(carLocked(st("sensor.118i_zustand_der_turen", "SELECTIVE_LOCKED")), false);
+  assert.equal(carLocked(st("sensor.118i_zustand_der_turen", "unknown")), null);
+  assert.equal(carLocked(st("input_boolean.auto_zu", "on")), true);
+});
+
+test("a door in a free wall outside every room follows the contact chosen for it (#367)", () => {
+  const hass = hassWith();
+  hass.states["binary_sensor.haustuer"] = { entity_id: "binary_sensor.haustuer", state: "on", attributes: { device_class: "door" } };
+  const door: Opening = {
+    id: "d1", room_id: "wall1", wall: "wall1", edge: 0, offset: 1, width: 1, type: "door", sill: 0, height: 2.05, hinge: "left", leaves: 1, swing: "in",
+    cover: null, contact: "binary_sensor.haustuer", contact2: null, tilt: null,
+  };
+  const floor: Floor = { ...newFloor("f", "F", 0), openings: [door], walls: [{ id: "wall1", a: [0, 0], b: [4, 0], thickness: null, height: null }] };
+  const links = openingEntities(hass, [floor]);
+  assert.equal(links.get("d1")?.contact, "binary_sensor.haustuer");
+  assert.equal(openingState(hass, links.get("d1")!, "door").open, 1);
+});
+
+test("a room without a temperature sensor takes its thermostat's current temperature and humidity (#478)", () => {
+  const hass = {
+    language: "de",
+    config: { unit_system: { temperature: "°C" } },
+    areas: { bad: { area_id: "bad", name: "Bad" } },
+    devices: { d: { id: "d", area_id: "bad" } },
+    entities: { "climate.bad": { entity_id: "climate.bad", device_id: "d" } },
+    states: { "climate.bad": { entity_id: "climate.bad", state: "heat", attributes: { current_temperature: 21.5, current_humidity: 58, friendly_name: "Bad Thermostat" } } },
+  } as unknown as HomeAssistant;
+  const room: Room = { id: "r", name: "Bad", area_id: "bad", points: [[0, 0], [3, 0], [3, 3], [0, 3]], floor_material: "tiles" };
+  const floor = { ...newFloor("eg", "EG", 0), rooms: [room] };
+  assert.deepEqual(roomClimateSensors(hass, floor, room, "temperature"), ["climate.bad"]);
+  assert.equal(roomClimateValue(hass, floor, room, "temperature"), 21.5);
+  assert.equal(roomClimateValue(hass, floor, room, "humidity"), 58);
+  assert.deepEqual(roomClimateSensors(hass, floor, room, "co2"), []);
+  // chosen by hand works the same
+  assert.equal(roomClimateValue(hass, floor, { ...room, area_id: null, climate: { temperature: "climate.bad" } }, "temperature"), 21.5);
+});
+
+test("a cooktop glows while it runs, faintly when ready, not when inactive (customer mail)", () => {
+  const s = (state: string) => ({ entity_id: "sensor.kochfeld_betriebszustand", state, attributes: { device_class: "enum" } });
+  assert.equal(cooktopLevel(s("run"), false), 1);
+  assert.equal(cooktopLevel(s("ready"), false), 0.3);
+  assert.equal(cooktopLevel(s("inactive"), false), 0);
+  // a cooktop behind a power plug: power over the threshold counts as cooking
+  assert.equal(cooktopLevel(undefined, true), 1);
+  assert.ok(isActive(s("run")));
+});
+
+test("an air conditioner glows in the colour of its mode, dimmer while idle", () => {
+  const c = (state: string, hvac_action?: string) => ({ entity_id: "climate.klima", state, attributes: hvac_action ? { hvac_action } : {} });
+  assert.equal(climateModeGlow(c("off")), null);
+  const heat = climateModeGlow(c("heat", "heating"))!;
+  assert.ok(heat.color[0] > heat.color[2] && heat.level === 1);
+  const cool = climateModeGlow(c("cool", "idle"))!;
+  assert.ok(cool.color[2] > cool.color[0] && cool.level < 1);
+  const auto = climateModeGlow(c("heat_cool", "cooling"))!;
+  assert.ok(auto.color[1] > auto.color[0] && auto.color[1] > auto.color[2]);
+});
+
+test("a lamp with one colour only glows for that colour (customer mail: yellow = water)", () => {
+  const g = (color: [number, number, number]) => ({ color, level: 1 });
+  assert.ok(onlyColor(g([1, 0.85, 0]), "#ffd400"));
+  assert.equal(onlyColor(g([1, 0, 0]), "#ffd400"), null);
+  // a fixed colour (#977): the colour is the chosen one, the level stays; off stays off; a bad value changes nothing
+  const fixed = fixedGlowColor({ color: [1, 0, 0] as [number, number, number], level: 0.6 }, "#00ff80");
+  assert.deepEqual(fixed, { color: [0, 1, 128 / 255], level: 0.6 });
+  assert.equal(fixedGlowColor(null, "#00ff80"), null);
+  // a white-only light (Loxone's moods come as its "effect") cannot run a colour effect (#977)
+  const light = (modes: string[] | undefined) => ({ entity_id: "light.x", state: "on", attributes: modes ? { supported_color_modes: modes } : {}, last_changed: "", last_updated: "" }) as never;
+  assert.equal(colorCapable(light(["onoff"])), false);
+  assert.equal(colorCapable(light(["brightness", "color_temp"])), false);
+  assert.equal(colorCapable(light(["color_temp", "hs"])), true);
+  assert.equal(colorCapable(light(undefined)), true);
+  assert.deepEqual(fixedGlowColor({ color: [1, 0, 0] as [number, number, number], level: 1 }, "red"), { color: [1, 0, 0], level: 1 });
+  assert.equal(onlyColor(g([0, 0.3, 1]), "#ffd400"), null);
+  assert.equal(onlyColor(g([1, 0.95, 0.9]), "#ffd400"), null);
+  assert.ok(onlyColor(g([1, 0, 0]), null));
+});
+
+test("water values of a pool count as sensors: pH by its class, redox and salt by their units (D600)", () => {
+  const hass = {
+    states: {
+      "sensor.pool_ph": { entity_id: "sensor.pool_ph", state: "7.2", attributes: { device_class: "ph" } },
+      "sensor.pool_redox": { entity_id: "sensor.pool_redox", state: "720", attributes: { unit_of_measurement: "mV" } },
+      "sensor.pool_salt": { entity_id: "sensor.pool_salt", state: "3200", attributes: { unit_of_measurement: "mg/L" } },
+      "sensor.pool_firmware": { entity_id: "sensor.pool_firmware", state: "1.2", attributes: {} },
+    },
+    entities: {},
+  } as unknown as Parameters<typeof isRelevant>[0];
+  assert.equal(isRelevant(hass, "sensor.pool_ph"), true);
+  assert.equal(isRelevant(hass, "sensor.pool_redox"), true);
+  assert.equal(isRelevant(hass, "sensor.pool_salt"), true);
+  assert.equal(isRelevant(hass, "sensor.pool_firmware"), false);
+});
+
+test("a redox probe that reports as a voltage in mV counts, a mains voltage does not (#814)", () => {
+  const hass = {
+    states: {
+      "sensor.pool_orp": { entity_id: "sensor.pool_orp", state: "690", attributes: { device_class: "voltage", unit_of_measurement: "mV" } },
+      "sensor.mains": { entity_id: "sensor.mains", state: "231", attributes: { device_class: "voltage", unit_of_measurement: "V" } },
+    },
+    entities: {},
+  } as unknown as Parameters<typeof isRelevant>[0];
+  assert.equal(isRelevant(hass, "sensor.pool_orp"), true);
+  assert.equal(isRelevant(hass, "sensor.mains"), false);
+});
+
+test("a door with a smart lock and no drive gets no roller shutter, and glows while unlocked (#682)", () => {
+  const hass = hassWith();
+  hass.states["lock.haustuer"] = { entity_id: "lock.haustuer", state: "unlocked", attributes: {} } as HomeAssistant["states"][string];
+  hass.states["sensor.level"] = { entity_id: "sensor.level", state: "40", attributes: { unit_of_measurement: "%" } } as HomeAssistant["states"][string];
+  const o: Opening = { id: "d", room_id: "r", edge: 0, offset: 1, width: 1, type: "door", sill: 0, height: 2, hinge: "left", leaves: 1, swing: "in", cover: "none", contact: "none", contact2: null, tilt: null, lock: "lock.haustuer", position: "sensor.level" };
+  const floor: Floor = { ...newFloor("f", "F", 0), rooms: [room], openings: [o] };
+  const link = openingEntities(hass, [floor]).get("d")!;
+  // a blind's position sensor left behind without a blind lowers nothing
+  assert.equal(link.position, null);
+  const st = openingState(hass, link, "door");
+  assert.equal(st.cover, null);
+  assert.equal(st.unlocked, true);
+  hass.states["lock.haustuer"] = { ...hass.states["lock.haustuer"], state: "locked" };
+  assert.equal(openingState(hass, link, "door").unlocked, undefined);
+  // the lock follows its own state, whatever the contact says; a door without a lock is unchanged
+  assert.equal(openingState(hass, { ...link, lock: null }, "door").unlocked, undefined);
+  // with a blind, its position sensor still counts
+  hass.states["cover.rollo_tuer"] = { entity_id: "cover.rollo_tuer", state: "open", attributes: { device_class: "shutter" } } as HomeAssistant["states"][string];
+  const withBlind = openingEntities(hass, [{ ...floor, openings: [{ ...o, cover: "cover.rollo_tuer" }] }]).get("d")!;
+  assert.equal(withBlind.position, "sensor.level");
+});
+
+test("a garage door driven by a pulse switch or button shows its contact, not the switch (#677)", () => {
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  const hass = {
+    states: {
+      "switch.tor_impuls": st("switch.tor_impuls", "off"),
+      "button.tor": st("button.tor", "2026-10-21T08:00:00Z"),
+      "binary_sensor.tor": st("binary_sensor.tor", "on", { device_class: "garage_door" }),
+      "binary_sensor.tor_zu": st("binary_sensor.tor_zu", "off", { device_class: "garage_door" }),
+    },
+  } as unknown as HomeAssistant;
+  const none = { cover: null, contact: null, tilt: null, contact2: null, tilt2: null };
+  // the switch is off again after its pulse, the contact says open: open
+  const open = openingState(hass, { ...none, cover: "switch.tor_impuls", contact: "binary_sensor.tor" }, "garage");
+  assert.equal(open.cover, 0);
+  assert.equal(open.sensed, true);
+  assert.equal(openingState(hass, { ...none, cover: "switch.tor_impuls", contact: "binary_sensor.tor_zu" }, "garage").cover, 1);
+  assert.equal(openingState(hass, { ...none, cover: "button.tor", contact: "binary_sensor.tor" }, "garage").cover, 0);
+  // without a contact the door cannot be known: closed, not sensed
+  const blind = openingState(hass, { ...none, cover: "switch.tor_impuls" }, "garage");
+  assert.equal(blind.cover, 1);
+  assert.equal(blind.sensed, false);
+  // older plans with the switch as the contact: on is open, as before
+  hass.states["switch.tor_impuls"] = st("switch.tor_impuls", "on") as HomeAssistant["states"][string];
+  assert.equal(openingState(hass, { ...none, contact: "switch.tor_impuls" }, "garage").cover, 0);
+  assert.equal(isPulseDrive("switch.tor_impuls"), true);
+  assert.equal(isPulseDrive("input_button.tor"), true);
+  assert.equal(isPulseDrive("cover.tor"), false);
+});
+
+test("slat buttons only for covers with slats: a KNX roller shutter announcing tilt features gets none (#704)", () => {
+  const cover = (attributes: Record<string, unknown>) => ({ entity_id: "cover.x", state: "open", attributes, last_changed: "", last_updated: "" }) as Parameters<typeof coverTiltButtons>[0];
+  assert.equal(coverTiltButtons(cover({ device_class: "shutter", supported_features: 127, current_position: 100 })), false);
+  assert.equal(coverTiltButtons(cover({ device_class: "blind", supported_features: 255, current_tilt_position: 100 })), true);
+  // a shutter that really reports a tilt position keeps its buttons; a cover without a class keeps them too
+  assert.equal(coverTiltButtons(cover({ device_class: "shutter", supported_features: 127, current_tilt_position: 40 })), true);
+  assert.equal(coverTiltButtons(cover({ supported_features: 48 })), true);
+  assert.equal(coverTiltButtons(cover({ device_class: "blind", supported_features: 15 })), false);
+});
+
+test("a child device without an area takes its parent's (Home Assistant 2026.11), older versions as before", async () => {
+  const { areaEntities, deviceAreaId, entityAreaId } = await import("./devices.ts");
+  const hass = {
+    states: { "switch.gang_2": { entity_id: "switch.gang_2", state: "off", attributes: {} }, "switch.own": { entity_id: "switch.own", state: "off", attributes: {} } },
+    entities: {
+      "switch.gang_2": { entity_id: "switch.gang_2", device_id: "child", area_id: null },
+      "switch.own": { entity_id: "switch.own", device_id: "child_own", area_id: null },
+      "switch.loop": { entity_id: "switch.loop", device_id: "loop_a", area_id: null },
+    },
+    devices: {
+      parent: { id: "parent", area_id: "kitchen" },
+      child: { id: "child", area_id: null, parent_device_id: "parent" },
+      child_own: { id: "child_own", area_id: "hall", parent_device_id: "parent" },
+      // a parent chain in a circle ends instead of looping
+      loop_a: { id: "loop_a", area_id: null, parent_device_id: "loop_b" },
+      loop_b: { id: "loop_b", area_id: null, parent_device_id: "loop_a" },
+      // older Home Assistant: no parent field at all
+      old: { id: "old", area_id: "office" },
+    },
+  } as never;
+  assert.equal(entityAreaId(hass, "switch.gang_2"), "kitchen");
+  // a child's own area wins over its parent's
+  assert.equal(entityAreaId(hass, "switch.own"), "hall");
+  assert.equal(entityAreaId(hass, "switch.loop"), null);
+  assert.equal(deviceAreaId(hass, "old"), "office");
+  assert.equal(deviceAreaId(hass, "missing"), null);
+  assert.equal(deviceAreaId(hass, null), null);
+  // the room's device list finds the channel in the parent's room
+  assert.ok(areaEntities(hass, "kitchen").includes("switch.gang_2"));
+});
+
+test("a fence gate opens with its cover, switch or contact (#818)", async () => {
+  const { gateState } = await import("./devices.ts");
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes, last_changed: "", last_updated: "", context: { id: "", user_id: null, parent_id: null } });
+  const hass = (...list: ReturnType<typeof st>[]) => ({ states: Object.fromEntries(list.map((s) => [s.entity_id, s])) }) as never;
+  const gate = { id: "g", edge: 0, at: 1, width: 1, entity: "cover.gate" };
+  // a cover with its position follows it; running without one moves at the run time
+  assert.deepEqual(gateState(hass(st("cover.gate", "open", { current_position: 40 })), gate), { out: 0.4, moving: 0, time: 4 });
+  assert.equal(gateState(hass(st("cover.gate", "opening")), gate).moving, 1);
+  // open, or a switch that is on: it stands open, and stands there at once when first seen
+  assert.deepEqual(gateState(hass(st("cover.gate", "open")), gate), { out: null, moving: 1, time: 4, settled: true });
+  assert.equal(gateState(hass(st("switch.gate", "on")), { ...gate, entity: "switch.gate", kind: "slide" }).time, 15);
+  // the contact wins over the motor's state
+  const both = hass(st("cover.gate", "closed"), st("binary_sensor.gate", "on"));
+  assert.equal(gateState(both, { ...gate, contact: "binary_sensor.gate" }).moving, 1);
+  // nothing linked: shut
+  assert.equal(gateState(hass(), { id: "g", edge: 0, at: 1, width: 1 }).moving, -1);
+});
+
+test("covers open, close and stop the way they can: a slat-only blind by its tilt (#920)", async () => {
+  const { coverCall, coverCalls } = await import("./devices.ts");
+  const st = (f: number) => ({ entity_id: "cover.x", state: "open", attributes: { supported_features: f } }) as never;
+  // a roller shutter (open, close, stop, position): as always
+  assert.deepEqual(coverCall(st(15), "open"), { service: "open_cover", data: {} });
+  // slats only, with open/close tilt and stop tilt
+  assert.deepEqual(coverCall(st(16 | 32 | 64 | 128), "open"), { service: "open_cover_tilt", data: {} });
+  assert.deepEqual(coverCall(st(16 | 32 | 64 | 128), "stop"), { service: "stop_cover_tilt", data: {} });
+  // only a tilt position: open is 100, close is 0
+  assert.deepEqual(coverCall(st(128), "close"), { service: "set_cover_tilt_position", data: { tilt_position: 0 } });
+  // no features reported: as always
+  assert.deepEqual(coverCall(st(0), "close"), { service: "close_cover", data: {} });
+  const hass = { states: { "cover.a": st(15), "cover.b": st(128), "cover.c": st(3) } } as never;
+  assert.deepEqual(coverCalls(hass, ["cover.a", "cover.b", "cover.c"], "open"), [
+    { service: "open_cover", data: { entity_id: ["cover.a", "cover.c"] } },
+    { service: "set_cover_tilt_position", data: { tilt_position: 100, entity_id: ["cover.b"] } },
+  ]);
+});
+
+test("a venetian blind reports how far its slats stand open; \"Invert slats\" turns it round (#971)", () => {
+  const cover = (attributes: Record<string, unknown>) => ({ entity_id: "cover.raff", state: "open", attributes });
+  const hass = (attributes: Record<string, unknown>) => ({ states: { "cover.raff": cover(attributes) } }) as unknown as HomeAssistant;
+  const link = { cover: "cover.raff", contact: null, tilt: null, contact2: null, tilt2: null };
+  // down to 30 % open, slats level
+  const level = openingState(hass({ current_position: 30, current_tilt_position: 100 }), link, "window");
+  assert.equal(level.cover, 0.7);
+  assert.equal(level.slats, 1);
+  assert.equal(openingState(hass({ current_position: 30, current_tilt_position: 25 }), link, "window").slats, 0.25);
+  // an integration that reports 0 for open slats
+  assert.equal(openingState(hass({ current_position: 30, current_tilt_position: 0 }), { ...link, slatInvert: true }, "window").slats, 1);
+  // a roller shutter has no slats to turn: nothing changes for it
+  assert.equal("slats" in openingState(hass({ current_position: 30 }), link, "window"), false);
+  // a garage door never shows slats
+  assert.equal("slats" in openingState(hass({ current_position: 30, current_tilt_position: 50 }), link, "garage"), false);
+  assert.equal(slatTilt(cover({ current_tilt_position: 130 }) as never), 100);
+  assert.equal(slatTilt(cover({ current_tilt_position: 20 }) as never, true), 80);
+  assert.equal(slatTilt(cover({}) as never), null);
+  const floor = { ...newFloor("f", "EG", 0), openings: [{ id: "w", cover: "cover.raff", slat_invert: true } as unknown as Opening] };
+  assert.equal(slatsInverted({ floors: [floor] } as never, "cover.raff"), true);
+  assert.equal(slatsInverted({ floors: [floor] } as never, "cover.other"), false);
+});
+
+test("a charger's status: whole words, so not_charging or charger_free is no charging and disconnected no car", () => {
+  const c = (raw: string) => chargerStatus(raw);
+  assert.deepEqual(c("charging"), { charging: true, plugged: true });
+  assert.deepEqual(c("Laden"), { charging: true, plugged: true });
+  assert.deepEqual(c("not_charging"), { charging: false, plugged: false });
+  assert.deepEqual(c("ready_to_charge"), { charging: false, plugged: true });
+  assert.deepEqual(c("charger_free"), { charging: false, plugged: false });
+  assert.deepEqual(c("charger_insert"), { charging: false, plugged: true });
+  assert.deepEqual(c("disconnected"), { charging: false, plugged: false });
+  assert.deepEqual(c("unplugged"), { charging: false, plugged: false });
+  assert.deepEqual(c("connected"), { charging: false, plugged: true });
+  assert.deepEqual(c("Available"), { charging: false, plugged: false });
+  assert.deepEqual(c("SuspendedEV"), { charging: false, plugged: true });
+  assert.deepEqual(c("charge complete"), { charging: false, plugged: true });
 });

@@ -20,6 +20,9 @@ export interface HassEntityEntry {
   device_id?: string | null;
   area_id?: string | null;
   hidden?: boolean;
+  /** Set when the full registry entry is at hand (the frontend's short entry only has `hidden`). */
+  hidden_by?: string | null;
+  disabled_by?: string | null;
   entity_category?: "config" | "diagnostic" | null;
   /** The integration's key for the entity (e.g. "current_room"). */
   translation_key?: string | null;
@@ -30,6 +33,8 @@ export interface HassEntityEntry {
 export interface HassDevice {
   id: string;
   area_id?: string | null;
+  /** Home Assistant 2026.11: the device this one is a channel of (a Tuya multi-gang, a Z-Wave endpoint). */
+  parent_device_id?: string | null;
   name?: string | null;
   name_by_user?: string | null;
 }
@@ -39,6 +44,7 @@ export interface HassEntity {
   state: string;
   attributes: Record<string, unknown>;
   last_changed?: string;
+  last_updated?: string;
 }
 
 export interface HassConnection {
@@ -47,13 +53,13 @@ export interface HassConnection {
 
 export interface HomeAssistant {
   language: string;
-  user?: { is_admin: boolean; name: string };
+  user?: { is_admin: boolean; name: string; id?: string };
   areas?: Record<string, HassArea>;
   floors?: Record<string, HassFloor>;
   entities?: Record<string, HassEntityEntry>;
   devices?: Record<string, HassDevice>;
   states: Record<string, HassEntity>;
-  config?: { unit_system?: { temperature?: string } };
+  config?: { unit_system?: { temperature?: string; length?: string }; latitude?: number; longitude?: number; time_zone?: string };
   connection: HassConnection;
   callWS<T>(msg: Record<string, unknown>): Promise<T>;
   callService(domain: string, service: string, data?: Record<string, unknown>): Promise<unknown>;

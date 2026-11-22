@@ -1,3 +1,4 @@
 # Memory index
 
-- `domain/floorplan3d.md` — FloorPlan3D: product decisions, phase status (P1–P4 done), CDP test pitfalls (updated 2026-10-05)
+- `domain/project-provenance.md` — One-time upstream copy, no-sync/no-push constraint, stale local git HEAD (2026-11-22)
+- `general.md` — `Create a Prompt for:` writes a prompt .md into `Prompts/`; `Create a Plan for:` writes a plan .md into `Plans/`; both for later review, no execution (2026-11-22)

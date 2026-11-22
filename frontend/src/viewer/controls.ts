@@ -22,6 +22,8 @@ export interface ControlEvents {
   grab?(x: number, y: number): boolean;
   drag?(x: number, y: number): void;
   drop?(): void;
+  /** A short right click (with rightClickBack on): one step back. */
+  back?(): void;
   /**
    * A one-finger drag starts at (x, y) moving by (dx, dy): return true to take it as a swipe on an
    * object (dimming a lamp, moving a blind) instead of turning the view. Moves then report the
@@ -33,6 +35,20 @@ export interface ControlEvents {
 }
 
 const HOLD_MS = 500;
+/** How far a finger on a label, a pin or a glass card travels before it turns the house instead (px, #1248). */
+const GUEST_DRAG = 8;
+/**
+ * A move or wheel event this old when it is handled waited out a freeze (building the house just after
+ * opening, a slow tablet): it is dropped, not replayed – replayed, the view caught up seconds later and landed
+ * somewhere else in the house (#712). A second, so a slow wall tablet (a frame of half a second) still turns.
+ */
+const STALE_MS = 1000;
+
+/** The event waited longer than STALE_MS to be handled (timestamps on the performance clock, as all browsers now). */
+export function stale(e: { timeStamp: number }, now: number): boolean {
+  const age = now - e.timeStamp;
+  return age > STALE_MS && age < 60_000;
+}
 
 const MIN_PHI = 0.12;
 const MAX_PHI = 1.35;
@@ -43,6 +59,15 @@ export class OrbitControls {
   view: OrbitView = { target: new Vector3(), radius: 16, theta: -0.6, phi: 0.85 };
   minRadius = 2;
   maxRadius = 80;
+  /**
+   * A drag with the left mouse button turns the view (default). Off (the editor's wall view): the left button is
+   * kept for furniture, the middle and right buttons turn the view instead of panning it; fingers are unchanged.
+   */
+  leftDragTurns = true;
+  /** 3D lock (idea from dlavrantonis' fork): the angle stays put – a drag moves the view, zooming still works. */
+  angleLock = false;
+  /** A short right click goes one step back (room → floor → house) instead of tapping (a setting, default off). */
+  rightClickBack = false;
 
   private pointers = new Map<number, { x: number; y: number; button: number; type: string }>();
   private velocity = { theta: 0, phi: 0 };
@@ -60,6 +85,10 @@ export class OrbitControls {
   private readonly camera: PerspectiveCamera;
   private readonly events: ControlEvents;
   private readonly listeners: [string, EventListener][] = [];
+  private readonly guestListeners: [EventTarget, string, EventListener][] = [];
+  /** Fingers down on an element over the picture (see watchGuests), and when one of them last zoomed. */
+  private guests = new Map<number, { x: number; y: number; x0: number; y0: number; type: string; button: number }>();
+  private guestPinchAt = -1e9;
 
   constructor(el: HTMLElement, camera: PerspectiveCamera, events: ControlEvents) {
     this.el = el;
@@ -75,11 +104,106 @@ export class OrbitControls {
     on("pointercancel", (e) => this.onUp(e));
     on("wheel", (e) => this.onWheel(e), { passive: false });
     on("contextmenu", (e) => e.preventDefault());
+    this.watchGuests();
+  }
+
+  /**
+   * Fingers on what lies over the picture – a floor's label, a pin, a glass card – count for a pinch as well. They
+   * never reached the canvas, so with the house full of labels and pins two fingers rarely both met free picture and
+   * the house could be turned but not zoomed. Such a finger is a guest: alone it does what its element does; with a
+   * second finger down, both zoom and pan, and the element's own click is left out.
+   */
+  private watchGuests(): void {
+    const host = this.el.parentElement;
+    if (!host || typeof window === "undefined") return;
+    const add = (target: EventTarget, type: string, fn: (e: PointerEvent) => void) => {
+      target.addEventListener(type, fn as EventListener, true);
+      this.guestListeners.push([target, type, fn as EventListener]);
+    };
+    // what is used with a pointer of its own: a field, a slider, a list that scrolls
+    const ownUse = (target: EventTarget | null): boolean => {
+      for (let n = target as HTMLElement | null; n && n !== host; n = n.parentElement) {
+        if (/^(INPUT|SELECT|TEXTAREA)$/.test(n.tagName)) return true;
+        if (n.scrollHeight > n.clientHeight + 1 && /auto|scroll/.test(getComputedStyle(n).overflowY)) return true;
+      }
+      return false;
+    };
+    add(host, "pointerdown", (e) => {
+      if ((e.pointerType !== "touch" && e.pointerType !== "mouse") || e.target === this.el || this.grabbing || this.swiping) return;
+      if (ownUse(e.target)) return;
+      this.guests.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, type: e.pointerType, button: e.button });
+      this.joinGuests();
+    });
+    // the wheel over a pin, a name or a glass card zooms the house: it never reached the picture, so zooming stopped
+    // wherever the pointer happened to rest (#1271)
+    add(host, "wheel", ((e: WheelEvent) => {
+      if (e.target === this.el || this.grabbing || this.swiping || ownUse(e.target)) return;
+      this.onWheel(e);
+    }) as unknown as (e: PointerEvent) => void);
+    add(window, "pointermove", (e) => {
+      const g = this.guests.get(e.pointerId);
+      if (!g) return;
+      g.x = e.clientX;
+      g.y = e.clientY;
+      if (this.pointers.has(e.pointerId)) this.onMove(e);
+      else this.dragGuest(e, g);
+    });
+    const up = (e: PointerEvent) => {
+      if (!this.guests.delete(e.pointerId) || !this.pointers.delete(e.pointerId)) return;
+      if (this.pointers.size < 2) this.pinch = null;
+      this.guestPinchAt = performance.now();
+      this.events.change();
+    };
+    add(window, "pointerup", up);
+    add(window, "pointercancel", up);
+    // the element under a finger that zoomed is not tapped
+    add(host, "click", ((e: Event) => {
+      if (performance.now() - this.guestPinchAt > 500) return;
+      e.stopPropagation();
+      e.preventDefault();
+    }) as unknown as (e: PointerEvent) => void);
+  }
+
+  /**
+   * One finger that began on a label, a pin or a glass card and then travels: it turns the house, like a finger on
+   * free picture. Such a drag belonged to nobody before, and on a phone the browser took it for its own "back" swipe
+   * – a small sideways move over a pin and the dashboard was back instead of the house turning (#1248). The
+   * element's own click is left out once the finger has travelled.
+   */
+  private dragGuest(e: PointerEvent, g: { x0: number; y0: number; type: string; button: number }): void {
+    if (this.grabbing || this.swiping || this.pointers.size || this.guests.size !== 1) return;
+    // the mouse only drags while a button is held; a finger is always down
+    if (g.type === "mouse" && e.buttons === 0) return;
+    if (Math.hypot(e.clientX - g.x0, e.clientY - g.y0) < GUEST_DRAG) return;
+    this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, button: g.button, type: g.type });
+    this.flight = null;
+    this.velocity = { theta: 0, phi: 0 };
+    clearTimeout(this.holdTimer);
+    this.held = false;
+    this.down = null;
+    this.guestPinchAt = performance.now();
+    this.events.change();
+  }
+
+  /** Two fingers down, at least one of them a guest: the guests join the pinch. */
+  private joinGuests(): void {
+    if (!this.guests.size || this.grabbing || this.swiping) return;
+    const waiting = [...this.guests].filter(([id]) => !this.pointers.has(id));
+    if (!waiting.length || this.pointers.size + waiting.length < 2) return;
+    for (const [id, g] of waiting) this.pointers.set(id, { x: g.x, y: g.y, button: 0, type: "touch" });
+    this.flight = null;
+    this.velocity = { theta: 0, phi: 0 };
+    clearTimeout(this.holdTimer);
+    this.held = false;
+    this.down = null;
+    this.pinch = this.pinchState();
+    this.guestPinchAt = performance.now();
   }
 
   dispose(): void {
     clearTimeout(this.holdTimer);
     for (const [type, fn] of this.listeners) this.el.removeEventListener(type, fn);
+    for (const [target, type, fn] of this.guestListeners) target.removeEventListener(type, fn, true);
   }
 
   /** A finger or the mouse holds the view, or a flight runs (an automatic orbit waits meanwhile). */
@@ -117,13 +241,17 @@ export class OrbitControls {
     return active;
   }
 
-  flyTo(to: Partial<OrbitView>, duration = 700): void {
+  /** `saved`: a start view saved for the house, a floor or a room – its angle applies even under the 3D lock (#645). */
+  flyTo(to: Partial<OrbitView>, duration = 700, saved = false): void {
     const from = { ...this.view, target: this.view.target.clone() };
     // take the short way round
     let theta = to.theta ?? from.theta;
     while (theta - from.theta > Math.PI) theta -= 2 * Math.PI;
     while (theta - from.theta < -Math.PI) theta += 2 * Math.PI;
-    const target = { target: (to.target ?? from.target).clone(), radius: to.radius ?? from.radius, theta, phi: to.phi ?? from.phi };
+    // locked: the flight moves and zooms, the angle stays
+    const target = this.angleLock && !saved
+      ? { target: (to.target ?? from.target).clone(), radius: to.radius ?? from.radius, theta: from.theta, phi: from.phi }
+      : { target: (to.target ?? from.target).clone(), radius: to.radius ?? from.radius, theta, phi: to.phi ?? from.phi };
     this.velocity = { theta: 0, phi: 0 };
     if (duration <= 0 || matchMedia("(prefers-reduced-motion: reduce)").matches) {
       this.view = target;
@@ -145,7 +273,7 @@ export class OrbitControls {
 
   private onDown(e: PointerEvent): void {
     this.el.setPointerCapture(e.pointerId);
-    if (this.pointers.size === 0 && e.button === 0 && this.events.grab?.(...this.local(e))) {
+    if (this.pointers.size === 0 && e.button === 0 && this.events.grab && this.events.grab(...this.local(e))) {
       this.grabbing = true;
       this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, button: e.button, type: e.pointerType });
       this.flight = null;
@@ -171,13 +299,22 @@ export class OrbitControls {
       this.down = null;
       this.pinch = this.pinchState();
     }
+    // a finger already resting on a label or a pin makes this a pinch
+    this.joinGuests();
   }
 
   private onMove(e: PointerEvent): void {
     const p = this.pointers.get(e.pointerId);
     if (!p) return;
     if (this.grabbing) {
-      this.events.drag?.(...this.local(e));
+      if (this.events.drag) this.events.drag(...this.local(e));
+      return;
+    }
+    if (stale(e, performance.now()) && !this.swiping) {
+      // only the position is taken: the next fresh move continues from here
+      p.x = e.clientX;
+      p.y = e.clientY;
+      if (this.pointers.size > 1) this.pinch = this.pinchState();
       return;
     }
     const dx = e.clientX - p.x;
@@ -208,7 +345,13 @@ export class OrbitControls {
         p.y = e.clientY;
         return;
       }
-      const pan = p.button === 1 || p.button === 2 || e.shiftKey;
+      const mouse = p.type === "mouse";
+      if (mouse && !this.leftDragTurns && p.button === 0) {
+        p.x = e.clientX;
+        p.y = e.clientY;
+        return;
+      }
+      const pan = this.angleLock || ((p.button === 1 || p.button === 2 || e.shiftKey) && (this.leftDragTurns || !mouse));
       if (pan) this.pan(dx, dy);
       else {
         const h = this.el.clientHeight || 1;
@@ -234,7 +377,8 @@ export class OrbitControls {
   }
 
   private onUp(e: PointerEvent): void {
-    if (!this.pointers.has(e.pointerId)) return;
+    const button = this.pointers.get(e.pointerId)?.button;
+    if (button === undefined) return;
     if (this.grabbing) {
       this.grabbing = false;
       this.pointers.delete(e.pointerId);
@@ -258,7 +402,10 @@ export class OrbitControls {
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       const now = performance.now();
-      if (now - this.lastTap < 320) {
+      if (button === 2 && this.rightClickBack && this.events.back) {
+        this.lastTap = 0;
+        this.events.back();
+      } else if (now - this.lastTap < 320) {
         this.lastTap = 0;
         this.events.doubleTap(x, y);
       } else {
@@ -272,6 +419,7 @@ export class OrbitControls {
 
   private onWheel(e: WheelEvent): void {
     e.preventDefault();
+    if (stale(e, performance.now())) return;
     this.flight = null;
     this.zoom(Math.exp(e.deltaY * (e.deltaMode === 1 ? 0.05 : 0.0015)));
     this.events.change();

@@ -9,7 +9,7 @@
 import { generateWalls } from "./geometry/walls.ts";
 import type { Building, CableRoute, EnergySettings, Floor, Furniture, Room, SolarField, Vec2 } from "./model.ts";
 import { fieldCenter, fieldFace, fieldSize, roofFaces, topFloor, wallFaces } from "./solar.ts";
-import { powerSensorsOf } from "./devices.ts";
+import { entityAreaId, isHubDevice, powerSensorsOf } from "./devices.ts";
 import { pointInPolygon, signedArea } from "./model.ts";
 import type { HassEntity, HomeAssistant } from "./types.ts";
 
@@ -99,13 +99,23 @@ export function deviceSensors(building: Building, power: (f: Furniture) => strin
   return out;
 }
 
-/** Where the cables meet: the meter cabinet in the plan, else the meter spot set in older plans. */
+/**
+ * Where the cables meet: the meter cabinet in the plan, else the meter spot set in older plans. A hub point set by
+ * hand (`hub_point`, e.g. the house board while the meter stands at the grid connection, #841) wins over the cabinet.
+ */
 export function meterPosition(building: Building): { floor_id: string; x: number; z: number } | null {
+  if (hubPoint(building)) return building.energy.meter;
   for (const floor of building.floors) {
     const m = floor.furniture.find((f) => f.type === "meter");
     if (m) return { floor_id: floor.id, x: m.x, z: m.z };
   }
   return building.energy.meter;
+}
+
+/** Whether the cables meet at a point set by hand (switched on, set, on a floor of the plan). */
+export function hubPoint(building: Building): boolean {
+  const m = building.energy.meter;
+  return !!building.energy.hub_point && !!m && building.floors.some((f) => f.id === m.floor_id);
 }
 
 /** Home Assistant's energy dashboard settings (`energy/get_prefs`), as far as the proposals need them. */
@@ -117,6 +127,34 @@ export interface EnergyPrefs {
     flow_from?: { stat_energy_from: string }[];
     flow_to?: { stat_energy_to: string }[];
   }[];
+}
+
+/** The gas and water meters of the energy dashboard (their statistics are the meters' sensors). */
+export function proposeMeters(prefs: EnergyPrefs): { gas: string | null; water: string | null } {
+  const of = (type: string) => prefs.energy_sources?.find((s) => s.type === type)?.stat_energy_from ?? null;
+  // statistics of external sources have a colon instead of a dot: only sensors can be linked
+  const sensor = (id: string | null) => (id && id.startsWith("sensor.") ? id : null);
+  return { gas: sensor(of("gas")), water: sensor(of("water")) };
+}
+
+/** How much counters (gas, water) went up since midnight, from the recorder's hourly statistics (null when it has none). */
+export async function fetchTodayChange(hass: HomeAssistant, ids: string[]): Promise<Map<string, number> | null> {
+  const midnight = new Date();
+  midnight.setHours(0, 0, 0, 0);
+  try {
+    const rows = await hass.callWS<Record<string, { change?: number | null }[]>>({
+      type: "recorder/statistics_during_period",
+      start_time: midnight.toISOString(),
+      statistic_ids: ids,
+      period: "hour",
+      types: ["change"],
+    });
+    const out = new Map<string, number>();
+    for (const id of ids) out.set(id, (rows?.[id] ?? []).reduce((s, r) => s + (typeof r.change === "number" ? r.change : 0), 0));
+    return out;
+  } catch {
+    return null;
+  }
 }
 
 /** The power sensor (W) that belongs to an energy statistic: one of the same device, named like it if there are several. */
@@ -171,12 +209,28 @@ function isPowerSensor(hass: HomeAssistant, id: string): boolean {
   return id.startsWith("sensor.") && hass.states[id]?.attributes.device_class === "power";
 }
 
-/** Power sensor of a placed entity: the entity itself, or a power sensor of the same device. */
+/**
+ * Power sensor of a placed entity: the entity itself, or a power sensor of the same device. On a hub (one
+ * device for a whole house, its entities in several areas) only a power sensor in the entity's own area
+ * counts, else every light of the house would get the first meter of the hub (#243).
+ */
 export function powerSensorFor(hass: HomeAssistant, entityId: string): string | null {
   if (isPowerSensor(hass, entityId)) return entityId;
+  // a motion, door or presence sensor uses no power worth a pin: the meter of its device (a wired presence sensor,
+  // a hub) belongs to something else, and the pin said "3 W" at a motion sensor (#337)
+  if (entityId.startsWith("binary_sensor.")) return null;
   const device = hass.entities?.[entityId]?.device_id;
   if (!device) return null;
-  return powerSensorsOf(hass, device).find((e) => e !== entityId) ?? null;
+  const hub = isHubDevice(hass, device);
+  const area = entityAreaId(hass, entityId);
+  const list = powerSensorsOf(hass, device).filter((e) => e !== entityId);
+  // the entity's own meter first: PowerCalc names it after the entity (sensor.<light>_power); then one in the same
+  // area; a meter filed under another room belongs to another light of the device (#743)
+  const own = `sensor.${entityId.slice(entityId.indexOf(".") + 1)}_power`;
+  if (list.includes(own)) return own;
+  const same = list.find((e) => area !== null && entityAreaId(hass, e) === area);
+  if (same || hub) return same ?? null;
+  return list.find((e) => area === null || entityAreaId(hass, e) === null || entityAreaId(hass, e) === area) ?? null;
 }
 
 /** Placed entities that report power, with their position and current power. */
@@ -196,6 +250,29 @@ export function findConsumers(hass: HomeAssistant, building: Building): Consumer
   return out;
 }
 
+/**
+ * What the PV strings report together (W), for one inverter or (without one) all of them; null when no string has a
+ * power sensor that answers.
+ */
+export function stringsPower(hass: HomeAssistant, building: Building, inverterId?: string): number | null {
+  const values = (building.settings.roof.strings ?? [])
+    .filter((s) => (inverterId === undefined || s.inverter === inverterId) && s.entity && s.entity !== "none")
+    .map((s) => readPower(hass.states[s.entity!]))
+    .filter((v): v is number => v !== null);
+  return values.length ? values.reduce((a, b) => a + Math.max(0, b), 0) : null;
+}
+
+/**
+ * The PV power to show: the sensor's value – unless the strings tell more. A plant whose inverter has no power sensor,
+ * or one that reads nothing while its strings make more than 50 W (an inverter's output sensor instead of its PV
+ * power, a Deye through Solarman), showed 0 W beside glowing fields.
+ */
+export function pvWithStrings(sensor: number | null, strings: number | null): number | null {
+  if (strings === null) return sensor;
+  if (sensor === null || (Math.max(0, sensor) < 5 && strings > 50)) return strings;
+  return sensor;
+}
+
 export function energySummary(hass: HomeAssistant, building: Building, consumers: Consumer[], devices: DeviceSensors = deviceSensors(building)): EnergySummary {
   const e = building.energy;
   // the balance sensors win; without them the placed devices bring theirs (the meter, the inverters, the battery)
@@ -211,6 +288,7 @@ export function energySummary(hass: HomeAssistant, building: Building, consumers
     const values = devices.solar.map((id) => readPower(hass.states[id])).filter((v): v is number => v !== null);
     solar = values.length ? values.reduce((a, b) => a + b, 0) : null;
   }
+  solar = pvWithStrings(solar, stringsPower(hass, building));
   let battery: number | null = e.battery ? readPower(hass.states[e.battery], e.battery_invert) : null;
   if (!e.battery && devices.batteries.length) {
     // every battery on its own: a signed sensor (+ = discharging, inverted on request), or discharging and a
@@ -320,7 +398,54 @@ function buildGraph(floor: Floor, exterior: number, interior: number): Graph {
     const b = attach(g, w.roomRight, m);
     if (a !== null && b !== null) link(g, a, b);
   }
+  bridgeGaps(g);
   return g;
+}
+
+/** Rooms drawn a little apart (no shared wall between them) are still one house: up to this gap a cable crosses. */
+const BRIDGE_GAP = 1.0;
+
+/**
+ * Links the parts of the cable graph that no shared wall joins (rooms drawn with a gap, #731) at their closest
+ * ring points – as long as the gap is a wall's width, not a garden between a house and a detached garage.
+ */
+function bridgeGaps(g: Graph): void {
+  const rooms = [...g.rings.entries()];
+  for (;;) {
+    // the part of the graph each node belongs to
+    const part = new Array<number>(g.pos.length).fill(-1);
+    let parts = 0;
+    for (let start = 0; start < g.pos.length; start++) {
+      if (part[start] >= 0) continue;
+      const stack = [start];
+      part[start] = parts;
+      while (stack.length) for (const { to } of g.adj[stack.pop()!]) if (part[to] < 0) stack.push(to), (part[to] = parts);
+      parts++;
+    }
+    if (parts < 2) return;
+    // the closest ring corner of one part to a ring edge of another
+    let best: { a: number; room: string; d: number } | null = null;
+    for (const [, segsA] of rooms)
+      for (const a of new Set(segsA.flat()))
+        for (const [roomB, segsB] of rooms) {
+          if (part[segsB[0][0]] === part[a]) continue;
+          for (const [s0, s1] of segsB) {
+            const p = g.pos[a];
+            const q0 = g.pos[s0];
+            const q1 = g.pos[s1];
+            const dx = q1[0] - q0[0];
+            const dz = q1[1] - q0[1];
+            const t = Math.min(1, Math.max(0, ((p[0] - q0[0]) * dx + (p[1] - q0[1]) * dz) / (dx * dx + dz * dz || 1)));
+            const d = Math.hypot(p[0] - q0[0] - dx * t, p[1] - q0[1] - dz * t);
+            if (!best || d < best.d) best = { a, room: roomB, d };
+          }
+        }
+    // the rings keep a little distance from the walls: their gap is the rooms' gap plus that
+    if (!best || best.d > BRIDGE_GAP + 2 * RING_GAP) return;
+    const b = attach(g, best.room, g.pos[best.a]);
+    if (b === null) return;
+    link(g, best.a, b);
+  }
 }
 
 /** New node at the point of a room's ring closest to p, linked to that segment's ends. */
@@ -344,6 +469,34 @@ function attach(g: Graph, roomId: string, p: Vec2): number | null {
   link(g, node, best.seg[0]);
   link(g, node, best.seg[1]);
   return node;
+}
+
+/**
+ * Links a device's node to its room's ring. A leg that would run slant to the wall (a device in a corner, or
+ * outside the room) becomes an L: first along the ring's other direction, then square to the device (#256).
+ */
+function attachDevice(g: Graph, room: Room, node: number): boolean {
+  const p = g.pos[node];
+  const at = attach(g, room.id, p);
+  if (at === null) return false;
+  const q = g.pos[at];
+  // attach() linked the new ring node to its segment's two ends first
+  const a = g.pos[g.adj[at][0].to];
+  const b = g.pos[g.adj[at][1].to];
+  const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+  const s: Vec2 = [(b[0] - a[0]) / l, (b[1] - a[1]) / l];
+  const along = (p[0] - q[0]) * s[0] + (p[1] - q[1]) * s[1];
+  const across = (p[1] - q[1]) * s[0] - (p[0] - q[0]) * s[1];
+  if (Math.abs(along) < 0.01 || Math.abs(across) < 0.01) {
+    link(g, node, at);
+    return true;
+  }
+  const c1: Vec2 = [q[0] + s[0] * along, q[1] + s[1] * along];
+  const c2: Vec2 = [q[0] - s[1] * across, q[1] + s[0] * across];
+  const corner = addNode(g, pointInPolygon(c2, room.points) || !pointInPolygon(c1, room.points) ? c2 : c1);
+  link(g, at, corner);
+  link(g, corner, node);
+  return true;
 }
 
 /** Room containing p, or the one whose outline is nearest. */
@@ -453,18 +606,14 @@ function planRoutes(building: Building, targets: Target[]): PlannedSegment[] {
     const rootRoom = roomAt(f, [meter.x, meter.z]);
     if (!rootRoom) continue;
     const root = addNode(g, [meter.x, meter.z]);
-    const rootAttach = attach(g, rootRoom.id, [meter.x, meter.z]);
-    if (rootAttach === null) continue;
-    link(g, root, rootAttach);
+    if (!attachDevice(g, rootRoom, root)) continue;
     const ends: { node: number; member: number }[] = [];
     for (const i of byFloor.get(f.id)!) {
       const t = targets[i];
       const room = roomAt(f, [t.x, t.z]);
       if (!room) continue;
       const node = addNode(g, [t.x, t.z]);
-      const at = attach(g, room.id, [t.x, t.z]);
-      if (at === null) continue;
-      link(g, node, at);
+      if (!attachDevice(g, room, node)) continue;
       ends.push({ node, member: i });
     }
     const { dist, prev } = dijkstra(g, root);
@@ -549,8 +698,14 @@ export function flowSegments({ building, consumers, summary, battery, fieldPower
     const importing = summary.grid! >= 0;
     const hand = laid("grid");
     const route: V3[] = hand
-      ? manualPoints(building, hand, [street.end[0], meterFloor.elevation + CABLE_Y, street.end[1]], [meter.x, meterFloor.elevation + 0.4 + 1.1, meter.z])
-      : [[street.end[0], CABLE_Y, street.end[1]], [street.wall[0], CABLE_Y, street.wall[1]], [meter.x, CABLE_Y, meter.z]];
+      ? manualPoints(building, hand, [street.end[0], meterFloor.elevation + Math.max(CABLE_Y, street.height), street.end[1]], [meter.x, meterFloor.elevation + 0.4 + 1.1, meter.z])
+      : [
+          // a grid connection mounted on a wall: the cable comes down from it first
+          ...(street.height > 0.05 ? [[street.end[0], street.height, street.end[1]] as V3] : []),
+          [street.end[0], CABLE_Y, street.end[1]],
+          [street.wall[0], CABLE_Y, street.wall[1]],
+          [meter.x, CABLE_Y, meter.z],
+        ];
     const pieces = hand
       ? absolutePolyline(building, importing ? route : [...route].reverse(), Math.abs(summary.grid!), importing ? "grid" : "export", meterFloor)
       : polyline(meterFloor.id, importing ? route : [...route].reverse(), Math.abs(summary.grid!), importing ? "grid" : "export", 0);
@@ -570,7 +725,20 @@ export function flowSegments({ building, consumers, summary, battery, fieldPower
     for (const f of fields) {
       const power = fieldPower.get(f.id) ?? 0;
       const named = f.string ? strings.find((x) => x.id === f.string)?.inverter : null;
-      let inv = named ? (inverters.find((x) => x.id === named) ?? null) : null;
+      // a string may also end at a battery with its own solar input (a power station such as an EcoFlow, D410)
+      const station = named ? (batteries.find((x) => x.id === named) ?? null) : null;
+      let inv = named && !station ? (inverters.find((x) => x.id === named) ?? null) : null;
+      if (station) {
+        const via = onInverter.get(station.id);
+        if (via) fieldsOf.set(via.id, (fieldsOf.get(via.id) ?? 0) + power);
+        const batY = station.variant === "wall" ? 0.5 + station.h : 0.9;
+        const hand = laid(`solar:${f.id}`);
+        const start = hand ? fieldStart(building, f) : null;
+        const floor = building.floors.find((x) => x.id === station.floorId);
+        if (hand && start && floor) out.push(...tag(absolutePolyline(building, manualPoints(building, hand, start, [station.x, floor.elevation + batY, station.z]), power, "solar", floor), `solar:${f.id}`));
+        else out.push(...tag(solarRoute(building, f, power, station, batY), `solar:${f.id}`));
+        continue;
+      }
       if (!inv && inverters.length) {
         const face = fieldFace(building, f, faces);
         const c = face ? fieldCenter(face, f) : [f.u, f.v];
@@ -603,10 +771,14 @@ export function flowSegments({ building, consumers, summary, battery, fieldPower
     const invFloor = building.floors.find((x) => x.id === inv.floorId);
     if (summary.solar !== null || summary.battery !== null) {
       const hand = laid(`inv:${inv.id}`);
+      // the cable ends at the meter, or at the grid point when the inverter is told so (#841)
+      const grid = inverterToGrid(building, inv.id) ? gridPoint(building) : null;
+      const end = grid ? { floorId: grid.floorId, x: grid.end[0], z: grid.end[1], y: Math.max(CABLE_Y, grid.height) } : { floorId: meter.floor_id, x: meter.x, z: meter.z, y: 1.5 };
+      const endFloor = grid ? (building.floors.find((x) => x.id === grid.floorId) ?? meterFloor) : meterFloor;
       const pieces =
         hand && invFloor
-          ? absolutePolyline(building, manualPoints(building, hand, [inv.x, invFloor.elevation + invTop, inv.z], [meter.x, meterFloor.elevation + 1.5, meter.z]), Math.max(0, feed), "inverter", invFloor)
-          : deviceRoute(building, inv, invTop, { floorId: meter.floor_id, x: meter.x, z: meter.z }, 1.5, Math.max(0, feed), "inverter", 0);
+          ? absolutePolyline(building, manualPoints(building, hand, [inv.x, invFloor.elevation + invTop, inv.z], [end.x, endFloor.elevation + end.y, end.z]), Math.max(0, feed), "inverter", invFloor)
+          : deviceRoute(building, inv, invTop, end, end.y, Math.max(0, feed), "inverter", 0);
       out.push(...tag(pieces, `inv:${inv.id}`));
     }
     for (const bat of mine) {
@@ -641,7 +813,8 @@ interface DevicePos {
  * Where the grid cable leaves the house and where it ends: through the exterior wall nearest to the meter and on
  * to the edge of the plot in that direction (the outermost outdoor area, else a few metres out) – the street.
  */
-export function gridPoint(building: Building): { floorId: string; wall: Vec2; end: Vec2 } | null {
+/** Where the grid cable leaves the house: the wall it passes, its end at the street, and the height of that end above the floor (a grid connection mounted on a wall, #256). */
+export function gridPoint(building: Building): { floorId: string; wall: Vec2; end: Vec2; height: number } | null {
   const meter = meterPosition(building);
   const floor = meter ? building.floors.find((f) => f.id === meter.floor_id) : undefined;
   if (!meter || !floor) return null;
@@ -666,7 +839,8 @@ export function gridPoint(building: Building): { floorId: string; wall: Vec2; en
       hit = { q: [meter.x + dx * t, meter.z + dz * t], out: [ez / l, -ex / l], t };
     }
     const wall: Vec2 = hit ? [hit.q[0] + hit.out[0] * (ext / 2 + 0.05), hit.q[1] + hit.out[1] * (ext / 2 + 0.05)] : [meter.x, meter.z];
-    return { floorId: floor.id, wall, end: [set.x, set.z] };
+    const height = building.floors.flatMap((f) => f.furniture).find((m) => m.id === set.id)?.mount_y ?? 0;
+    return { floorId: floor.id, wall, end: [set.x, set.z], height: Math.max(0, height) };
   }
   let best: { q: Vec2; out: Vec2; d: number } | null = null;
   for (const w of exterior) {
@@ -700,7 +874,12 @@ export function gridPoint(building: Building): { floorId: string; wall: Vec2; en
     }
   }
   const t = far > ext + 1 ? far : ext + 2.5;
-  return { floorId: floor.id, wall: [q[0] + out[0] * (ext / 2 + 0.05), q[1] + out[1] * (ext / 2 + 0.05)], end: [q[0] + out[0] * t, q[1] + out[1] * t] };
+  return { floorId: floor.id, wall: [q[0] + out[0] * (ext / 2 + 0.05), q[1] + out[1] * (ext / 2 + 0.05)], end: [q[0] + out[0] * t, q[1] + out[1] * t], height: 0 };
+}
+
+/** Whether an inverter's cable ends at the grid point instead of the meter (#841). */
+export function inverterToGrid(building: Building, id: string): boolean {
+  return building.floors.some((f) => f.furniture.some((m) => m.id === id && m.type === "inverter" && m.cable_to === "grid"));
 }
 
 /** All energy devices of a type in the plan (where cables start or end). */
@@ -726,12 +905,8 @@ function roomPath(building: Building, floor: Floor, from: Vec2, to: Vec2): Vec2[
   const b = roomAt(floor, to);
   if (a && b) {
     const na = addNode(g, from);
-    const aa = attach(g, a.id, from);
     const nb = addNode(g, to);
-    const ab = attach(g, b.id, to);
-    if (aa !== null && ab !== null) {
-      link(g, na, aa);
-      link(g, nb, ab);
+    if (attachDevice(g, a, na) && attachDevice(g, b, nb)) {
       const { dist, prev } = dijkstra(g, na);
       if (Number.isFinite(dist[nb])) {
         path.length = 0;
@@ -891,14 +1066,19 @@ export function solarDayFromStats(rows: Record<string, StatRow[]>, now = new Dat
   midnight.setHours(0, 0, 0, 0);
   const slots = Math.max(1, Math.floor((now.getTime() - midnight.getTime()) / 300000) + 1);
   const curve = new Array<number>(slots).fill(0);
+  let last = -1;
   for (const list of Object.values(rows)) {
     for (const r of list) {
       const start = typeof r.start === "number" ? r.start : Date.parse(r.start);
       const i = Math.floor((start - midnight.getTime()) / 300000);
       if (i < 0 || i >= slots || typeof r.mean !== "number") continue;
       curve[i] += Math.max(0, r.mean);
+      last = Math.max(last, i);
     }
   }
+  // the recorder writes a five-minute mean only after its slot: the last few minutes have none yet, so the curve
+  // ends at the newest mean instead of dropping to zero there (#527); a longer gap stays a gap
+  curve.length = Math.max(last + 1, slots - 3, 1);
   const kwh = curve.reduce((s, w) => s + (w * 5) / 60 / 1000, 0);
   return { kwh, peak: Math.max(0, ...curve), curve };
 }

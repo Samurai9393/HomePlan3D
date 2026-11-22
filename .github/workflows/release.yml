@@ -1,8 +1,10 @@
 name: Release
 
 # On a published GitHub release: check that the tag matches the manifest version, pack the integration
-# as neonplan3d.zip (HACS installs this file because hacs.json sets zip_release) and attach it. The
-# asset's download count is the number of HACS installs and updates of that version.
+# as neonplan3d.zip and attach it. HACS and the Marketplace install from this zip (hacs.json zip_release,
+# on again since 18.11.2026 – hacs/integration#5643 was fixed on 25.10.2026), and its downloads are the
+# number the Marketplace shows. The zip is best attached when the release is created (the same files, packed
+# the same way), so no update in the first minute finds a release without it; then this job leaves it alone.
 on:
   release:
     types: [published]
@@ -33,4 +35,10 @@ jobs:
       - name: Attach to the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "$GITHUB_REF_NAME" neonplan3d.zip --clobber
+        run: |
+          # already attached when the release was created: keep it (replacing it would reset its download count)
+          if gh release view "$GITHUB_REF_NAME" --json assets --jq '.assets[].name' | grep -qx neonplan3d.zip; then
+            echo "neonplan3d.zip already attached"
+          else
+            gh release upload "$GITHUB_REF_NAME" neonplan3d.zip
+          fi

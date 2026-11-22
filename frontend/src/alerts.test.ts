@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { alertEntities, alertSources, alertText, findAlerts } from "./alerts.ts";
+import { alertEntities, alertSources, alertText, findAlerts, isOutage } from "./alerts.ts";
 import type { OpeningEntities } from "./devices.ts";
 import { emptyBuilding, newFloor, type Opening } from "./model.ts";
 import type { HomeAssistant } from "./types.ts";
@@ -59,6 +59,11 @@ test("smoke and water raise room warnings, a triggered alarm a house-wide one", 
   );
   assert.equal(alertText(hass, b, alerts[0]), "Küche · Rauch: Rauchmelder");
   assert.equal(alertText(hass, b, alerts[2]), "Alarm ausgelöst");
+  // without device names only the room and the kind remain; a warning without a room keeps its text (#374)
+  b.settings.alert_names = false;
+  assert.equal(alertText(hass, b, alerts[0]), "Küche · Rauch");
+  assert.equal(alertText(hass, b, alerts[2]), "Alarm ausgelöst");
+  delete b.settings.alert_names;
   hass.states["alarm_control_panel.haus"].state = "pending";
   assert.equal(findAlerts(hass, b, src, links).at(-1)?.kind, "alarm_pending");
 });
@@ -81,4 +86,95 @@ test("the rain warning can be switched off on its own", () => {
   b.settings.rain_warning = false;
   const alerts = findAlerts(hass, b, alertSources(hass, b), links);
   assert.equal(alerts.filter((a) => a.kind === "window_rain").length, 0);
+});
+
+test("a window may stay open in the rain; a weather station's own rain sensor decides (D328, D407)", () => {
+  const { hass, b, links } = setup();
+  hass.states["weather.zuhause"].state = "rainy";
+  // the window under a canopy does not warn
+  for (const o of b.floors[0].openings) if (o.type === "window") o.rain_ignore = true;
+  assert.equal(findAlerts(hass, b, alertSources(hass, b), links).filter((a) => a.kind === "window_rain").length, 0);
+  for (const o of b.floors[0].openings) delete o.rain_ignore;
+  // the station says dry although the forecast says rainy: no warning; then it rains at the house
+  hass.states["sensor.regenrate"] = { entity_id: "sensor.regenrate", state: "0", attributes: { unit_of_measurement: "mm/h" } } as never;
+  b.settings.rain_entity = "sensor.regenrate";
+  assert.equal(findAlerts(hass, b, alertSources(hass, b), links).filter((a) => a.kind === "window_rain").length, 0);
+  hass.states["sensor.regenrate"].state = "2.4";
+  hass.states["weather.zuhause"].state = "sunny";
+  assert.equal(findAlerts(hass, b, alertSources(hass, b), links).filter((a) => a.kind === "window_rain").length, 1);
+});
+
+test("a power outage: grid sensors off, helpers on, a UPS on battery, a low mains voltage (#214)", () => {
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  assert.equal(isOutage(st("binary_sensor.netz", "off", { device_class: "power" })), true);
+  assert.equal(isOutage(st("binary_sensor.netz", "on", { device_class: "power" })), false);
+  assert.equal(isOutage(st("binary_sensor.stromausfall", "on")), true);
+  assert.equal(isOutage(st("input_boolean.stromausfall", "on")), true);
+  assert.equal(isOutage(st("sensor.ups_status", "OB DISCHRG")), true);
+  assert.equal(isOutage(st("sensor.ups_status", "OL")), false);
+  assert.equal(isOutage(st("sensor.netzspannung", "0", { unit_of_measurement: "V" })), true);
+  assert.equal(isOutage(st("sensor.netzspannung", "231", { unit_of_measurement: "V" })), false);
+  assert.equal(isOutage(st("sensor.netzbezug", "0", { unit_of_measurement: "W" })), false);
+  assert.equal(isOutage(st("binary_sensor.netz", "unavailable", { device_class: "power" })), false);
+
+  const b = emptyBuilding();
+  b.settings.outage_entity = "binary_sensor.netz";
+  const hass = { language: "de", areas: {}, entities: {}, devices: {}, states: { "binary_sensor.netz": st("binary_sensor.netz", "off", { device_class: "power", friendly_name: "Netz" }) } } as unknown as HomeAssistant;
+  const sources = alertSources(hass, b);
+  assert.deepEqual(alertEntities(sources), ["binary_sensor.netz"]);
+  const alerts = findAlerts(hass, b, sources, new Map());
+  assert.deepEqual(alerts.map((a) => a.kind), ["power_outage"]);
+  assert.equal(alertText(hass, b, alerts[0]), "Stromausfall: Netz");
+});
+
+test("the outage picker offers grid and UPS sources, not switches or meters (#831)", async () => {
+  const { isOutageSource } = await import("./outage.ts");
+  const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
+  assert.equal(isOutageSource(st("binary_sensor.netz", "on", { device_class: "power" })), true);
+  assert.equal(isOutageSource(st("input_boolean.stromausfall", "off")), true);
+  assert.equal(isOutageSource(st("sensor.netzspannung", "231", { unit_of_measurement: "V" })), true);
+  assert.equal(isOutageSource(st("sensor.grid_connection_status", "On Grid")), true);
+  assert.equal(isOutageSource(st("switch.sigen_phase_power_control", "on")), false);
+  assert.equal(isOutageSource(st("sensor.netzbezug", "420", { unit_of_measurement: "W" })), false);
+  assert.equal(isOutage(st("sensor.grid_connection_status", "Off Grid")), true);
+  assert.equal(isOutage(st("sensor.grid_connection_status", "On Grid")), false);
+});
+
+test("Haushalt Pro warns when a fridge door stands open too long", async () => {
+  const { setPacks } = await import("./packs.ts");
+  const open = new Date(Date.now() - 5 * 60_000).toISOString();
+  const hass = {
+    language: "de",
+    states: { "binary_sensor.kuehlschrank": { entity_id: "binary_sensor.kuehlschrank", state: "on", attributes: { friendly_name: "Kühlschranktür" }, last_changed: open } },
+    entities: {},
+  } as unknown as HomeAssistant;
+  const b = emptyBuilding();
+  const floor = newFloor("eg", "EG", 0);
+  floor.rooms = [{ id: "k", name: "Küche", area_id: null, points: [[0, 0], [4, 0], [4, 3], [0, 3]], floor_material: "tiles" }];
+  floor.furniture = [{ id: "f1", type: "fridge", x: 1, z: 1, rotation: 0, w: 0.6, d: 0.65, h: 1.8, variant: null, door_left: "binary_sensor.kuehlschrank" }];
+  b.floors = [floor];
+  setPacks([]);
+  assert.deepEqual(findAlerts(hass, b, alertSources(hass, b), new Map()), []);
+  setPacks([{ id: "pro", name: "Pro", items: [], features: ["household"] } as never]);
+  const sources = alertSources(hass, b);
+  assert.ok(alertEntities(sources).includes("binary_sensor.kuehlschrank"));
+  const alerts = findAlerts(hass, b, sources, new Map());
+  assert.deepEqual(alerts.map((a) => [a.kind, a.roomId]), [["fridge_door", "k"]]);
+  assert.equal(alertText(hass, b, alerts[0]), "Küche · Kühlschrank offen: Kühlschranktür");
+  setPacks([]);
+});
+
+test("a contact unavailable for 10 minutes warns only when switched on; a short gap passes", () => {
+  const { hass, b, links } = setup();
+  const src = alertSources(hass, b);
+  const fenster = hass.states["binary_sensor.fenster"] as { state: string; last_changed?: string };
+  fenster.state = "unavailable";
+  fenster.last_changed = new Date(Date.now() - 30 * 60_000).toISOString();
+  // off by default: nothing changes for anyone who has not switched it on
+  assert.equal(findAlerts(hass, b, src, links).length, 0);
+  b.settings.alert_unavailable = true;
+  assert.deepEqual(findAlerts(hass, b, src, links).map((a) => [a.kind, a.roomId, a.entity]), [["contact_unavailable", "k", "binary_sensor.fenster"]]);
+  // a restart of Home Assistant: unavailable for a minute is no warning
+  fenster.last_changed = new Date(Date.now() - 60_000).toISOString();
+  assert.equal(findAlerts(hass, b, src, links).length, 0);
 });

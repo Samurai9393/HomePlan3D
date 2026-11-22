@@ -5,9 +5,9 @@
 // length); on a flat roof s runs across, level. A field's u and v place its lower left corner on the face.
 
 import type { Building, Floor, RoofSection, RoofWindow, SolarField, Vec2 } from "./model.ts";
-import { outdoorGround } from "./model.ts";
+import { outdoorGround, pointInPolygon } from "./model.ts";
 import { generateWalls } from "./geometry/walls.ts";
-import { sectionFrame, sectionOverhang, sectionProfile } from "./roof-sections.ts";
+import { endRuns, sectionEnds, sectionFrame, sectionOverhang, sectionProfile, sectionTurn, turnPoint, type SectionTurn } from "./roof-sections.ts";
 
 const DEG = Math.PI / 180;
 type V3 = [number, number, number];
@@ -22,11 +22,11 @@ const LIFT = 0.07;
 const FLAT_SLAB = 0.25;
 
 export interface RoofFace {
-  /** "main:a" / "main:b" / "main:top" for the single roof, "<section id>:a" / ":b" / ":top" for sections. */
+  /** "main:a" / "main:b" / "main:top" for the single roof, "<section id>:a" / ":b" / ":top" for sections; the hip ends of a hip or pyramid roof are ":c" (start) and ":d" (end). */
   key: string;
   /** Section the face belongs to (null: the single roof). */
   section: string | null;
-  side: "a" | "b" | "top";
+  side: "a" | "b" | "c" | "d" | "top";
   flat: boolean;
   /** Eave corner (heights above the ground), unit vectors along the eave and up the slope, the normal. */
   o: V3;
@@ -43,8 +43,8 @@ export interface RoofFace {
   facing: Vec2;
   /** The ground in the garden: no edges, the field goes where it is put. */
   unbounded?: boolean;
-  /** A house wall: upright, on this floor (its modules hang flat on the facade). */
-  wall?: { floorId: string };
+  /** A house wall: upright, on this floor (its modules hang flat on the facade); its room and the room edge it lies on, for its name. */
+  wall?: { floorId: string; room?: string | null; edge?: number | null; free?: boolean };
 }
 
 /** Outer faces of the house walls, per floor: modules can hang on a facade or a balcony. */
@@ -59,13 +59,16 @@ export function wallFaces(b: Building, floorId?: string): RoofFace[] {
       const dx = w.b[0] - w.a[0];
       const dz = w.b[1] - w.a[1];
       const l = Math.hypot(dx, dz);
-      if (l < 1.2) continue;
+      // short walls too: a 0.92 m garden wall carries a single module (#295)
+      if (l < 0.5) continue;
       // exterior walls have their room on the left: the outer face lies on the right
       const nx = dz / l;
       const nz = -dx / l;
       const height = Math.min(floor.height, w.height ?? floor.height);
+      const edge = w.sources.find((s) => s.room_id === w.roomLeft)?.edge ?? null;
+      const wall = { floorId: floor.id, room: w.roomLeft, edge, free: !!w.free };
       const face = (key: string, o: V3, eu: V3, n: V3) =>
-        out.push({ key, section: null, side: "top", flat: false, o, eu, es: [0, 1, 0], n, lu: l, ls: height, pitch: 90, span: () => [0, l], facing: [n[0], n[2]], wall: { floorId: floor.id } });
+        out.push({ key, section: null, side: "top", flat: false, o, eu, es: [0, 1, 0], n, lu: l, ls: height, pitch: 90, span: () => [0, l], facing: [n[0], n[2]], wall });
       face(`wall:${floor.id}:${w.id}`, [w.a[0] + nx * w.right, floor.elevation, w.a[1] + nz * w.right], [dx / l, 0, dz / l], [nx, 0, nz]);
       // the back of a free wall runs the other way, so its modules face outwards too
       if (w.free) face(`wall:${floor.id}:${w.id}:back`, [w.b[0] - nx * w.left, floor.elevation, w.b[1] - nz * w.left], [-dx / l, 0, -dz / l], [-nx, 0, -nz]);
@@ -77,10 +80,13 @@ export function wallFaces(b: Building, floorId?: string): RoofFace[] {
 /** Face key of fields standing in the garden. */
 export const GROUND = "ground";
 
-/** The floor whose garden ground-mounted fields stand in: the lowest with rooms. */
+/**
+ * The floor whose garden ground-mounted fields stand in: the lowest with rooms at ground level – a cellar
+ * below the ground is passed over (#192) – else the lowest with rooms at all.
+ */
 export function groundFloor(b: Building): Floor | null {
-  const withRooms = b.floors.filter((f) => f.rooms.some((r) => r.points.length >= 3));
-  return [...withRooms].sort((p, q) => p.elevation - q.elevation)[0] ?? b.floors[0] ?? null;
+  const withRooms = [...b.floors.filter((f) => f.rooms.some((r) => r.points.length >= 3))].sort((p, q) => p.elevation - q.elevation);
+  return withRooms.find((f) => f.elevation > -0.5) ?? withRooms[0] ?? b.floors[0] ?? null;
 }
 
 /**
@@ -138,6 +144,18 @@ export function topFloor(b: Building): Floor | null {
   return withRooms.sort((p, q) => q.elevation - p.elevation)[0] ?? null;
 }
 
+/**
+ * The rooms a single (flat or gable) roof spans, [x0, z0, x1, z1]: the top floor's – or the whole house's, kept in
+ * the settings by a card that shows only some rooms, so the roof over them stays as it is (#997).
+ */
+export function roofFootprint(b: Building, floor: Floor): [number, number, number, number] {
+  const frame = b.settings.roof?.frame;
+  if (frame && frame.length === 4 && frame.every((v) => Number.isFinite(v))) return frame;
+  const xs = floor.rooms.flatMap((r) => r.points.map((p) => p[0]));
+  const zs = floor.rooms.flatMap((r) => r.points.map((p) => p[1]));
+  return [Math.min(...xs), Math.min(...zs), Math.max(...xs), Math.max(...zs)];
+}
+
 /** All roof faces modules can lie on. */
 export function roofFaces(b: Building): RoofFace[] {
   const roof = b.settings.roof;
@@ -145,13 +163,12 @@ export function roofFaces(b: Building): RoofFace[] {
   if (roof.type === "custom") return (roof.sections ?? []).flatMap((s) => sectionFaces(s, sectionOverhang(b, s, s.overhang ?? roof.overhang)));
   const floor = topFloor(b);
   if (!floor) return [];
-  const xs = floor.rooms.flatMap((r) => r.points.map((p) => p[0]));
-  const zs = floor.rooms.flatMap((r) => r.points.map((p) => p[1]));
+  const [fx0, fz0, fx1, fz1] = roofFootprint(b, floor);
   const m = b.settings.wall_exterior + roof.overhang;
-  const x0 = Math.min(...xs) - m;
-  const x1 = Math.max(...xs) + m;
-  const z0 = Math.min(...zs) - m;
-  const z1 = Math.max(...zs) + m;
+  const x0 = fx0 - m;
+  const x1 = fx1 + m;
+  const z0 = fz0 - m;
+  const z1 = fz1 + m;
   const top = floor.elevation + floor.height;
   if (roof.type === "flat") return [flatFace("main", null, x0, z0, x1, z1, top + FLAT_SLAB)];
   // gable, as built by the roof: the ridge along the longer side (or the shorter one)
@@ -181,17 +198,26 @@ function sectionFaces(s: RoofSection, ov: { u0: number; u1: number; a: number; b
   const U1 = fr.u1 + Math.max(0, ov.u1);
   const lu = U1 - U0;
   if (s.shape === "flat" || s.shape === "parapet") {
-    const a = fr.at(U0, -oa);
-    const c = fr.at(U1, fr.w + ob);
-    return [flatFace(s.id, s.id, Math.min(a[0], c[0]), Math.min(a[1], c[1]), Math.max(a[0], c[0]), Math.max(a[1], c[1]), s.eave_a + FLAT_SLAB)];
+    // a turned section: its face as it lay before the turn, then turned along with it – the corners of the turned
+    // frame made a box square to the plan, and fields, roof windows and fairy lights lay askew to the roof (#1147)
+    const plain = sectionFrame({ ...s, rotation: 0 });
+    const a = plain.at(U0, -oa);
+    const c = plain.at(U1, fr.w + ob);
+    const face = flatFace(s.id, s.id, Math.min(a[0], c[0]), Math.min(a[1], c[1]), Math.max(a[0], c[0]), Math.max(a[1], c[1]), s.eave_a + FLAT_SLAB);
+    return [turnFace(face, sectionTurn(s))];
   }
   if (s.shape === "pent") return [slopeFace(`${s.id}:a`, s.id, "a", P(U0, -oa, pr.y(-oa)), P(U1, -oa, pr.y(-oa)), P(U0, fr.w + ob, pr.y(fr.w + ob)), s.pitch_a, () => [0, lu])];
-  // a pyramid is a hip whose ridge has no length; half-hip and mansard place their modules like a gable
-  const hip = s.shape === "hip" || s.shape === "pyramid";
-  const d = s.shape === "pyramid" ? (fr.u1 - fr.u0) / 2 : hip ? Math.min((fr.u1 - fr.u0) / 2, Math.min(pr.vr, fr.w - pr.vr) || fr.w / 2) : 0;
+  // a pyramid is a hip whose ridge has no length; half-hip and mansard place their modules like a gable; a
+  // gable, hip or half-hip section may end differently at each end (#466)
+  const ends = sectionEnds(s);
+  const runs = ends ? endRuns(s, ends) : null;
+  const hip0 = s.shape === "pyramid" || ends?.[0] === "hip";
+  const hip1 = s.shape === "pyramid" || ends?.[1] === "hip";
+  const d0 = s.shape === "pyramid" ? (fr.u1 - fr.u0) / 2 : hip0 ? runs!.d0 : 0;
+  const d1 = s.shape === "pyramid" ? (fr.u1 - fr.u0) / 2 : hip1 ? runs!.d1 : 0;
   // a hip slope narrows from the full eave (with the overhang) to the ridge, which starts d in from the walls
-  const in0 = hip ? fr.u0 + d - U0 : 0;
-  const in1 = hip ? U1 - (fr.u1 - d) : 0;
+  const in0 = hip0 ? fr.u0 + d0 - U0 : 0;
+  const in1 = hip1 ? U1 - (fr.u1 - d1) : 0;
   const out: RoofFace[] = [];
   if (pr.vr > 0.3) {
     const len = Math.hypot(pr.vr + oa, pr.rh - pr.y(-oa));
@@ -202,7 +228,44 @@ function sectionFaces(s: RoofSection, ov: { u0: number; u1: number; a: number; b
     // side b: the eave at v = w + overhang, running the other way so the face looks outwards
     out.push(slopeFace(`${s.id}:b`, s.id, "b", P(U1, fr.w + ob, pr.y(fr.w + ob)), P(U0, fr.w + ob, pr.y(fr.w + ob)), P(U1, pr.vr, pr.rh), s.pitch_b, (t) => [in1 * (t / len), lu - in0 * (t / len)]));
   }
+  // the hip ends: triangles from the end eave up to where the ridge starts (D134, D158)
+  if (hip0 || hip1) {
+    const ya = pr.y(-oa);
+    const yb = pr.y(fr.w + ob);
+    const hipEnds: [string, "c" | "d", V3, V3, V3][] = [];
+    if (hip0) hipEnds.push([`${s.id}:c`, "c", P(U0, fr.w + ob, yb), P(U0, -oa, ya), P(fr.u0 + d0, pr.vr, pr.rh)]);
+    if (hip1) hipEnds.push([`${s.id}:d`, "d", P(U1, -oa, ya), P(U1, fr.w + ob, yb), P(fr.u1 - d1, pr.vr, pr.rh)]);
+    for (const [key, side, o, e, apex] of hipEnds) {
+      const face = triangleFace(key, s.id, side, o, e, apex);
+      if (face) out.push(face);
+    }
+  }
   return out;
+}
+
+/**
+ * A triangular roof face (a hip end): the eave from `o` to `eaveEnd`, rising to `apex`. The slope frame
+ * is the plane's own (s at right angles to the eave), the usable span narrows linearly towards the apex.
+ */
+function triangleFace(key: string, section: string, side: "c" | "d", o: V3, eaveEnd: V3, apex: V3): RoofFace | null {
+  const lu = len(sub(eaveEnd, o));
+  if (lu < 0.3) return null;
+  const eu = unit(sub(eaveEnd, o));
+  const ra = sub(apex, o);
+  const uf = ra[0] * eu[0] + ra[1] * eu[1] + ra[2] * eu[2];
+  const up: V3 = [ra[0] - eu[0] * uf, ra[1] - eu[1] * uf, ra[2] - eu[2] * uf];
+  const ls = len(up);
+  if (ls < 0.3) return null;
+  const es = unit(up);
+  let n = unit(cross(eu, es));
+  if (n[1] < 0) n = [-n[0], -n[1], -n[2]];
+  const down = unit([-es[0], 0, -es[2]]);
+  const pitch = Math.atan2(es[1], Math.hypot(es[0], es[2])) / DEG;
+  const span = (t: number): [number, number] => {
+    const k = Math.min(1, Math.max(0, t / ls));
+    return [uf * k, lu - (lu - uf) * k];
+  };
+  return { key, section, side, flat: false, o, eu, es, n, lu, ls, pitch, span, facing: [down[0], down[2]] };
 }
 
 function slopeFace(key: string, section: string | null, side: "a" | "b", o: V3, eaveEnd: V3, ridge: V3, pitch: number, span: (s: number) => [number, number]): RoofFace {
@@ -212,6 +275,18 @@ function slopeFace(key: string, section: string | null, side: "a" | "b", o: V3, 
   if (n[1] < 0) n = [-n[0], -n[1], -n[2]];
   const down = unit([-es[0], 0, -es[2]]);
   return { key, section, side, flat: false, o, eu, es, n, lu: len(sub(eaveEnd, o)), ls: len(sub(ridge, o)), pitch, span, facing: [down[0], down[2]] };
+}
+
+/** A face turned about a section's turn point (directions turned alike); unchanged without a turn. */
+function turnFace(f: RoofFace, t: SectionTurn | null): RoofFace {
+  if (!t) return f;
+  const dir = (d: V3): V3 => {
+    const [x, z] = turnPoint({ p: [0, 0], c: t.c, s: t.s }, [d[0], d[2]]);
+    return [x, d[1], z];
+  };
+  const [ox, oz] = turnPoint(t, [f.o[0], f.o[2]]);
+  const [fx, fz] = turnPoint({ p: [0, 0], c: t.c, s: t.s }, f.facing);
+  return { ...f, o: [ox, f.o[1], oz], eu: dir(f.eu), es: dir(f.es), n: dir(f.n), facing: [fx, fz] };
 }
 
 function flatFace(id: string, section: string | null, x0: number, z0: number, x1: number, z1: number, y: number): RoofFace {
@@ -299,6 +374,7 @@ export function fieldModules(face: RoofFace, f: SolarField, withSkipped = false)
   const counts = rowCounts(f);
   const most = Math.max(1, ...counts);
   const skip = new Set(f.skip ?? []);
+  const wide = !!face.wall && mw > face.lu + 1e-6;
   const at = (u: number, s: number, up: number): V3 => [
     face.o[0] + face.eu[0] * u + face.es[0] * s + face.n[0] * up,
     face.o[1] + face.eu[1] * u + face.es[1] * s + face.n[1] * up,
@@ -321,7 +397,10 @@ export function fieldModules(face: RoofFace, f: SolarField, withSkipped = false)
       const s0 = f.v + r * pitch;
       const u1 = u0 + mw;
       const s1 = s0 + (face.flat || face.wall ? depth : mh);
-      if (![[u0, s0], [u1, s0], [u1, s1], [u0, s1]].every(([u, s]) => inside(u, s))) continue;
+      // a wall narrower than a module (a short garden wall) carries it overhanging both ends, centred on it (#295)
+      if (wide) {
+        if (!(inside((u0 + u1) / 2, s0) && inside((u0 + u1) / 2, s1))) continue;
+      } else if (![[u0, s0], [u1, s0], [u1, s1], [u0, s1]].every(([u, s]) => inside(u, s))) continue;
       if (face.wall && t > 0.001) {
         // on a wall, tilted: the upper edge stands off the wall (flipped: the lower edge), on brackets
         const away = LIFT + mh * Math.sin(t);
@@ -390,7 +469,9 @@ export function clampField(face: RoofFace, f: SolarField): { u: number; v: numbe
   const [w, d] = fieldSize(face, f);
   // rounded down to centimetres, so a field pushed to the far edge still fits completely
   const r = (x: number) => Math.floor(x * 100 + 1e-6) / 100;
-  return { u: r(Math.min(Math.max(0, f.u), Math.max(0, face.lu - w))), v: r(Math.min(Math.max(0, f.v), Math.max(0, face.ls - d))) };
+  // a field wider than its wall sits centred on it, overhanging both ends
+  const u = face.wall && w > face.lu ? Math.round(((face.lu - w) / 2) * 100) / 100 : r(Math.min(Math.max(0, f.u), Math.max(0, face.lu - w)));
+  return { u, v: r(Math.min(Math.max(0, f.v), Math.max(0, face.ls - d))) };
 }
 
 /** Corners of every module of a field in the plan (for the editor). */
@@ -412,6 +493,28 @@ export function proposeField(face: RoofFace, id: string): SolarField {
   f.u = center(face, f);
   f.v = margin;
   return f;
+}
+
+/**
+ * A field moved to another face (a roof section replaced, #258): it keeps its modules – rows, columns, format
+ * and tilt where the face allows one – and is centred along the eave of the new face, inside its edges.
+ */
+export function moveField(face: RoofFace, f: SolarField): SolarField {
+  const next: SolarField = { ...f, face: face.key, tilt: face.flat ? (f.tilt ?? 15) : null, rotation: null, flip: false };
+  if (face.wall) Object.assign(next, fitWall(face, next));
+  next.u = center(face, next);
+  next.v = 0.4;
+  return { ...next, ...clampField(face, next) };
+}
+
+/**
+ * On a wall a field keeps as many modules in its row as the wall takes; one too narrow for a module lying
+ * down takes it upright, and one narrower than that carries a single module (#295).
+ */
+function fitWall(face: RoofFace, f: SolarField): Pick<SolarField, "portrait" | "cols" | "layout" | "skip"> {
+  const fits = (portrait: boolean) => Math.floor((face.lu + MODULE_GAP + 1e-6) / (moduleSize({ ...f, portrait })[0] + MODULE_GAP));
+  const portrait = f.portrait === false && fits(false) < 1 ? true : f.portrait;
+  return { portrait, cols: Math.max(1, Math.min(Math.max(...rowCounts(f)), fits(portrait !== false))), layout: undefined, skip: undefined };
 }
 
 function center(face: RoofFace, f: SolarField): number {
@@ -456,9 +559,12 @@ function cross(a: V3, b: V3): V3 {
 export const ROOF_WINDOW_W = 0.78;
 export const ROOF_WINDOW_H = 1.18;
 
-/** A roof window seen as a field of one module of its size (so placing, moving and keeping it on the face work alike). */
+/**
+ * A roof window seen as a field of one module of its size (so placing, moving and keeping it on the face work alike).
+ * It lies in its face: on a flat roof flush like a rooflight, not raised on a frame like a solar module (#1078).
+ */
 export function windowAsField(w: RoofWindow): SolarField {
-  return { id: w.id, face: w.face, u: w.u, v: w.v, rows: 1, cols: 1, portrait: true, module_w: w.w || ROOF_WINDOW_W, module_h: w.h || ROOF_WINDOW_H };
+  return { id: w.id, face: w.face, u: w.u, v: w.v, rows: 1, cols: 1, portrait: true, tilt: 0, module_w: w.w || ROOF_WINDOW_W, module_h: w.h || ROOF_WINDOW_H };
 }
 
 /** The four corners of a roof window, a little above the roof (lower left, lower right, upper right, upper left); null off the face. */
@@ -468,6 +574,32 @@ export function windowCorners(face: RoofFace, w: RoofWindow): [V3, V3, V3, V3] |
   // the modules ride 7 cm above the roof on rails; a roof window sits nearly flush
   const down = (p: V3): V3 => [p[0] - face.n[0] * 0.05, p[1] - face.n[1] * 0.05, p[2] - face.n[2] * 0.05];
   return [down(m.corners[0]), down(m.corners[1]), down(m.corners[2]), down(m.corners[3])];
+}
+
+/**
+ * The room under a roof window: the one holding the window's middle in the plan on the highest floor below it,
+ * so the room's card shows it like the windows in its walls and the sun falls through it into that room (#482).
+ */
+export function roofWindowRoom(b: Building, face: RoofFace | undefined, w: RoofWindow): { floor: Floor; roomId: string; corners: [V3, V3, V3, V3] } | null {
+  const c = face ? windowCorners(face, w) : null;
+  if (!c) return null;
+  const x = (c[0][0] + c[2][0]) / 2;
+  const y = (c[0][1] + c[2][1]) / 2;
+  const z = (c[0][2] + c[2][2]) / 2;
+  for (const f of [...b.floors].sort((p, q) => q.elevation - p.elevation)) {
+    if (f.elevation > y) continue;
+    const room = f.rooms.find((r) => pointInPolygon([x, z], r.points));
+    if (room) return { floor: f, roomId: room.id, corners: c };
+  }
+  return null;
+}
+
+/** The roof windows over a room (#482). */
+export function roofWindowsOver(b: Building, roomId: string): RoofWindow[] {
+  const windows = b.settings.roof?.windows ?? [];
+  if (!windows.length) return [];
+  const faces = new Map(roofFaces(b).map((f) => [f.key, f]));
+  return windows.filter((w) => roofWindowRoom(b, faces.get(w.face), w)?.roomId === roomId);
 }
 
 /** A new roof window in the middle of a face, at about head height above the floor below. */

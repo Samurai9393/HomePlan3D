@@ -40,8 +40,9 @@ export class GeoBuffer {
     this.c.push(ca.r, ca.g, ca.b, cb.r, cb.g, cb.b, cc.r, cc.g, cc.b);
     this.f.push(fold, fold, fold);
     // without explicit uvs, point into an empty spot of the texture
-    this.uv?.push(...(uv ?? [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]));
-    this.tile?.push(...tile, ...tile, ...tile);
+    // no `a?.b(...x)`: old Fire-tablet WebViews (before Chrome 91) fail on it (see build.mjs)
+    if (this.uv) this.uv.push(...(uv ?? [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]));
+    if (this.tile) this.tile.push(...tile, ...tile, ...tile);
   }
 
   get count(): number {
@@ -133,8 +134,8 @@ export function cutAbove(buf: GeoBuffer, fromTri: number, cut: number, fold: num
       buf.p.push(...v.p);
       buf.c.push(...v.c);
       buf.f.push(f);
-      buf.uv?.push(...(v.uv ?? [0.5, 0.5]));
-      buf.tile?.push(...(v.tile ?? [0, 1]));
+      if (buf.uv) buf.uv.push(...(v.uv ?? [0.5, 0.5]));
+      if (buf.tile) buf.tile.push(...(v.tile ?? [0, 1]));
     }
     return tri;
   };
@@ -211,6 +212,17 @@ export function shade(hex: number, k: number): Color {
   return c;
 }
 
+/** Twice the signed area of a ring in (x, z): positive when counter-clockwise. */
+function ringArea(ring: Vec2[]): number {
+  let a = 0;
+  for (let i = 0; i < ring.length; i++) {
+    const p = ring[i];
+    const q = ring[(i + 1) % ring.length];
+    a += p[0] * q[1] - q[0] * p[1];
+  }
+  return a;
+}
+
 export function triangulate(poly: Vec2[], holes: Vec2[][] = []): number[][] {
   const contour = poly.map(([x, z]) => new Vector2(x, z));
   return ShapeUtils.triangulateShape(
@@ -260,6 +272,8 @@ export function pushLoft(buf: GeoBuffer, lo: Vec2[], hi: Vec2[], y0: number, y1:
  * A cylinder lying along the x or z axis (wheels, rollers, pipes): `at` maps the along-axis value
  * and the across value to world (x, z); `c` is the across-centre, `cy` the centre height.
  */
+type V3 = [number, number, number];
+
 export function pushLyingCyl(buf: GeoBuffer, at: (along: number, across: number) => Vec2, a0: number, a1: number, c: number, cy: number, r: number, side: number, cap: number, n: number): void {
   const capC = new Color(cap);
   const ring: { y: number; s: number }[] = [];
@@ -267,20 +281,39 @@ export function pushLyingCyl(buf: GeoBuffer, at: (along: number, across: number)
     const t = (i / n) * Math.PI * 2;
     ring.push({ y: cy + Math.cos(t) * r, s: c + Math.sin(t) * r });
   }
-  const P = (along: number, i: number) => {
+  const P = (along: number, i: number): V3 => {
     const p = at(along, ring[i % n].s);
     return [p[0], ring[i % n].y, p[1]];
+  };
+  const axis0 = at(a0, c);
+  const axis1 = at(a1, c);
+  // every face turned outwards, whatever way `at` maps the axes (along z the swap of x and z mirrors the winding,
+  // and the two caps need opposite windings): a face pointing inwards is culled and the part looks hollow (#534)
+  const tri = (p: V3, q: V3, w: V3, out: V3, col: Color) => {
+    const n0 = (q[1] - p[1]) * (w[2] - p[2]) - (q[2] - p[2]) * (w[1] - p[1]);
+    const n1 = (q[2] - p[2]) * (w[0] - p[0]) - (q[0] - p[0]) * (w[2] - p[2]);
+    const n2 = (q[0] - p[0]) * (w[1] - p[1]) - (q[1] - p[1]) * (w[0] - p[0]);
+    if (n0 * out[0] + n1 * out[1] + n2 * out[2] < 0) buf.tri(p, w, q, col);
+    else buf.tri(p, q, w, col);
   };
   for (let i = 0; i < n; i++) {
     const mid = ((i + 0.5) / n) * Math.PI * 2;
     const col = shade(side, 0.62 + 0.4 * Math.max(0, Math.cos(mid)));
-    buf.tri(P(a0, i), P(a1, i + 1), P(a1, i), col);
-    buf.tri(P(a0, i), P(a0, i + 1), P(a1, i + 1), col);
+    // outwards: from the axis to the middle of the strip
+    const m = at((a0 + a1) / 2, c + Math.sin(mid) * r);
+    const o = at((a0 + a1) / 2, c);
+    const out: V3 = [m[0] - o[0], Math.cos(mid) * r, m[1] - o[1]];
+    tri(P(a0, i), P(a1, i + 1), P(a1, i), out, col);
+    tri(P(a0, i), P(a0, i + 1), P(a1, i + 1), out, col);
   }
-  for (const along of [a0, a1]) {
+  for (const [along, from, to] of [
+    [a0, axis1, axis0],
+    [a1, axis0, axis1],
+  ] as const) {
     const m = at(along, c);
-    const centre = [m[0], cy, m[1]];
-    for (let i = 0; i < n; i++) buf.tri(centre, P(along, i), P(along, i + 1), capC);
+    const centre: V3 = [m[0], cy, m[1]];
+    const out: V3 = [to[0] - from[0], 0, to[1] - from[1]];
+    for (let i = 0; i < n; i++) tri(centre, P(along, i), P(along, i + 1), out, capC);
   }
 }
 
@@ -291,7 +324,22 @@ export function pushPrism(
   y1: number | ((x: number, z: number) => number),
   side: number,
   top: number,
-  opts: { aoFrom?: number; fold?: number; topFold?: number; bottom?: boolean; topFace?: boolean } = {},
+  opts: {
+    aoFrom?: number;
+    fold?: number;
+    topFold?: number;
+    bottom?: boolean;
+    topFace?: boolean;
+    holes?: Vec2[][];
+    skipSide?: (a: Vec2, b: Vec2) => boolean;
+    /**
+     * Only these height bands of a side are drawn, each clipped to the prism (the rest lies against a neighbouring
+     * solid); null draws the side whole.
+     */
+    sideBands?: (a: Vec2, b: Vec2) => [number, number][] | null;
+    /** An own colour for one side (a wall colour): given the side's corners and its outward unit normal in the plan. */
+    sideColor?: (a: Vec2, b: Vec2, nx: number, nz: number) => number | null;
+  } = {},
 ): void {
   // a top that follows a height function (a wall ending under a roof slope): planar for a wall piece
   // within one roof plane, so the top quad and the vertical sides stay flat
@@ -299,42 +347,64 @@ export function pushPrism(
   const aoFrom = opts.aoFrom ?? y0;
   const fold = opts.fold ?? ALWAYS;
   const k = (y: number) => 0.5 + 0.5 * Math.min(1, Math.max(0, (y - aoFrom) / 1.6));
-  const tris = opts.topFace === false && !opts.bottom ? [] : triangulate(poly);
+  // holes (an area with a patch cut out): their rings run clockwise so the inner sides face the hole
+  const holes = (opts.holes ?? []).map((h) => (ringArea(h) > 0 ? [...h].reverse() : h));
+  const all = holes.length ? [...poly, ...holes.flat()] : poly;
+  const tris = opts.topFace === false && !opts.bottom ? [] : triangulate(poly, holes);
   if (opts.topFace !== false) {
     const topC = new Color(top);
     for (const [i, j, l] of tris) {
       // polygon is counter-clockwise in (x, z); seen from above (+y) that is clockwise, so swap
-      const a = poly[i];
-      const b = poly[j];
-      const c = poly[l];
+      const a = all[i];
+      const b = all[j];
+      const c = all[l];
       buf.tri([a[0], topY(a), a[1]], [c[0], topY(c), c[1]], [b[0], topY(b), b[1]], topC, topC, topC, undefined, opts.topFold ?? fold);
     }
   }
   if (opts.bottom) {
     const botC = shade(side, 0.55);
     for (const [i, j, l] of tris) {
-      const a = poly[i];
-      const b = poly[j];
-      const c = poly[l];
+      const a = all[i];
+      const b = all[j];
+      const c = all[l];
       buf.tri([a[0], y0, a[1]], [b[0], y0, b[1]], [c[0], y0, c[1]], botC, botC, botC, undefined, fold);
     }
   }
-  for (let i = 0; i < poly.length; i++) {
-    const a = poly[i];
-    const b = poly[(i + 1) % poly.length];
-    const dx = b[0] - a[0];
-    const dz = b[1] - a[1];
-    const l = Math.hypot(dx, dz);
-    if (l < 1e-6) continue;
-    const facing = ((dz / l) * LIGHT[0] - (dx / l) * LIGHT[1] + 1) / 2;
-    const dir = 0.8 + 0.28 * facing;
-    const ya = topY(a);
-    const yb = topY(b);
-    const lo = shade(side, k(y0) * dir);
-    const hiA = shade(side, k(ya) * dir);
-    const hiB = shade(side, k(yb) * dir);
-    buf.tri([a[0], y0, a[1]], [a[0], ya, a[1]], [b[0], yb, b[1]], lo, hiA, hiB, undefined, fold);
-    buf.tri([a[0], y0, a[1]], [b[0], yb, b[1]], [b[0], y0, b[1]], lo, hiB, lo, undefined, fold);
+  for (const ring of [poly, ...holes]) {
+    // the outward side of a counter-clockwise ring (x, z) lies at (dz, −dx); a clockwise one the other way
+    const ccw = !opts.sideColor || ringArea(ring) > 0;
+    for (let i = 0; i < ring.length; i++) {
+      const a = ring[i];
+      const b = ring[(i + 1) % ring.length];
+      const dx = b[0] - a[0];
+      const dz = b[1] - a[1];
+      const l = Math.hypot(dx, dz);
+      if (l < 1e-6 || opts.skipSide?.(a, b)) continue;
+      const facing = ((dz / l) * LIGHT[0] - (dx / l) * LIGHT[1] + 1) / 2;
+      const dir = 0.8 + 0.28 * facing;
+      const ya = topY(a);
+      const yb = topY(b);
+      const own = opts.sideColor ? opts.sideColor(a, b, (ccw ? dz : -dz) / l, (ccw ? -dx : dx) / l) : null;
+      const col = own ?? side;
+      const face = (u: number, va: number, vb: number) => {
+        const lo = shade(col, k(u) * dir);
+        const hiA = shade(col, k(va) * dir);
+        const hiB = shade(col, k(vb) * dir);
+        buf.tri([a[0], u, a[1]], [a[0], va, a[1]], [b[0], vb, b[1]], lo, hiA, hiB, undefined, fold);
+        buf.tri([a[0], u, a[1]], [b[0], vb, b[1]], [b[0], u, b[1]], lo, hiB, lo, undefined, fold);
+      };
+      const bands = opts.sideBands?.(a, b);
+      if (!bands) {
+        face(y0, ya, yb);
+        continue;
+      }
+      for (const [u0, v] of bands) {
+        const u = Math.max(u0, y0);
+        const va = Math.max(u, Math.min(v, ya));
+        const vb = Math.max(u, Math.min(v, yb));
+        if (Math.max(va, vb) - u > 1e-4) face(u, va, vb);
+      }
+    }
   }
 }
 

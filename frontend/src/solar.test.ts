@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { emptyBuilding, newFloor, type Building, type RoofSection, type SolarField } from "./model.ts";
-import { bestFace, clampField, faceAt, faceCompass, fieldFace, fieldModules, fieldPlan, fieldCenter, groundFace, proposeField, proposeGroundField, proposeWallField, roofFaces, turnGroundField, wallFaces } from "./solar.ts";
+import { bestFace, clampField, proposeWindow, roofWindowsOver, faceAt, faceCompass, fieldFace, fieldModules, fieldPlan, fieldCenter, groundFace, groundFloor, moveField, proposeField, proposeGroundField, proposeWallField, roofFaces, turnGroundField, wallFaces, windowCorners } from "./solar.ts";
 
 /** A 10 × 8 m house of one floor (walls 2.5 m high) with the given roof. */
 function house(roof: Building["settings"]["roof"]): Building {
@@ -185,4 +185,145 @@ test("a wall field in portrait fits after moving back, and tilts away from the w
   const off = (p: number[]) => (p[0] - face.o[0]) * face.n[0] + (p[2] - face.o[2]) * face.n[2];
   near(off(m.corners[3]) - off(m.corners[0]), 1.13 * Math.sin(Math.PI / 6), 1e-9);
   assert.equal(m.posts.length, 2);
+});
+
+test("a hip roof offers its two hip ends for modules too (D158)", () => {
+  const sec: RoofSection = { id: "h", x0: 0, z0: 0, x1: 10, z1: 8, shape: "hip", axis: "x", eave_a: 2.5, eave_b: 2.5, pitch_a: 30, pitch_b: 30, base: 2.5 };
+  const b = house({ type: "custom", pitch: 30, overhang: 0.4, sections: [sec] });
+  const faces = roofFaces(b);
+  assert.deepEqual(faces.map((f) => f.key), ["h:a", "h:b", "h:c", "h:d"]);
+  const [c, d] = faces.slice(2);
+  // symmetric hip: the ends slope like the sides, look along -x and +x, and narrow to a point
+  near(c.pitch, 30, 1e-4);
+  near(d.pitch, 30, 1e-4);
+  assert.ok(c.facing[0] < -0.99 && d.facing[0] > 0.99);
+  near(c.lu, 8.8);
+  const [l1, r1] = c.span(c.ls);
+  near(l1, r1);
+  const field = proposeField(c, "s");
+  assert.ok(field.rows * field.cols > 0);
+  assert.equal(fieldModules(c, field).length, field.rows * field.cols);
+});
+
+test("garden fields stand on the ground floor, not in the cellar below it (#192)", () => {
+  const b = house({ type: "flat", pitch: 0, overhang: 0 });
+  const room = b.floors[0].rooms[0];
+  b.floors.push({ ...newFloor("kg", "KG", -2.5), height: 2.3, rooms: [{ ...room, id: "k" }] });
+  assert.equal(groundFloor(b)?.id, "eg");
+  near(groundFace(b, { u: 2, v: 2 }).o[1], -0.2);
+  // a house of cellars only keeps the lowest floor
+  b.floors = b.floors.filter((f) => f.id === "kg");
+  assert.equal(groundFloor(b)?.id, "kg");
+});
+
+test("a field moved to another face keeps its modules (#258)", () => {
+  const b = house({ type: "flat", pitch: 0, overhang: 0 });
+  const face = roofFaces(b)[0];
+  const f: SolarField = { ...proposeField(face, "pv"), rows: 2, cols: 4, tilt: 30 };
+  const moved = moveField(face, { ...f, face: "gone" });
+  assert.equal(moved.face, face.key);
+  assert.equal(moved.rows, 2);
+  assert.equal(moved.cols, 4);
+  assert.equal(moved.tilt, 30);
+  assert.ok(moved.u >= 0 && moved.v >= 0);
+});
+
+test("a field moved to a short wall keeps what fits and stays visible, walls name their room and corners (#295)", () => {
+  const b = house({ type: "gable", pitch: 35, overhang: 0.4 });
+  b.floors[0].walls = [
+    { id: "g1", a: [12, 0], b: [12.92, 0], thickness: 0.2 },
+    { id: "g2", a: [14, 0], b: [14.6, 0], thickness: 0.2 },
+  ];
+  const faces = wallFaces(b);
+  const south = faces.find((w) => !w.wall?.free && faceCompass(w, 0) === "s")!;
+  assert.deepEqual([south.wall?.room, south.wall?.edge], ["r", 2]);
+  const f: SolarField = { ...proposeWallField(b, "w", "eg")!, cols: 4, portrait: false };
+  // 0.92 m: no room for a module lying down (1.72 m), one upright module (1.13 m) overhangs a little, centred
+  const short = faces.find((w) => w.wall?.free && Math.abs(w.lu - 0.92) < 1e-6)!;
+  const onShort = moveField(short, f);
+  assert.equal(onShort.portrait, true);
+  assert.equal(onShort.cols, 1);
+  assert.equal(fieldModules(short, onShort).length, 1);
+  // 0.6 m: still one module
+  const tiny = faces.find((w) => w.wall?.free && Math.abs(w.lu - 0.6) < 1e-6)!;
+  assert.equal(fieldModules(tiny, moveField(tiny, f)).length, 1);
+  // a long wall keeps its four modules lying down
+  const long = moveField(south, f);
+  assert.equal(long.portrait, false);
+  assert.equal(fieldModules(south, long).length, 4);
+});
+
+test("a roof window belongs to the room under its middle, so the room's card shows it (#482)", () => {
+  const b = house({ type: "gable", pitch: 35, overhang: 0.4 });
+  // two rooms side by side along the ridge: left 0–5 m, right 5–10 m
+  b.floors[0].rooms = [
+    { id: "left", name: "L", area_id: null, points: [[0, 0], [5, 0], [5, 8], [0, 8]], floor_material: "wood" },
+    { id: "right", name: "R", area_id: null, points: [[5, 0], [10, 0], [10, 8], [5, 8]], floor_material: "wood" },
+  ];
+  const face = roofFaces(b)[0];
+  const w = { ...proposeWindow(face, "w1"), u: 1, cover: "cover.roof" };
+  b.settings.roof = { ...b.settings.roof!, windows: [w] };
+  const x = face.o[0] + face.eu[0] * (1 + 0.39);
+  const inLeft = x < 5;
+  assert.deepEqual(roofWindowsOver(b, inLeft ? "left" : "right").map((x) => x.id), ["w1"]);
+  assert.deepEqual(roofWindowsOver(b, inLeft ? "right" : "left"), []);
+});
+
+test("a roof footprint kept in the settings wins over the rooms present: a card with some rooms keeps the whole roof (#997)", () => {
+  const b = house({ type: "gable", pitch: 35, overhang: 0.4 });
+  const whole = roofFaces(b)[1];
+  // only the front half of the house shown: the roof would shrink onto it – unless the whole footprint is kept
+  b.floors[0].rooms[0].points = [[0, 0], [10, 0], [10, 4], [0, 4]];
+  const half = roofFaces(b)[1];
+  near(half.ls, (4 + 2 * 0.64) / 2 / Math.cos((35 * Math.PI) / 180));
+  b.settings = { ...b.settings, roof: { ...b.settings.roof, frame: [0, 0, 10, 8] } };
+  const kept = roofFaces(b)[1];
+  near(kept.lu, whole.lu);
+  near(kept.ls, whole.ls);
+});
+
+test("a roof window on a flat roof lies flush, not tilted on a frame like a module (#1078)", () => {
+  const b = house({ type: "flat", pitch: 0, overhang: 0.2 });
+  const face = roofFaces(b).find((f) => f.flat);
+  assert.ok(face);
+  const c = windowCorners(face, { id: "w", face: face.key, u: 2, v: 2, w: 1.2, h: 1.5 });
+  assert.ok(c);
+  const ys = c.map((p) => p[1]);
+  near(Math.max(...ys) - Math.min(...ys), 0);
+});
+
+test("a turned flat roof's face turns with it: fields, roof windows and fairy lights lie square to the roof (#1147)", async () => {
+  const { sectionFrame } = await import("./roof-sections.ts");
+  const { roofLightPoints } = await import("./viewer/snow.ts");
+  const plain: RoofSection = { id: "f", x0: 0, z0: 0, x1: 10, z1: 8, shape: "flat", axis: "x", eave_a: 2.5, eave_b: 2.5, pitch_a: 0, pitch_b: 0, base: 2.5, overhang: 0 };
+  const turned: RoofSection = { ...plain, rotation: 30, pivot: [5, 4] };
+  const corners = (s: RoofSection) => {
+    const face = roofFaces(house({ type: "custom", pitch: 30, overhang: 0, sections: [s] })).find((f) => f.flat)!;
+    const at = (u: number, v: number) => [face.o[0] + face.eu[0] * u + face.es[0] * v, face.o[2] + face.eu[2] * u + face.es[2] * v];
+    return { face, pts: [at(0, 0), at(face.lu, 0), at(face.lu, face.ls), at(0, face.ls)] };
+  };
+  // not turned: the same face as before
+  const a = corners(plain);
+  assert.deepEqual(a.face.o, [0, 2.75, 0]);
+  assert.deepEqual(a.face.eu, [1, 0, 0]);
+  // turned: its corners are the turned roof's corners, its size the roof's own
+  const b = corners(turned);
+  near(b.face.lu, 10);
+  near(b.face.ls, 8);
+  const fr = sectionFrame(turned);
+  const want = [fr.at(0, 0), fr.at(10, 0), fr.at(10, 8), fr.at(0, 8)];
+  for (const p of b.pts) assert.ok(want.some((q) => Math.hypot(p[0] - q[0], p[1] - q[1]) < 1e-9), `corner ${p} not on the turned roof`);
+  near(b.face.n[1], 1);
+  // the fairy lights run along the turned rim: each bulb within 6 cm of one of its edges
+  const bulbs = roofLightPoints([b.face], 0, false, true)!;
+  const dist = (p: number[], q: number[], r: number[]) => {
+    const [dx, dz] = [r[0] - q[0], r[1] - q[1]];
+    const t = Math.max(0, Math.min(1, ((p[0] - q[0]) * dx + (p[1] - q[1]) * dz) / (dx * dx + dz * dz)));
+    return Math.hypot(p[0] - q[0] - dx * t, p[1] - q[1] - dz * t);
+  };
+  for (let i = 0; i < bulbs.positions.length; i += 3) {
+    const p = [bulbs.positions[i], bulbs.positions[i + 2]];
+    const d = Math.min(...want.map((q, k) => dist(p, q, want[(k + 1) % 4])));
+    assert.ok(d < 0.06, `bulb ${p} is ${d} m off the rim`);
+  }
 });

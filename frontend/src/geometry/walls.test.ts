@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { Room, Vec2 } from "../model.ts";
 import { polygonArea, signedArea } from "../model.ts";
-import { generateWalls, locateOnWalls, locateOpening, openingHost } from "./walls.ts";
+import { edgeReach, freeWallRoomLeft, generateWalls, locateOnWalls, locateOpening, openingHost, placeWallPlate } from "./walls.ts";
 
 const EXT = 0.24;
 const INT = 0.12;
@@ -90,6 +90,21 @@ test("collinear pieces of the same room are merged into one wall", () => {
   assert.equal(walls.length, 4);
   const top = walls.find((w) => Math.abs(w.a[1]) < 1e-9 && Math.abs(w.b[1]) < 1e-9)!;
   assert.equal(top.sources.length, 2);
+});
+
+test("an outer wall stored in many pieces keeps the room on its inner side (found by T-Eberle)", () => {
+  // three or more pieces along one side, both ways round: merging must not leave the wall turned round, or a
+  // window's blind on it is drawn inside the room
+  const pts: Vec2[] = [[0, 0], [4, 0], [4, 0.8], [4, 1.5], [4, 2.2], [4, 3], [0, 3], [0, 2], [0, 1]];
+  for (const points of [pts, [...pts].reverse()]) {
+    const { walls } = generateWalls([{ ...rect("a", 0, 0, 4, 3), points }], opts);
+    assert.equal(walls.length, 4);
+    for (const w of walls) {
+      assert.equal(w.roomLeft, "a");
+      assert.equal(w.roomRight, null);
+      near(w.right, EXT);
+    }
+  }
 });
 
 test("L-shaped room gets a mitred reflex corner", () => {
@@ -216,4 +231,124 @@ test("a split point cuts a wall into parts that keep apart, each with its own he
   // without the split the edge is one wall
   const plain = generateWalls([room("a", 0, 0, 6, 4)], { exterior: 0.24, interior: 0.12 }).walls;
   assert.equal(plain.filter((w) => Math.abs(w.a[1]) < 1e-6 && Math.abs(w.b[1]) < 1e-6).length, 1);
+});
+
+test("a wall takes the thickness set on its room edge; a shared wall the thicker one (D149)", () => {
+  const a = { ...rect("a", 0, 0, 4, 3), wall_thickness: [0.365, null, 0.08, null] };
+  const b = { ...rect("b", 4, 0, 7, 3), wall_thickness: [null, null, null, 0.175] };
+  const { walls, warnings } = generateWalls([a, b], opts);
+  assert.deepEqual(warnings, []);
+  // edge 0 of a (z = 0, x 0 … 4): an outer wall of 36.5 cm
+  const south = walls.find((w) => w.exterior && w.sources.some((s) => s.room_id === "a" && s.edge === 0))!;
+  near(south.right, 0.365);
+  // the shared wall (a's edge 1, b's edge 3): 17.5 cm, centred
+  const shared = walls.find((w) => !w.exterior)!;
+  near(shared.left + shared.right, 0.175);
+  near(shared.left, shared.right);
+  // a's edge 2 (z = 3): its own thin setting; b's outer walls keep the building's
+  const north = walls.find((w) => w.exterior && w.sources.some((s) => s.room_id === "a" && s.edge === 2))!;
+  near(north.right, 0.08);
+  for (const w of walls.filter((w) => w.exterior && w.sources.every((s) => s.room_id === "b"))) near(w.right, EXT);
+});
+
+test("an interior wall continuing an outer wall in line sits flush with it (#179)", () => {
+  // A (0..4 × 0..3) and B (4..7 × 0..5): B's west edge x = 4 is shared with A for z 0..3 and outside above
+  const { walls } = generateWalls([rect("a", 0, 0, 4, 3), rect("b", 4, 0, 7, 5)], opts);
+  const inner = walls.find((w) => !w.exterior)!;
+  // the shared wall's face towards B lies on x = 4, like the outer wall's inner face above it
+  const bSide = inner.roomLeft === "b" ? inner.left : inner.right;
+  near(bSide, 0);
+  near(inner.left + inner.right, INT);
+});
+
+test("rooms with a ceiling of their own: walls end at the taller room, a room without one keeps the floor height (#30)", () => {
+  const room = (id: string, x0: number, x1: number, ceiling_height?: number) => ({ id, name: id, area_id: null, points: [[x0, 0], [x1, 0], [x1, 3], [x0, 3]] as [number, number][], floor_material: "wood", ceiling_height });
+  const { walls } = generateWalls([room("wohnen", 0, 4, 2.5), room("flur", 4, 6, 2.6), room("garage", 6, 10)], { exterior: 0.24, interior: 0.12 }, []);
+  const at = (x: number) => walls.find((w) => !w.exterior && Math.abs(w.a[0] - x) < 1e-6 && Math.abs(w.b[0] - x) < 1e-6)!;
+  // living room 2.5 and hall 2.6: the taller one; hall and garage (floor height): full height
+  assert.equal(at(4).height, 2.6);
+  assert.equal(at(6).height, undefined);
+  // the living room's outer walls end at its ceiling, the garage's stand at full height
+  const outer = walls.filter((w) => w.exterior);
+  assert.ok(outer.filter((w) => w.roomLeft === "wohnen" || w.roomRight === "wohnen").every((w) => w.height === 2.5));
+  assert.ok(outer.filter((w) => w.roomLeft === "garage" || w.roomRight === "garage").every((w) => w.height === undefined));
+});
+
+test("a socket dropped into a low balcony wall is drawn on its face (#593)", () => {
+  const balcony = { id: "b", name: "Balkon", area_id: null, points: [[0.24, -6.011], [2.23, -6.011], [2.23, -0.241], [0.24, -0.241]], wall_heights: [1.28, 0, 1.28, 1.28] } as unknown as Room;
+  const { walls } = generateWalls([balcony], { exterior: 0.24, interior: 0.08 });
+  // in the middle of the 24 cm wall, its front towards the balcony
+  const at = placeWallPlate(walls, { x: 0.46, z: -6.18, rotation: 0, d: 0.014, h: 0.085 }, 2.4, 0.3);
+  assert.ok(Math.abs(at.x - 0.46) < 1e-6);
+  assert.ok(Math.abs(at.z - (-6.011 + 0.007)) < 1e-6, String(at.z));
+  assert.equal(at.y, 0.3);
+  // already on the face: unchanged
+  const on = placeWallPlate(walls, { x: 1, z: -6.004, rotation: 0, d: 0.014, h: 0.085 }, 2.4, 0.3);
+  assert.ok(Math.abs(on.z - -6.004) < 1e-6);
+  // standing free in the room: unchanged
+  assert.deepEqual(placeWallPlate(walls, { x: 1, z: -3, rotation: 0, d: 0.014, h: 0.085 }, 2.4, 0.3), { x: 1, z: -3, y: 0.3 });
+});
+
+test("a light switch on a free wall lower than its mount height comes down onto it (#593)", () => {
+  const free = [{ id: "w", a: [0, 0] as Vec2, b: [2, 0] as Vec2, thickness: 0.1, height: 1.1 }];
+  const { walls } = generateWalls([], { exterior: 0.24, interior: 0.12 }, free);
+  const at = placeWallPlate(walls, { x: 1, z: 0.057, rotation: 0, d: 0.014, h: 0.085 }, 2.5, 1.05);
+  assert.ok(at.y < 1.05 && at.y + 0.085 < 1.1, String(at.y));
+  // an explicit mount height is kept
+  assert.equal(placeWallPlate(walls, { x: 1, z: 0.057, rotation: 0, d: 0.014, h: 0.085, mount_y: 1.2 }, 2.5, 1.2).y, 1.2);
+  // on a full-height wall nothing changes
+  const tall = generateWalls([], { exterior: 0.24, interior: 0.12 }, [{ ...free[0], height: undefined as unknown as number }]).walls;
+  assert.equal(placeWallPlate(tall, { x: 1, z: 0.057, rotation: 0, d: 0.014, h: 0.085 }, 2.5, 1.05).y, 1.05);
+});
+
+test("an opening may reach across a transition without a wall where the outer wall carries on in line (#624)", () => {
+  const room = (id: string, pts: Vec2[], wall_heights?: (number | null)[]): Room => ({ id, name: id, area_id: null, points: pts, floor_material: "wood", ...(wall_heights ? { wall_heights } : {}) });
+  // living room and dining room side by side, open to each other (no wall on the shared edge)
+  const a = room("a", [[0, 0], [0, 4], [3, 4], [3, 0]]);
+  const b = room("b", [[0, 4], [0, 8], [3, 8], [3, 4]], [null, null, null, 0]);
+  const open = generateWalls([a, b], { exterior: 0.3, interior: 0.115 }, []).walls;
+  // a's edge 0 runs along x = 0 from z 0 to 4; past its end the outer wall of b carries on for 4 m
+  assert.deepEqual(edgeReach(open, a, 0), [0, 4]);
+  assert.deepEqual(edgeReach(open, b, 0), [4, 0]);
+  // the far ends are corners: no reach
+  assert.deepEqual(edgeReach(open, a, 1), [0, 0]);
+  // with a wall between the rooms the opening stays on its own edge
+  const closed = generateWalls([a, { ...b, wall_heights: undefined }], { exterior: 0.3, interior: 0.115 }, []).walls;
+  assert.deepEqual(edgeReach(closed, a, 0), [0, 0]);
+});
+
+test("a free wall drawn as an outer wall knows its room side, whichever way it was drawn (#542)", () => {
+  const rooms = [rect("bath", 0, 0, 4, 3)];
+  const wall = (a: Vec2, b: Vec2) => ({ a, b, left: 0.12, right: 0.12 });
+  // along the room's top edge: the room lies at larger z
+  assert.equal(freeWallRoomLeft(wall([0, 0], [4, 0]), rooms), true);
+  assert.equal(freeWallRoomLeft(wall([4, 0], [0, 0]), rooms), false);
+  // standing in the room, or out in the open: no outer side
+  assert.equal(freeWallRoomLeft(wall([2, 0.5], [2, 2.5]), rooms), null);
+  assert.equal(freeWallRoomLeft(wall([10, 0], [12, 0]), rooms), null);
+});
+
+test("a door on an inner wall piece left by an extra corner on a straight line reaches into the next piece", () => {
+  // the hall's edge along x = 4 has an extra corner at z = 1, a hair off the line, that the other room does not have:
+  // the wall breaks into two pieces there
+  const a = rect("a", 0, 0, 4, 3);
+  const hall: Room = { id: "hall", name: "hall", area_id: null, points: [[4, 0], [8, 0], [8, 3], [4, 3], [4.0005, 1]], floor_material: "wood" };
+  const { walls } = generateWalls([a, hall], opts);
+  // edge 4 runs from (4, 1) to (4, 0), 1 m long; before its start the same wall carries on for 2 m
+  const [before, after] = edgeReach(walls, hall, 4);
+  near(before, 2, 1e-3);
+  near(after, 0);
+});
+
+test("a wall left out by a height of 0 is reported with the room edges of both sides (#1151)", () => {
+  // a long room with a short one beside part of its edge; the long room leaves the shared part out
+  const long: Room = { ...rect("a", 0, 0, 6, 2), wall_heights: [null, null, null, null] };
+  const short = rect("b", 1, 2, 3, 4);
+  const plain = generateWalls([long, short], opts);
+  assert.deepEqual(plain.noWalls, []);
+  // edge 2 of a runs from (6, 2) to (0, 2) and is split by b: part 1 (from 3 m) is the shared one
+  long.wall_heights![2] = [null, 0, null];
+  const res = generateWalls([long, short], opts);
+  assert.equal(res.noWalls.length, 1);
+  assert.deepEqual(res.noWalls[0].map((s) => `${s.room_id}:${s.edge}`).sort(), ["a:2", "b:0"]);
 });

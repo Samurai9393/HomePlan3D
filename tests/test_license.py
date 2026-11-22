@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import json
+from types import SimpleNamespace
 
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
@@ -69,6 +70,20 @@ def test_bound_packs_are_only_accepted_by_their_installation() -> None:
     assert free["instance"] is None and free["release"] == 1
 
 
+def test_a_module_update_waiting_for_approval_is_not_offered_again() -> None:
+    # #805: the update to release 8 was fetched and waits beside release 7, the shop list must not offer it again
+    data = SimpleNamespace(
+        license={
+            "key": "NP-ABCD-EFGH-2345-6789",
+            "catalog": [{"id": "pro_heat", "release": 8}, {"id": "shop.living", "release": 2}],
+        },
+        packs=[{"id": "pro_heat", "release": 7, "pending": {"release": 8}}, {"id": "shop.living", "release": 1}],
+    )
+    heat, living = lic.status(data, "x")["packs"]
+    assert heat["installed"] == 8 and heat["waits"] is True
+    assert living["installed"] == 1 and living["waits"] is False
+
+
 async def _setup(hass: HomeAssistant) -> None:
     await async_setup_component(hass, "http", {})
     entry = MockConfigEntry(domain=DOMAIN, data={})
@@ -103,12 +118,25 @@ async def test_activate_install_and_update(hass: HomeAssistant, hass_ws_client, 
     status = result["result"]
     assert status["active"] and status["licensee"] == "Anna" and status["key_hint"] == "…6789"
     assert status["packs"] == [
-        {"id": "shop.living", "name": "Wohnzimmer", "release": 1, "url": "https://shop/x", "installed": None}
+        {
+            "id": "shop.living",
+            "name": "Wohnzimmer",
+            "release": 1,
+            "url": "https://shop/x",
+            "installed": None,
+            "waits": False,
+        }
     ]
     # an older shop sends no offers and no loyalty code
-    assert status["offers"] == [] and status["loyalty"] is None
+    assert status["offers"] == [] and status["loyalty"] is None and status["supporter"] is None
     sent = aioclient_mock.mock_calls[-1][2]
-    assert sent == {"key": "NP-ABCD-EFGH-2345-6789", "instance": fp}
+    # the version goes along, so the shop can ask an old installation to update first
+    assert {k: v for k, v in sent.items() if k != "version"} == {
+        "key": "NP-ABCD-EFGH-2345-6789",
+        "instance": fp,
+        "lang": "en",
+    }
+    assert isinstance(sent["version"], str) and sent["version"]
 
     await client.send_json_auto_id({"type": "neonplan3d/packs/install", "pack_id": "shop.living"})
     result = await client.receive_json()
@@ -128,9 +156,13 @@ async def test_activate_install_and_update(hass: HomeAssistant, hass_ws_client, 
             "kind": "pack",
             "new": True,
         },
+        {"id": "fun_pets", "name": "Haustiere", "url": "https://shop/fun", "kind": "fun", "price": "0,00 €"},
+        {"id": "pass", "name": "Supporter-Pass", "url": "https://shop/pass", "kind": "bundle", "supporter_pass": True},
         {"id": "bad", "name": "No link", "url": "http://insecure"},
     ]
     catalog["loyalty"] = {"code": "NP-TREUE-AB12CD", "percent": 10}
+    catalog["supporter"] = {"code": "NPS-7KQ4-X2M9", "until": "2027-12-31"}
+    catalog["newsletter"] = {"url": "https://shop/newsletter"}
     aioclient_mock.post(f"{lic.SHOP_API}/catalog", json=catalog)
     aioclient_mock.post(
         f"{lic.SHOP_API}/pack", text=_sign(private, keys, {**PAYLOAD, "instance": fp, "licensee": "Anna", "release": 2})
@@ -142,11 +174,15 @@ async def test_activate_install_and_update(hass: HomeAssistant, hass_ws_client, 
     await client.send_json_auto_id({"type": "neonplan3d/license/get"})
     status = (await client.receive_json())["result"]
     assert status["packs"][0]["installed"] == 2 and status["error"] is None
-    assert [o["id"] for o in status["offers"]] == ["kino"] and status["offers"][0]["new"]
+    assert [o["id"] for o in status["offers"]] == ["kino", "fun_pets", "pass"] and status["offers"][0]["new"]
+    assert [o["supporter_pass"] for o in status["offers"]] == [False, False, True]
+    assert status["offers"][1]["kind"] == "fun"
     # the update is remembered for the extensions page
     assert [(u["id"], u["release"]) for u in status["updates"]] == [("shop.living", 2)]
     assert status["offers"][0]["image"] is None and status["offers"][0]["kind"] == "pack"
     assert status["loyalty"] == {"code": "NP-TREUE-AB12CD", "percent": 10}
+    assert status["supporter"] == {"code": "NPS-7KQ4-X2M9", "until": "2027-12-31"}
+    assert status["newsletter"] == {"url": "https://shop/newsletter"}
 
     # the request carries our own User-Agent (the host blocks aiohttp's default one)
     assert aioclient_mock.mock_calls[-1][3]["User-Agent"].startswith("NeonPlan3D/")
@@ -178,7 +214,63 @@ async def test_activate_install_and_update(hass: HomeAssistant, hass_ws_client, 
     await client.send_json_auto_id({"type": "neonplan3d/license/remove"})
     status = (await client.receive_json())["result"]
     assert not status["active"] and len(hass.data[DOMAIN].packs) == 1
-    assert status["offers"] == [] and status["loyalty"] is None
+    assert status["offers"] == [] and status["loyalty"] is None and status["supporter"] is None
+    assert status["newsletter"] is None
+
+
+async def test_a_pack_that_newly_belongs_to_the_customer_is_announced_once(
+    hass: HomeAssistant, hass_ws_client, aioclient_mock, monkeypatch
+) -> None:
+    private, keys = _key()
+    monkeypatch.setattr(packs, "PACK_PUBLIC_KEYS", keys)
+    await _setup(hass)
+    client = await hass_ws_client(hass)
+    notices: list[tuple[str, str]] = []
+    dismissed: list[str] = []
+    monkeypatch.setattr(
+        lic.persistent_notification,
+        "async_create",
+        lambda hass, message, title=None, notification_id=None: notices.append((notification_id, title)),
+    )
+    monkeypatch.setattr(
+        lic.persistent_notification, "async_dismiss", lambda hass, notification_id: dismissed.append(notification_id)
+    )
+    living = {"id": "shop.living", "name": "Wohnzimmer", "release": 1, "url": "https://shop/x"}
+    aioclient_mock.post(f"{lic.SHOP_API}/catalog", json={"licensee": "Anna", "packs": [living]})
+    await client.send_json_auto_id({"type": "neonplan3d/license/activate", "key": "NP-ABCD-EFGH-2345-6789"})
+    assert (await client.receive_json())["success"]
+    # the first catalog of a key: no notice (the customer is on the extensions page)
+    assert notices == []
+
+    # a gift turns up in the catalog: one notice, not again on the next check
+    gift = {"id": "mastershort.fun_halloween", "name": "Fun-Pack: Halloween", "release": 1, "url": "https://shop/h"}
+    aioclient_mock.clear_requests()
+    aioclient_mock.post(f"{lic.SHOP_API}/catalog", json={"licensee": "Anna", "packs": [living, gift]})
+    await lic.async_refresh(hass, hass.data[DOMAIN])
+    await lic.async_refresh(hass, hass.data[DOMAIN])
+    assert [n[0] for n in notices] == ["neonplan3d_pack_mastershort.fun_halloween"]
+
+    # installed: the notice goes
+    fp = await lic.async_instance_fingerprint(hass)
+    aioclient_mock.post(
+        f"{lic.SHOP_API}/pack",
+        text=_sign(
+            private, keys, {**PAYLOAD, "id": gift["id"], "name": gift["name"], "instance": fp, "licensee": "Anna"}
+        ),
+    )
+    await lic.async_install(hass, hass.data[DOMAIN], gift["id"])
+    assert "neonplan3d_pack_mastershort.fun_halloween" in dismissed
+
+    # four taster packs at once: one notice for all of them, gone once one is installed
+    samples = [
+        {"id": f"mastershort.{n}_sample", "name": n, "release": 1, "url": "https://shop/s"}
+        for n in ("living", "kitchen", "bedroom", "bath")
+    ]
+    notices.clear()
+    aioclient_mock.clear_requests()
+    aioclient_mock.post(f"{lic.SHOP_API}/catalog", json={"licensee": "Anna", "packs": [living, gift, *samples]})
+    await lic.async_refresh(hass, hass.data[DOMAIN], install_updates=False)
+    assert notices == [("neonplan3d_packs_new", "NeonPlan 3D: 4 new packs are ready")]
 
 
 async def test_a_pack_bound_elsewhere_is_refused_on_import(hass: HomeAssistant, hass_ws_client, monkeypatch) -> None:
@@ -194,3 +286,40 @@ async def test_a_pack_bound_elsewhere_is_refused_on_import(hass: HomeAssistant, 
     )
     result = await client.receive_json()
     assert not result["success"] and result["error"]["code"] == "wrong_instance"
+
+
+def test_previews_are_checked() -> None:
+    """The shop's preview list: only https links, known packs, plain ids and sizes that make sense."""
+    raw = {
+        "base": "https://mastershort.de/np-previews/",
+        "packs": [
+            {
+                "id": "mastershort.living",
+                "name": {"de": "Wohnzimmer"},
+                "price": {"de": "5,90 €"},
+                "url": {"de": "https://mastershort.de/?p=1273", "en": "http://x"},
+            },
+            {"id": "bad id!", "name": {"de": "x"}},
+        ],
+        "items": [
+            {
+                "p": "mastershort.living",
+                "id": "sofa_3",
+                "name": {"de": "Sofa", "en": "Sofa"},
+                "size": [2.1, 0.9, 0.8],
+                "room": ["living"],
+                "electric": 1,
+            },
+            {"p": "mastershort.living", "id": "huge", "name": {"de": "x"}, "size": [500, 1, 1]},
+            {"p": "other", "id": "x", "name": {"de": "x"}, "size": [1, 1, 1]},
+        ],
+        "bundle": {"name": {"de": "Alles-Bundle"}, "price": {"de": "54,90 €"}, "url": {"de": "javascript:alert(1)"}},
+    }
+    out = lic.clean_previews(raw)
+    assert [p["id"] for p in out["packs"]] == ["mastershort.living"]
+    assert out["packs"][0]["url"] == {"de": "https://mastershort.de/?p=1273"}
+    assert [i["id"] for i in out["items"]] == ["sofa_3"]
+    assert out["items"][0]["electric"] is True
+    assert out["bundle"] is None
+    with pytest.raises(lic.LicenseError):
+        lic.clean_previews([])

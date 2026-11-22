@@ -2,7 +2,8 @@
 // up/stop/down for blinds, on/off for switches, with a slider and a way to the full details.
 
 import { css, html, LitElement, nothing } from "lit";
-import { entityName, isUnavailable, kindOf } from "../devices.ts";
+import { type CarState, coverCall, coverTiltButtons, entityName, isUnavailable, kindOf, slatTilt } from "../devices.ts";
+import { hasFeature } from "../features.ts";
 import { translate, type I18nKey } from "../i18n.ts";
 import { openMoreInfo, stateText } from "../markers.ts";
 import { tokens } from "../styles.ts";
@@ -41,16 +42,28 @@ export class Fp3dQuickMenu extends LitElement {
   static properties = {
     hass: { attribute: false },
     entity: { attribute: false },
+    car: { attribute: false },
+    presets: { attribute: false },
     confirmSwitch: { type: Boolean },
+    doorLock: { type: Boolean },
     pro: { type: Boolean },
+    slatInvert: { type: Boolean },
     low: { type: Boolean, reflect: true },
     _tick: { state: true },
   };
 
   declare hass: HomeAssistant;
   declare entity: string;
+  /** The window of this blind turns its slats' tilt round ("Invert slats"): shown and sent the other way. */
+  declare slatInvert: boolean;
+  /** Auto Pro: the car behind a parking spot's pin – its menu replaces the entity's. */
+  declare car: CarState | null;
+  /** Klang & Kino: stations and playlists to start on a speaker. */
+  declare presets: { id: string; label: string; type: string; content: string }[];
   /** Ask before the power button switches. */
   declare confirmSwitch: boolean;
+  /** The smart lock of a door that was tapped (#682): lock or unlock, always asking first. */
+  declare doorLock: boolean;
   /** The camera cockpit is unlocked (otherwise the look-through button shows a lock). */
   declare pro: boolean;
   /** Tablet level: no blur behind the menu. */
@@ -95,6 +108,12 @@ export class Fp3dQuickMenu extends LitElement {
 
   private call(domain: string, service: string, data: Record<string, unknown> = {}): void {
     void this.hass.callService(domain, service, { entity_id: this.entity, ...data });
+  }
+
+  /** Open, close or stop the cover the way it can: a slat-only blind by its tilt (#920). */
+  private cover(st: HassEntity, what: "open" | "close" | "stop"): void {
+    const c = coverCall(st, what);
+    this.call("cover", c.service, c.data);
   }
 
   private close(): void {
@@ -158,21 +177,22 @@ export class Fp3dQuickMenu extends LitElement {
     const at = (p: number) => pos !== null && Math.abs(pos - p) < 3;
     const ring = [
       // moving asks first when the blind is marked so; stopping never asks
-      slot("▲", this.t("cover_open"), () => this.ask() && this.call("cover", "open_cover"), at(100)),
+      slot("▲", this.t("cover_open"), () => this.ask() && this.cover(st, "open"), at(100)),
       ...(setPos ? [75, 50].map((p) => slot(`${p}`, `${p} %`, () => this.ask() && this.call("cover", "set_cover_position", { position: p }), at(p))) : []),
-      slot("▼", this.t("cover_close"), () => this.ask() && this.call("cover", "close_cover"), at(0)),
+      slot("▼", this.t("cover_close"), () => this.ask() && this.cover(st, "close"), at(0)),
       ...(setPos ? [25].map((p) => slot(`${p}`, `${p} %`, () => this.ask() && this.call("cover", "set_cover_position", { position: p }), at(p))) : []),
-      slot("■", this.t("cover_stop"), () => this.call("cover", "stop_cover"), moving),
+      slot("■", this.t("cover_stop"), () => this.cover(st, "stop"), moving),
     ];
-    // the centre shows the blind: its closed part fills from the top
-    const closed = pos === null ? (st.state === "closed" ? 100 : 0) : 100 - pos;
+    // the centre shows the blind: its closed part fills from the top (a slat-only blind: by its tilt, #920)
+    const tilt = slatTilt(st, this.slatInvert);
+    const closed = pos !== null ? 100 - pos : tilt !== null ? 100 - tilt : st.state === "closed" ? 100 : 0;
     return html`<div class="qm-ring">
         ${this.ring(ring)}
         <button
           class="qm-power qm-blind ${closed < 100 ? "qm-on" : ""}"
           style="--closed:${closed}%"
           aria-label=${moving ? this.t("cover_stop") : closed > 50 ? this.t("cover_open") : this.t("cover_close")}
-          @click=${() => (moving ? this.call("cover", "stop_cover") : this.ask() && this.call("cover", closed > 50 ? "open_cover" : "close_cover"))}
+          @click=${() => (moving ? this.cover(st, "stop") : this.ask() && this.cover(st, closed > 50 ? "open" : "close"))}
         >
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16M5 4v15M19 4v15M7 8h10M7 12h10M7 16h10" /></svg>
           <b>${pos !== null ? `${pos} %` : stateText(this.hass, st)}</b>
@@ -195,7 +215,8 @@ export class Fp3dQuickMenu extends LitElement {
   /** Slats of a venetian blind or a Raffstore: a tilt slider when the cover sets a tilt position, else open/close tilt buttons. */
   private renderTilt(st: HassEntity) {
     const features = ((st.attributes.supported_features as number) ?? 0) | 0;
-    const tilt = typeof st.attributes.current_tilt_position === "number" ? (st.attributes.current_tilt_position as number) : null;
+    const tilt = slatTilt(st, this.slatInvert);
+    const raw = (shown: number) => (this.slatInvert ? 100 - shown : shown);
     if (features & COVER_SET_TILT && tilt !== null)
       return html`<label class="qm-tilt"
         ><span>${this.t("cover_tilt")} · ${tilt} %</span>
@@ -206,14 +227,120 @@ export class Fp3dQuickMenu extends LitElement {
           max="100"
           .value=${String(tilt)}
           aria-label=${this.t("cover_tilt")}
-          @change=${(e: Event) => this.call("cover", "set_cover_tilt_position", { tilt_position: Number((e.target as HTMLInputElement).value) })}
+          @change=${(e: Event) => this.call("cover", "set_cover_tilt_position", { tilt_position: raw(Number((e.target as HTMLInputElement).value)) })}
       /></label>`;
-    if (features & (COVER_OPEN_TILT | COVER_CLOSE_TILT))
+    if (coverTiltButtons(st))
       return html`<div class="qm-tilt-buttons">
         ${features & COVER_OPEN_TILT ? html`<button class="qm-swatch qm-slot" @click=${() => this.call("cover", "open_cover_tilt")}>${this.t("cover_tilt_open")}</button>` : nothing}
         ${features & COVER_CLOSE_TILT ? html`<button class="qm-swatch qm-slot" @click=${() => this.call("cover", "close_cover_tilt")}>${this.t("cover_tilt_close")}</button>` : nothing}
       </div>`;
     return nothing;
+  }
+
+  /** Auto Pro: lock and unlock (unlocking asks first), climate, charging; the charge and range on top. */
+  private renderCar(car: CarState) {
+    const e = car.entities;
+    const svc = (domain: string, service: string, id: string, data: Record<string, unknown> = {}) => void this.hass.callService(domain, service, { entity_id: id, ...data });
+    const lockId = e.lock;
+    const lockIsLock = !!lockId && lockId.startsWith("lock.");
+    // anything that switches on and off (a switch, an input_boolean helper …) goes through homeassistant.turn_on/off
+    const onOff = (id: string) => /^(switch|input_boolean|fan|light)\./.test(id);
+    const climId = e.climate;
+    const climIsClimate = !!climId && climId.startsWith("climate.");
+    const chargeId = e.charging && onOff(e.charging) ? e.charging : null;
+    const line = [car.soc !== null ? `${Math.round(car.soc)} %` : null, car.range !== null ? `${Math.round(car.range)} ${car.rangeUnit}` : null, car.charging ? `⚡ ${this.t("car_charging_short")}` : car.plugged ? "🔌" : null].filter(Boolean).join(" · ");
+    return html`<p class="qm-car-line">${line || stateText(this.hass, this.hass.states[this.entity])}</p>
+      <div class="qm-car">
+        ${lockIsLock || (lockId && onOff(lockId))
+          ? html`<button
+              class="qm-swatch qm-slot ${car.locked ? "qm-slot-on" : ""}"
+              @click=${() =>
+                car.locked
+                  ? confirm(this.t("car_unlock_confirm")) && (lockIsLock ? svc("lock", "unlock", lockId!) : svc("homeassistant", "turn_off", lockId!))
+                  : lockIsLock
+                    ? svc("lock", "lock", lockId!)
+                    : svc("homeassistant", "turn_on", lockId!)}
+            >
+              ${car.locked ? `🔓 ${this.t("car_unlock_btn")}` : `🔒 ${this.t("car_lock_btn")}`}
+            </button>`
+          : nothing}
+        ${climId
+          ? html`<button class="qm-swatch qm-slot ${car.climateOn ? "qm-slot-on" : ""}" @click=${() => (climIsClimate ? svc("climate", car.climateOn ? "turn_off" : "turn_on", climId) : svc("homeassistant", car.climateOn ? "turn_off" : "turn_on", climId))}>
+              ${car.climateOn ? `❄ ${this.t("car_climate_off")}` : `🌡 ${this.t("car_climate_on")}`}
+            </button>`
+          : nothing}
+        ${chargeId
+          ? html`<button class="qm-swatch qm-slot ${car.charging ? "qm-slot-on" : ""}" @click=${() => svc("homeassistant", car.charging ? "turn_off" : "turn_on", chargeId)}>
+              ${car.charging ? `⏹ ${this.t("car_charge_stop")}` : `⚡ ${this.t("car_charge_start")}`}
+            </button>`
+          : nothing}
+        ${!lockIsLock && !climId && !chargeId ? html`<p class="qm-note">${this.t("car_no_controls")}</p>` : nothing}
+      </div>`;
+  }
+
+  /** Klang & Kino: a media player – cover in the middle, play/pause on it, previous and next around, the volume below. */
+  private renderMedia(st: HassEntity) {
+    const a = st.attributes;
+    const playing = st.state === "playing";
+    const off = st.state === "off" || st.state === "standby";
+    const vol = typeof a.volume_level === "number" ? Math.round((a.volume_level as number) * 100) : null;
+    const title = [a.media_title, a.media_artist].filter((x) => typeof x === "string" && x).join(" · ");
+    const picture = typeof a.entity_picture === "string" ? (a.entity_picture as string) : null;
+    return html`<div class="qm-media">
+        <button class="qm-swatch qm-slot" aria-label=${this.t("previous")} ?disabled=${off} @click=${() => this.call("media_player", "media_previous_track")}>⏮</button>
+        <button class="qm-power qm-media-main ${playing ? "qm-on" : ""}" aria-label=${this.t("play_pause")} style=${picture ? `background-image:url(${picture})` : ""} @click=${() => this.call("media_player", off ? "turn_on" : playing ? "media_pause" : "media_play")}>
+          <span>${off ? "⏻" : playing ? "⏸" : "▶"}</span>
+        </button>
+        <button class="qm-swatch qm-slot" aria-label=${this.t("next")} ?disabled=${off} @click=${() => this.call("media_player", "media_next_track")}>⏭</button>
+      </div>
+      ${title ? html`<p class="qm-media-title">${title}</p>` : nothing}
+      ${vol !== null
+        ? html`<input
+            class="qm-slider"
+            type="range"
+            min="0"
+            max="100"
+            .value=${String(vol)}
+            aria-label=${this.t("volume")}
+            @change=${(e: Event) => this.call("media_player", "volume_set", { volume_level: Number((e.target as HTMLInputElement).value) / 100 })}
+          />`
+        : nothing}
+      ${this.renderPlay(st)}`;
+  }
+
+  /** Klang & Kino: start something – the player's own sources (Sonos favourites, inputs) and the plan's stations. */
+  private renderPlay(st: HassEntity) {
+    if (!hasFeature("sound")) return nothing;
+    const sources = Array.isArray(st.attributes.source_list) ? (st.attributes.source_list as string[]).slice(0, 10) : [];
+    const presets = this.presets ?? [];
+    if (!sources.length && !presets.length) return nothing;
+    const current = st.attributes.source;
+    return html`<p class="qm-play-head">${this.t("media_play_head")}</p>
+      <div class="qm-play">
+        ${presets.map(
+          (p) => html`<button class="qm-chip" @click=${() => this.call("media_player", "play_media", { media_content_type: p.type, media_content_id: p.content })}>
+            ▶ ${p.label}
+          </button>`,
+        )}
+        ${sources.map(
+          (src) => html`<button class="qm-chip ${src === current ? "qm-chip-on" : ""}" @click=${() => this.call("media_player", "select_source", { source: src })}>${src}</button>`,
+        )}
+      </div>`;
+  }
+
+  /** A door's smart lock: one button that locks or unlocks by the state, asking first either way (#682). */
+  private renderDoorLock(st: HassEntity) {
+    const locked = st.state === "locked" || st.state === "locking" || st.state === "jammed";
+    const name = entityName(this.hass, this.entity);
+    const act = () => {
+      if (!confirm(this.t(locked ? "door_unlock_confirm" : "door_lock_confirm", { name }))) return;
+      this.call("lock", locked ? "unlock" : "lock");
+      this.close();
+    };
+    return html`<p class="qm-car-line">${stateText(this.hass, st)}</p>
+      <div class="qm-car">
+        <button class="qm-swatch qm-slot ${locked ? "qm-slot-on" : ""}" @click=${act}>${locked ? `🔓 ${this.t("door_unlock_btn")}` : `🔒 ${this.t("door_lock_btn")}`}</button>
+      </div>`;
   }
 
   private renderToggle(st: HassEntity) {
@@ -235,15 +362,21 @@ export class Fp3dQuickMenu extends LitElement {
     const st = this.hass?.states[this.entity];
     if (!st) return nothing;
     const kind = kindOf(this.entity);
-    const body = isUnavailable(st)
+    const body = this.car
+      ? this.renderCar(this.car)
+      : isUnavailable(st)
       ? html`<p class="qm-note">${stateText(this.hass, st)}</p>`
+      : this.doorLock && kind === "lock"
+        ? this.renderDoorLock(st)
       : kind === "light"
         ? this.renderLight(st)
         : kind === "cover"
           ? this.renderCover(st)
           : kind === "camera"
             ? this.renderCamera(st)
-            : this.renderToggle(st);
+            : kind === "media" && hasFeature("sound")
+              ? this.renderMedia(st)
+              : this.renderToggle(st);
     return html`<div class="qm" role="dialog" aria-label=${entityName(this.hass, this.entity)}>
       <div class="qm-title">${entityName(this.hass, this.entity)}</div>
       ${body}
@@ -254,6 +387,34 @@ export class Fp3dQuickMenu extends LitElement {
   static styles = [
     tokens,
     css`
+    .qm-play-head {
+      margin: 10px 0 4px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+    .qm-play {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 110px;
+      overflow-y: auto;
+    }
+    .qm-chip {
+      border: 1px solid rgba(160, 240, 255, 0.35);
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: rgba(8, 16, 34, 0.55);
+      color: inherit;
+      font: inherit;
+      font-size: 12.5px;
+      cursor: pointer;
+    }
+    .qm-chip-on {
+      border-color: var(--fp3d-accent, #37e0ff);
+      color: var(--fp3d-accent, #37e0ff);
+    }
       .qm-camera {
         display: block;
         width: 100%;
@@ -390,6 +551,59 @@ export class Fp3dQuickMenu extends LitElement {
         color: var(--fp3d-accent-text);
         font-size: 17px;
         cursor: pointer;
+      }
+      .qm-car-line {
+        margin: 2px 0 8px;
+        text-align: center;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+      .qm-car {
+        display: grid;
+        gap: 6px;
+        justify-items: stretch;
+      }
+      .qm-car .qm-slot {
+        width: auto;
+        padding: 6px 10px;
+        font-size: 13px;
+      }
+      .qm-media {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin: 6px 0;
+      }
+      .qm-media-main {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+      }
+      .qm-media-main span {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font-size: 22px;
+        text-shadow: 0 0 6px rgba(0, 0, 0, 0.8);
+        color: #fff;
+      }
+      .qm-media .qm-slot {
+        width: auto;
+        padding: 0 10px;
+      }
+      .qm-media-title {
+        margin: 2px 0 4px;
+        text-align: center;
+        font-size: 12px;
+        opacity: 0.85;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
       .qm-tilt {
         display: grid;
