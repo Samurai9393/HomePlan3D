@@ -35,16 +35,16 @@ def _house() -> dict:
     b = copy.deepcopy(BUILDING)
     ground = b["floors"][0]
     ground["rooms"].append(
-        {"id": "r2", "name": "Küche", "area_id": "kitchen", "points": [[4, 0], [8, 0], [8, 3], [4, 3]]}
+        {"id": "r2", "name": "Kitchen", "area_id": "kitchen", "points": [[4, 0], [8, 0], [8, 3], [4, 3]]}
     )
     ground["placements"] = [{"entity_id": "media_player.living_echo", "x": 1, "z": 1}]
     ground["rooms"][1]["mods"] = {MODULE_ID: {"speaker": "media_player.kitchen_sonos"}}
     upper = copy.deepcopy(ground)
-    upper.update(id="f2", name="Obergeschoss", placements=[], furniture=[])
+    upper.update(id="f2", name="Upper floor", placements=[], furniture=[])
     upper["rooms"] = [
         {
             "id": "r3",
-            "name": "Kinderzimmer",
+            "name": "Kids' room",
             "area_id": None,
             "points": [[0, 0], [4, 0], [4, 3], [0, 3]],
             "mods": {MODULE_ID: {"quiet_from": 19, "quiet_to": 7}},
@@ -65,36 +65,36 @@ def test_module_ready_needs_the_approved_code() -> None:
 def test_rooms_by_name_area_or_floor() -> None:
     b = _house()
     areas = {"kitchen": "Kitchen area"}
-    rooms, missing = target_rooms(b, ["küche"], None, areas)
+    rooms, missing = target_rooms(b, ["kitchen"], None, areas)
     assert [r["id"] for _, r in rooms] == ["r2"] and missing == []
     rooms, _ = target_rooms(b, ["Kitchen area"], None, areas)
     assert [r["id"] for _, r in rooms] == ["r2"]
-    rooms, _ = target_rooms(b, [], "obergeschoss", areas)
+    rooms, _ = target_rooms(b, [], "upper floor", areas)
     assert [r["id"] for _, r in rooms] == ["r3"]
     rooms, _ = target_rooms(b, [], None, areas)
     assert len(rooms) == 3
     assert target_rooms(b, ["Garage"], None, areas)[1] == ["Garage"]
-    assert target_rooms(b, [], "Keller", areas) == ([], ["Keller"])
+    assert target_rooms(b, [], "Basement", areas) == ([], ["Basement"])
 
 
 def test_outdoor_areas_with_an_area_act_as_rooms() -> None:
     """A terrace with a Home Assistant area gets announcements; a hedge or one without an area does not (#866)."""
     floor = {
-        "rooms": [{"id": "r1", "name": "Wohnen", "points": [[0, 0], [4, 0], [4, 3]]}],
+        "rooms": [{"id": "r1", "name": "Living room", "points": [[0, 0], [4, 0], [4, 3]]}],
         "outdoor": [
             {
                 "id": "t",
                 "type": "terrace",
-                "name": "Terrasse",
+                "name": "Terrace",
                 "area_id": "terrace",
                 "points": [[5, 0], [8, 0], [8, 3]],
             },
-            {"id": "h", "type": "hedge", "name": "Hecke", "area_id": "garden", "points": [[9, 0], [12, 0], [12, 3]]},
-            {"id": "l", "type": "lawn", "name": "Rasen", "area_id": None, "points": [[0, 5], [4, 5], [4, 8]]},
+            {"id": "h", "type": "hedge", "name": "Hedge", "area_id": "garden", "points": [[9, 0], [12, 0], [12, 3]]},
+            {"id": "l", "type": "lawn", "name": "Lawn", "area_id": None, "points": [[0, 5], [4, 5], [4, 8]]},
         ],
     }
     assert [z["id"] for z in zones_of(floor)] == ["r1", "t"]
-    rooms, missing = target_rooms({"floors": [floor]}, ["Terrasse"], None, {})
+    rooms, missing = target_rooms({"floors": [floor]}, ["Terrace"], None, {})
     assert [r["id"] for _, r in rooms] == ["t"] and missing == []
 
 
@@ -126,7 +126,7 @@ async def _ready(hass: HomeAssistant, packs: list) -> None:
 async def test_service_needs_the_module(hass: HomeAssistant) -> None:
     await _ready(hass, [MODULE])
     with pytest.raises(ServiceValidationError):
-        await hass.services.async_call(DOMAIN, "announce", {"message": "Hallo"}, blocking=True)
+        await hass.services.async_call(DOMAIN, "announce", {"message": "Hello"}, blocking=True)
 
 
 async def test_service_speaks_on_each_rooms_speaker(hass: HomeAssistant) -> None:
@@ -135,7 +135,7 @@ async def test_service_speaks_on_each_rooms_speaker(hass: HomeAssistant) -> None
     result = await hass.services.async_call(
         DOMAIN,
         "announce",
-        {"message": "Es hat geklingelt!", "rooms": ["Living", "Küche"]},
+        {"message": "The doorbell rang!", "rooms": ["Living", "Kitchen"]},
         blocking=True,
         return_response=True,
     )
@@ -143,7 +143,7 @@ async def test_service_speaks_on_each_rooms_speaker(hass: HomeAssistant) -> None
         "media_player.kitchen_sonos",
         "media_player.living_echo",
     ]
-    assert all(c.data["entity_id"] == "tts.cloud" and c.data["message"] == "Es hat geklingelt!" for c in speak)
+    assert all(c.data["entity_id"] == "tts.cloud" and c.data["message"] == "The doorbell rang!" for c in speak)
     assert result["failed"] == [] and result["no_speaker"] == []
 
 
@@ -151,7 +151,7 @@ async def test_a_room_without_a_speaker_takes_the_default(hass: HomeAssistant) -
     await _ready(hass, [APPROVED])
     speak = async_mock_service(hass, "tts", "speak")
     await hass.services.async_call(
-        DOMAIN, "announce", {"message": "Zähne putzen!", "rooms": ["Kinderzimmer"]}, blocking=True
+        DOMAIN, "announce", {"message": "Brush your teeth!", "rooms": ["Kids' room"]}, blocking=True
     )
     # one room asked for by name speaks even in its quiet time
     assert [c.data["media_player_entity_id"] for c in speak] == ["media_player.hall"]
@@ -160,7 +160,7 @@ async def test_a_room_without_a_speaker_takes_the_default(hass: HomeAssistant) -
 async def test_unknown_room_is_an_error(hass: HomeAssistant) -> None:
     await _ready(hass, [APPROVED])
     with pytest.raises(ServiceValidationError):
-        await hass.services.async_call(DOMAIN, "announce", {"message": "Hallo", "rooms": ["Garage"]}, blocking=True)
+        await hass.services.async_call(DOMAIN, "announce", {"message": "Hello", "rooms": ["Garage"]}, blocking=True)
 
 
 async def test_player_that_can_announce_lowers_its_music(hass: HomeAssistant) -> None:
@@ -168,10 +168,10 @@ async def test_player_that_can_announce_lowers_its_music(hass: HomeAssistant) ->
     hass.states.async_set("media_player.kitchen_sonos", "playing", {"supported_features": 1048576})
     play = async_mock_service(hass, "media_player", "play_media")
     await hass.services.async_call(
-        DOMAIN, "announce", {"message": "Essen ist fertig!", "rooms": ["Küche"]}, blocking=True
+        DOMAIN, "announce", {"message": "Dinner is ready!", "rooms": ["Kitchen"]}, blocking=True
     )
     assert play[0].data["announce"] is True
-    assert play[0].data["media_content_id"] == "media-source://tts/tts.cloud?message=Essen%20ist%20fertig%21&cache=true"
+    assert play[0].data["media_content_id"] == "media-source://tts/tts.cloud?message=Dinner%20is%20ready%21&cache=true"
 
 
 async def test_echo_of_alexa_devices_announces_through_its_notify_entity(hass: HomeAssistant) -> None:
@@ -203,9 +203,9 @@ async def test_echo_of_alexa_devices_announces_through_its_notify_entity(hass: H
     send = async_mock_service(hass, "notify", "send_message")
     speak = async_mock_service(hass, "tts", "speak")
     await hass.services.async_call(
-        DOMAIN, "announce", {"message": "Es hat geklingelt!", "rooms": ["Living"]}, blocking=True
+        DOMAIN, "announce", {"message": "The doorbell rang!", "rooms": ["Living"]}, blocking=True
     )
-    assert len(send) == 1 and send[0].data["message"] == "Es hat geklingelt!"
+    assert len(send) == 1 and send[0].data["message"] == "The doorbell rang!"
     assert send[0].data["entity_id"] in ("notify.living_echo_announce", ["notify.living_echo_announce"])
     assert speak == []
 
@@ -222,10 +222,14 @@ async def test_screens_get_the_announcement(hass: HomeAssistant, hass_ws_client)
     speak = async_mock_service(hass, "tts", "speak")
 
     result = await hass.services.async_call(
-        DOMAIN, "announce", {"message": "Es hat geklingelt!", "screens": ["Flur"]}, blocking=True, return_response=True
+        DOMAIN,
+        "announce",
+        {"message": "The doorbell rang!", "screens": ["Hallway"]},
+        blocking=True,
+        return_response=True,
     )
     event = (await view.receive_json())["event"]["announce"]
-    assert event["message"] == "Es hat geklingelt!" and event["screens"] == ["Flur"]
+    assert event["message"] == "The doorbell rang!" and event["screens"] == ["Hallway"]
     # only the screens asked for: no room's speaker
     assert speak == [] and result["screens"] is True
 
@@ -234,15 +238,15 @@ async def test_a_room_of_another_floor_plan(hass: HomeAssistant) -> None:
     await _ready(hass, [APPROVED])
     data = hass.data[DOMAIN]
     garage = copy.deepcopy(_house())
-    garage["floors"][0]["rooms"][0]["name"] = "Werkstatt"
+    garage["floors"][0]["rooms"][0]["name"] = "Workshop"
     await data.async_create_plan("Garage", garage)
     speak = async_mock_service(hass, "tts", "speak")
     await hass.services.async_call(
-        DOMAIN, "announce", {"message": "Feierabend!", "rooms": ["Werkstatt"]}, blocking=True
+        DOMAIN, "announce", {"message": "End of the day!", "rooms": ["Workshop"]}, blocking=True
     )
     assert [c.data["media_player_entity_id"] for c in speak] == ["media_player.living_echo"]
     # limited to the main plan, the workshop is not there
     with pytest.raises(ServiceValidationError):
         await hass.services.async_call(
-            DOMAIN, "announce", {"message": "Hallo", "rooms": ["Werkstatt"], "plan": "main"}, blocking=True
+            DOMAIN, "announce", {"message": "Hello", "rooms": ["Workshop"], "plan": "main"}, blocking=True
         )

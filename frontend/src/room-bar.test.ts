@@ -8,13 +8,13 @@ const room = (id: string, name: string, x0: number, panel: string[]): Room => ({
 
 function setup(): { hass: HomeAssistant; b: Building } {
   const b = emptyBuilding();
-  const eg = { ...newFloor("eg", "EG", 0), rooms: [room("wohnen", "Wohnzimmer", 0, ["light.decke", "light.stehlampe", "binary_sensor.fenster", "media_player.tv", "climate.wohnen"]), room("bad", "Bad", 4, ["light.bad", "media_player.echo"])] };
-  const og = { ...newFloor("og", "OG", 2.75), rooms: [room("kind", "Kind", 0, [])] };
+  const eg = { ...newFloor("eg", "Ground floor", 0), rooms: [room("wohnen", "Living room", 0, ["light.decke", "light.stehlampe", "binary_sensor.fenster", "media_player.tv", "climate.wohnen"]), room("bad", "Bathroom", 4, ["light.bad", "media_player.echo"])] };
+  const og = { ...newFloor("og", "Upper floor", 2.75), rooms: [room("kind", "Kids' room", 0, [])] };
   b.floors = [og, eg];
   b.settings.favorites = ["scene.gemuetlich", "switch.stehlampe", "script.weg"];
   const st = (state: string, attributes: Record<string, unknown> = {}) => ({ state, attributes, last_changed: "" });
   const hass = {
-    language: "de",
+    language: "en",
     entities: {},
     states: {
       "light.decke": st("on"),
@@ -34,7 +34,7 @@ function setup(): { hass: HomeAssistant; b: Building } {
 test("room bar: a tile per room with its temperature, the lights on, an open window and a player that plays", () => {
   const { hass, b } = setup();
   const [wohnen, bad] = roomTiles(hass, b, "eg");
-  assert.equal(wohnen.name, "Wohnzimmer");
+  assert.equal(wohnen.name, "Living room");
   assert.equal(wohnen.temp, 21.4, "a thermostat tells the temperature when no sensor does");
   assert.deepEqual(wohnen.lightsOn, ["light.decke", "light.stehlampe"]);
   assert.equal(wohnen.open, 1);

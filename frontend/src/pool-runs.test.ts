@@ -12,7 +12,7 @@ const pool: OutdoorArea = {
   points: [[0, -8], [4, -8], [4, -4], [0, -4]],
   pool: { ports: [{ id: "sk", kind: "skimmer", x: 1, z: -4 }], joints: [{ id: "t", x: 3, z: 0.05, y: 0.9 }] },
 } as OutdoorArea;
-const floor = { ...newFloor("eg", "EG", 0), rooms: [garage], outdoor: [pool] };
+const floor = { ...newFloor("eg", "Ground floor", 0), rooms: [garage], outdoor: [pool] };
 floor.furniture = [{ id: "pump", type: "pool_pump", x: 2, z: 0.4, rotation: 0, w: 0.7, d: 0.32, h: 0.4, variant: null, mount_y: null } as never];
 const b = { floors: [floor], settings: {} } as unknown as Building;
 const nodeAt = poolNodeAt(b, floor, pool);
@@ -165,7 +165,7 @@ test("the water's direction: built from a T-piece outside to the filter's return
 
 test("a pipe at the bottom drain leaves under the pool's floor and comes up outside the pool", async () => {
   const { underBasin } = await import("./pool-runs.ts");
-  const floor = { id: "eg", name: "EG", elevation: 0, height: 2.5, cut_height: 1.15, rooms: [], openings: [], furniture: [], placements: [], background: null } as unknown as Parameters<typeof underBasin>[3];
+  const floor = { id: "eg", name: "Ground floor", elevation: 0, height: 2.5, cut_height: 1.15, rooms: [], openings: [], furniture: [], placements: [], background: null } as unknown as Parameters<typeof underBasin>[3];
   const area = { id: "p", type: "pool", points: [[0, 0], [8, 0], [8, 4], [0, 4]], depth: 1.5, rim: 0.2, pool: { ports: [{ id: "bd", kind: "drain", x: 4, z: 2 }] } } as unknown as Parameters<typeof underBasin>[2];
   // the pool lies in a lawn (else it is drawn shallow)
   (floor as unknown as { outdoor: unknown[] }).outdoor = [{ id: "l", type: "lawn", points: [[-5, -5], [20, -5], [20, 10], [-5, 10]] }, area];
@@ -184,7 +184,7 @@ test("a pipe at the bottom drain leaves under the pool's floor and comes up outs
 
 test("an inlet's pipe comes straight through the pool wall at its depth, not down through the water", async () => {
   const { poolWallNormal, underBasin } = await import("./pool-runs.ts");
-  const floor = { id: "eg", name: "EG", elevation: 0, height: 2.5, cut_height: 1.15, rooms: [], openings: [], furniture: [], placements: [], background: null } as unknown as Parameters<typeof underBasin>[3];
+  const floor = { id: "eg", name: "Ground floor", elevation: 0, height: 2.5, cut_height: 1.15, rooms: [], openings: [], furniture: [], placements: [], background: null } as unknown as Parameters<typeof underBasin>[3];
   const area = { id: "p", type: "pool", points: [[0, 0], [8, 0], [8, 4], [0, 4]], pool: { ports: [{ id: "in", kind: "inlet", x: 8, z: 2 }] } } as unknown as Parameters<typeof underBasin>[2];
   assert.deepEqual(poolWallNormal(area, [8, 2]), [1, 0]);
   assert.deepEqual(poolWallNormal({ points: [[0, 0], [0, 4], [8, 4], [8, 0]] }, [8, 2]), [1, 0]);
@@ -198,7 +198,7 @@ test("an inlet's pipe comes straight through the pool wall at its depth, not dow
 
 test("an inlet pipe drawn along the wall line moves out behind the wall: no zigzag (Torsten's T-piece)", async () => {
   const { underBasin } = await import("./pool-runs.ts");
-  const floor = { id: "eg", name: "EG", elevation: 0, height: 2.5, cut_height: 1.15, rooms: [], openings: [], furniture: [], placements: [], background: null } as unknown as Parameters<typeof underBasin>[3];
+  const floor = { id: "eg", name: "Ground floor", elevation: 0, height: 2.5, cut_height: 1.15, rooms: [], openings: [], furniture: [], placements: [], background: null } as unknown as Parameters<typeof underBasin>[3];
   const area = { id: "p", type: "pool", points: [[3, -7.15], [10.65, -7.15], [10.65, -3.85], [3, -3.85]], pool: { ports: [{ id: "in", kind: "inlet", x: 3, z: -6.55 }] } } as unknown as Parameters<typeof underBasin>[2];
   // T-piece at x 2.15, the pipe along the wall line x = 3 to the inlet, which sits at -0.59
   const path = underBasin([[2.15, -0.3, -5.65], [3, -0.3, -5.65], [3, -0.3, -6.55], [3, -0.59, -6.55]], { from: "joint:t:out1", to: "port:in" }, area, floor);

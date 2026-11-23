@@ -188,17 +188,17 @@ async def test_spoken_names_are_matched_tolerantly(hass: HomeAssistant) -> None:
     from custom_components.homeplan3d.locate.answers import async_answer
 
     async def ask(text: str, user: str | None = None) -> str | None:
-        return await async_answer(hass, service, text, "de", user)
+        return await async_answer(hass, service, text, "en", user)
 
-    # speech recognition writes "Thorstens" for "Torsten"
-    assert await ask("Wo ist Thorstens Apple Watch?") == "Torsten Apple Watch ist im Raum Kitchen."
+    # speech recognition writes "Thorsten's" for "Torsten"
+    assert await ask("Where is Thorsten's Apple Watch?") == "Torsten Apple Watch is in the Kitchen."
     # "my iPhone" is the iPhone of the person who asks
-    assert await ask("Wo ist mein iPhone?", "u2") == "Frauke Iphone ist im Raum Living."
-    assert await ask("Wo ist mein iPhone?", "u1") == "Torsten Iphone ist im Raum Hall."
+    assert await ask("Where is my iPhone?", "u2") == "Frauke Iphone is in the Living."
+    assert await ask("Where is my iPhone?", "u1") == "Torsten Iphone is in the Hall."
     # a first name alone means the person: the watch tells where
-    assert await ask("Wo ist Torsten?") == "Torsten ist im Raum Kitchen."
-    assert await ask("Wo ist Frauke?") == "Frauke Iphone ist im Raum Living."
-    assert await ask("Wo ist der Fernseher?") is None
+    assert await ask("Where is Torsten?") == "Torsten is in the Kitchen."
+    assert await ask("Where is Frauke?") == "Frauke Iphone is in the Living."
+    assert await ask("Where is the TV?") is None
 
 
 async def test_weak_beacons_show_among_nearby_devices(hass: HomeAssistant) -> None:
@@ -313,17 +313,17 @@ async def test_a_view_asks_locating_first(hass: HomeAssistant, hass_ws_client) -
     await _setup(hass)
     service: LocateService = hass.data[DATA_LOCATE]
     client = await hass_ws_client(hass)
-    await client.send_json_auto_id({"type": "homeplan3d/locate/ask", "text": "Wer ist zu Hause?", "language": "de"})
+    await client.send_json_auto_id({"type": "homeplan3d/locate/ask", "text": "Who is home?", "language": "en"})
     assert (await client.receive_json())["result"] is None
     service.devices = [dict(WATCH, name="Torsten Apple Watch")]
     service.rooms = ROOMS
     service.state = {
         "irk_watch": {"room": "kitchen", "room_name": "Kitchen", "probability": 0.9, "last_seen": time.time()}
     }
-    await client.send_json_auto_id({"type": "homeplan3d/locate/ask", "text": "Wer ist zu Hause?", "language": "de"})
+    await client.send_json_auto_id({"type": "homeplan3d/locate/ask", "text": "Who is home?", "language": "en"})
     res = (await client.receive_json())["result"]
-    assert res == {"text": "Zu Hause: Torsten Apple Watch (Kitchen).", "rooms": ["kitchen"], "admins_only": False}
-    await client.send_json_auto_id({"type": "homeplan3d/locate/ask", "text": "Zeig die Küche", "language": "de"})
+    assert res == {"text": "At home: Torsten Apple Watch (Kitchen).", "rooms": ["kitchen"], "admins_only": False}
+    await client.send_json_auto_id({"type": "homeplan3d/locate/ask", "text": "Show the kitchen", "language": "en"})
     assert (await client.receive_json())["result"] is None
 
 

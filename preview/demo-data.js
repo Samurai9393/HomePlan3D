@@ -27,26 +27,26 @@ const floor = (id, name, elevation, rooms) => ({
 });
 
 export const DEMO_FLOORS = {
-  keller: { floor_id: "keller", name: "Keller", level: -1 },
-  erdgeschoss: { floor_id: "erdgeschoss", name: "Erdgeschoss", level: 0 },
-  obergeschoss: { floor_id: "obergeschoss", name: "Obergeschoss", level: 1 },
-  dachgeschoss: { floor_id: "dachgeschoss", name: "Dachgeschoss", level: 2 },
+  keller: { floor_id: "keller", name: "Basement", level: -1 },
+  erdgeschoss: { floor_id: "erdgeschoss", name: "Ground floor", level: 0 },
+  obergeschoss: { floor_id: "obergeschoss", name: "Upper floor", level: 1 },
+  dachgeschoss: { floor_id: "dachgeschoss", name: "Attic floor", level: 2 },
 };
 
 export const DEMO_AREAS = {
-  wohnzimmer: { area_id: "wohnzimmer", name: "Wohnzimmer", floor_id: "erdgeschoss" },
-  kueche: { area_id: "kueche", name: "Küche", floor_id: "erdgeschoss" },
-  schlafzimmer: { area_id: "schlafzimmer", name: "Schlafzimmer", floor_id: "obergeschoss" },
-  bad: { area_id: "bad", name: "Bad", floor_id: "obergeschoss" },
-  flur: { area_id: "flur", name: "Flur", floor_id: "erdgeschoss" },
-  kinderzimmer: { area_id: "kinderzimmer", name: "Kinderzimmer", floor_id: "obergeschoss" },
-  arbeitszimmer: { area_id: "arbeitszimmer", name: "Arbeitszimmer", floor_id: "obergeschoss" },
+  wohnzimmer: { area_id: "wohnzimmer", name: "Living room", floor_id: "erdgeschoss" },
+  kueche: { area_id: "kueche", name: "Kitchen", floor_id: "erdgeschoss" },
+  schlafzimmer: { area_id: "schlafzimmer", name: "Bedroom", floor_id: "obergeschoss" },
+  bad: { area_id: "bad", name: "Bathroom", floor_id: "obergeschoss" },
+  flur: { area_id: "flur", name: "Hallway", floor_id: "erdgeschoss" },
+  kinderzimmer: { area_id: "kinderzimmer", name: "Kids' room", floor_id: "obergeschoss" },
+  arbeitszimmer: { area_id: "arbeitszimmer", name: "Study", floor_id: "obergeschoss" },
   garage: { area_id: "garage", name: "Garage", floor_id: "erdgeschoss" },
-  waschkueche: { area_id: "waschkueche", name: "Waschküche", floor_id: "erdgeschoss" },
-  heizung: { area_id: "heizung", name: "Heizungsraum", floor_id: "keller" },
-  vorrat: { area_id: "vorrat", name: "Vorratsraum", floor_id: "keller" },
-  hobby: { area_id: "hobby", name: "Hobbyraum", floor_id: "erdgeschoss" },
-  garten: { area_id: "garten", name: "Garten", floor_id: "erdgeschoss" },
+  waschkueche: { area_id: "waschkueche", name: "Laundry", floor_id: "erdgeschoss" },
+  heizung: { area_id: "heizung", name: "Heating room", floor_id: "keller" },
+  vorrat: { area_id: "vorrat", name: "Pantry", floor_id: "keller" },
+  hobby: { area_id: "hobby", name: "Hobby room", floor_id: "erdgeschoss" },
+  garten: { area_id: "garten", name: "Garden", floor_id: "erdgeschoss" },
 };
 
 // The demo house, an L: a main house of 14 × 9 m with two full storeys and two rooms under the roof, a lower
@@ -55,13 +55,13 @@ export const DEMO_AREAS = {
 export const DEMO_BUILDING = {
   version: 1,
   settings: {
-    pets: { on: true, list: [{ id: "pet_mia", kind: "cat", name: "Mia", fur: "orange" }, { id: "pet_bello", kind: "dog", breed: "labrador", name: "Bello", fur: "golden" }, { id: "pet_kruemel", kind: "dog", breed: "dachshund", name: "Krümel", fur: "brown" }] }, wall_exterior: 0.24, wall_interior: 0.12, grid: 0.05 },
+    pets: { on: true, list: [{ id: "pet_mia", kind: "cat", name: "Mia", fur: "orange" }, { id: "pet_bello", kind: "dog", breed: "labrador", name: "Bello", fur: "golden" }, { id: "pet_kruemel", kind: "dog", breed: "dachshund", name: "Crumble", fur: "brown" }] }, wall_exterior: 0.24, wall_interior: 0.12, grid: 0.05 },
   floors: [
-    floor("eg", "Erdgeschoss", 0, [
+    floor("eg", "Ground floor", 0, [
       {
         // the living wing reaches into the garden; its bay window looks west
         id: "wohnen",
-        name: "Wohnzimmer",
+        name: "Living room",
         area_id: "wohnzimmer",
         points: [
           [0, -6],
@@ -75,15 +75,15 @@ export const DEMO_BUILDING = {
         ],
         floor_material: "wood",
       },
-      rect("essen", "Essen", null, 0, 0, 6, 4.6, "wood"),
-      rect("kueche", "Küche", "kueche", 6, 0, 11, 4.6, "tiles"),
-      rect("hwr", "Hauswirtschaft", "waschkueche", 11, 0, 14, 4.6, "tiles"),
-      rect("gast", "Gästezimmer", null, 0, 4.6, 3.6, 9, "carpet"),
-      rect("gwc", "Gäste-WC", null, 3.6, 4.6, 5.2, 6.4, "tiles"),
-      rect("garderobe", "Garderobe", null, 3.6, 6.4, 5.2, 9, "oak"),
+      rect("essen", "Dining", null, 0, 0, 6, 4.6, "wood"),
+      rect("kueche", "Kitchen", "kueche", 6, 0, 11, 4.6, "tiles"),
+      rect("hwr", "Utility room", "waschkueche", 11, 0, 14, 4.6, "tiles"),
+      rect("gast", "Guest room", null, 0, 4.6, 3.6, 9, "carpet"),
+      rect("gwc", "Guest WC", null, 3.6, 4.6, 5.2, 6.4, "tiles"),
+      rect("garderobe", "Cloakroom", null, 3.6, 6.4, 5.2, 9, "oak"),
       {
         id: "flur",
-        name: "Flur",
+        name: "Hallway",
         area_id: "flur",
         points: [
           [5.2, 4.6],
@@ -97,20 +97,20 @@ export const DEMO_BUILDING = {
         ],
         floor_material: "oak",
       },
-      rect("hobby", "Hobbyraum", "hobby", 9.6, 4.6, 14, 9, "concrete"),
+      rect("hobby", "Hobby room", "hobby", 9.6, 4.6, 14, 9, "concrete"),
       rect("garage", "Garage", "garage", 14, 0, 17.6, 6, "concrete"),
     ]),
-    floor("og", "Obergeschoss", 2.75, [
-      rect("kind", "Kinderzimmer", "kinderzimmer", 0, 0, 4.4, 4.6, "carpet"),
-      rect("ankleide", "Ankleide", null, 4.4, 0, 6.2, 4.6, "carpet"),
-      rect("schlafen", "Schlafzimmer", "schlafzimmer", 6.2, 0, 10, 4.6, "carpet"),
-      rect("jugend", "Jugendzimmer", null, 10, 0, 14, 4.6, "oak"),
-      rect("bad", "Bad", "bad", 0, 4.6, 3.6, 9, "tiles"),
-      rect("galerie", "Galerie", null, 3.6, 4.6, 11, 9, "oak"),
-      rect("arbeit", "Arbeitszimmer", "arbeitszimmer", 11, 4.6, 14, 9, "oak"),
+    floor("og", "Upper floor", 2.75, [
+      rect("kind", "Kids' room", "kinderzimmer", 0, 0, 4.4, 4.6, "carpet"),
+      rect("ankleide", "Dressing room", null, 4.4, 0, 6.2, 4.6, "carpet"),
+      rect("schlafen", "Bedroom", "schlafzimmer", 6.2, 0, 10, 4.6, "carpet"),
+      rect("jugend", "Teen room", null, 10, 0, 14, 4.6, "oak"),
+      rect("bad", "Bathroom", "bad", 0, 4.6, 3.6, 9, "tiles"),
+      rect("galerie", "Gallery", null, 3.6, 4.6, 11, 9, "oak"),
+      rect("arbeit", "Study", "arbeitszimmer", 11, 4.6, 14, 9, "oak"),
     ]),
     // under the roof: the walls end under the slopes, the dormers give headroom and light
-    floor("dg", "Dachgeschoss", 5.5, [rect("studio", "Studio", null, 0, 0, 8, 9, "oak"), rect("loft", "Gästeloft", null, 8, 0, 14, 9, "oak")]),
+    floor("dg", "Attic floor", 5.5, [rect("studio", "Studio", null, 0, 0, 8, 9, "oak"), rect("loft", "Guest loft", null, 8, 0, 14, 9, "oak")]),
   ],
 };
 
@@ -118,7 +118,7 @@ export const DEMO_BUILDING = {
 // Invented pictures (no real logos or photos): a cover for the TV and a camera still.
 const svgPicture = (body) => `data:image/svg+xml;base64,${btoa(body)}`;
 const COVER = svgPicture(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#2b0a3d"/><stop offset="1" stop-color="#b3122e"/></linearGradient></defs><rect width="320" height="180" fill="url(#g)"/><circle cx="240" cy="70" r="38" fill="#ffb547" opacity="0.85"/><path d="M0 150 L90 95 L150 130 L230 80 L320 140 L320 180 L0 180 Z" fill="#12061c"/><text x="24" y="52" font-family="sans-serif" font-size="30" font-weight="700" fill="#fff">Serie</text></svg>',
+  '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><defs><linearGradient id="g" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#2b0a3d"/><stop offset="1" stop-color="#b3122e"/></linearGradient></defs><rect width="320" height="180" fill="url(#g)"/><circle cx="240" cy="70" r="38" fill="#ffb547" opacity="0.85"/><path d="M0 150 L90 95 L150 130 L230 80 L320 140 L320 180 L0 180 Z" fill="#12061c"/><text x="24" y="52" font-family="sans-serif" font-size="30" font-weight="700" fill="#fff">Series</text></svg>',
 );
 // a stored picture for a screen rule (shown on the TV while Netflix runs)
 export const DEMO_PICTURES = {
@@ -127,11 +127,11 @@ export const DEMO_PICTURES = {
   ),
 };
 const DOOR_STILL = svgPicture(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2440"/><stop offset="1" stop-color="#3b3350"/></linearGradient></defs><rect width="320" height="180" fill="url(#s)"/><rect x="0" y="118" width="320" height="62" fill="#2b2f38"/><polygon points="120,180 200,180 178,118 142,118" fill="#4a4f5c"/><rect x="40" y="70" width="36" height="48" fill="#1d3b2a"/><rect x="250" y="62" width="44" height="56" fill="#1d3b2a"/><rect x="146" y="96" width="28" height="22" fill="#20242c"/><circle cx="160" cy="62" r="12" fill="#c9a27a"/><rect x="146" y="74" width="28" height="46" rx="8" fill="#3c6ea8"/><rect x="0" y="0" width="320" height="16" fill="#00000066"/><text x="8" y="12" font-family="monospace" font-size="10" fill="#e6eefc">HAUSTUER  18:42:07</text></svg>',
+  '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1a2440"/><stop offset="1" stop-color="#3b3350"/></linearGradient></defs><rect width="320" height="180" fill="url(#s)"/><rect x="0" y="118" width="320" height="62" fill="#2b2f38"/><polygon points="120,180 200,180 178,118 142,118" fill="#4a4f5c"/><rect x="40" y="70" width="36" height="48" fill="#1d3b2a"/><rect x="250" y="62" width="44" height="56" fill="#1d3b2a"/><rect x="146" y="96" width="28" height="22" fill="#20242c"/><circle cx="160" cy="62" r="12" fill="#c9a27a"/><rect x="146" y="74" width="28" height="46" rx="8" fill="#3c6ea8"/><rect x="0" y="0" width="320" height="16" fill="#00000066"/><text x="8" y="12" font-family="monospace" font-size="10" fill="#e6eefc">FRONT DOOR  18:42:07</text></svg>',
 );
 
 const CAMERA_STILL = svgPicture(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><rect width="320" height="180" fill="#1b2230"/><rect x="0" y="120" width="320" height="60" fill="#2a3444"/><rect x="40" y="60" width="90" height="70" fill="#3b4a60"/><rect x="190" y="40" width="80" height="90" fill="#324055"/><text x="12" y="20" font-family="monospace" font-size="12" fill="#cfd8e6">KAMERA 1  12:04:31</text></svg>',
+  '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180"><rect width="320" height="180" fill="#1b2230"/><rect x="0" y="120" width="320" height="60" fill="#2a3444"/><rect x="40" y="60" width="90" height="70" fill="#3b4a60"/><rect x="190" y="40" width="80" height="90" fill="#324055"/><text x="12" y="20" font-family="monospace" font-size="12" fill="#cfd8e6">CAMERA 1  12:04:31</text></svg>',
 );
 
 // Invented devices: registry entries, states and placements for the preview.
@@ -154,29 +154,29 @@ const light = (id, name, area, on, extra = {}) => ({
 const entity = (entity_id, area, state, attributes) => ({ entry: { entity_id, area_id: area }, state: { entity_id, state, attributes } });
 
 const DEVICES = [
-  light("wohnzimmer_decke", "Wohnzimmer Deckenlicht", "wohnzimmer", true),
-  light("stehlampe", "Stehlampe", "wohnzimmer", true, { brightness: 90, color_mode: "hs", rgb_color: [255, 150, 60] }),
-  light("kueche", "Küchenlicht", "kueche", false),
-  light("schlafzimmer", "Schlafzimmer Decke", "schlafzimmer", false),
-  light("nachttisch", "Nachttisch", "schlafzimmer", true, { brightness: 60 }),
-  light("bad", "Bad Spots", "bad", true, { brightness: 220, color_temp_kelvin: 4000 }),
-  light("flur", "Flurlicht", "flur", true, { brightness: 120 }),
-  light("kinderzimmer", "Kinderzimmer Decke", "kinderzimmer", true, { brightness: 150 }),
-  entity("fan.kinderzimmer", "kinderzimmer", "on", { friendly_name: "Kinderzimmer Ventilator", percentage: 66, percentage_step: 33 }),
-  light("schreibtisch", "Schreibtischlampe", "arbeitszimmer", true, { color_temp_kelvin: 4500 }),
-  light("esstisch", "Esstisch Pendel", "kueche", true, { brightness: 140 }),
-  light("kueche_links", "Küche links", "kueche", true, { brightness: 230, color_mode: "hs", rgb_color: [255, 70, 40] }),
-  light("kueche_rechts", "Küche rechts", "kueche", true, { brightness: 230, color_mode: "hs", rgb_color: [60, 110, 255] }),
-  light("garten", "Garten Wegleuchten", "garten", true, { brightness: 170 }),
+  light("wohnzimmer_decke", "Living room ceiling light", "wohnzimmer", true),
+  light("stehlampe", "Floor lamp", "wohnzimmer", true, { brightness: 90, color_mode: "hs", rgb_color: [255, 150, 60] }),
+  light("kueche", "Kitchen light", "kueche", false),
+  light("schlafzimmer", "Bedroom ceiling light", "schlafzimmer", false),
+  light("nachttisch", "Nightstand", "schlafzimmer", true, { brightness: 60 }),
+  light("bad", "Bathroom spots", "bad", true, { brightness: 220, color_temp_kelvin: 4000 }),
+  light("flur", "Hallway light", "flur", true, { brightness: 120 }),
+  light("kinderzimmer", "Kids' room ceiling light", "kinderzimmer", true, { brightness: 150 }),
+  entity("fan.kinderzimmer", "kinderzimmer", "on", { friendly_name: "Kids' room fan", percentage: 66, percentage_step: 33 }),
+  light("schreibtisch", "Desk lamp", "arbeitszimmer", true, { color_temp_kelvin: 4500 }),
+  light("esstisch", "Dining table pendant", "kueche", true, { brightness: 140 }),
+  light("kueche_links", "Kitchen left", "kueche", true, { brightness: 230, color_mode: "hs", rgb_color: [255, 70, 40] }),
+  light("kueche_rechts", "Kitchen right", "kueche", true, { brightness: 230, color_mode: "hs", rgb_color: [60, 110, 255] }),
+  light("garten", "Garden path lights", "garten", true, { brightness: 170 }),
   light("pool", "Pool Spot", null, true, { brightness: 200, color_mode: "hs", rgb_color: [40, 200, 255] }),
-  light("haustuer", "Haustür Außenlicht", "flur", true, { brightness: 200 }),
-  light("neon_schild", "Neon-Schild", "hobby", true, { brightness: 200, color_mode: "hs", rgb_color: [255, 60, 180] }),
-  light("studio", "Studio Stehlampe", null, true, { brightness: 120 }),
-  light("led_band", "LED Band", "wohnzimmer", true, { brightness: 160, color_mode: "hs", rgb_color: [120, 90, 255], effect: "colorloop", effect_list: ["colorloop", "none"] }),
-  entity("cover.wohnzimmer", "wohnzimmer", "open", { friendly_name: "Wohnzimmer Rollladen", current_position: 70, supported_features: 15 }),
-  entity("cover.kueche", "kueche", "open", { friendly_name: "Rollladen Küche", current_position: 40, supported_features: 15 }),
+  light("haustuer", "Front door outdoor light", "flur", true, { brightness: 200 }),
+  light("neon_schild", "Neon sign", "hobby", true, { brightness: 200, color_mode: "hs", rgb_color: [255, 60, 180] }),
+  light("studio", "Studio floor lamp", null, true, { brightness: 120 }),
+  light("led_band", "LED strip", "wohnzimmer", true, { brightness: 160, color_mode: "hs", rgb_color: [120, 90, 255], effect: "colorloop", effect_list: ["colorloop", "none"] }),
+  entity("cover.wohnzimmer", "wohnzimmer", "open", { friendly_name: "Living room roller shutter", current_position: 70, supported_features: 15 }),
+  entity("cover.kueche", "kueche", "open", { friendly_name: "Kitchen roller shutter", current_position: 40, supported_features: 15 }),
   entity("climate.wohnzimmer", "wohnzimmer", "heat", {
-    friendly_name: "Wohnzimmer Heizung",
+    friendly_name: "Living room heating",
     current_temperature: 21.4,
     temperature: 21.5,
     hvac_modes: ["off", "heat", "auto"],
@@ -186,7 +186,7 @@ const DEVICES = [
     target_temp_step: 0.5,
   }),
   entity("climate.schlafzimmer", "schlafzimmer", "heat", {
-    friendly_name: "Schlafzimmer Heizung",
+    friendly_name: "Bedroom heating",
     current_temperature: 18.2,
     temperature: 18,
     hvac_modes: ["off", "heat"],
@@ -194,102 +194,102 @@ const DEVICES = [
     min_temp: 5,
     max_temp: 30,
   }),
-  entity("media_player.fernseher", "wohnzimmer", "playing", { friendly_name: "Fernseher", device_class: "tv", app_name: "Netflix", media_title: "Serie", volume_level: 0.35, entity_picture: COVER }),
-  entity("media_player.kueche_lautsprecher", "kueche", "playing", { friendly_name: "Küche Lautsprecher", device_class: "speaker", media_title: "Blue Train", media_artist: "John Coltrane", volume_level: 0.45, entity_picture: COVER, group_members: ["media_player.kueche_lautsprecher", "media_player.bad_lautsprecher"] }),
-  entity("media_player.bad_lautsprecher", "bad", "playing", { friendly_name: "Bad Lautsprecher", device_class: "speaker", media_title: "Blue Train", media_artist: "John Coltrane", volume_level: 0.3, entity_picture: COVER, group_members: ["media_player.kueche_lautsprecher", "media_player.bad_lautsprecher"] }),
-  entity("switch.kaffeemaschine", "kueche", "on", { friendly_name: "Kaffeemaschine" }),
-  entity("camera.wohnzimmer", "wohnzimmer", "idle", { friendly_name: "Wohnzimmer Kamera", entity_picture: CAMERA_STILL }),
+  entity("media_player.fernseher", "wohnzimmer", "playing", { friendly_name: "TV", device_class: "tv", app_name: "Netflix", media_title: "Series", volume_level: 0.35, entity_picture: COVER }),
+  entity("media_player.kueche_lautsprecher", "kueche", "playing", { friendly_name: "Kitchen speaker", device_class: "speaker", media_title: "Blue Train", media_artist: "John Coltrane", volume_level: 0.45, entity_picture: COVER, group_members: ["media_player.kueche_lautsprecher", "media_player.bad_lautsprecher"] }),
+  entity("media_player.bad_lautsprecher", "bad", "playing", { friendly_name: "Bathroom speaker", device_class: "speaker", media_title: "Blue Train", media_artist: "John Coltrane", volume_level: 0.3, entity_picture: COVER, group_members: ["media_player.kueche_lautsprecher", "media_player.bad_lautsprecher"] }),
+  entity("switch.kaffeemaschine", "kueche", "on", { friendly_name: "Coffee machine" }),
+  entity("camera.wohnzimmer", "wohnzimmer", "idle", { friendly_name: "Living room camera", entity_picture: CAMERA_STILL }),
   // the front door: a camera and its doorbell (one device), for the live director
-  entity("camera.haustuer", "flur", "idle", { friendly_name: "Haustür Kamera", entity_picture: DOOR_STILL }),
-  entity("event.haustuer_klingel", "flur", "2026-10-19T08:00:00.000Z", { friendly_name: "Haustür Klingel", device_class: "doorbell", event_type: "ring" }),
-  entity("sensor.wohnzimmer_temperatur", "wohnzimmer", "21.4", { friendly_name: "Wohnzimmer Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
-  entity("sensor.kueche_temperatur", "kueche", "23.4", { friendly_name: "Küche Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
-  entity("sensor.schlafzimmer_temperatur", "schlafzimmer", "18.1", { friendly_name: "Schlafzimmer Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
-  entity("sensor.bad_temperatur", "bad", "24.6", { friendly_name: "Bad Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
-  entity("sensor.flur_temperatur", "flur", "19.6", { friendly_name: "Flur Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
-  entity("sensor.garten_temperatur", "garten", "14.2", { friendly_name: "Garten Temperatur", device_class: "temperature", unit_of_measurement: "°C" }),
-  entity("sun.sun", null, "above_horizon", { friendly_name: "Sonne", elevation: 32, azimuth: 205 }),
-  entity("sensor.wohnzimmer_feuchte", "wohnzimmer", "48", { friendly_name: "Wohnzimmer Luftfeuchtigkeit", device_class: "humidity", unit_of_measurement: "%" }),
-  entity("binary_sensor.kueche_fenster", "kueche", "on", { friendly_name: "Küche Fenster", device_class: "window" }),
-  entity("binary_sensor.kueche_rauch", "kueche", "off", { friendly_name: "Küche Rauchmelder", device_class: "smoke" }),
-  entity("binary_sensor.garage_auto", "garage", "on", { friendly_name: "Auto in der Garage", device_class: "occupancy" }),
-  entity("sensor.van_ladestand", "garage", "78", { friendly_name: "Van Ladestand", device_class: "battery", unit_of_measurement: "%" }),
-  // helpers standing in for a car without an integration (Auto Pro with input_number / input_boolean)
-  entity("input_number.test_ladestand", null, "78.0", { friendly_name: "Test Auto Ladestand", unit_of_measurement: "%", min: 0, max: 100, step: 1 }),
-  entity("input_number.test_reichweite", null, "312.0", { friendly_name: "Test Auto Reichweite", unit_of_measurement: "km", min: 0, max: 600, step: 1 }),
-  entity("input_number.test_ladeleistung", null, "0.0", { friendly_name: "Test Auto Ladeleistung", unit_of_measurement: "W", min: 0, max: 11000, step: 100 }),
-  entity("input_boolean.test_verriegelt", null, "on", { friendly_name: "Test Auto verriegelt" }),
-  entity("input_boolean.test_klima", null, "on", { friendly_name: "Test Auto Klima" }),
-  entity("input_boolean.test_auto_da", null, "on", { friendly_name: "Test Auto da" }),
-  entity("sensor.van_reichweite", "garage", "312", { friendly_name: "Van Reichweite", unit_of_measurement: "km" }),
-  entity("sensor.van_ladeleistung", "garage", "7400", { friendly_name: "Van Ladeleistung", device_class: "power", unit_of_measurement: "W" }),
-  entity("lock.van", "garage", "locked", { friendly_name: "Van Verriegelung" }),
-  entity("switch.van_klima", "garage", "on", { friendly_name: "Van Klima" }),
-  entity("sensor.garage_fahrzeugtyp", "garage", "van", { friendly_name: "Fahrzeugtyp Garage" }),
-  entity("device_tracker.zweitwagen", null, "not_home", { friendly_name: "Zweitwagen" }),
-  entity("weather.zuhause", null, "sunny", { friendly_name: "Wetter" }),
-  entity("alarm_control_panel.haus", null, "disarmed", { friendly_name: "Alarmanlage" }),
-  entity("scene.wohnzimmer_kino", "wohnzimmer", "unknown", { friendly_name: "Wohnzimmer Kino" }),
-  entity("scene.wohnzimmer_lesen", "wohnzimmer", "unknown", { friendly_name: "Wohnzimmer Lesen" }),
-  entity("script.wohnzimmer_alles_aus", "wohnzimmer", "off", { friendly_name: "Wohnzimmer Alles aus" }),
-  entity("binary_sensor.flur_bewegung", "flur", "off", { friendly_name: "Flur Bewegung", device_class: "motion" }),
-  entity("binary_sensor.kueche_praesenz", "kueche", "off", { friendly_name: "Küche Präsenz", device_class: "presence" }),
-  entity("binary_sensor.kuehlschrank_tuer", "kueche", "off", { friendly_name: "Kühlschrank Tür", device_class: "door" }),
-  entity("binary_sensor.gefrierfach_tuer", "kueche", "on", { friendly_name: "Gefrierfach Tür", device_class: "door" }),
-  entity("binary_sensor.wohnzimmer_kamera_bewegung", "wohnzimmer", "on", { friendly_name: "Wohnzimmer Kamera Bewegung", device_class: "motion" }),
-  entity("binary_sensor.wohnzimmer_kamera_person", "wohnzimmer", "on", { friendly_name: "Wohnzimmer Kamera Person", device_class: "occupancy" }),
-  entity("binary_sensor.haustuer", "flur", "off", { friendly_name: "Haustür", device_class: "door" }),
-  entity("binary_sensor.bad_fenster", "bad", "off", { friendly_name: "Bad Fenster", device_class: "window" }),
-  entity("binary_sensor.bad_wasser", "bad", "off", { friendly_name: "Bad Wassermelder", device_class: "moisture" }),
-  entity("binary_sensor.bett_links", "schlafzimmer", "on", { friendly_name: "Bett links belegt", device_class: "occupancy" }),
-  entity("binary_sensor.bett_rechts", "schlafzimmer", "off", { friendly_name: "Bett rechts belegt", device_class: "occupancy" }),
-  entity("cover.garagentor", "garage", "open", { friendly_name: "Garagentor", device_class: "garage", current_position: 60, supported_features: 15 }),
-  entity("cover.einfahrtstor", "garten", "open", { friendly_name: "Einfahrtstor", device_class: "gate", supported_features: 3 }),
-  entity("binary_sensor.gartenpforte", "garten", "off", { friendly_name: "Gartenpforte", device_class: "door" }),
-  // Energie Pro: gas and water meters (counters)
-  entity("sensor.wasserzaehler", null, "412.318", { friendly_name: "Wasserzähler", device_class: "water", unit_of_measurement: "m³", state_class: "total_increasing" }),
+  entity("camera.haustuer", "flur", "idle", { friendly_name: "Front door camera", entity_picture: DOOR_STILL }),
+  entity("event.haustuer_klingel", "flur", "2026-10-19T08:00:00.000Z", { friendly_name: "Front door doorbell", device_class: "doorbell", event_type: "ring" }),
+  entity("sensor.wohnzimmer_temperatur", "wohnzimmer", "21.4", { friendly_name: "Living room temperature", device_class: "temperature", unit_of_measurement: "°C" }),
+  entity("sensor.kueche_temperatur", "kueche", "23.4", { friendly_name: "Kitchen temperature", device_class: "temperature", unit_of_measurement: "°C" }),
+  entity("sensor.schlafzimmer_temperatur", "schlafzimmer", "18.1", { friendly_name: "Bedroom temperature", device_class: "temperature", unit_of_measurement: "°C" }),
+  entity("sensor.bad_temperatur", "bad", "24.6", { friendly_name: "Bathroom temperature", device_class: "temperature", unit_of_measurement: "°C" }),
+  entity("sensor.flur_temperatur", "flur", "19.6", { friendly_name: "Hallway temperature", device_class: "temperature", unit_of_measurement: "°C" }),
+  entity("sensor.garten_temperatur", "garten", "14.2", { friendly_name: "Garden temperature", device_class: "temperature", unit_of_measurement: "°C" }),
+  entity("sun.sun", null, "above_horizon", { friendly_name: "Sun", elevation: 32, azimuth: 205 }),
+  entity("sensor.wohnzimmer_feuchte", "wohnzimmer", "48", { friendly_name: "Living room humidity", device_class: "humidity", unit_of_measurement: "%" }),
+  entity("binary_sensor.kueche_fenster", "kueche", "on", { friendly_name: "Kitchen window", device_class: "window" }),
+  entity("binary_sensor.kueche_rauch", "kueche", "off", { friendly_name: "Kitchen smoke detector", device_class: "smoke" }),
+  entity("binary_sensor.garage_auto", "garage", "on", { friendly_name: "Car in the garage", device_class: "occupancy" }),
+  entity("sensor.van_ladestand", "garage", "78", { friendly_name: "Van charge level", device_class: "battery", unit_of_measurement: "%" }),
+  // helpers standing in for a car without an integration (Car Pro with input_number / input_boolean)
+  entity("input_number.test_ladestand", null, "78.0", { friendly_name: "Test car charge level", unit_of_measurement: "%", min: 0, max: 100, step: 1 }),
+  entity("input_number.test_reichweite", null, "312.0", { friendly_name: "Test car range", unit_of_measurement: "km", min: 0, max: 600, step: 1 }),
+  entity("input_number.test_ladeleistung", null, "0.0", { friendly_name: "Test car charging power", unit_of_measurement: "W", min: 0, max: 11000, step: 100 }),
+  entity("input_boolean.test_verriegelt", null, "on", { friendly_name: "Test car locked" }),
+  entity("input_boolean.test_klima", null, "on", { friendly_name: "Test car climate" }),
+  entity("input_boolean.test_auto_da", null, "on", { friendly_name: "Test car home" }),
+  entity("sensor.van_reichweite", "garage", "312", { friendly_name: "Van range", unit_of_measurement: "km" }),
+  entity("sensor.van_ladeleistung", "garage", "7400", { friendly_name: "Van charging power", device_class: "power", unit_of_measurement: "W" }),
+  entity("lock.van", "garage", "locked", { friendly_name: "Van lock" }),
+  entity("switch.van_klima", "garage", "on", { friendly_name: "Van climate" }),
+  entity("sensor.garage_fahrzeugtyp", "garage", "van", { friendly_name: "Garage vehicle type" }),
+  entity("device_tracker.zweitwagen", null, "not_home", { friendly_name: "Second car" }),
+  entity("weather.zuhause", null, "sunny", { friendly_name: "Weather" }),
+  entity("alarm_control_panel.haus", null, "disarmed", { friendly_name: "Alarm system" }),
+  entity("scene.wohnzimmer_kino", "wohnzimmer", "unknown", { friendly_name: "Living room cinema" }),
+  entity("scene.wohnzimmer_lesen", "wohnzimmer", "unknown", { friendly_name: "Living room reading" }),
+  entity("script.wohnzimmer_alles_aus", "wohnzimmer", "off", { friendly_name: "Living room all off" }),
+  entity("binary_sensor.flur_bewegung", "flur", "off", { friendly_name: "Hallway motion", device_class: "motion" }),
+  entity("binary_sensor.kueche_praesenz", "kueche", "off", { friendly_name: "Kitchen presence", device_class: "presence" }),
+  entity("binary_sensor.kuehlschrank_tuer", "kueche", "off", { friendly_name: "Fridge door", device_class: "door" }),
+  entity("binary_sensor.gefrierfach_tuer", "kueche", "on", { friendly_name: "Freezer door", device_class: "door" }),
+  entity("binary_sensor.wohnzimmer_kamera_bewegung", "wohnzimmer", "on", { friendly_name: "Living room camera motion", device_class: "motion" }),
+  entity("binary_sensor.wohnzimmer_kamera_person", "wohnzimmer", "on", { friendly_name: "Living room camera person", device_class: "occupancy" }),
+  entity("binary_sensor.haustuer", "flur", "off", { friendly_name: "Front door", device_class: "door" }),
+  entity("binary_sensor.bad_fenster", "bad", "off", { friendly_name: "Bathroom window", device_class: "window" }),
+  entity("binary_sensor.bad_wasser", "bad", "off", { friendly_name: "Bathroom water sensor", device_class: "moisture" }),
+  entity("binary_sensor.bett_links", "schlafzimmer", "on", { friendly_name: "Bed left occupied", device_class: "occupancy" }),
+  entity("binary_sensor.bett_rechts", "schlafzimmer", "off", { friendly_name: "Bed right occupied", device_class: "occupancy" }),
+  entity("cover.garagentor", "garage", "open", { friendly_name: "Garage door", device_class: "garage", current_position: 60, supported_features: 15 }),
+  entity("cover.einfahrtstor", "garten", "open", { friendly_name: "Driveway gate", device_class: "gate", supported_features: 3 }),
+  entity("binary_sensor.gartenpforte", "garten", "off", { friendly_name: "Garden gate", device_class: "door" }),
+  // Energy Pro: gas and water meters (counters)
+  entity("sensor.wasserzaehler", null, "412.318", { friendly_name: "Water meter", device_class: "water", unit_of_measurement: "m³", state_class: "total_increasing" }),
   // Pool Pro: an 8 x 4 m pool with heat pump, filter pump, light, pH and redox measurement and a cover
-  entity("sensor.pool_wassertemperatur", null, "27.4", { friendly_name: "Pool Wassertemperatur", device_class: "temperature", unit_of_measurement: "°C" }),
-  entity("climate.pool_waermepumpe", null, "heat", { friendly_name: "Pool Wärmepumpe", temperature: 28, current_temperature: 27.4, hvac_action: "heating", hvac_modes: ["off", "heat"], min_temp: 15, max_temp: 35, target_temp_step: 0.5 }),
-  entity("switch.pool_filterpumpe", null, "on", { friendly_name: "Pool Filterpumpe" }),
+  entity("sensor.pool_wassertemperatur", null, "27.4", { friendly_name: "Pool water temperature", device_class: "temperature", unit_of_measurement: "°C" }),
+  entity("climate.pool_waermepumpe", null, "heat", { friendly_name: "Pool heat pump", temperature: 28, current_temperature: 27.4, hvac_action: "heating", hvac_modes: ["off", "heat"], min_temp: 15, max_temp: 35, target_temp_step: 0.5 }),
+  entity("switch.pool_filterpumpe", null, "on", { friendly_name: "Pool filter pump" }),
   entity("sensor.pool_ph", null, "7.32", { friendly_name: "Pool pH" }),
   entity("sensor.pool_redox", null, "712", { friendly_name: "Pool Redox", unit_of_measurement: "mV" }),
-  // Haushalt Pro: an invented waste calendar and a "post" flag set by an automation
-  entity("calendar.abfallkalender", null, "off", { friendly_name: "Abfallkalender", message: "Papier", all_day: true }),
-  entity("input_boolean.post_da", null, "on", { friendly_name: "Post da" }),
-  entity("input_boolean.restmuell_rausgestellt", null, "on", { friendly_name: "Restmüll rausgestellt" }),
-  entity("sensor.monstera_feuchte", null, "14", { friendly_name: "Monstera Feuchte", device_class: "moisture", unit_of_measurement: "%" }),
-  entity("sensor.waschmaschine_restzeit", null, "23", { friendly_name: "Waschmaschine Restzeit", unit_of_measurement: "min" }),
-  entity("binary_sensor.kuehlschrank_filter", null, "on", { friendly_name: "Kühlschrank Wasserfilter", device_class: "problem" }),
-  entity("cover.pool_abdeckung", null, "open", { friendly_name: "Pool Abdeckung", current_position: 70, supported_features: 15 }),
-  entity("binary_sensor.wohnzimmer_terrasse", "wohnzimmer", "on", { friendly_name: "Terrassentür", device_class: "opening" }),
-  entity("vacuum.saugi", "wohnzimmer", "cleaning", { friendly_name: "Saugi", battery_level: 64 }),
-  entity("binary_sensor.wohnzimmer_terrasse_2", "wohnzimmer", "off", { friendly_name: "Terrassentür Standflügel", device_class: "opening" }),
-  entity("binary_sensor.schlafzimmer_fenster", "schlafzimmer", "on", { friendly_name: "Schlafzimmer Fenster", device_class: "window" }),
-  entity("binary_sensor.schlafzimmer_kipp", "schlafzimmer", "on", { friendly_name: "Schlafzimmer Fenster gekippt", device_class: "window" }),
-  entity("scene.wohnzimmer_film", "wohnzimmer", "2024-01-01T00:00:00", { friendly_name: "Wohnzimmer Film" }),
-  entity("scene.wohnzimmer_lesen", "wohnzimmer", "2024-01-01T00:00:00", { friendly_name: "Wohnzimmer Lesen" }),
-  entity("script.gute_nacht", "schlafzimmer", "off", { friendly_name: "Gute Nacht" }),
+  // Household Pro: an invented waste calendar and a "post" flag set by an automation
+  entity("calendar.abfallkalender", null, "off", { friendly_name: "Waste calendar", message: "Paper", all_day: true }),
+  entity("input_boolean.post_da", null, "on", { friendly_name: "Mail arrived" }),
+  entity("input_boolean.restmuell_rausgestellt", null, "on", { friendly_name: "Residual waste put out" }),
+  entity("sensor.monstera_feuchte", null, "14", { friendly_name: "Monstera moisture", device_class: "moisture", unit_of_measurement: "%" }),
+  entity("sensor.waschmaschine_restzeit", null, "23", { friendly_name: "Washing machine time remaining", unit_of_measurement: "min" }),
+  entity("binary_sensor.kuehlschrank_filter", null, "on", { friendly_name: "Fridge water filter", device_class: "problem" }),
+  entity("cover.pool_abdeckung", null, "open", { friendly_name: "Pool cover", current_position: 70, supported_features: 15 }),
+  entity("binary_sensor.wohnzimmer_terrasse", "wohnzimmer", "on", { friendly_name: "Terrace door", device_class: "opening" }),
+  entity("vacuum.saugi", "wohnzimmer", "cleaning", { friendly_name: "Vacuum", battery_level: 64 }),
+  entity("binary_sensor.wohnzimmer_terrasse_2", "wohnzimmer", "off", { friendly_name: "Terrace door fixed panel", device_class: "opening" }),
+  entity("binary_sensor.schlafzimmer_fenster", "schlafzimmer", "on", { friendly_name: "Bedroom window", device_class: "window" }),
+  entity("binary_sensor.schlafzimmer_kipp", "schlafzimmer", "on", { friendly_name: "Bedroom window tilted", device_class: "window" }),
+  entity("scene.wohnzimmer_film", "wohnzimmer", "2024-01-01T00:00:00", { friendly_name: "Living room movie" }),
+  entity("scene.wohnzimmer_lesen", "wohnzimmer", "2024-01-01T00:00:00", { friendly_name: "Living room reading" }),
+  entity("script.gute_nacht", "schlafzimmer", "off", { friendly_name: "Good night" }),
   // energy (invented values)
-  entity("sensor.netz_leistung", "flur", "420", { friendly_name: "Netz Leistung", device_class: "power", unit_of_measurement: "W" }),
-  entity("sensor.pv_leistung", "flur", "1150", { friendly_name: "PV Leistung", device_class: "power", unit_of_measurement: "W" }),
-  entity("sensor.balkon_leistung", "flur", "380", { friendly_name: "Balkonkraftwerk Leistung", device_class: "power", unit_of_measurement: "W" }),
-  entity("sensor.akku_leistung", "flur", "-300", { friendly_name: "Akku Leistung", device_class: "power", unit_of_measurement: "W" }),
-  entity("sensor.akku_ladestand", "flur", "64", { friendly_name: "Akku Ladestand", device_class: "battery", unit_of_measurement: "%" }),
-  entity("sensor.strompreis", null, "0.29", { friendly_name: "Strompreis", device_class: "monetary", unit_of_measurement: "€/kWh" }),
-  entity("sensor.fernseher_leistung", "wohnzimmer", "95", { friendly_name: "Fernseher Leistung", device_class: "power", unit_of_measurement: "W" }),
-  entity("sensor.kaffeemaschine_leistung", "kueche", "0.9", { friendly_name: "Kaffeemaschine Leistung", device_class: "power", unit_of_measurement: "kW" }),
-  entity("sensor.kuehlschrank_leistung", "kueche", "85", { friendly_name: "Kühlschrank Leistung", device_class: "power", unit_of_measurement: "W" }),
-  entity("sensor.waschmaschine_leistung", "bad", "430", { friendly_name: "Waschmaschine Leistung", device_class: "power", unit_of_measurement: "W" }),
-  entity("sensor.pc_leistung", "arbeitszimmer", "70", { friendly_name: "Computer Leistung", device_class: "power", unit_of_measurement: "W" }),
-  entity("sensor.gaszaehler", "garage", "4821.374", { friendly_name: "Gaszähler", device_class: "gas", unit_of_measurement: "m³" }),
+  entity("sensor.netz_leistung", "flur", "420", { friendly_name: "Grid power", device_class: "power", unit_of_measurement: "W" }),
+  entity("sensor.pv_leistung", "flur", "1150", { friendly_name: "PV power", device_class: "power", unit_of_measurement: "W" }),
+  entity("sensor.balkon_leistung", "flur", "380", { friendly_name: "Balcony solar power", device_class: "power", unit_of_measurement: "W" }),
+  entity("sensor.akku_leistung", "flur", "-300", { friendly_name: "Battery power", device_class: "power", unit_of_measurement: "W" }),
+  entity("sensor.akku_ladestand", "flur", "64", { friendly_name: "Battery charge level", device_class: "battery", unit_of_measurement: "%" }),
+  entity("sensor.strompreis", null, "0.29", { friendly_name: "Electricity price", device_class: "monetary", unit_of_measurement: "€/kWh" }),
+  entity("sensor.fernseher_leistung", "wohnzimmer", "95", { friendly_name: "TV power", device_class: "power", unit_of_measurement: "W" }),
+  entity("sensor.kaffeemaschine_leistung", "kueche", "0.9", { friendly_name: "Coffee machine power", device_class: "power", unit_of_measurement: "kW" }),
+  entity("sensor.kuehlschrank_leistung", "kueche", "85", { friendly_name: "Fridge power", device_class: "power", unit_of_measurement: "W" }),
+  entity("sensor.waschmaschine_leistung", "bad", "430", { friendly_name: "Washing machine power", device_class: "power", unit_of_measurement: "W" }),
+  entity("sensor.pc_leistung", "arbeitszimmer", "70", { friendly_name: "Computer power", device_class: "power", unit_of_measurement: "W" }),
+  entity("sensor.gaszaehler", "garage", "4821.374", { friendly_name: "Gas meter", device_class: "gas", unit_of_measurement: "m³" }),
   // people and their room sensors (as ESPresense or Bermuda would report them)
   entity("person.mia", null, "home", { friendly_name: "Mia" }),
-  entity("person.tom", null, "home", { friendly_name: "Tom Beispiel" }),
+  entity("person.tom", null, "home", { friendly_name: "Tom Example" }),
   entity("person.lea", null, "not_home", { friendly_name: "Lea" }),
-  entity("sensor.mia_raum", null, "Wohnzimmer", { friendly_name: "Mia Raum" }),
-  entity("sensor.tom_raum", null, "Küche", { friendly_name: "Tom Raum" }),
-  entity("sensor.lea_raum", null, "not_home", { friendly_name: "Lea Raum" }),
+  entity("sensor.mia_raum", null, "Living room", { friendly_name: "Mia room" }),
+  entity("sensor.tom_raum", null, "Kitchen", { friendly_name: "Tom room" }),
+  entity("sensor.lea_raum", null, "not_home", { friendly_name: "Lea room" }),
 ];
 // a LED matrix with many light entities: only the main one (without a name of its own) is shown first
 for (const [suffix, name] of [
@@ -302,7 +302,7 @@ for (const [suffix, name] of [
   const id = `light.pixeluhr${suffix}`;
   DEVICES.push({
     entry: { entity_id: id, area_id: "wohnzimmer", device_id: "d_pixeluhr", ...(name ? { name } : {}) },
-    state: { entity_id: id, state: "off", attributes: { friendly_name: name ? `Pixeluhr ${name}` : "Pixeluhr", supported_color_modes: ["hs"] } },
+    state: { entity_id: id, state: "off", attributes: { friendly_name: name ? `Pixel clock ${name}` : "Pixel clock", supported_color_modes: ["hs"] } },
   });
 }
 // devices with a power sensor of their own
@@ -323,9 +323,9 @@ for (const [id, device] of [
 export const DEMO_ENTITIES = Object.fromEntries(DEVICES.map((d) => [d.entry.entity_id, d.entry]));
 export const DEMO_STATES = Object.fromEntries(DEVICES.map((d) => [d.state.entity_id, d.state]));
 
-const [EG, OG, DG] = DEMO_BUILDING.floors;
+const [GROUND, UPPER, ATTIC] = DEMO_BUILDING.floors;
 const place = (entity_id, x, z) => ({ entity_id, x, z, y: null });
-EG.placements = [
+GROUND.placements = [
   place("light.wohnzimmer_decke", 3.0, -3.0),
   { ...place("camera.wohnzimmer", 0.2, -5.8), mount: "wall", rotation: 315 },
   { ...place("camera.haustuer", 8.35, 10.3), mount: "wall", rotation: 90 },
@@ -341,14 +341,14 @@ EG.placements = [
   place("sensor.waschmaschine_leistung", 13.3, 1.0),
   place("sensor.akku_leistung", 15.1, 0.6),
 ];
-OG.placements = [
+UPPER.placements = [
   place("light.schlafzimmer", 8.1, 2.0),
   { ...place("light.nachttisch", 9.55, 4.37), mount: "table" },
   place("media_player.bad_lautsprecher", 1.8, 6.8),
   place("light.schreibtisch", 13.1, 8.6),
   place("sensor.pc_leistung", 12.0, 8.6),
 ];
-DG.placements = [place("light.studio", 4.0, 4.5)];
+ATTIC.placements = [place("light.studio", 4.0, 4.5)];
 // grid, solar and battery come from the devices in the garage (meter, inverter, home battery)
 DEMO_BUILDING.energy = {
   meter: null,
@@ -400,64 +400,64 @@ function at(floor, type, room_id, [x, z], width, extra = {}) {
 }
 const terrace = { sill: 0, height: 2.15 };
 const passage = { style: "passage" };
-EG.openings = [
+GROUND.openings = [
   // the living wing: a glass gable, a double terrace door to the courtyard, the bay's three windows
-  at(EG, "window", "wohnen", [3, -6], 3.6, { ...terrace, height: 2.3, style: "glass_wall", contact: "none" }),
-  at(EG, "window", "wohnen", [6, -1.5], 2.4, { ...terrace, style: "slide", contact: "binary_sensor.wohnzimmer_terrasse", contact2: "binary_sensor.wohnzimmer_terrasse_2", hinge: "right" }),
-  at(EG, "window", "wohnen", [-0.9, -3], 1.3, { contact: "none" }),
-  at(EG, "window", "wohnen", [-0.45, -1.85], 0.6, { contact: "none" }),
-  at(EG, "window", "wohnen", [-0.45, -4.15], 0.6, { contact: "none" }),
-  at(EG, "door", "wohnen", [3, 0], 3.0, passage),
-  at(EG, "window", "essen", [0, 2.3], 1.6, { contact: "none" }),
-  at(EG, "door", "essen", [6, 2.3], 2.0, passage),
-  at(EG, "door", "essen", [2.6, 4.6], 0.9),
-  at(EG, "window", "kueche", [8.6, 0], 1.4),
-  at(EG, "door", "kueche", [7.0, 4.6], 1.0, { hinge: "right" }),
-  at(EG, "door", "kueche", [11, 2.8], 0.9),
-  at(EG, "window", "hwr", [12.5, 0], 1.0, { contact: "none" }),
-  at(EG, "door", "hwr", [14, 3.8], 0.9),
-  at(EG, "window", "gast", [0, 6.8], 1.2, { contact: "none" }),
-  at(EG, "door", "gwc", [5.2, 5.4], 0.8),
-  at(EG, "door", "garderobe", [5.2, 7.6], 1.2, passage),
-  at(EG, "window", "garderobe", [4.4, 9], 0.6, { sill: 1.3, height: 0.8, contact: "none" }),
-  at(EG, "door", "flur", [7.4, 10.2], 1.2, { swing: "out", style: "sidelight" }),
-  at(EG, "window", "flur", [5.9, 9], 0.9, { contact: "none" }),
-  at(EG, "door", "hobby", [9.6, 8.55], 0.8),
-  at(EG, "window", "hobby", [11.8, 9], 1.6, { contact: "none" }),
-  at(EG, "window", "hobby", [14, 7.6], 1.0, { contact: "none" }),
-  at(EG, "garage", "garage", [15.8, 6], 2.6, { sill: 0, height: 2.1 }),
-  at(EG, "door", "garage", [16.9, 0], 0.9),
-  at(EG, "window", "garage", [17.6, 3.0], 1.0, { contact: "none" }),
+  at(GROUND, "window", "wohnen", [3, -6], 3.6, { ...terrace, height: 2.3, style: "glass_wall", contact: "none" }),
+  at(GROUND, "window", "wohnen", [6, -1.5], 2.4, { ...terrace, style: "slide", contact: "binary_sensor.wohnzimmer_terrasse", contact2: "binary_sensor.wohnzimmer_terrasse_2", hinge: "right" }),
+  at(GROUND, "window", "wohnen", [-0.9, -3], 1.3, { contact: "none" }),
+  at(GROUND, "window", "wohnen", [-0.45, -1.85], 0.6, { contact: "none" }),
+  at(GROUND, "window", "wohnen", [-0.45, -4.15], 0.6, { contact: "none" }),
+  at(GROUND, "door", "wohnen", [3, 0], 3.0, passage),
+  at(GROUND, "window", "essen", [0, 2.3], 1.6, { contact: "none" }),
+  at(GROUND, "door", "essen", [6, 2.3], 2.0, passage),
+  at(GROUND, "door", "essen", [2.6, 4.6], 0.9),
+  at(GROUND, "window", "kueche", [8.6, 0], 1.4),
+  at(GROUND, "door", "kueche", [7.0, 4.6], 1.0, { hinge: "right" }),
+  at(GROUND, "door", "kueche", [11, 2.8], 0.9),
+  at(GROUND, "window", "hwr", [12.5, 0], 1.0, { contact: "none" }),
+  at(GROUND, "door", "hwr", [14, 3.8], 0.9),
+  at(GROUND, "window", "gast", [0, 6.8], 1.2, { contact: "none" }),
+  at(GROUND, "door", "gwc", [5.2, 5.4], 0.8),
+  at(GROUND, "door", "garderobe", [5.2, 7.6], 1.2, passage),
+  at(GROUND, "window", "garderobe", [4.4, 9], 0.6, { sill: 1.3, height: 0.8, contact: "none" }),
+  at(GROUND, "door", "flur", [7.4, 10.2], 1.2, { swing: "out", style: "sidelight" }),
+  at(GROUND, "window", "flur", [5.9, 9], 0.9, { contact: "none" }),
+  at(GROUND, "door", "hobby", [9.6, 8.55], 0.8),
+  at(GROUND, "window", "hobby", [11.8, 9], 1.6, { contact: "none" }),
+  at(GROUND, "window", "hobby", [14, 7.6], 1.0, { contact: "none" }),
+  at(GROUND, "garage", "garage", [15.8, 6], 2.6, { sill: 0, height: 2.1 }),
+  at(GROUND, "door", "garage", [16.9, 0], 0.9),
+  at(GROUND, "window", "garage", [17.6, 3.0], 1.0, { contact: "none" }),
 ];
-OG.openings = [
-  at(OG, "window", "kind", [0, 2.3], 1.2),
-  at(OG, "door", "kind", [4.0, 4.6], 0.7),
-  at(OG, "door", "ankleide", [6.2, 2.3], 0.8),
-  at(OG, "door", "ankleide", [5.3, 4.6], 0.8),
-  at(OG, "window", "schlafen", [6.95, 0], 0.9, { contact: "binary_sensor.schlafzimmer_fenster", tilt: "binary_sensor.schlafzimmer_kipp" }),
-  at(OG, "window", "schlafen", [8.4, 0], 1.0, { ...terrace, contact: "none" }),
-  at(OG, "door", "schlafen", [6.65, 4.6], 0.8),
-  at(OG, "window", "jugend", [12.1, 0], 1.2, { contact: "none" }),
-  at(OG, "window", "jugend", [14, 1.4], 0.9, { ...terrace, contact: "none" }),
-  at(OG, "door", "jugend", [10.5, 4.6], 0.8),
-  at(OG, "window", "bad", [0, 6.0], 0.8, { sill: 1.2, height: 1.0, contact: "binary_sensor.bad_fenster" }),
-  at(OG, "window", "bad", [1.8, 9], 0.8, { sill: 1.3, height: 0.8, contact: "none" }),
-  at(OG, "door", "bad", [3.6, 5.6], 0.8),
-  at(OG, "window", "galerie", [6.9, 9], 1.6, { contact: "none" }),
-  at(OG, "door", "arbeit", [11, 6.0], 0.9),
-  at(OG, "window", "arbeit", [12.5, 9], 1.4, { contact: "none" }),
-  at(OG, "window", "arbeit", [14, 7.6], 1.0, { contact: "none" }),
+UPPER.openings = [
+  at(UPPER, "window", "kind", [0, 2.3], 1.2),
+  at(UPPER, "door", "kind", [4.0, 4.6], 0.7),
+  at(UPPER, "door", "ankleide", [6.2, 2.3], 0.8),
+  at(UPPER, "door", "ankleide", [5.3, 4.6], 0.8),
+  at(UPPER, "window", "schlafen", [6.95, 0], 0.9, { contact: "binary_sensor.schlafzimmer_fenster", tilt: "binary_sensor.schlafzimmer_kipp" }),
+  at(UPPER, "window", "schlafen", [8.4, 0], 1.0, { ...terrace, contact: "none" }),
+  at(UPPER, "door", "schlafen", [6.65, 4.6], 0.8),
+  at(UPPER, "window", "jugend", [12.1, 0], 1.2, { contact: "none" }),
+  at(UPPER, "window", "jugend", [14, 1.4], 0.9, { ...terrace, contact: "none" }),
+  at(UPPER, "door", "jugend", [10.5, 4.6], 0.8),
+  at(UPPER, "window", "bad", [0, 6.0], 0.8, { sill: 1.2, height: 1.0, contact: "binary_sensor.bad_fenster" }),
+  at(UPPER, "window", "bad", [1.8, 9], 0.8, { sill: 1.3, height: 0.8, contact: "none" }),
+  at(UPPER, "door", "bad", [3.6, 5.6], 0.8),
+  at(UPPER, "window", "galerie", [6.9, 9], 1.6, { contact: "none" }),
+  at(UPPER, "door", "arbeit", [11, 6.0], 0.9),
+  at(UPPER, "window", "arbeit", [12.5, 9], 1.4, { contact: "none" }),
+  at(UPPER, "window", "arbeit", [14, 7.6], 1.0, { contact: "none" }),
 ];
-DG.openings = [
-  at(DG, "window", "studio", [0, 4.5], 1.0, { contact: "none" }),
-  at(DG, "door", "studio", [8, 4.5], 0.9),
-  at(DG, "window", "loft", [14, 4.5], 1.0, { contact: "none" }),
+ATTIC.openings = [
+  at(ATTIC, "window", "studio", [0, 4.5], 1.0, { contact: "none" }),
+  at(ATTIC, "door", "studio", [8, 4.5], 0.9),
+  at(ATTIC, "window", "loft", [14, 4.5], 1.0, { contact: "none" }),
 ];
 
 let furnitureId = 0;
 const item = (type, x, z, w, d, h, rotation = 0) => ({ id: `m${++furnitureId}`, type, x, z, w, d, h, rotation, variant: null });
 const tvPicture = [{ entity: "media_player.fernseher", attribute: "app_name", state: "netflix", image: "pic_demo" }];
-EG.furniture = [
+GROUND.furniture = [
   // living wing: a corner sofa facing the TV on the east wall, a reading chair in the bay
   item("rug", 3.6, -4.0, 2.4, 3.0, 0.01),
   item("sofa_l", 2.4, -4.0, 2.6, 1.8, 0.82, 270),
@@ -573,7 +573,7 @@ EG.furniture = [
   item("pack:mastershort.garden:shrub", 12.9, -12.6, 1.4, 1.4, 1.2),
   item("pack:mastershort.garden:tree_birch", -2.4, 6.0, 2.8, 2.8, 6.5),
 ];
-OG.furniture = [
+UPPER.furniture = [
   // children's room: a ceiling fan with light, a bunk bed
   { ...item("lamp_fan", 2.2, 2.3, 1.3, 1.3, 0.45), entity: "light.kinderzimmer", fan: "fan.kinderzimmer" },
   item("bunk_bed", 1.1, 0.55, 1.0, 2.05, 1.65, 270),
@@ -618,7 +618,7 @@ OG.furniture = [
   item("office_chair", 12.5, 7.9, 0.65, 0.65, 1.1),
   item("shelf", 13.82, 6.0, 1.2, 0.35, 1.9, 90),
 ];
-DG.furniture = [
+ATTIC.furniture = [
   // studio: a sofa corner under the ridge, a desk in the dormer
   item("sofa_l", 3.6, 4.5, 2.6, 1.8, 0.82, 0),
   item("rug", 3.6, 5.0, 2.6, 2.0, 0.01),
@@ -636,13 +636,13 @@ DG.furniture = [
 // The garden: lawns around the L, a terrace in the courtyard, a pool, a pergola, a front garden with a path and a
 // driveway falling to the street, a fence with a sliding gate and a garden gate; a balcony and a roof terrace upstairs.
 const area = (id, type, x0, z0, x1, z1) => ({ id, type, points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]] });
-EG.outdoor = [
+GROUND.outdoor = [
   // the garden acts as a room: tapped, it opens with its lights and the outdoor temperature (#100)
   {
     id: "a1",
     type: "lawn",
     area_id: "garten",
-    name: "Garten",
+    name: "Garden",
     points: [
       [-4, -14],
       [22, -14],
@@ -698,26 +698,26 @@ EG.outdoor = [
 ];
 // free walls: a partition in the garage closes off a niche for the technique (with a door), a parapet on the
 // gallery runs along the stair opening
-EG.walls = [{ id: "wall_garage", a: [14, 0.85], b: [16.6, 0.85], thickness: null, height: null }];
-EG.openings.push(hole("door", "garage", 0, 1.2, 0.9, { wall: "wall_garage" }));
-OG.walls = [{ id: "wall_gallery", a: [8.1, 5.3], b: [8.1, 8.5], thickness: 0.1, height: 1.0 }];
-OG.outdoor = [
+GROUND.walls = [{ id: "wall_garage", a: [14, 0.85], b: [16.6, 0.85], thickness: null, height: null }];
+GROUND.openings.push(hole("door", "garage", 0, 1.2, 0.9, { wall: "wall_garage" }));
+UPPER.walls = [{ id: "wall_gallery", a: [8.1, 5.3], b: [8.1, 8.5], thickness: 0.1, height: 1.0 }];
+UPPER.outdoor = [
   // the bedroom balcony over the terrace and the roof terrace on the garage (railings only where no wall is)
-  { ...area("b1", "balcony", 7.0, -1.6, 9.8, -0.24), name: "Balkon" },
-  { ...area("b2", "balcony", 14.24, -0.24, 17.84, 6.24), name: "Dachterrasse" },
+  { ...area("b1", "balcony", 7.0, -1.6, 9.8, -0.24), name: "Balcony" },
+  { ...area("b2", "balcony", 14.24, -0.24, 17.84, 6.24), name: "Roof terrace" },
 ];
 // Pool Pro: the pool's technique beside the pergola, the heat pump behind it
-EG.furniture.push(
+GROUND.furniture.push(
   { ...item("pool_pump", 16.6, -7.3, 0.7, 0.32, 0.4), id: "pt_pump" },
   { ...item("pool_filter", 17.5, -7.3, 0.6, 0.6, 1.0), id: "pt_filter" },
   { ...item("pool_heat_pump", 17.8, -9.4, 1.0, 0.45, 0.75, 90), id: "pt_wp" },
 );
 // meter, solar inverters, home battery and wallbox in the garage
-EG.furniture.push(
+GROUND.furniture.push(
   { ...item("meter", 17.2, 0.11, 0.55, 0.21, 1.1), power: "sensor.netz_leistung" },
   { ...item("inverter", 16.4, 0.11, 0.5, 0.2, 0.65), id: "inv_main", power: "sensor.pv_leistung" },
   // a balcony plant of its own: a small inverter with its field on the north face
-  { ...item("inverter", 15.75, 0.11, 0.3, 0.15, 0.4), id: "inv_balkon", name: "Balkonkraftwerk", power: "sensor.balkon_leistung" },
+  { ...item("inverter", 15.75, 0.11, 0.3, 0.15, 0.4), id: "inv_balkon", name: "Balcony solar plant", power: "sensor.balkon_leistung" },
   { ...item("home_battery", 15.0, 0.14, 0.6, 0.25, 1.1), power: "sensor.akku_leistung", soc: "sensor.akku_ladestand" },
   item("wallbox", 17.45, 3.6, 0.3, 0.15, 0.42, 90),
 );
@@ -730,8 +730,8 @@ DEMO_BUILDING.settings = {
   halloween: { ghost: false },
   favorites: ["scene.wohnzimmer_film", "scene.wohnzimmer_lesen", "script.gute_nacht"],
   buttons: [
-    { id: "b1", label: "Rollos", icon: "window-shutter", action: "fire_dom_event", data: { browser_mod: { service: "browser_mod.popup", data: { title: "Rollos" } } } },
-    { id: "b2", label: "Energie", icon: "lightning-bolt", action: "navigate", target: "/energy" },
+    { id: "b1", label: "Blinds", icon: "window-shutter", action: "fire_dom_event", data: { browser_mod: { service: "browser_mod.popup", data: { title: "Blinds" } } } },
+    { id: "b2", label: "Energy", icon: "lightning-bolt", action: "navigate", target: "/energy" },
   ],
   roof: {
     type: "custom",
@@ -755,8 +755,8 @@ DEMO_BUILDING.settings = {
       { id: "pv_balkon", face: "main:a", u: 6.2, v: 0.75, rows: 1, cols: 2, portrait: true, string: "str_balkon" },
     ],
     strings: [
-      { id: "str_main", name: "Strang Süd", entity: null, inverter: "inv_main" },
-      { id: "str_balkon", name: "Balkon", entity: null, inverter: "inv_balkon" },
+      { id: "str_main", name: "String South", entity: null, inverter: "inv_main" },
+      { id: "str_balkon", name: "Balcony", entity: null, inverter: "inv_balkon" },
     ],
     // two roof windows over the guest loft: one open, with the blind half down
     windows: [
@@ -772,12 +772,12 @@ export const DEMO_PACK = {
   format: "fp3dpack",
   version: 1,
   id: "demo.pack",
-  name: "Demo-Pack",
+  name: "Demo pack",
   publisher: "Demo",
   items: [
     {
       id: "cube_seat",
-      name: { de: "Sitzwürfel", en: "Seat cube" },
+      name: { en: "Seat cube" },
       size: [0.45, 0.45, 0.45],
       parts: [
         { shape: "box", x: 0, z: 0, w: 1, d: 1, y: 0, h: 0.9, color: "fabric", edges: true },
@@ -793,23 +793,23 @@ const withRoof = (floors) => ({ ...smallPlan(floors), settings: { ...smallPlan(f
 export const DEMO_PLANS = [
   {
     id: "pgarten",
-    name: "Gartenhaus",
+    name: "Garden house",
     icon: "🏡",
     site: { on: true, x: 15.8, y: -14.4, rot: 0 },
     building: withRoof([
       {
-        ...floor("gh", "Gartenhaus", 0, [rect("werk", "Werkstatt", "garten", 0, 0, 4, 3, "concrete"), rect("lounge", "Lounge", null, 4, 0, 7, 3)]),
+        ...floor("gh", "Garden house", 0, [rect("werk", "Workshop", "garten", 0, 0, 4, 3, "concrete"), rect("lounge", "Lounge", null, 4, 0, 7, 3)]),
         placements: [place("light.garten", 2, 1.5), place("sensor.garten_temperatur", 5.5, 1.5)],
       },
     ]),
   },
   {
     id: "pferien",
-    name: "Ferienwohnung",
+    name: "Holiday flat",
     icon: "🏖️",
     site: null,
     building: smallPlan([
-      floor("fw", "Wohnung", 0, [rect("fw_wohnen", "Wohnen", null, 0, 0, 5, 4), rect("fw_schlafen", "Schlafen", null, 5, 0, 8, 4, "carpet"), rect("fw_bad", "Bad", null, 5, 4, 8, 6, "tiles")]),
+      floor("fw", "Flat", 0, [rect("fw_wohnen", "Living room", null, 0, 0, 5, 4), rect("fw_schlafen", "Bedroom", null, 5, 0, 8, 4, "carpet"), rect("fw_bad", "Bathroom", null, 5, 4, 8, 6, "tiles")]),
     ]),
   },
 ];

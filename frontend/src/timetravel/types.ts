@@ -14,7 +14,7 @@ export interface HistorySpec {
   low: boolean;
   /** The cars' own trackers (Auto Pro): replayed as home or away only, never a place. */
   cars?: string[];
-  /** Pro add-ons the owner has: Energie Pro (energy in the summaries and events), Auto Pro. */
+  /** Pro add-ons the owner has: Energy Pro (energy in the summaries and events), Auto Pro. */
   energy?: boolean;
   auto?: boolean;
 }
@@ -60,7 +60,7 @@ export interface StartOptions {
   range?: Range | null;
   /** Where to start: a moment (ms) or a link's text ("07:42", "-3h"); null: an hour ago. */
   at?: number | string | null;
-  /** Texts in the user's language (the bundle has no texts of its own). */
+  /** The host's translator; the bundle falls back to its own English table for unknown keys. */
   t: (key: string, vars?: Record<string, string | number>) => string;
   /** The replayed states or the session changed: the host renders again. */
   onChange: () => void;

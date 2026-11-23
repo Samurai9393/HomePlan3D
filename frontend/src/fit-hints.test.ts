@@ -13,7 +13,7 @@ test("the add-ons that fit come from the home's entities, with a sign of why", (
     st("sensor.pv_power", { device_class: "power" }),
     st("media_player.living_room"),
     st("weather.home"),
-    st("sensor.abfall_restmuell"),
+    st("sensor.waste_residual"),
     st("sensor.wallbox_power", { device_class: "power" }),
   ]);
   const hints = fitHints(states, emptyBuilding());
@@ -34,16 +34,15 @@ test("nothing that fits: no hints; look-alike names do not count", () => {
 test("the plan counts too: a grid sensor set up, a parking spot", () => {
   const b = emptyBuilding();
   b.energy = { ...b.energy, grid: "sensor.grid" };
-  b.floors = [{ ...newFloor("eg", "EG", 0), furniture: [{ id: "p", type: "parking", x: 1, z: 1, w: 2.5, d: 5, h: 0.1, rotation: 0 } as never] }];
+  b.floors = [{ ...newFloor("eg", "Ground floor", 0), furniture: [{ id: "p", type: "parking", x: 1, z: 1, w: 2.5, d: 5, h: 0.1, rotation: 0 } as never] }];
   const hints = fitHints({}, b);
   assert.equal(hints.get("energy_pro"), "⚡");
   assert.equal(hints.get("auto_pro"), "🚗");
 });
 
-test("the lines in German, English, and English while a further language is not fetched or unknown", () => {
-  assert.equal(fitText("de-DE", "fit"), "Passt zu deinem Zuhause");
+test("the lines are English whatever language is passed", () => {
+  assert.equal(fitText("fr-FR", "fit"), "Fits your home");
   assert.equal(fitText("en-GB", "fit"), "Fits your home");
-  // further languages come from their lang file; not fetched here, so English
   assert.equal(fitText("nl", "fit"), "Fits your home");
   assert.equal(fitText("ja", "fit"), "Fits your home");
 });

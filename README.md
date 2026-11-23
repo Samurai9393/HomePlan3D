@@ -2,13 +2,13 @@
 
 # HomePlan 3D
 
-### 3D-Grundrisse für Home Assistant
+### 3D floor plans for Home Assistant
 
-**Zeichne dein Zuhause direkt in Home Assistant – und lebe darin als leuchtendes Neonhaus oder in jedem anderen Stil.**
-Lichter leuchten in ihren Farben, Rollläden bewegen sich, Türen öffnen sich, Kameras schauen in den Raum und Energie fließt durch die Wände.
+**Draw your home right inside Home Assistant – and live in it as a glowing neon house, or in any style you like.**
+Lights glow in their colours, blinds move, doors open, cameras look into the room and energy flows through the walls.
 
-**Vollständig MIT-open-source. Alle Funktionen – einschließlich der Pro-Funktionen – sind kostenlos und in `custom_components/homeplan3d/open-source-config.json` standardmäßig aktiviert. Alles läuft lokal in Home Assistant.**
+**Fully MIT open source. Every feature – including the Pro features – is free and enabled by default in `custom_components/homeplan3d/open-source-config.json`. Everything runs locally in Home Assistant.**
 
-**[Anleitung](docs/anleitung.md)** · **[Manual (English)](docs/manual.md)** · **[README (English)](README2.md)** · **[Changelog](CHANGELOG.md)** · **[Roadmap](ROADMAP.md)**
+**[Guide](docs/anleitung.md)** · **[Manual](docs/manual.md)** · **[README](README2.md)** · **[Changelog](CHANGELOG.md)** · **[Roadmap](ROADMAP.md)**
 
 </div>

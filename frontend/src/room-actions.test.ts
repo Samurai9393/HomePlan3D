@@ -4,9 +4,9 @@ import { callCount, cleaningCall, everythingOff, roomOfArea } from "./room-actio
 import { newFloor, type Floor, type Room } from "./model.ts";
 import type { HomeAssistant } from "./types.ts";
 
-const room: Room = { id: "wohnen", name: "Wohnzimmer", area_id: "wohnzimmer", points: [[0, 0], [5, 0], [5, 5], [0, 5]], cleaning: "script.saug_wohnzimmer" } as Room;
+const room: Room = { id: "wohnen", name: "Living room", area_id: "wohnzimmer", points: [[0, 0], [5, 0], [5, 5], [0, 5]], cleaning: "script.saug_wohnzimmer" } as Room;
 const floor = (): Floor => ({
-  ...newFloor("eg", "EG", 0),
+  ...newFloor("eg", "Ground floor", 0),
   rooms: [room],
   furniture: [
     { id: "f1", type: "lamp_floor", x: 1, z: 1, rotation: 0, entity: "switch.stehlampe" },
@@ -29,7 +29,7 @@ const hass = (): HomeAssistant =>
       ["light.decke", "light.aus", "fan.luefter", "media_player.tv", "media_player.sonos"].map((id) => [id, { entity_id: id, area_id: "wohnzimmer" }]),
     ),
     devices: {},
-    areas: { wohnzimmer: { area_id: "wohnzimmer", name: "Wohnzimmer" } },
+    areas: { wohnzimmer: { area_id: "wohnzimmer", name: "Living room" } },
   }) as unknown as HomeAssistant;
 
 test("room actions: everything off reaches lights, fans, the TV, a playing speaker and a lamp's switch – never the fridge", () => {

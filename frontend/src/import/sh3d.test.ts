@@ -9,22 +9,22 @@ import { polygonArea } from "../model.ts";
 // faces as Sweet Home 3D does; a door between the rooms, a window, a front door, furniture, and an upper floor
 const HOME = `<?xml version='1.0'?>
 <home version='7000' wallHeight='250'>
-  <level id='L0' name='Erdgeschoss' elevation='0' floorThickness='12' height='250' elevationIndex='0'/>
-  <level id='L1' name='Obergeschoss' elevation='262' floorThickness='12' height='240' elevationIndex='0'/>
+  <level id='L0' name='Ground floor' elevation='0' floorThickness='12' height='250' elevationIndex='0'/>
+  <level id='L1' name='Upper floor' elevation='262' floorThickness='12' height='240' elevationIndex='0'/>
   <wall id='w1' level='L0' xStart='0' yStart='0' xEnd='1000' yEnd='0' height='250' thickness='30'/>
   <wall id='w2' level='L0' xStart='1000' yStart='0' xEnd='1000' yEnd='800' height='250' thickness='30'/>
   <wall id='w3' level='L0' xStart='1000' yStart='800' xEnd='0' yEnd='800' height='250' thickness='30'/>
   <wall id='w4' level='L0' xStart='0' yStart='800' xEnd='0' yEnd='0' height='250' thickness='30'/>
   <wall id='w5' level='L0' xStart='600' yStart='0' xEnd='600' yEnd='800' height='250' thickness='12'/>
-  <room id='r1' level='L0' name='Wohnzimmer &amp; Essen'><point x='15' y='15'/><point x='594' y='15'/><point x='594' y='785'/><point x='15' y='785'/></room>
-  <room id='r2' level='L0' name='Küche'><point x='606' y='15'/><point x='985' y='15'/><point x='985' y='785'/><point x='606' y='785'/></room>
+  <room id='r1' level='L0' name='Living room &amp; Dining'><point x='15' y='15'/><point x='594' y='15'/><point x='594' y='785'/><point x='15' y='785'/></room>
+  <room id='r2' level='L0' name='Kitchen'><point x='606' y='15'/><point x='985' y='15'/><point x='985' y='785'/><point x='606' y='785'/></room>
   <doorOrWindow id='d1' level='L0' catalogId='eTeks#door' name='Door' x='600' y='400' elevation='0' width='90' depth='12' height='210' angle='1.5708'/>
   <doorOrWindow id='d2' level='L0' catalogId='eTeks#window' name='Window' x='300' y='0' elevation='90' width='120' depth='30' height='130' angle='0'/>
   <doorOrWindow id='d3' level='L0' catalogId='eTeks#frontDoor' name='Front door' x='800' y='800' elevation='0' width='100' depth='30' height='210' angle='3.14159'/>
   <pieceOfFurniture id='f1' level='L0' catalogId='eTeks#doubleBed' name='Double bed' x='300' y='500' elevation='0' width='160' depth='200' height='50' angle='0'/>
   <pieceOfFurniture id='f2' level='L0' catalogId='eTeks#sofa' name='Sofa' x='450' y='200' elevation='0' width='200' depth='90' height='80' angle='3.14159'/>
-  <furnitureGroup id='g1' level='L0' name='Gruppe'>
-    <pieceOfFurniture id='f3' level='L0' name='Kaminofen' x='900' y='700' elevation='0' width='50' depth='50' height='110' angle='0'/>
+  <furnitureGroup id='g1' level='L0' name='Group'>
+    <pieceOfFurniture id='f3' level='L0' name='Fireplace' x='900' y='700' elevation='0' width='50' depth='50' height='110' angle='0'/>
   </furnitureGroup>
   <light id='l1' level='L0' catalogId='eTeks#ceilingLight' name='Ceiling light' x='300' y='300' elevation='235' width='40' depth='40' height='15' angle='0' power='0.5'/>
   <wall id='w6' level='L1' xStart='0' yStart='0' xEnd='1000' yEnd='0' thickness='30'/>
@@ -40,14 +40,14 @@ test("a Sweet Home 3D house: floors, joined rooms, doors and windows on their ed
   const { building: b, stats, warnings } = buildPlan(raw);
   assert.equal(stats.floors, 2);
   const [eg, og] = b.floors;
-  assert.equal(eg.name, "Erdgeschoss");
-  assert.equal(og.name, "Obergeschoss");
+  assert.equal(eg.name, "Ground floor");
+  assert.equal(og.name, "Upper floor");
   assert.equal(eg.elevation, 0);
   assert.equal(og.elevation, 2.62);
   assert.equal(og.height, 2.4);
   assert.deepEqual(
     eg.rooms.map((r) => r.name),
-    ["Wohnzimmer & Essen", "Küche"],
+    ["Living room & Dining", "Kitchen"],
   );
   // the 12 cm between the rooms became one wall: both rooms meet at x = 6 m
   const xs = (i: number) => eg.rooms[i].points.map((p) => p[0]);
@@ -78,11 +78,11 @@ test("a Sweet Home 3D house: floors, joined rooms, doors and windows on their ed
   assert.ok(Math.abs(dx - 6) < 0.01 && Math.abs(dz - 4) < 0.01, `door at ${dx},${dz}`);
   const [wx, wz] = edgeMid(win);
   assert.ok(Math.abs(wx - 3) < 0.01 && Math.abs(wz - 0.15) < 0.01, `window at ${wx},${wz}`);
-  // furniture: known kinds mapped, the unknown stove kept as a cabinet with its own name, the lamp a ceiling lamp
+  // furniture: known kinds mapped, the unknown fireplace kept as a cabinet with its own name, the lamp a ceiling lamp
   const types = eg.furniture.map((f) => f.type).sort();
   assert.deepEqual(types, ["bed", "lamp_ceiling", "sideboard", "sofa"]);
   assert.equal(eg.furniture.find((f) => f.type === "sofa")!.rotation, 180);
-  assert.equal(eg.furniture.find((f) => f.type === "sideboard")!.name, "Kaminofen");
+  assert.equal(eg.furniture.find((f) => f.type === "sideboard")!.name, "Fireplace");
   assert.ok(warnings.some((w) => w.code === "furniture_unknown"));
   assert.equal(og.rooms.length, 1);
   assert.ok(Math.abs(polygonArea(og.rooms[0].points) - 9.7 * 7.7) < 0.01);

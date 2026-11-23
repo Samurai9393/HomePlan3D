@@ -15,7 +15,7 @@ const PACK: FurniturePack = {
   items: [
     {
       id: "robot_vacuum",
-      name: { de: "Saugroboter mit Station", en: "Robot vacuum with dock" },
+      name: { en: "Robot vacuum with dock" },
       size: [0.45, 0.75, 0.5],
       parts: [
         { shape: "box", x: 0, z: -0.2933, w: 0.8889, d: 0.4, y: 0, h: 1, color: "white", edges: true },
@@ -25,8 +25,8 @@ const PACK: FurniturePack = {
         { shape: "box", x: 0, z: 0.44, w: 0.1333, d: 0.0267, y: 0.14, h: 0.03, color: "accent" },
       ],
     },
-    { id: "garage_light", name: { de: "Werkstattleuchte", en: "Workshop light" }, size: [1.5, 0.2, 0.12], mount: "ceiling", light: "panel", parts: [{ shape: "box", x: 0, z: 0, w: 1, d: 1, y: 0, h: 1, color: "white" }] },
-    { id: "chandelier", name: { de: "Kronleuchter", en: "Chandelier" }, size: [0.6, 0.6, 0.5], mount: "ceiling", light: "pendant", parts: [{ shape: "box", x: 0, z: 0, w: 1, d: 1, y: 0, h: 1, color: "white" }] },
+    { id: "garage_light", name: { en: "Workshop light" }, size: [1.5, 0.2, 0.12], mount: "ceiling", light: "panel", parts: [{ shape: "box", x: 0, z: 0, w: 1, d: 1, y: 0, h: 1, color: "white" }] },
+    { id: "chandelier", name: { en: "Chandelier" }, size: [0.6, 0.6, 0.5], mount: "ceiling", light: "pendant", parts: [{ shape: "box", x: 0, z: 0, w: 1, d: 1, y: 0, h: 1, color: "white" }] },
   ],
 };
 

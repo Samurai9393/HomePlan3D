@@ -14,13 +14,13 @@ from custom_components.homeplan3d.const import DATA_DIAGNOSTICS, DOMAIN
 BUILDING = {
     "floors": [
         {
-            "name": "Erdgeschoss",
-            "rooms": [{"name": "Wohnzimmer"}, {"name": "Küche"}],
+            "name": "Ground floor",
+            "rooms": [{"name": "Living room"}, {"name": "Kitchen"}],
             "furniture": [{"type": "sofa"}],
             "placements": [{"entity_id": "camera.garden"}, {"entity_id": "light.wohnzimmer_decke"}],
             "outdoor": [{"kind": "lawn"}],
         },
-        {"name": "OG", "rooms": [{"name": "Bad"}], "furniture": [], "placements": []},
+        {"name": "Upper floor", "rooms": [{"name": "Bathroom"}], "furniture": [], "placements": []},
     ]
 }
 PACKS = [
@@ -96,7 +96,7 @@ def test_payload_has_counts_and_ids_only() -> None:
         ],
         "errors": [],
     }
-    payload = diag.build_payload(state, building=BUILDING, packs=PACKS, neonplan="1.17.0", ha="2026.10.1", lang="de-DE")
+    payload = diag.build_payload(state, building=BUILDING, packs=PACKS, neonplan="1.17.0", ha="2026.10.1", lang="en-GB")
     assert set(payload) == {
         "v",
         "id",
@@ -110,7 +110,7 @@ def test_payload_has_counts_and_ids_only() -> None:
         "clients",
         "errors",
     }
-    assert payload["v"] == 1 and payload["lang"] == "de"
+    assert payload["v"] == 1 and payload["lang"] == "en"
     assert payload["packs"] == ["local.energy", "studio.anna-sofa"]
     assert payload["features"] == sorted(diag.ENABLED_FEATURES)
     assert payload["plan"] == {"floors": 2, "rooms": 3, "furniture": 1, "devices_linked": 2, "outdoor": 1, "cameras": 1}
@@ -118,7 +118,7 @@ def test_payload_has_counts_and_ids_only() -> None:
         {"device": "tablet", "browser": "Silk 120", "os": "Android 9", "fps": 24.0, "views": {}}
     ]
     text = repr(payload)
-    for private in ("Wohnzimmer", "Erdgeschoss", "light.", "camera."):
+    for private in ("Living room", "Ground floor", "light.", "camera."):
         assert private not in text
 
 

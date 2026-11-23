@@ -14,10 +14,10 @@ test("heat colours: cold is blue, warm is red, values in between are mixed", () 
 
 test("room values are the average of the room's sensors of that kind", () => {
   const b = emptyBuilding();
-  b.floors = [{ ...newFloor("eg", "EG", 0), rooms: [{ id: "r", name: "R", area_id: "wohnen", points: [[0, 0], [1, 0], [1, 1]], floor_material: "wood" }] }];
+  b.floors = [{ ...newFloor("eg", "Ground floor", 0), rooms: [{ id: "r", name: "R", area_id: "wohnen", points: [[0, 0], [1, 0], [1, 1]], floor_material: "wood" }] }];
   const st = (id: string, state: string, dc: string) => ({ entity_id: id, state, attributes: { device_class: dc } });
   const hass = {
-    language: "de",
+    language: "en",
     entities: {
       "sensor.a": { entity_id: "sensor.a", area_id: "wohnen" },
       "sensor.b": { entity_id: "sensor.b", area_id: "wohnen" },
@@ -32,7 +32,7 @@ test("room values are the average of the room's sensors of that kind", () => {
 
 test("temperatures in °F are coloured as °C and shown in Home Assistant's unit", () => {
   const b = emptyBuilding();
-  b.floors = [{ ...newFloor("eg", "EG", 0), rooms: [{ id: "r", name: "R", area_id: "wohnen", points: [[0, 0], [1, 0], [1, 1]], floor_material: "wood" }] }];
+  b.floors = [{ ...newFloor("eg", "Ground floor", 0), rooms: [{ id: "r", name: "R", area_id: "wohnen", points: [[0, 0], [1, 0], [1, 1]], floor_material: "wood" }] }];
   const hass = {
     language: "en",
     config: { unit_system: { temperature: "°F" } },

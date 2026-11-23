@@ -303,7 +303,7 @@ export type ClimateKey = keyof typeof CLIMATE_CLASSES;
 const NOT_A_ROOM_SENSOR = new Set(["climate", "water_heater", "switch", "button", "camera", "media_player", "vacuum", "light", "fan", "lawn_mower"]);
 /** Names of temperatures that are not the room's (flow, nozzle, CPU, outside …). */
 const NOT_ROOM_NAME =
-  /(vorlauf|r(ü|ue)cklauf|flow|return|d(ü|ue)se|nozzle|hotend|extruder|druckbett|heatbed|(^|[^a-z])bed($|[^a-z])|chamber|cpu|gpu|chip|soc|akku|batter|wasser|water|kessel|boiler|au(ß|ss)en|outdoor|outside|abgas|exhaust|sole|brine|verdampfer|kondensat|verdichter|compressor|motor|k(ü|ue)hl|freezer|fridge|gefrier)/i;
+  /(flow|return|nozzle|hotend|extruder|heatbed|(^|[^a-z])bed($|[^a-z])|chamber|cpu|gpu|chip|soc|batter|water|boiler|outdoor|outside|exhaust|sole|brine|compressor|motor|freezer|fridge)/i;
 
 /** Whether a sensor measures the room itself (not a device's inner temperature). */
 export function isRoomClimateSensor(hass: HomeAssistant, entityId: string): boolean {
@@ -390,7 +390,7 @@ export function powerSensorsOf(hass: HomeAssistant, deviceId: string): string[] 
   return registryOf(hass).power.get(deviceId) ?? [];
 }
 
-/** Friendly name without a leading area name ("Wohnzimmer Deckenlicht" in the Wohnzimmer -> "Deckenlicht"). */
+/** Friendly name without a leading area name ("Living room ceiling light" in the Living room -> "Ceiling light"). */
 export function entityName(hass: HomeAssistant, entityId: string, areaName?: string, dropDevice = false): string {
   const st = hass.states[entityId];
   const entry = hass.entities?.[entityId];
@@ -430,10 +430,10 @@ export function heatSensorOn(hass: HomeAssistant, ref: EntityRef | undefined): b
  */
 export function chargerStatus(raw: string): { charging: boolean; plugged: boolean } {
   const s = raw.toLowerCase().trim().replace(/[\s-]+/g, "_");
-  const not = /(^|_)(not|no|nicht|kein|keine|un|dis)_?(charging|charge|connected|plugged|verbunden|angesteckt)/.test(s);
-  const free = /charger_free|^available$|^idle$|frei|abgesteckt|no_car|kein_fahrzeug/.test(s);
-  const charging = !not && !/ready_to_charge|charger_|complete|finish|charged|fertig|beendet|voll$|full/.test(s) && /(^|_)(charging|charge|laden|lädt|ladend|lade)($|_)/.test(s);
-  const plugged = charging || (!not && !free && /connect|plug|ready|insert|angesteckt|verbunden|wait|paused|suspend|preparing|complete|finish|charged|fertig|full|voll/.test(s));
+  const not = /(^|_)(not|no|un|dis)_?(charging|charge|connected|plugged)/.test(s);
+  const free = /charger_free|^available$|^idle$|no_car/.test(s);
+  const charging = !not && !/ready_to_charge|charger_|complete|finish|charged|full/.test(s) && /(^|_)(charging|charge)($|_)/.test(s);
+  const plugged = charging || (!not && !free && /connect|plug|ready|insert|wait|paused|suspend|preparing|complete|finish|charged|full/.test(s));
   return { charging, plugged };
 }
 
@@ -784,14 +784,14 @@ export function openingEntities(hass: HomeAssistant, floors: readonly Floor[]): 
 }
 
 const POSITION_WORDS: [RegExp, "open" | "tilted" | "closed"][] = [
-  [/^(tilted|tilt|gekippt|kipp)/i, "tilted"],
-  [/^(open|opened|offen|geöffnet|on)$/i, "open"],
-  [/^(closed|close|geschlossen|zu|off)$/i, "closed"],
+  [/^(tilted|tilt)/i, "tilted"],
+  [/^(open|opened|on)$/i, "open"],
+  [/^(closed|close|off)$/i, "closed"],
 ];
 
 /**
  * Position of a window or door from its contact: plain contacts (on = open), handle sensors with
- * three states ("open" / "tilted" / "closed", also in German) and contacts that tell it in a
+ * three states ("open" / "tilted" / "closed") and contacts that tell it in a
  * window_state attribute (HomematicIP). Null when the sensor gives no answer.
  */
 export function windowPosition(st: HassEntity | undefined): "open" | "tilted" | "closed" | null {
@@ -836,7 +836,7 @@ export function openingState(
   const on = (id: string | null | undefined) => !!id && hass.states[id]?.state === "on";
   const known = (id: string | null | undefined) => !!id && !!hass.states[id] && !isUnavailable(hass.states[id]);
   const raw = (id: string | null | undefined) => (id ? windowPosition(hass.states[id]) : null);
-  // "Kontakt umkehren": a contact that reports open as closed and the other way round (#329); tilted stays tilted
+  // "Invert contact": a contact that reports open as closed and the other way round (#329); tilted stays tilted
   const pos = (id: string | null | undefined) => {
     const p = raw(id);
     return e.contactInvert && id && id !== e.tilt && id !== e.tilt2 && p !== "tilted" && p ? (p === "open" ? "closed" : "open") : p;
@@ -975,23 +975,23 @@ export function primaryEntities(hass: HomeAssistant, ids: readonly string[]): st
 
 /** Name patterns of the entities that belong to electric furniture. */
 const FURNITURE_NAMES: Record<string, RegExp> = {
-  robot_vacuum: /(saug|vacuum|robo|roomba|roborock|dreame|ecovacs|deebot)/i,
-  tv_board: /\b(tv|fernseh|television|fire ?tv|apple ?tv|chromecast|shield)/i,
-  tv_wall: /\b(tv|fernseh|television|fire ?tv|apple ?tv|chromecast|shield)/i,
-  desk: /\b(pc|computer|rechner|desktop|monitor|workstation)/i,
-  fridge: /(kühl|fridge|gefrier|freezer)/i,
-  fridge_smart: /(kühl|fridge|gefrier|freezer)/i,
-  stove: /(herd|kochfeld|cooktop|stove|induktion)/i,
-  kitchen_tall: /(backofen|oven|ofen)/i,
-  dishwasher: /(spülmaschine|geschirrspül|dishwasher)/i,
-  washer: /(waschmaschine|washer|washing)/i,
-  dryer: /(trockner|dryer)/i,
-  kitchen: /(kaffee|coffee|wasserkocher|kettle)/i,
-  island: /(kochfeld|herd|induktion|cooktop)/i,
-  sink: /(spülmaschine|geschirrspül|dishwasher)/i,
-  radiator: /(heiz|radiator|thermostat|climate|hk|trv)/i,
-  ac_unit: /(klima|air ?con|aircon|airco|split|\bac\b|clim)/i,
-  awning: /(markise|awning|sonnensegel|beschattung|store|zonnescherm)/i,
+  robot_vacuum: /(vacuum|robo|roomba|roborock|dreame|ecovacs|deebot)/i,
+  tv_board: /\b(tv|television|fire ?tv|apple ?tv|chromecast|shield)/i,
+  tv_wall: /\b(tv|television|fire ?tv|apple ?tv|chromecast|shield)/i,
+  desk: /\b(pc|computer|desktop|monitor|workstation)/i,
+  fridge: /(fridge|freezer)/i,
+  fridge_smart: /(fridge|freezer)/i,
+  stove: /(cooktop|stove|induction)/i,
+  kitchen_tall: /(oven)/i,
+  dishwasher: /(dishwasher)/i,
+  washer: /(washer|washing)/i,
+  dryer: /(dryer)/i,
+  kitchen: /(coffee|kettle)/i,
+  island: /(cooktop|induction)/i,
+  sink: /(dishwasher)/i,
+  radiator: /(radiator|thermostat|climate|trv)/i,
+  ac_unit: /(air ?con|aircon|split|\bac\b|clim)/i,
+  awning: /(awning)/i,
 };
 const MEDIA_FURNITURE = new Set(["tv_board", "tv_wall"]);
 
@@ -1112,19 +1112,19 @@ export function fridgeDoors(hass: HomeAssistant, floors: readonly Floor[]): Map<
 }
 /** Name hints for picking a lamp's light (a light that fits the name wins, otherwise any free one). */
 const LAMP_NAMES: Record<string, RegExp> = {
-  lamp_ceiling: /(decke|ceiling|haupt|main)/i,
-  lamp_downlight: /(spot|strahler|downlight|einbau)/i,
-  lamp_spot: /(spot|strahler)/i,
-  lamp_panel: /(panel|decke|ceiling)/i,
-  lamp_uplight: /(fluter|uplight|steh)/i,
-  lamp_bollard: /(weg|garten|garden|path|poller|außen|aussen|outdoor)/i,
-  lamp_garden: /(garten|garden|spot|außen|aussen|outdoor|baum|tree)/i,
-  lamp_pendant: /(pendel|pendant|hänge|esstisch|dining)/i,
-  lamp_fan: /(ventilator|fan|lüfter|luefter|decke|ceiling)/i,
-  lamp_floor: /(steh|floor)/i,
-  lamp_table: /(tisch|nacht|table|bedside|lese|reading)/i,
-  lamp_wall: /(wand|wall)/i,
-  led_strip: /(led|strip|streifen|leiste|band)/i,
+  lamp_ceiling: /(ceiling|main)/i,
+  lamp_downlight: /(spot|downlight)/i,
+  lamp_spot: /(spot)/i,
+  lamp_panel: /(panel|ceiling)/i,
+  lamp_uplight: /(uplight)/i,
+  lamp_bollard: /(garden|path|poller|outdoor)/i,
+  lamp_garden: /(garden|spot|outdoor|tree)/i,
+  lamp_pendant: /(pendant|dining)/i,
+  lamp_fan: /(fan|ceiling)/i,
+  lamp_floor: /(floor)/i,
+  lamp_table: /(table|bedside|reading)/i,
+  lamp_wall: /(wall)/i,
+  led_strip: /(led|strip|band)/i,
 };
 
 export interface FurnitureLinks {
@@ -1233,7 +1233,6 @@ export function appColor(st: HassEntity | undefined): [number, number, number] |
   if (text.includes("prime") || text.includes("amazon")) return [0.1, 0.6, 0.95];
   if (text.includes("disney")) return [0.2, 0.35, 1];
   if (text.includes("spotify")) return [0.12, 0.85, 0.4];
-  if (text.includes("zdf") || text.includes("ard") || text.includes("mediathek")) return [1, 0.5, 0.1];
   return [0.22, 0.88, 1];
 }
 
@@ -1264,7 +1263,7 @@ export function roomPanelEntities(hass: HomeAssistant, floor: Floor, room: Room,
   return { shown: unique, more: areaEntities(hass, room.area_id).filter((id) => !set.has(id) && !hidden.has(id)) };
 }
 
-const ROOM_KEYS = /(^|_)(current_room|current_segment|aktueller_raum|current_area)($|_)/;
+const ROOM_KEYS = /(^|_)(current_room|current_segment|current_area)($|_)/;
 
 // ------------------------------------------------------------------ Auto Pro: the car on a parking spot
 
@@ -1280,12 +1279,12 @@ export interface CarEntities {
 }
 
 const CAR_ROLE_PATTERNS: Record<keyof CarEntities, RegExp> = {
-  soc: /(^|_)(soc|state_of_charge|battery_level|battery|ladestand|ladezustand|akku)($|_)/,
-  range: /(^|_)(range|reichweite|remaining_range)($|_)/,
-  charging: /(charging|charge_power|ladeleistung|laden|charger_power|lade)/,
-  plugged: /(plug|cable|connected|stecker|kabel|angeschlossen)/,
-  lock: /(lock|verriegel|schloss)/,
-  climate: /(climat|preheat|precondition|hvac|heiz|klima|standheizung)/,
+  soc: /(^|_)(soc|state_of_charge|battery_level|battery)($|_)/,
+  range: /(^|_)(range|remaining_range)($|_)/,
+  charging: /(charging|charge_power|charger_power)/,
+  plugged: /(plug|cable|connected)/,
+  lock: /(lock)/,
+  climate: /(climat|preheat|precondition|hvac)/,
   tracker: /./,
 };
 
@@ -1339,8 +1338,8 @@ export function carLocked(st: HassEntity): boolean | null {
   if (id.startsWith("lock.")) return state === "locked";
   if (id.startsWith("binary_sensor.")) return st.attributes.device_class === "lock" ? state === "off" : state === "on";
   if (id.startsWith("sensor.")) {
-    if (/^(locked|secured|double_locked|verriegelt|gesichert|abgeschlossen)$/.test(state)) return true;
-    if (/^(unlocked|unsecured|selective_locked|partially_locked|open|entriegelt|offen|unverriegelt)$/.test(state)) return false;
+    if (/^(locked|secured|double_locked)$/.test(state)) return true;
+    if (/^(unlocked|unsecured|selective_locked|partially_locked|open)$/.test(state)) return false;
     return null;
   }
   return state === "on";
@@ -1358,7 +1357,7 @@ export function carState(hass: HomeAssistant, f: Pick<Furniture, "entity" | "car
   const chargeSt = st(e.charging);
   const chargeUnit = String(chargeSt?.attributes.unit_of_measurement ?? "");
   const chargingW = chargeSt && /^k?W$/.test(chargeUnit) ? (num(e.charging) ?? 0) * (chargeUnit === "kW" ? 1000 : 1) : null;
-  const charging = chargingW !== null ? chargingW > 50 : !!chargeSt && ["on", "charging", "laden"].includes(chargeSt.state.toLowerCase());
+  const charging = chargingW !== null ? chargingW > 50 : !!chargeSt && ["on", "charging"].includes(chargeSt.state.toLowerCase());
   const plugSt = st(e.plugged);
   const lockSt = st(e.lock);
   const climSt = st(e.climate);
@@ -1396,13 +1395,12 @@ export function robotRoomSensor(hass: HomeAssistant, vacuum: string | null, chos
   return null;
 }
 
-/** A name compared without case, accents or umlaut spelling ("Küche" = "kueche" = "Kuche"). */
+/** A name compared without case or accents ("Café" = "cafe"). */
 export function roomKey(name: string): string {
   return name
     .toLowerCase()
-    .replace(/ä/g, "a").replace(/ö/g, "o").replace(/ü/g, "u").replace(/ß/g, "ss")
-    .replace(/ae/g, "a").replace(/oe/g, "o").replace(/ue/g, "u")
     .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9]/g, "");
 }
 
@@ -1417,7 +1415,7 @@ export function robotRoom<R extends { name: string; area_id?: string | null }>(h
   return null;
 }
 
-/** The room a robot's name for it means ("Küche", "kitchen", the area's id). */
+/** The room a robot's name for it means ("Kitchen", "kitchen", the area's id). */
 export function roomNamed<R extends { name: string; area_id?: string | null }>(hass: HomeAssistant, rooms: readonly R[], raw: unknown): R | null {
   if (typeof raw !== "string" || !raw || raw === "unknown" || raw === "unavailable") return null;
   const want = roomKey(raw);

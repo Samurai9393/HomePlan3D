@@ -1,16 +1,16 @@
-// Tutorial episode 6 – "Geräte, Lampen und Kameras", in two parts (the checklist does not fit into 8 minutes):
-//   a) Geräte platzieren, Symbole und Namen: the device list of a room (grouping, „+n weitere“, which sensors show,
-//      search, the sources „Dieser Bereich“ / „Andere Bereiche“ / „Ohne Bereich“), „Platzieren“, „Alle n platzieren …“
-//      with undo, ☆ / 👁 / Aa for the room panel (checked live in 3D), „Raumklima“, the device form (X/Y, symbol
-//      height, turn, „Fixieren“, „In Raummitte“, „Entfernen“), „Vor dem Schalten nachfragen“ (live in 3D), „Symbol
-//      in 3D“ and the „Symbole“ switch, watts from a power sensor (Energie Pro hologram in one sentence), an own mdi
-//      icon, an own name under the symbol, „Als Möbel darstellen“ / „Wieder als Geräte-Pin“.
-//   b) Lampen und Kameras: the lamp types, a wall light with its light, „Farbe und Helligkeit von“, „Leuchtstärke in
-//      3D“, pendant shapes, the table lamp on its nightstand, a light as a plain pin with its mount, LED strips,
-//      „Spots setzen“, operating lamps live in 3D (tap, swipe, quick menu, double tap), cameras (mount, cone, handle,
-//      angle, reach, tilt, cone in 3D, red on motion, still and live picture; Kamera-Cockpit in one sentence).
+// Tutorial episode 6 – "Devices, lamps and cameras", in two parts (the checklist does not fit into 8 minutes):
+//   a) Place devices, markers and names: the device list of a room (grouping, “+n more”, which sensors show,
+//      search, the sources “This area” / “Other areas” / “No area”), “Place”, “Place all n …”
+//      with undo, ☆ / 👁 / Aa for the room panel (checked live in 3D), “Room climate”, the device form (X/Y, symbol
+//      height, turn, “Fix”, “To room centre”, “Remove”), “Ask before switching” (live in 3D), “Symbol
+//      in 3D” and the “Markers” switch, watts from a power sensor (Energy Pro hologram in one sentence), an own mdi
+//      icon, an own name under the symbol, “Show as furniture” / “Back to a device pin”.
+//   b) lamps and cameras: the lamp types, a wall light with its light, “Colour and brightness from”, “Brightness in
+//      3D”, pendant shapes, the table lamp on its nightstand, a light as a plain pin with its mount, LED strips,
+//      “Place spots”, operating lamps live in 3D (tap, swipe, quick menu, double tap), cameras (mount, cone, handle,
+//      angle, reach, tilt, cone in 3D, red on motion, still and live picture; Camera cockpit in one sentence).
 // The full demo house (invented data, mock Home Assistant). Setup steps before a scene are invisible.
-// Usage (from frontend/): node tutorials/ep06-geraete-lampen-kameras.mjs <out-dir> a|b [<voice-dir de> [<voice-dir en>]]
+// Usage (from frontend/): node tutorials/ep06-geraete-lampen-kameras.mjs <out-dir> a|b [<voice-dir>]
 //   (voice dirs: private/tutorial-audio/ep06a/de and …/en, resp. ep06b)
 // EP06_FAST=1: a quick dry run for checking the steps (the timing is not usable).
 // Then: python ../tools/make-tutorial.py <out-dir> <out.mp4> --en tutorials/ep06a-narration-en.json
@@ -21,9 +21,9 @@ import { helpers } from "./ep02-common.mjs";
 const out = process.argv[2] ?? "tutorial-ep06";
 const PART = process.argv[3] === "b" ? "b" : "a";
 const FAST = !!process.env.EP06_FAST;
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D ${appVersion()}</span>`;
+const VERSION = `<br><span style="font-size:20px;opacity:.7">recorded with HomePlan 3D ${appVersion()}</span>`;
 
-const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "de" });
+const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "en" });
 const N = narration(R, process.argv.slice(4));
 const { say, sayOver, chapter, catchUp } = N;
 const h = helpers(R);
@@ -105,7 +105,7 @@ const quiet = async (target, wait = 400) => {
   await R.sleep(wait);
 };
 /**
- * The editor's side panel is 320 px wide; the device rows (name, 👁, Aa, ☆, „Platzieren“) are wider and their
+ * The editor's side panel is 320 px wide; the device rows (name, 👁, Aa, ☆, “Place”) are wider and their
  * last button is cut off at the window's edge. For the video the panel gets 360 px (a style in the recording only).
  */
 const widenSide = () =>
@@ -147,7 +147,7 @@ const tapItem = async (pick, seconds = 0.5) => {
   }
   return f;
 };
-/** A button in the device row named `name` of the side panel: "Platzieren", "Entfernen", "☆", "👁", "Aa" … */
+/** A button in the device row named `name` of the side panel: "Place", "Remove", "☆", "👁", "Aa" … */
 const rowBox = (name, label) =>
   R.editor(
     `const rows = [...e.renderRoot.querySelectorAll(".fp3d-dev-row")];
@@ -242,14 +242,14 @@ const blur = () =>
     while (a?.shadowRoot?.activeElement) a = a.shadowRoot.activeElement;
     a?.blur?.();
   });
-/** The app's confirm() as a visible box with OK and „Abbrechen“ (native dialogs are not in headless screenshots). */
+/** The app's confirm() as a visible box with OK and “Cancel” (native dialogs are not in headless screenshots). */
 const fakeConfirm = (text) =>
   R.page.evaluate((t) => {
     const d = document.createElement("div");
     d.id = "tut-dialog";
     d.style.cssText =
       "position:fixed;left:50%;top:22%;transform:translateX(-50%);z-index:2147483644;max-width:620px;padding:22px 26px;border-radius:12px;background:#f4f6fa;color:#111;font:18px/1.4 system-ui,'Segoe UI',sans-serif;box-shadow:0 12px 50px rgba(0,0,0,.6)";
-    d.innerHTML = `<div style="font-size:14px;color:#555;margin-bottom:8px">127.0.0.1 meldet</div>${t}<div style="text-align:right;margin-top:18px"><span id="tut-ok" style="display:inline-block;padding:7px 22px;border-radius:6px;background:#1a73e8;color:#fff;margin-right:10px">OK</span><span id="tut-cancel" style="display:inline-block;padding:7px 18px;border-radius:6px;border:1px solid #1a73e8;color:#1a73e8">Abbrechen</span></div>`;
+    d.innerHTML = `<div style="font-size:14px;color:#555;margin-bottom:8px">127.0.0.1 says</div>${t}<div style="text-align:right;margin-top:18px"><span id="tut-ok" style="display:inline-block;padding:7px 22px;border-radius:6px;background:#1a73e8;color:#fff;margin-right:10px">OK</span><span id="tut-cancel" style="display:inline-block;padding:7px 18px;border-radius:6px;border:1px solid #1a73e8;color:#1a73e8">Cancel</span></div>`;
     document.body.appendChild(d);
   }, text);
 const noDialog = () => R.page.evaluate(() => document.getElementById("tut-dialog")?.remove());
@@ -326,15 +326,15 @@ const longPress = async (seconds = 0.8) => {
   await R.page.mouse.up();
   await R.frame(1 / FPS, 120);
 };
-/** Up to the floor form: "Zurück zu …" until nothing is selected. */
+/** Up to the floor form: "Back to …" until nothing is selected. */
 const toFloor = async () => {
   for (let i = 0; i < 3; i++) {
-    const up = await R.locate({ text: "Zurück zu" }).catch(() => null);
+    const up = await R.locate({ text: "Back to" }).catch(() => null);
     if (!up) break;
-    await R.clickOn({ text: "Zurück zu" }, 0.4);
+    await R.clickOn({ text: "Back to" }, 0.4);
   }
 };
-const fitPlan = () => R.clickOn({ text: "Alles zeigen", exact: true }, 0.4);
+const fitPlan = () => R.clickOn({ text: "Whole plan", exact: true }, 0.4);
 
 // ================================================================ part a
 if (PART === "a") {
@@ -342,16 +342,16 @@ if (PART === "a") {
   await chapter("Teaser");
   await R.open("");
   await R.hideCursor();
-  await quiet({ text: "Erdgeschoss", exact: true, nth: 0 }, 1200);
-  await quiet('button[aria-label="Bedienelemente ausblenden – nur die 3D-Ansicht bleibt"]', 700);
+  await quiet({ text: "Ground floor", exact: true, nth: 0 }, 1200);
+  await quiet('button[aria-label="Hide the controls – only the 3D view remains"]', 700);
   {
     const a = { theta: -0.75, phi: 0.78, radius: 12.5, y: 0.3 };
     const b = { theta: -0.2, phi: 0.7, radius: 10, y: 0.3 };
     await cam("eg", 4.0, 2.3, a);
     await R.sleep(1500);
-    await R.title("Geräte, Lampen und Kameras", `HomePlan 3D · Folge 6 · Teil 1${VERSION}`);
-    const l1 = "Lampen, die in 3D genau so leuchten wie bei dir, Sensoren mit ihren Werten und Kameras mit ihrem Blickfeld.";
-    const l2 = "Wie deine Geräte aus Home Assistant in den Plan kommen, zeige ich dir in dieser Folge.";
+    await R.title("Devices, lamps and cameras", `HomePlan 3D · episode 6 · part 1${VERSION}`);
+    const l1 = "Lamps that glow in 3D exactly like yours at home, sensors with their values, and cameras with their field of view.";
+    const l2 = "In this episode I'll show you how your devices from Home Assistant get into the plan.";
     const total = N.length(l1) + N.length(l2);
     const t0 = R.time;
     let end = await line(l1);
@@ -373,45 +373,45 @@ if (PART === "a") {
   }
 
   // ---------------------------------------------------------------- 2. Intro
-  await chapter("Worum es heute geht");
+  await chapter("Worum es today geht");
   await R.open("");
-  // the radiator of the demo stands for the heating already; here the heating is a plain pin (for „Als Möbel darstellen“)
+  // the radiator of the demo stands for the heating already; here the heating is a plain pin (for “Show as furniture”)
   await R.page.evaluate(() => {});
   await editorOpen();
   await R.editor(`e.change((doc) => { const f = doc.floors[0]; f.furniture = f.furniture.filter((m) => m.type !== "radiator"); const k = f.placements.find((p) => p.entity_id === "switch.kaffeemaschine"); k.x = 8.85; k.z = 0.75; }); e.past = []; e._canUndo = false;`);
   await R.sleep(500);
   await R.move(900, 560, 0.01);
-  await sayOver("Folge 6 hat zwei Teile. In Teil 1 geht es um die Geräteliste eines Raums, ums Platzieren, um Symbole und Namen.");
+  await sayOver("Episode 6 comes in two parts. Part 1 is about a room's device list, placing devices, symbols and names.");
   await R.move(780, 470, 1.2);
-  await sayOver("Teil 2 zeigt Lampen und Kameras im Detail. Du brauchst nur Räume, die mit einem Bereich aus Home Assistant verknüpft sind – das war Folge 1.");
+  await sayOver("Part 2 covers lamps and cameras in detail. All you need are rooms linked to an area in Home Assistant – that was episode 1.");
   await pointPlan(3.0, 1.6, 1.0);
 
   // ---------------------------------------------------------------- 3. The device list
-  await chapter("Die Geräteliste eines Raums");
-  await sayOver("Ich tippe im Editor das Wohnzimmer an. Rechts unter „Geräte“ steht alles, was in Home Assistant im Bereich Wohnzimmer liegt.");
+  await chapter("A room's device list");
+  await sayOver("In the editor I tap the living room. On the right, under Devices – you see everything that sits in the living room area in Home Assistant.");
   await tapRoom(5.5, 4.0, "wohnen");
   await R.hold(0.4);
-  await scrollSide({ text: "Dieser Bereich" }, 200, 0.8);
-  { const b = await textBox("Geräte", null, "H3"); if (b) await R.move(b.x, b.y, 0.5); }
-  await sayOver("Die Liste ist nach Geräten sortiert: vorn die Hauptentität, dahinter steckt der Rest.");
-  await rowMove("Deckenlicht", "name", 0.5);
+  await scrollSide({ text: "This area" }, 200, 0.8);
+  { const b = await textBox("Devices", null, "H3"); if (b) await R.move(b.x, b.y, 0.5); }
+  await sayOver("The list is grouped by device: the main entity comes first, the rest is tucked in behind it.");
+  await rowMove("Ceiling light", "name", 0.5);
   await R.hold(0.6);
-  await rowMove("Fernseher", "name", 0.5);
+  await rowMove("TV", "name", 0.5);
   await R.hold(0.4);
   await moveToText("+1 weitere", 0.4);
-  await sayOver("Die Pixeluhr hat zum Beispiel vier weitere Lichter für Anzeigen und Effekte. „+4 weitere“ klappt sie auf, „weniger“ wieder zu.");
-  await rowMove("Pixeluhr", "name", 0.5);
+  await sayOver("The pixel clock, for example, has four more lights for indicators and effects. “+4 more” – unfolds them, “less” – folds them away again.");
+  await rowMove("Pixel clock", "name", 0.5);
   await R.hold(0.5);
   await R.clickOn({ text: "+4 weitere" }, 0.5);
   await R.hold(1.6);
-  await R.clickOn({ text: "weniger", exact: true }, 0.5);
-  await sayOver("Sensoren erscheinen, wenn sie etwas für den Raum messen: Temperatur, Luftfeuchte, CO2, Leistung und Energie, Gas und Wasser, Helligkeit und Luftdruck.");
-  await rowMove("Luftfeuchtigkeit", "name", 0.6);
+  await R.clickOn({ text: "less", exact: true }, 0.5);
+  await sayOver("Sensors show up when they measure something for the room: temperature, humidity, CO2, power and energy, gas and water, brightness and air pressure.");
+  await rowMove("Humidity", "name", 0.6);
   await R.hold(0.8);
-  await rowMove("Temperatur", "name", 0.5);
-  await sayOver("Akku- und Signalsensoren bleiben weg. Und fehlt ein Gerät, liegt es in Home Assistant meist in einem anderen Bereich.");
+  await rowMove("Temperature", "name", 0.5);
+  await sayOver("Battery and signal sensors are left out. And if a device is missing, it's usually assigned to a different area in Home Assistant.");
   await R.move(1700, 900, 1.0);
-  await sayOver("Bei großen Bereichen hilft das Suchfeld.");
+  await sayOver("For large areas, the search field helps.");
   await R.clickOn('input[type="search"]', 0.5);
   await R.type("temp", 0.08);
   await R.hold(0.8);
@@ -419,42 +419,42 @@ if (PART === "a") {
   await R.key("Escape");
 
   // ---------------------------------------------------------------- 4. Other sources
-  await chapter("Andere Bereiche und ohne Bereich");
-  await sayOver("Über der Liste wählst du die Quelle. „Dieser Bereich“ ist der Standard, die Zahl dahinter sagt, wie viele Geräte es sind.");
-  await R.moveTo({ text: "Dieser Bereich" }, 0.6);
+  await chapter("Other areas and no area");
+  await sayOver("Above the list you pick the source. “This area” – is the default, and the number tells you how many devices it has.");
+  await R.moveTo({ text: "This area" }, 0.6);
   await R.hold(1.2);
-  await sayOver("„Andere Bereiche“ zeigt die Geräte aller übrigen Bereiche, nach Bereich sortiert. Steht eins schon in einem anderen Raum, steht das dabei.");
-  await R.clickOn({ text: "Andere Bereiche" }, 0.5);
+  await sayOver("“Other areas” – shows the devices of all the other areas, sorted by area. If one is already placed in another room, it says so.");
+  await R.clickOn({ text: "Other areas" }, 0.5);
   await R.hold(0.6);
-  { const b = await textBox("Arbeitszimmer", 0, "DIV"); if (b) await R.move(b.x, b.y, 0.5); }
+  { const b = await textBox("Study", 0, "DIV"); if (b) await R.move(b.x, b.y, 0.5); }
   await R.hold(0.6);
-  await moveToText("in Arbeitszimmer", 0.5, 0);
-  await sayOver("„Platzieren“ holt es dann hierher. Der Bereich in Home Assistant bleibt dabei, wie er ist.");
-  await rowMove("Schreibtischlampe", "Platzieren", 0.6);
-  await sayOver("„Ohne Bereich“ zeigt alles, was keinem Bereich zugeordnet ist: Template-Lichter, Gruppen und Helfer. Hier zählt jeder Sensor mit Zahl und Einheit.");
-  await R.clickOn({ text: "Ohne Bereich" }, 0.5);
+  await moveToText("in Study", 0.5, 0);
+  await sayOver("“Place” – then brings it over here. Its area in Home Assistant stays as it is.");
+  await rowMove("Desk lamp", "Place", 0.6);
+  await sayOver("“No area” – shows everything that isn't assigned to an area: template lights, groups and helpers. Here every sensor with a number and a unit counts.");
+  await R.clickOn({ text: "No area" }, 0.5);
   await R.hold(0.6);
   await rowMove("Pool Spot", "name", 0.5);
   await R.hold(0.6);
-  await sayOver("Werden es zu viele, sagt die Liste, wie viele noch fehlen – dann grenzt du mit der Suche ein.");
+  await sayOver("If there are too many, the list tells you how many more there are – then you narrow it down with the search.");
   await R.moveTo('input[type="search"]', 0.6);
 
   // ---------------------------------------------------------------- 5. Placing
-  await chapter("Geräte platzieren");
-  await sayOver("Zurück zu „Dieser Bereich“. Helle Einträge stehen schon im Plan, blasse noch nicht.");
-  await R.clickOn({ text: "Dieser Bereich" }, 0.5);
+  await chapter("Place devices");
+  await sayOver("Back to “This area”. Bright entries are already in the plan, faded ones are not yet.");
+  await R.clickOn({ text: "This area" }, 0.5);
   await R.hold(0.4);
-  await rowMove("Deckenlicht", "name", 0.5);
+  await rowMove("Ceiling light", "name", 0.5);
   await R.hold(0.5);
-  await rowMove("Temperatur", "name", 0.5);
-  await sayOver("„Platzieren“ setzt ein Gerät in den Raum. Der Temperatursensor steht jetzt als Symbol im Plan.");
-  await rowClick("Temperatur", "Platzieren", 0.5);
+  await rowMove("Temperature", "name", 0.5);
+  await sayOver("“Place” puts a device into the room. The temperature sensor now sits in the plan as a symbol.");
+  await rowClick("Temperature", "Place", 0.5);
   await R.hold(0.3);
   {
     const p = await R.editor(`const p = e.floor.placements.find((p) => p.entity_id === "sensor.wohnzimmer_temperatur"); return [p.x, p.z];`);
     await pointPlan(p[0], p[1], 0.7);
   }
-  await sayOver("Ich ziehe ihn an seinen Platz – an die Wand zur Küche.");
+  await sayOver("I drag it to its spot – onto the wall next to the kitchen.");
   {
     const p = await R.editor(`const p = e.floor.placements.find((p) => p.entity_id === "sensor.wohnzimmer_temperatur"); return [p.x, p.z];`);
     const a = await R.planPoint(p[0], p[1]);
@@ -462,254 +462,254 @@ if (PART === "a") {
     const b = await R.planPoint(5.75, 1.45);
     await R.drag(b.x, b.y, 1.1);
   }
-  await sayOver("„Alle 5 platzieren …“ setzt nach einer Rückfrage alle übrigen Hauptgeräte auf einmal.");
-  await scrollSide({ text: "Alle 5 platzieren" }, 900, 0.6).catch(() => scrollSide({ text: "platzieren …" }, 900, 0.6));
+  await sayOver("“Place all 5 …” – asks once and then places all the remaining main devices in one go.");
+  await scrollSide({ text: "Place all 5" }, 900, 0.6).catch(() => scrollSide({ text: "Place …" }, 900, 0.6));
   await muteDialogs(true);
-  await R.clickOn({ text: "platzieren …" }, 0.5);
-  await fakeConfirm("5 Geräte auf einmal in den Raum setzen? (Strg+Z bzw. „Rückgängig“ nimmt alle in einem Schritt zurück.)");
+  await R.clickOn({ text: "Place …" }, 0.5);
+  await fakeConfirm("Put 5 devices into the room at once? (Ctrl+Z or “Undo” takes them all back in one step.)");
   await R.hold(0.6);
   await clickFakeOk();
   await muteDialogs(false);
   {
     // the real click behind the fake dialog (confirm() is answered "yes" by the dialog handler)
-    const b = await R.locate({ text: "platzieren …" });
+    const b = await R.locate({ text: "Place …" });
     await R.page.mouse.click(b.x, b.y);
     await R.sleep(300);
   }
   await R.hold(0.4);
-  await sayOver("Lichter werden dabei gleich als Leuchte aus der Bibliothek gesetzt, damit sie in 3D leuchten – wie die Pixeluhr hier. Mehr dazu in Teil 2.");
+  await sayOver("Lights are placed straight away as a lamp from the library, so they glow in 3D – like the pixel clock here. More on that in part 2.");
   {
     const f = await R.editor(`const f = e.floor.furniture.find((f) => f.entity === "light.pixeluhr"); return f ? [f.x, f.z] : [3, 2];`);
     await pointPlan(f[0], f[1], 0.8);
   }
-  await sayOver("Gefällt dir das nicht, nimmt „Rückgängig“ oder Strg+Z alle in einem Schritt zurück.");
-  await R.clickOn({ text: "Rückgängig", exact: true }, 0.7);
+  await sayOver("If you don't like it, “Undo” – or Ctrl+Z takes them all back in one step.");
+  await R.clickOn({ text: "Undo", exact: true }, 0.7);
   await R.hold(0.6);
-  await sayOver("Ein platziertes Gerät nimmst du mit „Entfernen“ in seiner Zeile wieder heraus.");
-  await scrollSide({ text: "Dieser Bereich" }, 300, 0.6);
-  await rowMove("Rollladen", "Entfernen", 0.6);
+  await sayOver("To take a placed device out again, use “Remove” – in its row.");
+  await scrollSide({ text: "This area" }, 300, 0.6);
+  await rowMove("Blind", "Remove", 0.6);
 
   // ---------------------------------------------------------------- 6. The room panel: ☆, 👁, Aa
-  await chapter("Stern, Auge und Aa fürs Raumfenster");
-  await sayOver("Die kleinen Knöpfe in jeder Zeile gehören zum Raumfenster in 3D. Es zeigt die Geräte, die im Raum stehen.");
-  await rowMove("Deckenlicht", "👁", 0.6);
+  await chapter("Star, eye and Aa for the room panel");
+  await sayOver("The small buttons in each row belong to the room panel in 3D. It shows the devices placed in the room.");
+  await rowMove("Ceiling light", "👁", 0.6);
   await R.hold(0.5);
-  await rowMove("Deckenlicht", "Aa", 0.4);
-  await sayOver("Der Stern nimmt ein Gerät zusätzlich auf, ohne es zu platzieren – hier die Luftfeuchtigkeit.");
-  await rowClick("Luftfeuchtigkeit", "☆", 0.6);
+  await rowMove("Ceiling light", "Aa", 0.4);
+  await sayOver("The star adds a device to it without placing it – here the humidity.");
+  await rowClick("Humidity", "☆", 0.6);
   await R.hold(0.6);
-  await sayOver("Das Auge blendet ein Gerät im Raumfenster aus. Es wird durchgestrichen, ein zweiter Tipp holt es zurück.");
-  await rowClick("Fernseher", "👁", 0.6);
+  await sayOver("The eye hides a device from the room panel. It gets crossed out, and a second tap brings it back.");
+  await rowClick("TV", "👁", 0.6);
   await R.hold(0.8);
-  await sayOver("„Aa“ blendet nur den Zustand aus – praktisch bei einem Rollladen, der seine Position nicht meldet.");
-  await rowClick("Rollladen", "Aa", 0.6);
+  await sayOver("“Aa” only hides the state – handy for a blind that doesn't report its position.");
+  await rowClick("Blind", "Aa", 0.6);
   await R.hold(0.8);
-  await sayOver("In 3D steht die Luftfeuchtigkeit jetzt im Raumfenster, der Fernseher fehlt, und der Rollladen kommt ohne Prozentzahl.");
+  await sayOver("In 3D, the humidity now shows up in the room panel, the TV is gone, and the blind comes without a percentage.");
   await R.clickOn({ text: "3D", exact: true }, 0.6);
   await R.sleep(1000);
-  await quiet({ text: "Erdgeschoss", exact: true, nth: 0 }, 1000);
-  await R.clickOn({ text: "Wohnzimmer", exact: true }, 0.5);
+  await quiet({ text: "Ground floor", exact: true, nth: 0 }, 1000);
+  await R.clickOn({ text: "Living room", exact: true }, 0.5);
   await R.sleep(1500);
   await R.frame(0.2, 100);
-  await moveToText("Rollladen", 0.6);
+  await moveToText("Blind", 0.6);
   await R.hold(0.8);
   {
     // scroll the room panel down to the sensors
-    const b = await textBox("Rollladen");
+    const b = await textBox("Blind");
     await R.move(b.x + 120, b.y, 0.4);
     for (let i = 0; i < 12; i++) {
       await R.page.mouse.wheel({ deltaY: 70 });
       await R.frame(1 / FPS, 30);
     }
   }
-  await moveToText("Luftfeuchtigkeit", 0.5).catch(() => {});
-  await sayOver("Ganz unten blendet „Weitere Geräte des Bereichs“ den Rest ein – ausgeblendete bleiben weg.");
+  await moveToText("Humidity", 0.5).catch(() => {});
+  await sayOver("At the very bottom, “More devices in this area” – shows the rest; hidden ones stay away.");
   {
-    const b = await textBox("Weitere Geräte des Bereichs");
+    const b = await textBox("More devices of the area");
     if (b) await R.move(b.x, b.y, 0.6);
     else {
       for (let i = 0; i < 10; i++) {
         await R.page.mouse.wheel({ deltaY: 90 });
         await R.frame(1 / FPS, 30);
       }
-      await moveToText("Weitere Geräte des Bereichs", 0.5);
+      await moveToText("More devices of the area", 0.5);
     }
   }
 
   // ---------------------------------------------------------------- 7. Room climate
-  await chapter("Raumklima");
-  await sayOver("Zurück im Editor: Unter „Raumklima“ legst du fest, welche Sensoren Temperatur, Luftfeuchte und CO2 des Raums liefern – für die Heatmap und das Raumfenster.");
+  await chapter("Room climate");
+  await sayOver("Back in the editor: under “Room climate” – you choose which sensors provide the room's temperature, humidity and CO2 – for the heatmap and the room panel.");
   await editorOpen(true);
   await tapRoom(5.5, 4.0, "wohnen");
-  await scrollSide({ text: "Raumklima" }, 360, 0.7).catch(async () => {
+  await scrollSide({ text: "Room climate" }, 360, 0.7).catch(async () => {
     await scrollSide(() => textBox("RAUMKLIMA"), 360, 0.7);
   });
   {
-    const b = await textBox("Raumklima", null, "SUMMARY");
+    const b = await textBox("Room climate", null, "SUMMARY");
     await R.move(b.x, b.y, 0.5);
     await R.click();
   }
   await R.hold(0.6);
-  await sayOver("„Automatisch“ nimmt die Sensoren des Bereichs und die im Raum platzierten – aber keine Gerätetemperaturen, etwa vom 3D-Drucker. Du kannst auch einen Sensor wählen oder „Keiner“.");
-  await pickerMove("Temperatur", 0.5);
+  await sayOver("“Automatic” takes the area's sensors and the ones placed in the room – but no device temperatures, say from a 3D printer. You can also pick a sensor, or “None”.");
+  await pickerMove("Temperature", 0.5);
   await R.hold(1.0);
-  await pickerMove("Luftfeuchte", 0.4);
+  await pickerMove("Humidity", 0.4);
   await R.hold(0.8);
   await pickerMove("CO₂", 0.4);
 
   // ---------------------------------------------------------------- 8. The device form
-  await chapter("Das Geräteformular");
-  await sayOver("Tippst du ein Gerät im Plan an, öffnet sich rechts sein Formular. Oben stehen Art und Name, daneben „Fixieren“ gegen versehentliches Verschieben.");
+  await chapter("The device form");
+  await sayOver("Tap a device in the plan and its form opens on the right. At the top you see its type and name, and next to it “Lock” – against moving it by accident.");
   await tapDevice("sensor.wohnzimmer_temperatur", 0.6);
   await R.hold(0.4);
   await R.moveTo(".fp3d-dev-title", 0.5);
   await R.hold(0.5);
-  await R.moveTo({ text: "Fixieren" }, 0.5);
-  await sayOver("„X“ und „Y“ setzen den Platz genau. „Höhe des Symbols“ bestimmt, wie hoch der Pin in 3D schwebt – „Höhe automatisch“ setzt sie zurück.");
+  await R.moveTo({ text: "Fix" }, 0.5);
+  await sayOver("X and Y set the position exactly. “Symbol height” – sets how high the pin floats in 3D, and “Automatic height” – resets it.");
   await R.moveTo({ label: "X (m)" }, 0.5);
   await R.hold(0.4);
-  await fill("Höhe des Symbols", "1,5");
+  await fill("Marker height", "1,5");
   await R.hold(0.4);
-  await R.clickOn({ text: "Höhe automatisch", exact: true }, 0.5);
-  await sayOver("„Drehung“ dreht das Gerät – wichtig vor allem bei Kameras, dazu mehr in Teil 2.");
-  await R.moveTo({ label: "Drehung" }, 0.5);
-  await sayOver("„In Raummitte“ holt ein verrutschtes Gerät in die Mitte, „Entfernen“ nimmt es aus dem Plan.");
-  await R.moveTo({ text: "In Raummitte", exact: true }, 0.5);
+  await R.clickOn({ text: "Automatic height", exact: true }, 0.5);
+  await sayOver("“Rotation” – turns the device. That matters most for cameras – more on that in part 2.");
+  await R.moveTo({ label: "Turn" }, 0.5);
+  await sayOver("“To room centre” – brings a stray device back to the middle, and “Remove” takes it out of the plan.");
+  await R.moveTo({ text: "To room centre", exact: true }, 0.5);
   await R.hold(0.7);
-  await R.moveTo({ text: "Entfernen", exact: true }, 0.5);
+  await R.moveTo({ text: "Remove", exact: true }, 0.5);
 
   // ---------------------------------------------------------------- 9. Ask before switching
-  await chapter("Vor dem Schalten nachfragen");
-  await sayOver("Bei Schaltern und Lampen gibt es „Vor dem Schalten nachfragen“. Ich nehme die Kaffeemaschine in der Küche.");
+  await chapter("Ask before switching");
+  await sayOver("Switches and lamps have “Ask before switching”. I'll take the coffee machine in the kitchen.");
   await tapDevice("switch.kaffeemaschine", 0.7);
   await R.hold(0.4);
-  await sayOver("Mit Haken fragt NeonPlan erst nach – beim Antippen in 3D, im Schnellmenü und im Raumfenster. Das schützt etwa den Server-Schalter vor einem versehentlichen Tipp.");
-  await R.clickOn({ text: "Vor dem Schalten nachfragen" }, 0.6);
+  await sayOver("With the tick set, NeonPlan asks first – when you tap it in 3D, in the quick menu and in the room panel. That protects, say, the server switch from an accidental tap.");
+  await R.clickOn({ text: "Ask before switching" }, 0.6);
   await R.hold(0.8);
-  await sayOver("Ein Doppeltipp auf den Raum, der alle Lichter schaltet, lässt so ein Gerät aus. Und Wischen bewegt es auch nicht.");
+  await sayOver("A double tap on the room, which switches all the lights, leaves such a device out. And swiping doesn't move it either.");
   await R.move(1300, 420, 1.2);
 
-  // ---------------------------------------------------------------- 10. Symbol in 3D and power
-  await chapter("Symbol in 3D und Leistung");
-  await sayOver("Hat ein Gerät in Home Assistant einen Leistungssensor, zeigt sein Symbol in 3D die Watt – die Kaffeemaschine gerade 900 Watt.");
-  await R.moveTo({ label: "Symbol in 3D" }, 0.6);
-  await sayOver("„Symbol in 3D“ legt fest, wann der Pin erscheint. „Automatisch“ folgt dem Schalter in der 3D-Ansicht, „Immer zeigen“ zeigt ihn immer.");
-  await R.pickOption("Symbol in 3D", "Immer zeigen", 0.5);
-  await sayOver("„Ohne Watt“ lässt die Leistung weg, etwa an einer Steckdose. „Ausblenden“ zeigt nie ein Symbol.");
+  // ---------------------------------------------------------------- 10. Marker in 3D and power
+  await chapter("Marker in 3D and power");
+  await sayOver("If a device has a power sensor in Home Assistant, its symbol in 3D shows the watts – right now the coffee machine draws 900 watts.");
+  await R.moveTo({ label: "Marker in 3D" }, 0.6);
+  await sayOver("“Marker in 3D” – decides when the pin appears. “Automatic” follows the switch in the 3D view, “Always show” – always shows it.");
+  await R.pickOption("Marker in 3D", "Always show", 0.5);
+  await sayOver("“Without watts” – leaves out the power, for a smart plug for example. “Hide” – never shows a symbol.");
   {
-    const b = await R.locate({ label: "Symbol in 3D" });
+    const b = await R.locate({ label: "Marker in 3D" });
     await R.move(b.x, b.y, 0.5);
     await R.hold(1.6);
   }
-  await sayOver("Mit Energie Pro gibt es außerdem ein Hologramm über dem Gerät: Leistung jetzt, Verbrauch heute und die Tageskurve.");
-  await R.moveTo({ text: "Hologramm über dem Gerät" }, 0.6);
+  await sayOver("With Energy Pro you also get a hologram above the device: power right now, today's consumption and the day's curve.");
+  await R.moveTo({ text: "Hologram over the device" }, 0.6);
 
   // ---------------------------------------------------------------- 11. Own icon and name
-  await chapter("Eigenes Symbol und eigener Name");
-  await sayOver("„Eigenes Symbol“ ersetzt das Symbol nach Geräteart. Du trägst den Namen eines Material-Design-Icons ein, genau wie in Home Assistant.");
-  await R.clickOn({ label: "Eigenes Symbol" }, 0.6);
+  await chapter("Own symbol and own name");
+  await sayOver("“Own symbol” – replaces the symbol for the device type. You enter the name of a Material Design icon, just like in Home Assistant.");
+  await R.clickOn({ label: "Own symbol" }, 0.6);
   await R.type("mdi:coffee", 0.08);
   await R.key("Enter");
-  await sayOver("Daneben erscheint gleich die Vorschau. Leer lassen heißt: das Standard-Symbol.");
-  await R.moveTo({ label: "Eigenes Symbol" }, 0.4);
+  await sayOver("A preview appears right next to it. Leave it empty for the standard symbol.");
+  await R.moveTo({ label: "Own symbol" }, 0.4);
   {
-    const b = await R.locate({ label: "Eigenes Symbol" });
+    const b = await R.locate({ label: "Own symbol" });
     await R.move(b.x + b.w / 2 + 20, b.y, 0.5);
   }
   await R.hold(0.8);
-  await sayOver("„Eigener Name“ gilt nur im Plan – die Entität in Home Assistant bleibt, wie sie ist.");
-  await fill("Eigener Name", "Espresso");
-  await sayOver("Dann erscheint „Name unter dem Symbol in 3D zeigen“. So bleiben etwa drei Thermometer im Garten unterscheidbar.");
-  await R.clickOn({ text: "Name unter dem Symbol in 3D zeigen" }, 0.6);
+  await sayOver("“Own name” – only applies in the plan; the entity in Home Assistant stays as it is.");
+  await fill("Own name", "Espresso");
+  await sayOver("Then “Show name below the symbol in 3D” appears – “Show the name under the marker in 3D”. That way, say, three thermometers in the garden stay easy to tell apart.");
+  await R.clickOn({ text: "Show the name under the marker in 3D" }, 0.6);
   await R.hold(0.6);
-  await sayOver("Für die Dashboard-Karte gibt es dafür auch eine Option, die alle eigenen Namen zeigt – mehr in der Folge zur Karte.");
+  await sayOver("The dashboard card also has an option that shows all own names – more in the episode about the card.");
   await R.move(1300, 500, 1.0);
 
   // ---------------------------------------------------------------- 12. In 3D: the pin, the markers switch, the question
-  await chapter("In 3D: Symbole und Rückfrage");
-  await sayOver("In 3D steht der Pin jetzt mit Kaffeetasse, Watt und Namen da.");
+  await chapter("In 3D: markers and confirmation");
+  await sayOver("In 3D, the pin now shows a coffee cup, the watts and the name.");
   await R.clickOn({ text: "3D", exact: true }, 0.6);
   await R.sleep(800);
-  await quiet({ text: "Küche", exact: true }, 1500);
-  await R.clickOn('button[aria-label="Schließen"]', 0.01).catch(() => {});
+  await quiet({ text: "Kitchen", exact: true }, 1500);
+  await R.clickOn('button[aria-label="Close"]', 0.01).catch(() => {});
   await cam("eg", 8.4, 1.6, { theta: -0.25, phi: 0.82, radius: 6.5 });
   await R.sleep(800);
   await R.frame(0.1, 100);
   await R.moveTo('.fp3d-dev[data-entity="switch.kaffeemaschine"]', 0.7);
-  await sayOver("Oben rechts wählst du, welche Symbole die 3D-Ansicht zeigt: „Keine“, „Wichtige“ oder „Alle“.");
-  await R.moveTo({ text: "Wichtige", exact: true }, 0.7);
+  await sayOver("Top right, you choose which symbols the 3D view shows: “None”, “Important” or “All”, “Important”, “All”.");
+  await R.moveTo({ text: "Important", exact: true }, 0.7);
   await R.hold(0.5);
-  await R.clickOn({ text: "Alle", exact: true }, 0.4);
+  await R.clickOn({ text: "All", exact: true }, 0.4);
   await R.hold(0.8);
-  await sayOver("„Wichtige“ lässt Lampen und Geräte weg, die ihr 3D-Modell schon zeigt; Sensoren und Watt bleiben. „Keine“ blendet alle aus – auch die mit „Immer zeigen“.");
-  await R.clickOn({ text: "Wichtige", exact: true }, 0.5);
+  await sayOver("“Important” leaves out lamps and devices that their 3D model already shows; sensors and watts stay. “None” hides them all – even the ones set to “Always show”.");
+  await R.clickOn({ text: "Important", exact: true }, 0.5);
   await R.hold(1.0);
-  await R.clickOn({ text: "Keine", exact: true }, 0.5);
+  await R.clickOn({ text: "None", exact: true }, 0.5);
   await R.hold(1.0);
-  await R.clickOn({ text: "Wichtige", exact: true }, 0.5);
-  await sayOver("Tippe ich die Kaffeemaschine an, kommt jetzt erst die Rückfrage. Erst mit „OK“ schaltet sie.");
+  await R.clickOn({ text: "Important", exact: true }, 0.5);
+  await sayOver("When I tap the coffee machine now, the question comes first. Only “OK” switches it.");
   await muteDialogs(true);
   await R.clickOn('.fp3d-dev[data-entity="switch.kaffeemaschine"]', 0.7);
-  await fakeConfirm("Kaffeemaschine wirklich schalten?");
+  await fakeConfirm("Really switch Coffee machine?");
   await R.hold(1.0);
   await clickFakeOk();
   await muteDialogs(false);
   await service("switch", "turn_off", { entity_id: "switch.kaffeemaschine" });
   await R.hold(0.5);
-  await sayOver("Lange drücken öffnet bei Schaltern und Lampen das Schnellmenü. Wie du Lampen in 3D bedienst, zeigt Teil 2.");
+  await sayOver("A long press opens the quick menu for switches and lamps. Part 2 shows how to control lamps in 3D.");
   await R.moveTo('.fp3d-dev[data-entity="switch.kaffeemaschine"]', 0.5);
   await longPress(0.8);
   await R.hold(1.2);
 
   // ---------------------------------------------------------------- 13. As furniture
-  await chapter("Als Möbel darstellen");
-  await sayOver("Manche Geräte sehen als Möbel besser aus. Die Heizung im Wohnzimmer ist noch ein einfacher Pin.");
+  await chapter("Show as furniture");
+  await sayOver("Some devices look better as furniture. The heating in the living room is still a plain pin.");
   await editorOpen(true);
   await tapDevice("climate.wohnzimmer", 0.6);
   await R.hold(0.4);
-  await sayOver("„Als Möbel darstellen“ ersetzt den Pin durch ein passendes Möbel an derselben Stelle, schon mit dem Gerät verknüpft. Die Liste zeigt nur, was zur Geräteart passt.");
-  await scrollSide({ text: "In Raummitte", exact: true }, 700, 0.5);
-  await R.pickOption("Als Möbel darstellen", "Heizkörper", 0.6);
+  await sayOver("“Show as furniture” – replaces the pin with a matching item in the same spot, already linked to the device. The list only shows what fits the device type.");
+  await scrollSide({ text: "To room centre", exact: true }, 700, 0.5);
+  await R.pickOption("Show as furniture", "Radiator", 0.6);
   await R.hold(0.6);
-  await sayOver("Aus der Heizung ist ein Heizkörper geworden, der in 3D glüht, solange geheizt wird. Ein Lautsprecher, eine Leuchte oder der Saugroboter gehen genauso.");
+  await sayOver("The heating has become a radiator that glows in 3D while it's heating. A speaker, a lamp or the robot vacuum work the same way.");
   {
     const f = await R.editor(`const f = e.floor.furniture.find((f) => f.type === "radiator"); return [f.x, f.z];`);
     await pointPlan(f[0], f[1], 0.6);
   }
   await R.hold(1.2);
-  await sayOver("Im Möbelformular holt „Wieder als Geräte-Pin“ den einfachen Pin zurück – und Strg+Z nimmt beides zurück.");
-  await scrollSide({ text: "Wieder als Geräte-Pin" }, 800, 0.6);
-  await R.moveTo({ text: "Wieder als Geräte-Pin" }, 0.5);
+  await sayOver("In the furniture form, “Back to a device pin” – brings back the plain pin, and Ctrl+Z undoes either.");
+  await scrollSide({ text: "Back to a device pin" }, 800, 0.6);
+  await R.moveTo({ text: "Back to a device pin" }, 0.5);
 
   // ---------------------------------------------------------------- 14. Outro
   await chapter("Zusammenfassung");
   await catchUp();
   await R.clickOn({ text: "3D", exact: true }, 0.6);
   await R.sleep(1000);
-  await quiet({ text: "Erdgeschoss", exact: true, nth: 0 }, 1200);
+  await quiet({ text: "Ground floor", exact: true, nth: 0 }, 1200);
   await R.hideCursor();
-  await quiet('button[aria-label="Bedienelemente ausblenden – nur die 3D-Ansicht bleibt"]', 700);
+  await quiet('button[aria-label="Hide the controls – only the 3D view remains"]', 700);
   {
     const a = { theta: -0.6, phi: 0.95, radius: 13 };
     const b = { theta: 0.4, phi: 0.85, radius: 11 };
-    const l1 = "Kurz zusammengefasst: Die Geräteliste zeigt den Bereich des Raums, „Platzieren“ setzt Geräte in den Plan, und im Formular stellst du Symbol, Name und Rückfrage ein.";
+    const l1 = "To sum up: the device list shows the room's area, “Place” puts devices into the plan, and in the form you set the symbol, the name and the question before switching.";
     await cam("eg", 5.5, 3.5, a);
     await R.sleep(700);
     const end = await line(l1);
     await glide("eg", 5.5, 3.5, a, b, end - R.time);
   }
-  await R.title("Teil 2: Lampen und Kameras", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+  await R.title("part 2: lamps and cameras", `HomePlan 3D – also runs on old wall tablets${VERSION}`);
   {
-    let end = await line("In Teil 2 geht es um Lampen und Kameras.");
+    let end = await line("Part 2 is about lamps and cameras.");
     await live(end);
-    end = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und HomePlan 3D läuft auch auf alten Wandtablets. Bis gleich in Teil 2!");
+    end = await line("Left to the online demo and the manual are in the description. And HomePlan 3D also runs on old wall tablets. See you in part 2!");
     await live(end + 0.6);
   }
 }
 
 // ================================================================ part b
 if (PART === "b") {
-  /** Point the editor's 3D pane ("3D daneben") at a plan point of a floor. */
+  /** Point the editor's 3D pane ("3D beside") at a plan point of a floor. */
   const pane = (floorId, x, z, c) =>
     R.page.evaluate(
       (floorId, x, z, c) => {
@@ -740,16 +740,16 @@ if (PART === "b") {
   await chapter("Teaser");
   await R.open("");
   await R.hideCursor();
-  await quiet({ text: "Erdgeschoss", exact: true, nth: 0 }, 1200);
-  await quiet('button[aria-label="Bedienelemente ausblenden – nur die 3D-Ansicht bleibt"]', 700);
+  await quiet({ text: "Ground floor", exact: true, nth: 0 }, 1200);
+  await quiet('button[aria-label="Hide the controls – only the 3D view remains"]', 700);
   {
     const a = { theta: 0.5, phi: 0.75, radius: 13, y: 0.3 };
     const b = { theta: -0.35, phi: 0.68, radius: 10.5, y: 0.3 };
     await cam("eg", 5.5, 2.3, a);
     await R.sleep(1500);
-    await R.title("Geräte, Lampen und Kameras", `HomePlan 3D · Folge 6 · Teil 2${VERSION}`);
-    const l1 = "Lampen, die in Farbe und Helligkeit genau wie bei dir leuchten, und Kameras mit ihrem Blickfeld im Raum.";
-    const l2 = "Das ist Teil 2 von Folge 6: Lampen und Kameras.";
+    await R.title("Devices, lamps and cameras", `HomePlan 3D · episode 6 · part 2${VERSION}`);
+    const l1 = "Lamps that glow in the colour and brightness your lights really have, and cameras with their field of view in the room.";
+    const l2 = "This is part 2 of episode 6: lamps and cameras.";
     const total = N.length(l1) + N.length(l2);
     const t0 = R.time;
     const step = async (end) => {
@@ -767,34 +767,34 @@ if (PART === "b") {
   }
 
   // ---------------------------------------------------------------- 2. Intro, 3D beside
-  await chapter("Worum es heute geht");
+  await chapter("Worum es today geht");
   await R.open("");
   await editorOpen();
   await R.move(900, 560, 0.01);
-  await sayOver("In Teil 1 ging es um die Geräteliste und ums Platzieren. Jetzt schauen wir uns Lampen und Kameras genauer an.");
+  await sayOver("Part 1 covered the device list and placing devices. Now let's take a closer look at lamps and cameras.");
   await R.move(700, 500, 1.2);
-  await sayOver("Damit du siehst, was passiert, schalte ich „3D daneben“ ein – die 3D-Ansicht neben dem Plan.");
-  await R.clickOn({ text: "3D daneben", exact: true }, 0.6);
+  await sayOver("So you can see what happens, I switch on “3D beside” – the 3D view next to the plan.");
+  await R.clickOn({ text: "3D beside", exact: true }, 0.6);
   await R.sleep(2500);
   // full walls in the pane: the cut at 1.15 m would hide pendants and wall lights
-  await R.clickOn({ text: "Wände hoch", exact: true }, 0.5);
+  await R.clickOn({ text: "Tall walls", exact: true }, 0.5);
   await fitPlan();
   await pane("eg", 2.2, 6.3, { theta: -0.5, phi: 0.75, radius: 8, y: 0.3 });
   await R.hold(0.5);
 
   // ---------------------------------------------------------------- 3. Lamps in the library, a wall light
-  await chapter("Leuchten aus der Bibliothek");
-  await sayOver("Leuchten sind Möbel mit einem verknüpften Licht. Ich tippe das Schlafzimmer an – im Werkzeug „Möbel“ stehen sie ganz oben unter „Leuchten“.");
+  await chapter("Lights from the library");
+  await sayOver("Lamps are furniture with a linked light. I tap the bedroom – in the “Furniture” tool they're right at the top under “Lights”.");
   await tapRoom(3.7, 5.2, "schlafen");
-  await R.clickOn({ text: "Möbel", exact: true }, 0.5);
+  await R.clickOn({ text: "Furniture", exact: true }, 0.5);
   await R.hold(0.5);
-  await sayOver("Deckenleuchte, Einbauspot, Aufbau-Spot, LED-Panel, Pendelleuchte, Stehlampe, Deckenfluter, Tischlampe, Wandleuchte, LED-Streifen, Wegleuchte und Garten-Spot.");
-  for (const name of ["Deckenleuchte", "Einbauspot", "Aufbau-Spot", "LED-Panel", "Pendelleuchte", "Stehlampe", "Deckenfluter", "Tischlampe", "Wandleuchte", "LED-Streifen", "Wegleuchte", "Garten-Spot"]) {
+  await sayOver("Ceiling light, recessed spot, surface spot, LED panel, pendant light, floor lamp, uplighter, table lamp, wall light, LED strip, path light and garden spot.");
+  for (const name of ["Ceiling light", "Downlight", "Surface spot", "LED panel", "Pendant light", "Floor lamp", "Floor uplight", "Table lamp", "Wall light", "LED strip", "Path light", "Garden spot"]) {
     await R.moveTo({ text: name, exact: true }, 0.3);
     await R.hold(0.15);
   }
-  await sayOver("Ich nehme eine Wandleuchte. Ziehe ich sie an die Wand, rastet sie ein – Wandleuchten hängen von sich aus auf 1,75 Metern.");
-  await R.clickOn({ text: "Wandleuchte", exact: true }, 0.4);
+  await sayOver("I'll take a wall light. When I drag it to a wall, it snaps on – wall lights hang at 1.75 metres by default.");
+  await R.clickOn({ text: "Wall light", exact: true }, 0.4);
   await R.hold(0.4);
   {
     const f = await R.editor(`const f = e.furnitureItem; return [f.x, f.z];`);
@@ -819,62 +819,62 @@ if (PART === "b") {
     const at = await R.editor(`const f = e.furnitureItem; return f ? [f.x, f.z, f.rotation] : null;`);
     console.log(`wall light at ${JSON.stringify(at)}`);
   }
-  await R.clickOn({ text: "Auswählen", exact: true }, 0.5);
+  await R.clickOn({ text: "Select", exact: true }, 0.5);
   await pane("eg", 4.2, 5.4, { theta: -1.5, phi: 1.2, radius: 3.6, y: 1.5 });
   await R.hold(0.3);
-  await sayOver("Unter „Licht oder Schalter“ wählst du das Licht aus Home Assistant – ich nehme den Nachttisch.");
-  await scrollSide({ label: "Licht oder Schalter" }, 520, 0.6).catch(() => {});
-  await pickEntity("Licht oder Schalter", "Nacht", "Nachttisch", 0.5);
+  await sayOver("Under “Light or switch” – you choose the light from Home Assistant. I'll take the bedside light.");
+  await scrollSide({ label: "Light or switch" }, 520, 0.6).catch(() => {});
+  await pickEntity("Light or switch", "Tot", "Nightstand", 0.5);
   await R.hold(0.6);
-  await sayOver("Mehrere Leuchten dürfen demselben Licht folgen: Die Tischlampe hängt am selben Licht, beide leuchten jetzt zusammen.");
+  await sayOver("Several lamps may follow the same light: the table lamp is on the same light, so now both glow together.");
   await pane("eg", 3.7, 6.6, { theta: -1.0, phi: 1.0, radius: 5.2, y: 0.9 });
   {
     const b = await paneCentre();
     await R.move(b.x, b.y, 0.8);
   }
   await R.hold(1.0);
-  await sayOver("Statt eines Lichts geht auch ein Schalter, etwa ein Relais fürs Deckenlicht. Die Leuchte strahlt dann, solange er an ist.");
-  await pickerMove("Licht oder Schalter", 0.6);
-  await sayOver("Schaltet so ein Relais eine Lampe, die selbst Farbe und Helligkeit kennt, trägst du die Lampe unter „Farbe und Helligkeit von“ ein: An und Aus kommt vom Schalter, die Farbe von dort.");
-  await pickerMove("Farbe und Helligkeit von", 0.6);
+  await sayOver("Instead of a light you can also use a switch, say a relay for the ceiling light. The lamp then glows as long as it's on.");
+  await pickerMove("Light or switch", 0.6);
+  await sayOver("If such a relay switches a lamp that knows its own colour and brightness, enter the lamp under “Colour and brightness from”: on and off come from the switch, the colour from there.");
+  await pickerMove("Colour and brightness from", 0.6);
   await R.hold(1.5);
-  await moveToText("Für Lampen, die ein Relais", 0.6);
-  await sayOver("„Leuchtstärke in 3D“ sagt, wie kräftig die Leuchte in 3D strahlt: unter 100 Prozent gedämpfter, darüber kräftiger. In Home Assistant schaltet das nichts.");
-  await fill("Leuchtstärke in 3D", "150");
+  await moveToText("For lamps that use a relay", 0.6);
+  await sayOver("“Glow in 3D” – sets how strongly the lamp shines in 3D: below 100 percent it's softer, above it's brighter. It doesn't switch anything in Home Assistant.");
+  await fill("Glow in 3D", "150");
   await R.hold(1.2);
-  await sayOver("„Höhe über Boden“ hängt sie höher oder tiefer, „Höhe automatisch“ setzt sie zurück.");
-  await scrollSide({ label: "Höhe über Boden" }, 500, 0.5).catch(() => {});
-  await fill("Höhe über Boden", "2,1");
+  await sayOver("“Height above floor” – hangs it higher or lower, and “Automatic height” resets it.");
+  await scrollSide({ label: "Height above the floor" }, 500, 0.5).catch(() => {});
+  await fill("Height above the floor", "2,1");
   await R.hold(0.8);
-  await R.clickOn({ text: "Höhe automatisch", exact: true }, 0.5);
+  await R.clickOn({ text: "Automatic height", exact: true }, 0.5);
 
   // ---------------------------------------------------------------- 4. Pendant, table and floor lamps
-  await chapter("Pendel- und Tischlampen, Licht als Pin");
-  await sayOver("Bei der Pendelleuchte über dem Esstisch wählst du unter „Form“, wie sie aussieht: Schirm, Kugel, Kegel oder Trommel.");
+  await chapter("Pendant and table lamps, lights as pins");
+  await sayOver("For the pendant light above the dining table, you choose its look under “Shape”: shade, globe, cone or drum.");
   await tapItem("lamp_pendant", 0.7);
   await pane("eg", 8.0, 2.9, { theta: -0.6, phi: 1.05, radius: 4.2, y: 1.4 });
-  await scrollSide({ label: "Form" }, 600, 0.5).catch(() => {});
-  await R.pickOption("Form", "Schirm", 0.5);
+  await scrollSide({ label: "Shape" }, 600, 0.5).catch(() => {});
+  await R.pickOption("Shape", "Shade", 0.5);
   await R.hold(0.2);
-  await R.pickOption("Form", "Kegel", 0.3);
+  await R.pickOption("Shape", "Cone", 0.3);
   await R.hold(0.2);
-  await sayOver("Ihre Höhe ist die Abhängung unter der Decke – also wie weit sie von der Decke herunterhängt, etwa über dem Esstisch.");
-  await R.pickOption("Form", "Trommel", 0.3);
+  await sayOver("Its height is how far it hangs down from the ceiling – say, above the dining table.");
+  await R.pickOption("Shape", "Drum", 0.3);
   await R.hold(0.3);
-  await R.pickOption("Form", "Kugel", 0.3);
-  await R.moveTo({ label: "Höhe (m)" }, 0.5);
-  await sayOver("Eine Tischlampe stellt sich von selbst auf das Möbel darunter – hier auf den Nachttisch.");
+  await R.pickOption("Shape", "Globe", 0.3);
+  await R.moveTo({ label: "Height (m)" }, 0.5);
+  await sayOver("A table lamp sits on the piece of furniture below it by itself – here on the nightstand.");
   await tapItem("lamp_table", 0.7);
   await pane("eg", 3.3, 7.6, { theta: 2.7, phi: 1.0, radius: 3.4, y: 0.6 });
   await R.hold(1.0);
-  await sayOver("Steht ein Licht als einfacher Geräte-Pin im Plan, wählst du in seinem Formular unter „Lampe“, wie es montiert ist: Deckenleuchte, Stehlampe, Tischlampe oder Wandleuchte.");
-  await R.moveTo({ label: "Möbelstück" }, 0.6);
+  await sayOver("If a light sits in the plan as a plain device pin, you choose in its form under “Lamp” – how it's mounted: ceiling light, floor lamp, table lamp or wall light.");
+  await R.moveTo({ label: "Furniture item" }, 0.6);
   await R.hold(1.2);
-  await R.moveTo({ label: "Höhe über Boden" }, 0.6);
+  await R.moveTo({ label: "Height above the floor" }, 0.6);
 
   // ---------------------------------------------------------------- 5. LED strips
-  await chapter("LED-Streifen");
-  await sayOver("LED-Streifen rasten wie Wandleuchten an der Wand ein und hängen von sich aus direkt unter der Decke.");
+  await chapter("LED strip");
+  await sayOver("LED strips snap onto the wall just like wall lights, and by default they hang right below the ceiling.");
   {
     const f = await R.editor(`const f = e.floor.furniture.find((f) => f.type === "led_strip" && !f.upright); return { id: f.id, x: f.x, z: f.z };`);
     await tapPlan(f.x, f.z + 0.02, 0.7);
@@ -882,67 +882,67 @@ if (PART === "b") {
   }
   await pane("eg", 2.6, 0.6, { theta: 0.15, phi: 1.2, radius: 5.5, y: 1.3 });
   await R.hold(0.6);
-  await sayOver("Unter 1 Meter Höhe – an der Sockelleiste oder hinter dem Schrank – strahlen sie nach oben an die Wand, höher montierte nach unten.");
-  await scrollSide({ label: "Höhe über Boden" }, 500, 0.5).catch(() => {});
-  await fill("Höhe über Boden", "0,3");
+  await sayOver("Below one metre – along the skirting board or behind a cabinet – they shine up the wall; mounted higher, they shine down.");
+  await scrollSide({ label: "Height above the floor" }, 500, 0.5).catch(() => {});
+  await fill("Height above the floor", "0,3");
   await R.hold(1.6);
-  await R.clickOn({ text: "Höhe automatisch", exact: true }, 0.5);
-  await sayOver("Ein Streifen unterhalb der Schnitthöhe bleibt auch bei geschnittenen Wänden sichtbar.");
+  await R.clickOn({ text: "Automatic height", exact: true }, 0.5);
+  await sayOver("A strip below the cut height stays visible even when the walls are cut.");
   await R.move(1150, 700, 1.0);
-  await sayOver("„Neigung um die Länge“ legt den Streifen an eine Dachschräge oder kippt ihn zur Seite. „Senkrecht“ stellt ihn hochkant – wie die Lichtsäule hier am Fenster.");
-  await R.moveTo({ label: "Neigung um die Länge" }, 0.5);
+  await sayOver("“Tilt along the length” – lays the strip against a sloped ceiling or tips it sideways. “Upright” – stands it on end, like the light column here by the window.");
+  await R.moveTo({ label: "Tilt about its length" }, 0.5);
   await R.hold(0.8);
-  await R.moveTo({ text: "Senkrecht" }, 0.4);
+  await R.moveTo({ text: "Upright" }, 0.4);
   await R.hold(0.6);
   await pane("eg", 0.3, 1.3, { theta: 1.45, phi: 1.05, radius: 5, y: 1.1 });
   await pointPlan(0.12, 1.2, 0.7);
-  await sayOver("Und läuft in Home Assistant ein Farbeffekt wie ein Farbwechsel, ist er in 3D animiert.");
+  await sayOver("And if a colour effect like a colour loop runs in Home Assistant, it's animated in 3D.");
   await live(R.time + 0.5);
   await catchUp();
 
   // ---------------------------------------------------------------- 6. Spots
-  await chapter("Spots setzen");
-  await sayOver("Für Einbauspots gibt es am Raum „Spots setzen“. Es legt ein Raster aus Leuchten an, die alle einem Licht folgen – etwa sechs Spots an einem Dimmer.");
+  await chapter("Place spots");
+  await sayOver("For recessed spots, the room has “Place spots”. It lays out a grid of lamps that all follow one light – say six spots on one dalways.");
   await tapRoom(3.7, 5.2, "schlafen", 0.7);
-  await scrollSide({ text: "Spots setzen", exact: true }, 640, 0.6);
-  await R.clickOn({ text: "Spots setzen", exact: true }, 0.5);
+  await scrollSide({ text: "Place spots", exact: true }, 640, 0.6);
+  await R.clickOn({ text: "Place spots", exact: true }, 0.5);
   await R.hold(0.5);
-  await sayOver("Du wählst die Leuchte, die Spalten und Reihen und das Licht.");
-  await R.moveTo({ label: "Leuchte" }, 0.5);
+  await sayOver("You choose the lamp, the columns and rows, and the light.");
+  await R.moveTo({ label: "Lamp" }, 0.5);
   await R.hold(0.4);
-  await fill("Spalten", "3");
-  await fill("Reihen", "2");
-  await pickerMove("Licht oder Schalter", 0.5);
-  await sayOver("„6 Leuchten setzen“ – fertig. Jeder Spot lässt sich danach einzeln verschieben, wie jedes Möbel.");
-  await R.clickOn({ text: "6 Leuchten setzen" }, 0.5);
+  await fill("Columns", "3");
+  await fill("Rows", "2");
+  await pickerMove("Light or switch", 0.5);
+  await sayOver("“Place 6 lamps” – done. Afterwards you can move each spot on its own, like any piece of furniture.");
+  await R.clickOn({ text: "Place 6 lights" }, 0.5);
   await pane("eg", 2.2, 6.3, { theta: 0.3, phi: 0.62, radius: 7.5, y: 0.3 });
   await R.hold(1.2);
-  await sayOver("Und stehen mehrere Lichter als Decken-Pins in einem Raum, verteilt „Deckenlampen gleichmäßig verteilen“ oben in der Geräteliste sie über den Raum.");
-  await scrollSide({ text: "Dieser Bereich" }, 600, 0.6);
+  await sayOver("And if a room has several lights as ceiling pins, “Spread ceiling lights evenly” – at the top of the device list spreads them over the room.");
+  await scrollSide({ text: "This area" }, 600, 0.6);
   {
-    const b = await textBox("Geräte", null, "H3");
+    const b = await textBox("Devices", null, "H3");
     if (b) await R.move(b.x, b.y, 0.5);
   }
   await R.hold(1.0);
-  await R.moveTo({ text: "Dieser Bereich" }, 0.5);
+  await R.moveTo({ text: "This area" }, 0.5);
 
   // ---------------------------------------------------------------- 7. Lamps live in 3D
-  await chapter("Lampen live in 3D");
-  await sayOver("In 3D leuchtet jede Lampe in Farbe und Helligkeit, wie Home Assistant sie meldet. Boden und Wände leuchten mit, und zwei farbige Deckenleuchten mischen sich.");
+  await chapter("Lampn live in 3D");
+  await sayOver("In 3D every lamp glows in the colour and brightness Home Assistant reports. The floor and walls light up too, and two coloured ceiling lights blend in between.");
   await R.clickOn({ text: "3D", exact: true }, 0.6);
   await R.sleep(1000);
-  await quiet({ text: "Küche", exact: true }, 1500);
-  await R.clickOn('button[aria-label="Schließen"]', 0.01).catch(() => {});
+  await quiet({ text: "Kitchen", exact: true }, 1500);
+  await R.clickOn('button[aria-label="Close"]', 0.01).catch(() => {});
   {
     const a = { theta: -0.2, phi: 0.75, radius: 8.5, y: 0.5 };
     const b = { theta: 0.25, phi: 0.7, radius: 7.5, y: 0.5 };
     await cam("eg", 8.0, 2.4, a);
     await R.sleep(600);
     await glide("eg", 8.0, 2.4, a, b, 3.5);
-    await sayOver("In den Nachbarraum fällt das Licht nur durch Türen.");
+    await sayOver("Light only falls into the next room through doors.");
     await glide("eg", 8.0, 2.4, b, { theta: 0.45, phi: 0.72, radius: 7.5, y: 0.5 }, 2.0);
   }
-  await sayOver("Ein Tipp schaltet die Lampe, sie blinkt kurz zur Bestätigung.");
+  await sayOver("A tap switches the lamp, and it bleft briefly to confirm.");
   {
     const p = await point3d("eg", 8.0, 1.75, 2.9);
     await R.move(p.x, p.y, 0.6);
@@ -951,7 +951,7 @@ if (PART === "b") {
     await R.click();
     await live(R.time + 0.8);
   }
-  await sayOver("Senkrecht wischen dimmt – der Wert erscheint am Finger.");
+  await sayOver("Swiping up or down dims it – the value appears at your finger.");
   {
     const p = await point3d("eg", 8.0, 1.75, 2.9);
     await R.move(p.x, p.y, 0.3);
@@ -961,14 +961,14 @@ if (PART === "b") {
     await R.page.mouse.up();
     await live(R.time + 0.6);
   }
-  await sayOver("Lange drücken öffnet das Schnellmenü: Helligkeit, Farbtemperatur und Farben.");
+  await sayOver("A long press opens the quick menu: brightness, colour temperature and colours.");
   {
     const p = await point3d("eg", 8.0, 1.75, 2.9);
     await R.move(p.x, p.y, 0.4);
     await longPress(0.8);
     await R.hold(1.0);
   }
-  await sayOver("Ein Doppeltipp auf den Raum schaltet alle Lichter des Raums aus – und wieder an.");
+  await sayOver("A double tap on the room switches all of its lights off – and back on.");
   {
     // close the quick menu with a tap beside it, then double tap the kitchen floor
     const p = await point3d("eg", 6.7, 0, 2.2);
@@ -988,52 +988,52 @@ if (PART === "b") {
     const off = await R.page.evaluate(() => window.fp3dPanel.hass.states["light.esstisch"].state !== "on");
     if (off) {
       console.log("double tap on: fallback");
-      for (const id of ["light.esstisch", "light.kueche_links", "light.kueche_rechts", "light.kueche"]) await service("light", "turn_on", { entity_id: id });
+      for (const id of ["light.esstisch", "light.kueche_left", "light.kueche_right", "light.kueche"]) await service("light", "turn_on", { entity_id: id });
     }
     await live(R.time + 1.2);
-    await R.clickOn('button[aria-label="Schließen"]', 0.4).catch(() => {});
+    await R.clickOn('button[aria-label="Close"]', 0.4).catch(() => {});
   }
 
   // ---------------------------------------------------------------- 8. Cameras in the editor
-  await chapter("Kameras ausrichten");
-  await sayOver("Kameras platzierst du wie jedes Gerät. Im Plan zeigt ein Kegel, wohin die Kamera schaut.");
+  await chapter("Cameras ausrichten");
+  await sayOver("You place cameras like any other device. In the plan, a cone shows where the camera is looking.");
   await editorOpen(true);
   await tapDevice("camera.wohnzimmer", 0.7);
   await pane("eg", 2.6, 2.0, { theta: -0.75, phi: 0.75, radius: 9, y: 0.3 });
   await R.hold(0.6);
-  await sayOver("Unter „Montage“ hängt sie an der Wand und schaut in eine Richtung – die Drehung. An der Decke ist sie ein Dome, der rundum schaut.");
-  await R.pickOption("Montage", "Decke (Dome, rundum)", 0.5);
+  await sayOver("Under “Mounting” – it hangs on a wall and looks in one direction, its rotation. On the ceiling it's a dome that looks all around.");
+  await R.pickOption("Mount", "Ceiling (dome, all round)", 0.5);
   await R.hold(1.2);
-  await R.pickOption("Montage", "Wand (Blickrichtung = Drehung)", 0.4);
+  await R.pickOption("Mount", "Wall (looks along its rotation)", 0.4);
   await R.hold(0.4);
-  await sayOver("Der Griff an der Spitze des Kegels dreht die Kamera und setzt zugleich die Reichweite.");
+  await sayOver("The handle at the tip of the cone turns the camera and sets its range at the same time.");
   {
     const hnd = await R.editor(`const el = e.renderRoot.querySelector('[data-aim] .fp3d-hit'); if (!el) return null; const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 };`);
     await R.move(hnd.x, hnd.y, 0.6);
     const a = await R.planPoint(4.2, 3.4);
     await R.drag(a.x, a.y, 1.0);
   }
-  await sayOver("Genauer geht es mit Zahlen: „Sichtwinkel“, „Reichweite“ und „Neigung nach unten“.");
-  await fill("Sichtwinkel", "110");
+  await sayOver("For exact values, use the numbers: “Field of view”, “Range” and “Tilt down”, “Reach”, “Tilt down”.");
+  await fill("Field of view", "110");
   await R.hold(0.4);
-  await R.moveTo({ label: "Reichweite" }, 0.4);
+  await R.moveTo({ label: "Reach" }, 0.4);
   await R.hold(0.4);
-  await R.moveTo({ label: "Neigung nach unten" }, 0.4);
-  await sayOver("„Sichtkegel in 3D zeigen“ blendet den Kegel für diese Kamera aus und wieder ein.");
-  await R.clickOn({ text: "Sichtkegel in 3D zeigen" }, 0.5);
+  await R.moveTo({ label: "Tilt down" }, 0.4);
+  await sayOver("“Show the field of view in 3D” – hides and shows the cone for this camera.");
+  await R.clickOn({ text: "Show the field of view in 3D" }, 0.5);
   await R.hold(0.8);
-  await R.clickOn({ text: "Sichtkegel in 3D zeigen" }, 0.3);
-  await sayOver("In 3D endet der Kegel an der ersten Wand: Eine Innenkamera sieht nicht durch die Wand ins Nachbarzimmer.");
+  await R.clickOn({ text: "Show the field of view in 3D" }, 0.3);
+  await sayOver("In 3D the cone stops at the first wall: an indoor camera doesn't see through the wall into the next room.");
   await pane("eg", 3.0, 2.3, { theta: -0.4, phi: 0.6, radius: 10, y: 0.3 });
   await R.move(1150, 560, 0.8);
 
   // ---------------------------------------------------------------- 9. Cameras in 3D
-  await chapter("Kameras in 3D");
-  await sayOver("In 3D hängt die Kamera als kleines Modell an der Wand, ihr Sichtfeld liegt als Kegel auf dem Boden.");
+  await chapter("Cameras in 3D");
+  await sayOver("In 3D, the camera hangs on the wall as a small model, and its field of view lies on the floor as a cone.");
   await R.clickOn({ text: "3D", exact: true }, 0.6);
   await R.sleep(1000);
-  await quiet({ text: "Wohnzimmer", exact: true }, 1500);
-  await R.clickOn('button[aria-label="Schließen"]', 0.01).catch(() => {});
+  await quiet({ text: "Living room", exact: true }, 1500);
+  await R.clickOn('button[aria-label="Close"]', 0.01).catch(() => {});
   // evening: the living room's lights off, so the cone on the floor stands out (set up before the line)
   for (const id of ["light.wohnzimmer_decke", "light.stehlampe", "light.led_band", "light.pixeluhr"]) await service("light", "turn_off", { entity_id: id });
   await service("media_player", "turn_off", { entity_id: "media_player.fernseher" });
@@ -1046,7 +1046,7 @@ if (PART === "b") {
     await R.move(p.x, p.y, 0.7);
   }
   await R.hold(0.5);
-  await sayOver("Meldet ein Bewegungs- oder Präsenzsensor der Kamera Bewegung, wird der Kegel rot.");
+  await sayOver("When a motion or presence sensor of the camera reports movement, the cone turns red.");
   // the demo reports motion now and then: hold the sensors at "off" until the moment it turns red
   await live(R.time + 1.2, async () => {
     if (await R.page.evaluate(() => ["binary_sensor.wohnzimmer_kamera_bewegung", "binary_sensor.wohnzimmer_kamera_person"].some((id) => window.fp3dPanel.hass.states[id].state !== "off"))) {
@@ -1056,41 +1056,41 @@ if (PART === "b") {
   });
   await h.setState("binary_sensor.wohnzimmer_kamera_bewegung", "on");
   await live(R.time + 1.6);
-  await sayOver("Ein Tipp auf die Kamera oder auf ihren Kegel öffnet das Standbild, das sich alle paar Sekunden erneuert. Der Kegel ist die viel größere Tippfläche.");
+  await sayOver("Tapping the camera or its cone opens the snapshot, which refreshes every few seconds. The cone is the much bigger target to tap.");
   {
     const p = await point3d("eg", 1.2, 0.02, 1.3);
     await R.move(p.x, p.y, 0.7);
     await R.click();
     await R.hold(0.8);
   }
-  await sayOver("Ein Tipp aufs Bild öffnet das Livebild von Home Assistant.");
+  await sayOver("Tapping the picture opens the live view from Home Assistant.");
   await R.moveTo(".qm-camera", 0.6).catch(() => {});
   await R.hold(0.6);
-  await sayOver("Mit dem Kamera-Cockpit, einer Pro-Erweiterung, schaust du außerdem durch die Kamera in die 3D-Ansicht und siehst alle Livebilder auf einer Kamera-Wand.");
-  await R.moveTo({ text: "Durch die Kamera schauen" }, 0.6).catch(() => {});
+  await sayOver("With the Camera Cockpit, a Pro extension, you can also look through the camera into the 3D view and see all live pictures on a camera wall.");
+  await R.moveTo({ text: "Look through the camera" }, 0.6).catch(() => {});
   await R.hold(1.0);
-  await R.moveTo({ text: "Kameras", exact: true }, 0.8).catch(() => {});
+  await R.moveTo({ text: "Cameras", exact: true }, 0.8).catch(() => {});
 
   // ---------------------------------------------------------------- 10. Outro
   await chapter("Zusammenfassung");
   await catchUp();
   await R.open("");
   await R.hideCursor();
-  await quiet({ text: "Erdgeschoss", exact: true, nth: 0 }, 1200);
-  await quiet('button[aria-label="Bedienelemente ausblenden – nur die 3D-Ansicht bleibt"]', 700);
+  await quiet({ text: "Ground floor", exact: true, nth: 0 }, 1200);
+  await quiet('button[aria-label="Hide the controls – only the 3D view remains"]', 700);
   {
     const a = { theta: -0.6, phi: 0.95, radius: 13 };
     const b = { theta: 0.4, phi: 0.85, radius: 11 };
     await cam("eg", 5.5, 3.5, a);
     await R.sleep(700);
-    const end = await line("Kurz zusammengefasst: Leuchten sind Möbel mit einem Licht, mit Form, Höhe und Leuchtstärke. Kameras zeigen mit ihrem Kegel, was sie sehen.");
+    const end = await line("To sum up: lamps are furniture with a light, with a shape, a height and a glow setting. Cameras show with their cone what they can see.");
     await glide("eg", 5.5, 3.5, a, b, end - R.time);
   }
-  await R.title("Nächste Folge: Dächer, Teil 1", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+  await R.title("Next episode: Roofs, part 1", `HomePlan 3D – also runs on old wall tablets${VERSION}`);
   {
-    let end = await line("In der nächsten Folge geht es um Dächer: Satteldach, Walmdach und Co.");
+    let end = await line("The next episode is about roofs: gable roofs, hip roofs and more.");
     await live(end);
-    end = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und HomePlan 3D läuft auch auf alten Wandtablets. Bis zum nächsten Mal!");
+    end = await line("Left to the online demo and the manual are in the description. And HomePlan 3D also runs on old wall tablets. See you next time!");
     await live(end + 0.6);
   }
 }

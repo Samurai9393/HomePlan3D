@@ -58,7 +58,7 @@ export class Fp3dQuickMenu extends LitElement {
   declare slatInvert: boolean;
   /** Auto Pro: the car behind a parking spot's pin – its menu replaces the entity's. */
   declare car: CarState | null;
-  /** Klang & Kino: stations and playlists to start on a speaker. */
+  /** Sound & Cinema: stations and playlists to start on a speaker. */
   declare presets: { id: string; label: string; type: string; content: string }[];
   /** Ask before the power button switches. */
   declare confirmSwitch: boolean;
@@ -278,7 +278,7 @@ export class Fp3dQuickMenu extends LitElement {
       </div>`;
   }
 
-  /** Klang & Kino: a media player – cover in the middle, play/pause on it, previous and next around, the volume below. */
+  /** Sound & Cinema: a media player – cover in the middle, play/pause on it, previous and next around, the volume below. */
   private renderMedia(st: HassEntity) {
     const a = st.attributes;
     const playing = st.state === "playing";
@@ -308,7 +308,7 @@ export class Fp3dQuickMenu extends LitElement {
       ${this.renderPlay(st)}`;
   }
 
-  /** Klang & Kino: start something – the player's own sources (Sonos favourites, inputs) and the plan's stations. */
+  /** Sound & Cinema: start something – the player's own sources (Sonos favourites, inputs) and the plan's stations. */
   private renderPlay(st: HassEntity) {
     if (!hasFeature("sound")) return nothing;
     const sources = Array.isArray(st.attributes.source_list) ? (st.attributes.source_list as string[]).slice(0, 10) : [];

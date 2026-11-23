@@ -15,7 +15,7 @@ function rect(id: string, x0: number, z0: number, x1: number, z1: number): Room 
 
 function hassWith(states: HassEntity[], entities: Record<string, { entity_id: string; device_id?: string; area_id?: string }> = {}): HomeAssistant {
   return {
-    language: "de",
+    language: "en",
     connection: {} as HomeAssistant["connection"],
     callWS: async () => undefined as never,
     callService: async () => undefined,
@@ -26,12 +26,12 @@ function hassWith(states: HassEntity[], entities: Record<string, { entity_id: st
 
 function house(): Building {
   const b = emptyBuilding();
-  const eg = { ...newFloor("eg", "EG", 0), rooms: [rect("a", 0, 0, 4, 3), rect("b", 4, 0, 8, 3)] };
+  const eg = { ...newFloor("eg", "Ground floor", 0), rooms: [rect("a", 0, 0, 4, 3), rect("b", 4, 0, 8, 3)] };
   eg.placements = [
     { entity_id: "switch.tv", x: 7, z: 2, y: null },
     { entity_id: "sensor.fridge_power", x: 6, z: 0.5, y: null },
   ];
-  const og = { ...newFloor("og", "OG", 2.75), rooms: [rect("c", 0, 0, 8, 3)] };
+  const og = { ...newFloor("og", "Upper floor", 2.75), rooms: [rect("c", 0, 0, 8, 3)] };
   og.placements = [{ entity_id: "sensor.pc_power", x: 1, z: 1, y: null }];
   b.floors = [eg, og];
   b.energy = { ...b.energy, meter: { floor_id: "eg", x: 0.5, z: 1.5 }, grid: "sensor.grid", solar: "sensor.solar" };

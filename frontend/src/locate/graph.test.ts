@@ -10,13 +10,13 @@ function rect(id: string, name: string, x0: number): Room {
 
 test("rooms carry their floor and area; a door joins the two rooms of its wall", () => {
   const b = emptyBuilding();
-  const floor = { ...newFloor("eg", "EG", 0), rooms: [rect("a", "Küche", 0), rect("b", "Flur", 4), rect("c", "Bad", 8)] };
+  const floor = { ...newFloor("eg", "Ground floor", 0), rooms: [rect("a", "Kitchen", 0), rect("b", "Hallway", 4), rect("c", "Bathroom", 8)] };
   // the shared wall of a and b is a's right edge (edge 1: from [4,0] to [4,3])
   floor.openings = [{ id: "d1", room_id: "a", edge: 1, offset: 1.5, width: 0.9, height: 2.0, type: "door", sill: 0 } as never];
   b.floors = [floor];
   assert.deepEqual(
     locateRooms(b).map((r) => [r.id, r.floor, r.area_id]),
-    [["a", "EG", "a_area"], ["b", "EG", "b_area"], ["c", "EG", "c_area"]],
+    [["a", "Ground floor", "a_area"], ["b", "Ground floor", "b_area"], ["c", "Ground floor", "c_area"]],
   );
   const pairs = doorPairs(b).map((p) => [...p].sort().join("-"));
   assert.deepEqual(pairs, ["a-b"]);
@@ -26,10 +26,10 @@ test("rooms carry their floor and area; a door joins the two rooms of its wall",
 
 test("an outdoor area with an area is a room for locating, joined to the room whose terrace door opens onto it (#828)", () => {
   const b = emptyBuilding();
-  const floor = { ...newFloor("eg", "EG", 0), rooms: [rect("a", "Wohnen", 0)] };
+  const floor = { ...newFloor("eg", "Ground floor", 0), rooms: [rect("a", "Living room", 0)] };
   // the terrace below the room (z 3–6); a terrace door in the room's lower edge (edge 2: from [4,3] to [0,3])
   floor.outdoor = [
-    { id: "t", type: "terrace", name: "Terrasse", area_id: "terrace_area", points: [[0, 3.3], [4, 3.3], [4, 6], [0, 6]] },
+    { id: "t", type: "terrace", name: "Terrace", area_id: "terrace_area", points: [[0, 3.3], [4, 3.3], [4, 6], [0, 6]] },
     { id: "l", type: "lawn", points: [[-5, -5], [10, -5], [10, 10], [-5, 10]] },
   ] as never;
   floor.openings = [{ id: "d1", room_id: "a", edge: 2, offset: 2, width: 1.2, height: 2.1, type: "door", sill: 0 } as never];
@@ -37,7 +37,7 @@ test("an outdoor area with an area is a room for locating, joined to the room wh
   // the lawn without an area stays out
   assert.deepEqual(
     locateRooms(b).map((r) => [r.id, r.name, r.area_id]),
-    [["a", "Wohnen", "a_area"], ["t", "Terrasse", "terrace_area"]],
+    [["a", "Living room", "a_area"], ["t", "Terrace", "terrace_area"]],
   );
   assert.deepEqual(doorPairs(b), [["a", "t"]]);
   assert.equal(roomAt(b, "eg", 2, 5), "t");

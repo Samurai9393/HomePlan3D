@@ -5,7 +5,7 @@ import { houseShadow, shadowBox, SHADOW_REACH, sunEdge } from "./sun-shadow.ts";
 
 function box(height: number): Building {
   const b = emptyBuilding();
-  const f = newFloor("eg", "EG", 0);
+  const f = newFloor("eg", "Ground floor", 0);
   f.height = height;
   f.rooms = [{ id: "r", name: "r", area_id: null, points: [[0, 0], [4, 0], [4, 4], [0, 4]], floor_material: "wood" }];
   b.floors = [f];

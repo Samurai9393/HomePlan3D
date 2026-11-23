@@ -99,7 +99,7 @@ await hold(3);
 await inPage(`view._voice = { phase: "listen", text: "Listening …" };`);
 await hold(10);
 await inPage(`
-  view._voice = { phase: "done", text: "“Show the living room” → Wohnzimmer" };
+  view._voice = { phase: "done", text: "“Show the living room” → Living room" };
   view.fire("floor-tap", { floorId: "eg" });
   setTimeout(() => view.fire("room-tap", { floorId: "eg", roomId: "wohnen" }), 60);
 `);

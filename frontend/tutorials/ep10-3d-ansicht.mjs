@@ -1,15 +1,15 @@
-// Tutorial episode 10 – "Die 3D-Ansicht bedienen", in two parts (manual chapter 5 does not fit into 8 minutes):
-//   a) Navigieren und alle Schalter: house / floor / room (labels, drag, wheel, Esc, „Zurück“, double tap on a free
-//      spot, floor pictures and their fold arrow, the bar at the top with ≡ / ↔), „Wände hoch“ / „Schnitt“,
-//      „Auseinander“ / „Gestapelt“, „Dach bleibt“, „Abgedunkelt“ / „Gestapelt“ / „Einzeln“, the heatmap (Temp.,
-//      Feuchte, CO₂, Werte, Normal), „Raumnamen“, „Spur“ / „Kameras“ / „Wetter“ (Pro, one sentence), the header
-//      options (quality, look, accent colour, markers, ◧ / ◨, ⌖ „Ansicht halten“, FPS, version, ⚙ on phones) and the
-//      eye (Energie Pro in one sentence).
+// Tutorial episode 10 – "Die 3D-View bedienen", in two parts (manual chapter 5 does not fit into 8 minutes):
+//   a) navigating and all the switches: house / floor / room (labels, drag, wheel, Esc, “Back”, double tap on a free
+//      spot, floor pictures and their fold arrow, the bar at the top with ≡ / ↔), “Tall walls” / “Cut”,
+//      “Apart” / “Stacked”, “Roof stays”, “Dimmed” / “Stacked” / “Alone”, the heatmap (Temp.,
+//      Humidity, CO₂, Values, Normal), “Room names”, “Trail” / “Cameras” / “Weather” (Pro, one sentence), the header
+//      options (quality, look, accent colour, markers, ◧ / ◨, ⌖ “Keep view”, FPS, version, ⚙ on phones) and the
+//      eye (Energy Pro in one sentence).
 //   b) Bedienen: tap, swipe, long press on lamps and blinds, windows, TV, double tap on a room, the room panel, the
 //      star (central menu, favourites, own buttons), the search, warnings, sun and daylight, cameras in 3D, the
 //      start views of house, floor and room.
 // The full demo house (invented data, mock Home Assistant). Setup steps before a scene are invisible.
-// Usage (from frontend/): node tutorials/ep10-3d-ansicht.mjs <out-dir> a|b [<voice-dir de> [<voice-dir en>]]
+// Usage (from frontend/): node tutorials/ep10-3d-ansicht.mjs <out-dir> a|b [<voice-dir>]
 //   (voice dirs: private/tutorial-audio/ep10a/de and …/en, resp. ep10b)
 // EP10_FAST=1: a quick dry run for checking the steps (the timing is not usable).
 // Then: python ../tools/make-tutorial.py <out-dir> <out.mp4> --en tutorials/ep10a-narration-en.json
@@ -19,10 +19,10 @@ import { FPS, narration, startRecorder } from "./recorder.mjs";
 const out = process.argv[2] ?? "tutorial-ep10";
 const PART = process.argv[3] === "b" ? "b" : "a";
 const FAST = !!process.env.EP10_FAST;
-// the controls side (◧ / ◨) and „Ansicht halten“ (⌖) come with 1.12.7; the recorded build already has them
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D 1.12.7</span>`;
+// the controls side (◧ / ◨) and “Keep view” (⌖) come with 1.12.7; the recorded build already has them
+const VERSION = `<br><span style="font-size:20px;opacity:.7">recorded with HomePlan 3D 1.12.7</span>`;
 
-const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "de" });
+const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "en" });
 const N = narration(R, process.argv.slice(4));
 const { say, sayOver, chapter, catchUp } = N;
 if (FAST) {
@@ -77,10 +77,10 @@ const clickLive = async (target, seconds = 0.5, flight = 1.2) => {
   await R.click();
   await live(R.time + flight);
 };
-const EYE = 'button[aria-label="Bedienelemente ausblenden – nur die 3D-Ansicht bleibt"]';
-const EYE_BACK = 'button[aria-label="Bedienelemente wieder einblenden"]';
-const STAR = 'button[aria-label="Zentral: alle Lichter, Rollläden und Favoriten"]';
-const FIND = 'button[aria-label="Suchen"]';
+const EYE = 'button[aria-label="Hide the controls – only the 3D view remains"]';
+const EYE_BACK = 'button[aria-label="Show the controls again"]';
+const STAR = 'button[aria-label="Central: all lights, blinds and favourites"]';
+const FIND = 'button[aria-label="Search"]';
 /** The main 3D view's viewer object. */
 const VIEWER = `const v = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-view3d"); const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);`;
 /** Set the main 3D view's camera around a plan point of a floor (or the house when floorId is null). */
@@ -285,9 +285,9 @@ if (PART === "a") {
     const b = { theta: d.theta + 0.3, phi: d.phi - 0.05, radius: d.radius * 0.92 };
     await cam(null, 0, 0, a);
     await R.sleep(1200);
-    await R.title("Die 3D-Ansicht bedienen", `HomePlan 3D · Folge 10 · Teil 1${VERSION}`);
-    const l1 = "Die 3D-Ansicht ist das, was du jeden Tag benutzt: dein Haus live, zum Anschauen und zum Bedienen.";
-    const l2 = "In dieser Folge zeige ich dir jeden Knopf und jeden Schalter darin.";
+    await R.title("Die 3D-View bedienen", `HomePlan 3D · Episode 10 · part 1${VERSION}`);
+    const l1 = "The 3D view is what you use every day: your home live, to look at and to control.";
+    const l2 = "In this episode I show you every button and every switch in it.";
     const total = N.length(l1) + N.length(l2);
     const t0 = R.time;
     const step = async (end) => {
@@ -305,159 +305,159 @@ if (PART === "a") {
   }
 
   // ---------------------------------------------------------------- 2. Intro
-  await chapter("Worum es heute geht");
+  await chapter("Worum es today geht");
   await fresh();
   await R.move(960, 560, 0.01);
-  await sayOver("Folge 10 hat zwei Teile. In Teil 1 geht es ums Navigieren und um alle Schalter der Ansicht.");
+  await sayOver("Episode 10 has two parts. Part 1 is about getting around and about all the switches of the view.");
   await R.move(700, 1040, 1.2);
   await R.move(1500, 70, 1.4);
-  await sayOver("Teil 2 zeigt das Bedienen: Lampen und Rollläden, Raumfenster, Stern, Suche, Warnungen und Startansichten. Ich nehme das Demo-Haus aus der Online-Demo.");
+  await sayOver("Part 2 is about controlling things: lamps and blinds, the room panel, the star, the search, warnings and start views. I'm using the demo house from the online demo.");
   await R.move(960, 520, 1.2);
 
   // ---------------------------------------------------------------- 3. House, floor, room
-  await chapter("Haus, Etage, Raum");
-  await sayOver("Oben auf „3D“ siehst du zuerst das ganze Haus. Jede Etage hat eine Beschriftung: wie viele Räume und wie viele Lichter gerade an sind.");
+  await chapter("House, Floor, Room");
+  await sayOver("At the top, on “3D”, you first see the whole house. Every floor has a label: how many rooms and how many lights are on right now.");
   await R.moveTo({ text: "3D", exact: true, nth: 0 }, 0.6);
   await R.hold(0.5);
   await R.moveTo('button[data-floor="og"]', 0.7);
   await R.hold(0.6);
   await R.moveTo('button[data-floor="eg"]', 0.6);
-  await sayOver("Ziehen dreht die Ansicht, das Mausrad oder zwei Finger zoomen.");
+  await sayOver("Dragging turns the view, the mouse wheel or two fingers zoom.");
   await R.move(1000, 640, 0.5);
   await turn(-320, -40, 1.4);
   await wheel(-500, 1.0);
   await wheel(400, 0.8);
-  await sayOver("Ein Tipp auf die Beschriftung öffnet die Etage. Die Etagen darüber fliegen weg.");
+  await sayOver("A tap on the label opens the floor. The floors above fly away.");
   await clickLive('button[data-floor="eg"]', 0.6, 2.0);
-  await sayOver("Ein Tipp auf einen Raum fliegt hinein, und rechts öffnet sich das Raumfenster – dazu mehr in Teil 2.");
+  await sayOver("A tap on a room flies into it, and the room panel opens on the right – more about it in part 2.");
   await clickLive('button[data-room="wohnen"]', 0.6, 2.4);
-  await sayOver("Eine Ebene höher geht es mit Esc, mit „Zurück“ unten …");
+  await sayOver("You go up one level with Esc, with “Back” – at the bottom …");
   await R.move(1000, 640, 0.5);
   await R.key("Escape");
   await live(R.time + 1.2);
-  await clickLive({ text: "Zurück", exact: true }, 0.7, 1.4);
-  await sayOver("… oder mit einem Doppeltipp auf eine freie Stelle.");
+  await clickLive({ text: "Back", exact: true }, 0.7, 1.4);
+  await sayOver("… or with a double tap on an empty spot.");
   await clickLive('button[data-floor="eg"]', 0.6, 1.6);
   await R.move(1500, 260, 0.6);
   await dbl();
   await live(R.time + 0.7);
-  await sayOver("Links stehen die Etagenbilder. Ein Tipp wechselt direkt zu einer Etage, das Haus darüber zeigt wieder alle.");
-  await clickLive({ text: "Obergeschoss", exact: true, nth: 1 }, 0.6, 1.8);
-  await clickLive({ text: "Alle Etagen", exact: true, nth: 1 }, 0.5, 1.4);
-  await sayOver("Der kleine Pfeil darüber klappt sie zu schlichten Knöpfen ein – und wieder auf. Das merkt sich das Gerät.");
-  await R.clickOn('button[aria-label="Etagenbilder zu Knöpfen einklappen"]', 0.6);
+  await sayOver("On the left are the floor pictures. A tap jumps straight to a floor, the house above them shows all floors again.");
+  await clickLive({ text: "Upper floor", exact: true, nth: 1 }, 0.6, 1.8);
+  await clickLive({ text: "All floors", exact: true, nth: 1 }, 0.5, 1.4);
+  await sayOver("The small arrow above them folds them into plain buttons – and back. The device remembers that.");
+  await R.clickOn('button[aria-label="Fold the floor pictures into buttons"]', 0.6);
   await R.hold(1.0);
-  await R.clickOn('button[aria-label="Etagenbilder wieder zeigen"]', 0.4);
-  await sayOver("Oben in der Leiste stehen alle Etagen und die Räume. In der Hausansicht steht vor den Räumen jeder Etage ihr Name.");
-  await R.moveTo({ text: "Alle Etagen", exact: true, nth: 0 }, 0.6);
+  await R.clickOn('button[aria-label="Show the floor pictures again"]', 0.4);
+  await sayOver("The bar at the top lists all floors and the rooms. In the house view each floor's rooms come after its name.");
+  await R.moveTo({ text: "All floors", exact: true, nth: 0 }, 0.6);
   await R.hold(0.4);
-  await moveToText("Erdgeschoss", 0.6, 1, "SPAN");
+  await moveToText("Ground floor", 0.6, 1, "SPAN");
   await R.hold(0.4);
-  await sayOver("Passen nicht alle in eine Zeile, scrollt die Leiste seitlich, am PC mit dem Mausrad. Der Knopf rechts bricht sie auf mehrere Zeilen um, ein zweiter Tipp holt die eine Zeile zurück.");
-  await R.clickOn('button[aria-label="Leiste umbrechen: alle Etagen und Räume auf mehreren Zeilen"]', 0.8);
+  await sayOver("If they don't fit into one row, the bar scrolls sideways, on a PC with the mouse wheel. The button on the right wraps it onto several rows, a second tap brings back the single row.");
+  await R.clickOn('button[aria-label="Wrap the bar: every floor and room on several lines"]', 0.8);
   await R.hold(1.2);
-  await R.clickOn('button[aria-label="Leiste in einer Zeile (seitlich scrollen)"]', 0.5);
+  await R.clickOn('button[aria-label="Bar in one line (scrolls sideways)"]', 0.5);
 
   // ---------------------------------------------------------------- 4. Walls
-  await chapter("Wände hoch und Schnitt");
+  await chapter("Tall walls and cut");
   await quiet('button[data-floor="eg"]', 1800);
-  await sayOver("Unten liegen die Schalter. „Wände hoch“ zeigt die Wände in voller Höhe; die vorderen werden zu getöntem Glas, damit du trotzdem hineinsiehst.");
-  await R.moveTo({ text: "Wände hoch", exact: true }, 0.7);
+  await sayOver("The switches are at the bottom. “Tall walls” – shows the walls at full height; the front ones turn into tinted glass so you can still see inside.");
+  await R.moveTo({ text: "Tall walls", exact: true }, 0.7);
   await R.hold(0.3);
   await orbit(0.5, 0.75, 2.4);
-  await sayOver("„Schnitt“ schneidet alle Wände auf Hüfthöhe. Hohe Möbel wie Schrank, Treppe oder Hochschrank werden mitgeschnitten, damit sie nichts dahinter verdecken.");
-  await R.clickOn({ text: "Schnitt", exact: true }, 0.5);
+  await sayOver("“Cut” – cuts all walls at hip height. Tall furniture like wardrobes, stairs or tall cabinets is cut as well, so it doesn't hide anything behind it.");
+  await R.clickOn({ text: "Cut", exact: true }, 0.5);
   await orbit(-0.5, 1, 3.0);
-  await sayOver("Die Wahl merkt sich jedes Gerät: Das Wandtablet zeigt vielleicht den Schnitt, das Handy die hohen Wände.");
-  await R.clickOn({ text: "Wände hoch", exact: true }, 0.6);
+  await sayOver("Every device remembers its choice: the wall tablet may show the cut, the phone the tall walls.");
+  await R.clickOn({ text: "Tall walls", exact: true }, 0.6);
   await R.hold(0.8);
 
   // ---------------------------------------------------------------- 5. Floors and roof
-  await chapter("Etagen und Dach");
-  await sayOver("In der Hausansicht kommen zwei Schalter dazu. „Auseinander“ zieht die Etagen auseinander, „Gestapelt“ setzt sie aufeinander wie im echten Haus.");
-  await clickLive({ text: "Alle Etagen", exact: true, nth: 0 }, 0.6, 1.4);
-  await R.clickOn({ text: "Gestapelt", exact: true }, 0.6);
+  await chapter("Floors and roof");
+  await sayOver("The house view adds two switches. “Apart” – pulls the floors apart, “Stacked” – puts them on top of each other like the real house.");
+  await clickLive({ text: "All floors", exact: true, nth: 0 }, 0.6, 1.4);
+  await R.clickOn({ text: "Stacked", exact: true }, 0.6);
   await live(R.time + 1.6);
-  await R.clickOn({ text: "Auseinander", exact: true }, 0.5);
+  await R.clickOn({ text: "Apart", exact: true }, 0.5);
   await live(R.time + 1.2);
-  await sayOver("Normalerweise hebt sich das Dach beim Heranzoomen und blendet sich aus, damit du ins Haus siehst.");
-  await R.clickOn({ text: "Gestapelt", exact: true }, 0.5);
+  await sayOver("Normally the roof lifts and fades out as you zoom in, so you can look into the house.");
+  await R.clickOn({ text: "Stacked", exact: true }, 0.5);
   await R.move(960, 560, 0.6);
   const houseCam = await camNow();
   await orbit(0, 0.75, 1.8);
   await live(R.time + 0.6);
-  await sayOver("Mit „Dach bleibt“ bleibt es liegen – gut, wenn du das Haus von außen zeigen willst, etwa das Dach mit der Solaranlage.");
-  await R.clickOn({ text: "Dach bleibt", exact: true }, 0.6);
+  await sayOver("With “Roof stays” it stays in place. Tap when you want to show the house from outside, say the roof with the solar panels.");
+  await R.clickOn({ text: "Roof stays", exact: true }, 0.6);
   await live(R.time + 1.6);
-  await R.clickOn({ text: "Dach bleibt", exact: true }, 0.4);
+  await R.clickOn({ text: "Roof stays", exact: true }, 0.4);
   await R.move(960, 560, 0.5);
   await glide(null, 0, 0, await camNow(), houseCam, 1.0);
-  await R.clickOn({ text: "Auseinander", exact: true }, 0.5);
-  await sayOver("Ist eine Etage offen, wählst du, was mit den Etagen darunter passiert: „Abgedunkelt“ …");
+  await R.clickOn({ text: "Apart", exact: true }, 0.5);
+  await sayOver("With a floor open, you choose what happens to the floors below: “Dimmed” …");
   await clickLive('button[data-floor="og"]', 0.6, 1.8);
-  await R.moveTo({ text: "Abgedunkelt", exact: true }, 0.5);
+  await R.moveTo({ text: "Dimmed", exact: true }, 0.5);
   await R.hold(0.4);
-  await sayOver("… „Gestapelt“ – das ganze Haus bis hier – oder „Einzeln“, nur diese eine Etage.");
-  await R.clickOn({ text: "Gestapelt", exact: true }, 0.5);
+  await sayOver("… “Stacked” – the whole house up to here – or “Alone” – just this one floor.");
+  await R.clickOn({ text: "Stacked", exact: true }, 0.5);
   await live(R.time + 1.4);
-  await R.clickOn({ text: "Einzeln", exact: true }, 0.5);
+  await R.clickOn({ text: "Alone", exact: true }, 0.5);
   await live(R.time + 1.2);
-  await R.clickOn({ text: "Abgedunkelt", exact: true }, 0.5);
+  await R.clickOn({ text: "Dimmed", exact: true }, 0.5);
 
   // ---------------------------------------------------------------- 6. Heatmap
-  await chapter("Heatmap und Werte");
-  await quiet({ text: "Erdgeschoss", exact: true, nth: 0 }, 1800);
-  await sayOver("Die nächste Gruppe ist die Heatmap. „Temp.“ färbt die Böden nach der Temperatur im Raum, am Rand steht die Farbskala.");
+  await chapter("Heatmap and values");
+  await quiet({ text: "Ground floor", exact: true, nth: 0 }, 1800);
+  await sayOver("The next group is the heatmap. “Temp.” colours the floors by the temperature in the room, the colour scale is at the edge.");
   await R.clickOn({ text: "Temp.", exact: true }, 0.6);
   await R.hold(0.6);
   await R.moveTo(".fp3d-legend", 0.6);
-  await sayOver("Es zählen die Sensoren im Bereich des Raums. Die Einheit kommt aus Home Assistant, Celsius oder Fahrenheit, und wird richtig umgerechnet.");
+  await sayOver("It uses the sensors in the room's area. The unit comes from Home Assistant, Celsius or Fahrenheit, and is converted correctly.");
   await orbit(0.35, 1, 2.2);
-  await sayOver("„Feuchte“ und „CO2“ funktionieren genauso. Hat kein Raum so einen Sensor, steht das in der Skala.");
-  await R.clickOn({ text: "Feuchte", exact: true }, 0.5);
+  await sayOver("“Humidity” – and “CO2” work the same way. If no room has such a sensor, the scale says so.");
+  await R.clickOn({ text: "Humidity", exact: true }, 0.5);
   await R.hold(1.0);
   await R.clickOn({ text: "CO₂", exact: true }, 0.5);
   await R.hold(0.8);
-  await sayOver("„Werte“ färbt nichts, sondern schreibt Temperatur, Feuchte und CO2 als Zahlen unter die Raumnamen.");
-  await R.clickOn({ text: "Werte", exact: true }, 0.5);
+  await sayOver("“Values” – colours nothing; it writes temperature, humidity and CO2 as numbers under the room names.");
+  await R.clickOn({ text: "Values", exact: true }, 0.5);
   await R.hold(1.0);
-  await sayOver("„Normal“ schaltet die Heatmap wieder ab.");
+  await sayOver("“Normal” turns the heatmap off again.");
   await R.clickOn({ text: "Normal", exact: true }, 0.5);
 
   // ---------------------------------------------------------------- 7. Room names and the Pro switches
-  await chapter("Raumnamen, Spur, Kameras und Wetter");
-  await sayOver("„Raumnamen“ blendet die Namen der Räume aus und wieder ein – für ein ruhiges Bild an der Wand.");
-  await R.clickOn({ text: "Raumnamen", exact: true }, 0.6);
+  await chapter("Room names, trail, cameras and weather");
+  await sayOver("“Room names” – hides the room names and shows them again – for a calm picture on the wall.");
+  await R.clickOn({ text: "Room names", exact: true }, 0.6);
   await R.hold(1.2);
-  await R.clickOn({ text: "Raumnamen", exact: true }, 0.4);
-  await sayOver("„Spur“ und „Kameras“ gehören zur Erweiterung Kamera-Cockpit, „Wetter“ zu Wetter draußen. Ohne die Erweiterung steht ein Schloss davor.");
-  await R.moveTo({ text: "Spur", exact: true }, 0.6);
+  await R.clickOn({ text: "Room names", exact: true }, 0.4);
+  await sayOver("“Trail” and “Cameras” and “Cameras” – belong to the Camera Cockpit extension, “Weather” – to Outdoor Weather. Without the extension there's a lock in front of them.");
+  await R.moveTo({ text: "Trail", exact: true }, 0.6);
   await R.hold(0.6);
-  await R.moveTo({ text: "Kameras", exact: true }, 0.4);
+  await R.moveTo({ text: "Cameras", exact: true }, 0.4);
   await R.hold(0.6);
-  await R.moveTo({ text: "Wetter", exact: true }, 0.4);
+  await R.moveTo({ text: "Weather", exact: true }, 0.4);
   await R.hold(0.6);
 
   // ---------------------------------------------------------------- 8. Quality and look
-  await chapter("Qualität und Look");
-  await sayOver("Oben rechts stehen die Ansichtsoptionen. Zuerst die Qualität: „Auto“ wählt selbst.");
+  await chapter("Quality and look");
+  await sayOver("The view options are at the top right. Ridge, the quality: “Auto” chooses by itself.");
   await R.moveTo({ text: "Auto", exact: true }, 0.8);
-  await sayOver("„Tablet“ lässt Muster, Schatten und Lichthöfe weg. Das ist die sparsamste Stufe, auf Fire-Tablets wird sie von selbst gewählt.");
+  await sayOver("“Tablet” leaves out patterns, shadows and halos. It's the lightest level, and on Fire tablets it's chosen automatically.");
   await R.clickOn({ text: "Tablet", exact: true }, 0.5);
   await live(R.time + 1.5);
-  await sayOver("„Hoch“ zeigt zusätzlich Lichtkegel unter den Spots, wie hier im Bad.");
-  await R.clickOn({ text: "Hoch", exact: true }, 0.5);
+  await sayOver("“High” – also shows light cones under the spots, like here in the bathroom.");
+  await R.clickOn({ text: "High", exact: true }, 0.5);
   await live(R.time + 1.2);
   await R.clickOn({ text: "Auto", exact: true }, 0.5);
-  await sayOver("Daneben der Look: „Neon“ ist der Standard, „Blueprint“ sieht aus wie ein Bauplan, und „Tag“ zeigt das Haus hell.");
+  await sayOver("Next to it is the look: “Neon” is the default, “Blueprint” looks like a construction plan, and “Day” – shows the house bright.");
   await R.clickOn({ text: "Blueprint", exact: true }, 0.6);
   await live(R.time + 1.4);
-  await R.clickOn({ text: "Tag", exact: true }, 0.5);
+  await R.clickOn({ text: "Day", exact: true }, 0.5);
   await live(R.time + 1.4);
   await R.clickOn({ text: "Neon", exact: true }, 0.5);
-  await sayOver("Das Farbfeld daneben setzt deine eigene Akzentfarbe. Im Neon-Look nehmen Linien und Leuchtkanten sie an, Knöpfe und Pins in jedem Look.");
+  await sayOver("The colour field next to it sets your own accent colour. In the Neon look, lines and glowing edges take it on, buttons and pins in every look.");
   // only a ring on the colour field: a real click would open the native colour picker
-  await R.moveTo('input[aria-label="Akzentfarbe"]', 0.6);
+  await R.moveTo('input[aria-label="Accent colour"]', 0.6);
   await ringHere();
   await R.page.evaluate(() => {
     const walk = function* (root) {
@@ -467,19 +467,19 @@ if (PART === "a") {
       }
     };
     for (const el of walk(document)) {
-      if (el.matches?.('input[aria-label="Akzentfarbe"]')) {
+      if (el.matches?.('input[aria-label="Accent colour"]')) {
         el.value = "#ff8a00";
         el.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
       }
     }
   });
   await live(R.time + 1.6);
-  await sayOver("Der Pfeil daneben bringt das Cyan zurück.");
-  await R.clickOn('button[aria-label="Zurück zu Cyan"]', 0.5);
+  await sayOver("The arrow next to it brings back the cyan.");
+  await R.clickOn('button[aria-label="Back to cyan"]', 0.5);
   await R.hold(0.5);
 
   // ---------------------------------------------------------------- 9. Markers, controls side, keep view, FPS
-  await chapter("Symbole, Seite, Ansicht halten, FPS");
+  await chapter("Markers, Page, Keep view, FPS");
   // a calm house for the FPS counter (music paused, no colour effect, the robot docked, no solar sweep)
   for (const id of ["media_player.kueche_lautsprecher", "media_player.bad_lautsprecher", "media_player.fernseher"]) await setState(id, "paused");
   await setState("light.led_band", "on", { effect: "none" });
@@ -487,44 +487,44 @@ if (PART === "a") {
   // the solar modules sweep while they produce: evening for the counter
   await setState("sensor.pv_leistung", "0");
   await setState("sensor.balkon_leistung", "0");
-  await sayOver("„Symbole“ bestimmt, welche Gerätesymbole erscheinen. „Alle“ zeigt jedes Gerät …");
-  await R.clickOn({ text: "Alle", exact: true }, 0.6);
+  await sayOver("“Symbols” – decides which device symbols appear. “All” – shows every device …");
+  await R.clickOn({ text: "All", exact: true }, 0.6);
   await R.hold(1.0);
-  await sayOver("„Wichtige“ nur Geräte ohne eigenes 3D-Modell und Werte wie Watt oder die laufende App. „Keine“ blendet sie aus.");
-  await R.clickOn({ text: "Wichtige", exact: true }, 0.5);
+  await sayOver("… “Important” – only devices without their own 3D model, and values like watts or the running app. “None” – hides them.");
+  await R.clickOn({ text: "Important", exact: true }, 0.5);
   await R.hold(1.0);
-  await R.clickOn({ text: "Keine", exact: true }, 0.5);
+  await R.clickOn({ text: "None", exact: true }, 0.5);
   await R.hold(0.8);
-  await R.clickOn({ text: "Wichtige", exact: true }, 0.5);
-  await sayOver("Die zwei Knöpfe mit den halben Kästchen setzen Etagenbilder, Stern, Suche und Auge nach links oder nach rechts – praktisch, wenn die Ansicht am linken Rand des Dashboards sitzt.");
-  await R.clickOn('button[aria-label="Bedienleiste rechts"]', 0.6);
+  await R.clickOn({ text: "Important", exact: true }, 0.5);
+  await sayOver("The two buttons with the half squares put the floor pictures, the star, the search and the eye on the left or on the right – handy when the view sits at the left edge of the dashboard.");
+  await R.clickOn('button[aria-label="Controls on the right"]', 0.6);
   await R.hold(1.4);
-  await R.clickOn('button[aria-label="Bedienleiste links"]', 0.5);
-  await sayOver("Das Fadenkreuz heißt „Ansicht halten“: Wechselst du die Etage, bleibt die Kamera, wo sie ist, nur die Höhe wandert mit.");
-  await R.clickOn('button[aria-label="Ansicht halten"]', 0.6);
+  await R.clickOn('button[aria-label="Controls on the left"]', 0.5);
+  await sayOver("The crosshair is called “Keep view”: when you switch floors, the camera stays where it is, only the height moves along.");
+  await R.clickOn('button[aria-label="Keep view"]', 0.6);
   await R.move(1000, 640, 0.5);
   await turn(-150, 20, 0.9);
-  await clickLive({ text: "Obergeschoss", exact: true, nth: 1 }, 0.6, 1.6);
-  await clickLive({ text: "Erdgeschoss", exact: true, nth: 1 }, 0.5, 1.4);
-  await R.clickOn('button[aria-label="Ansicht halten"]', 0.6);
-  await sayOver("„FPS“ zeigt unten rechts die Bildrate, das langsamste Bild und den Grund für jedes gezeichnete Bild.");
+  await clickLive({ text: "Upper floor", exact: true, nth: 1 }, 0.6, 1.6);
+  await clickLive({ text: "Ground floor", exact: true, nth: 1 }, 0.5, 1.4);
+  await R.clickOn('button[aria-label="Keep view"]', 0.6);
+  await sayOver("“FPS” shows the frame rate at the bottom right, the slowest frame and the reason for every frame drawn.");
   await R.clickOn({ text: "FPS", exact: true }, 0.6);
   await live(R.time + 1.0);
-  await sayOver("In Ruhe steht dort null Bilder pro Sekunde: NeonPlan zeichnet nur, wenn sich etwas ändert. Darum läuft es auch auf alten Wandtablets.");
+  await sayOver("At rest it says zero frames per second: NeonPlan only draws when something changes. That's why it also runs on old wall tablets.");
   await live(R.time + 2.0);
   await R.clickOn({ text: "FPS", exact: true }, 0.5);
-  await sayOver("Ganz rechts steht die installierte Version. Auf dem Handy klappt ein Zahnrad diese Optionen auf und wieder zu.");
+  await sayOver("The installed version is on the far right. On a phone, a gear folds these options open and closed.");
   await moveToText("v1.", 0.6, null, "SPAN");
   await R.hold(0.6);
 
   // ---------------------------------------------------------------- 10. The eye
   await chapter("Das Auge");
-  await sayOver("Unten links, neben der Lupe, sitzt das Auge. Ein Tipp blendet alles aus, was nicht die 3D-Ansicht ist: Kopfzeile, Leisten, Etagenbilder und Schalter.");
+  await sayOver("At the bottom left, next to the magnifier, sits the eye. One tap hides everything that isn't the 3D view: header, bars, floor pictures and switches.");
   await R.clickOn(EYE, 0.7);
   await live(R.time + 1.2);
-  await sayOver("Auch die Energiewerte oben links verschwinden – die zeigt die Pro-Erweiterung Energie Pro.");
+  await sayOver("The energy values at the top left disappear too – they come from the Energy Pro extension.");
   await R.move(180, 160, 0.8);
-  await sayOver("Ein Raum lässt sich weiter antippen, und ein Tipp aufs Auge holt alles zurück. Auch diese Wahl merkt sich jedes Gerät, wie alle Schalter.");
+  await sayOver("You can still tap a room, and a tap on the eye brings everything back. Every device remembers this choice too, like all the switches.");
   await R.clickOn(EYE_BACK, 0.7);
   await R.hold(0.8);
 
@@ -540,12 +540,12 @@ if (PART === "a") {
     const b = { theta: d.theta + 1.0, phi: d.phi - 0.08, radius: d.radius * 0.9 };
     await cam(null, 0, 0, a);
     await R.sleep(700);
-    const end = await line("Das waren Haus, Etage und Raum und alle Schalter der Ansicht.");
+    const end = await line("That was house, floor and room, and all the switches of the view.");
     await glide(null, 0, 0, a, { ...b, theta: 0.5 }, end - R.time);
-    await R.title("Teil 2: Das Haus bedienen", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
-    let e2 = await line("In Teil 2 bedienen wir das Haus: Lampen, Rollläden, Raumfenster, Stern, Suche, Warnungen und Startansichten.");
+    await R.title("part 2: Das House bedienen", `HomePlan 3D – also runs on old wall tablets${VERSION}`);
+    let e2 = await line("In part 2 we control the house: lamps, blinds, room panel, star, search, warnings and start views.");
     await glide(null, 0, 0, { ...b, theta: 0.5 }, b, e2 - R.time);
-    e2 = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Bis gleich!");
+    e2 = await line("Left to the online demo and the manual are in the description. See you in a moment!");
     await live(e2 + 0.6);
   }
 }
@@ -615,9 +615,9 @@ if (PART === "b") {
     const b = { theta: 0.45, phi: 0.72, radius: 8.5, y: 0.4 };
     await cam("eg", 6.5, 2.4, a);
     await R.sleep(1200);
-    await R.title("Die 3D-Ansicht bedienen", `HomePlan 3D · Folge 10 · Teil 2${VERSION}`);
-    const l1 = "Licht an, Rollladen runter, eine Szene starten – alles direkt im 3D-Haus.";
-    const l2 = "In Teil 2 zeige ich dir, wie du dein Zuhause in der 3D-Ansicht bedienst.";
+    await R.title("Die 3D-View bedienen", `HomePlan 3D · Episode 10 · part 2${VERSION}`);
+    const l1 = "Lights on, blinds down, start a scene – all right in the 3D house.";
+    const l2 = "In part 2 I show you how to control your home in the 3D view.";
     const total = N.length(l1) + N.length(l2);
     const t0 = R.time;
     const step = async (end) => {
@@ -635,21 +635,21 @@ if (PART === "b") {
   }
 
   // ---------------------------------------------------------------- 2. Intro
-  await chapter("Worum es heute geht");
+  await chapter("Worum es today geht");
   await fresh();
   await quiet('button[data-floor="eg"]', 1800);
   await R.move(960, 560, 0.01);
-  await sayOver("In Teil 1 ging es ums Navigieren und um die Schalter. Jetzt bedienen wir: Lampen, Rollläden, das Raumfenster, den Stern mit den Favoriten und die Suche.");
+  await sayOver("Part 1 was about getting around and the switches. Now we control things: lamps, blinds, the room panel, the star with the favourites, and the search.");
   await R.move(1300, 600, 1.4);
-  await sayOver("Danach Warnungen, Sonnenlicht, Kameras und die Startansicht für Haus, Etage und Raum.");
+  await sayOver("After that: warnings, sunlight, cameras, and the start view for house, floor and room.");
   await R.move(60, 950, 1.2);
 
   // ---------------------------------------------------------------- 3. Lamps
-  await chapter("Lampen schalten und dimmen");
+  await chapter("Switch and dim lamps");
   await noMotion();
   await cam("eg", 4.2, 1.6, { theta: -0.35, phi: 0.78, radius: 9, y: 0.6 });
   await R.sleep(800);
-  await sayOver("Ein Tipp auf eine Lampe schaltet sie. Sie blinkt kurz zur Bestätigung.");
+  await sayOver("A tap on a lamp switches it. It bleft briefly to confirm.");
   {
     const p = await point3d("eg", 5.3, 1.35, 0.7);
     await R.move(p.x, p.y, 0.7);
@@ -658,7 +658,7 @@ if (PART === "b") {
     await R.click();
     await live(R.time + 0.8);
   }
-  await sayOver("Senkrecht wischen dimmt: nach oben heller, nach unten dunkler. Der Wert steht dabei am Finger.");
+  await sayOver("Swiping vertically dims it: up is brighter, down is darker. The value shows next to your finger.");
   {
     const p = await point3d("eg", 5.3, 1.35, 0.7);
     await R.move(p.x, p.y, 0.3);
@@ -668,7 +668,7 @@ if (PART === "b") {
     await R.page.mouse.up();
     await live(R.time + 0.6);
   }
-  await sayOver("Lange drücken öffnet das Schnellmenü: Helligkeit, Farbtemperatur und Farben.");
+  await sayOver("A long press opens the quick menu: brightness, colour temperature and colours.");
   {
     const p = await point3d("eg", 5.3, 1.35, 0.7);
     await R.move(p.x, p.y, 0.4);
@@ -681,7 +681,7 @@ if (PART === "b") {
     }
     await live(R.time + 0.8);
   }
-  await sayOver("Ein Doppeltipp auf den Boden eines Raums schaltet alle Lichter des Raums aus – und wieder an.");
+  await sayOver("A double tap on the floor of a room switches all the room's lights off – and on again.");
   {
     await away();
     const p = await point3d("eg", 2.2, 0, 3.6);
@@ -697,12 +697,12 @@ if (PART === "b") {
     }
     await live(R.time + 1.0);
   }
-  await sayOver("Geräte mit „Vor dem Schalten nachfragen“ bleiben dabei außen vor und reagieren auch nicht aufs Wischen – das war Folge 6.");
+  await sayOver("Devices with “Ask before switching” – are left out and don't react to swiping either – that was episode 6.");
   await R.move(1100, 700, 1.0);
 
   // ---------------------------------------------------------------- 4. Blinds, windows, TV
-  await chapter("Rollläden, Fenster und Fernseher");
-  await sayOver("Auf einem Rollladen oder Fenster fährt senkrechtes Wischen den Rollladen.");
+  await chapter("Blinds, windows and TV");
+  await sayOver("On a blind or a window, a vertical swipe moves the blind.");
   {
     const p = await point3d("eg", 1.6, 1.6, 0.05);
     await R.move(p.x, p.y, 0.6);
@@ -711,17 +711,17 @@ if (PART === "b") {
     await R.page.mouse.up();
     await live(R.time + 1.2);
   }
-  await sayOver("Lange drücken zeigt „Auf“, „Stopp“, „Zu“ und feste Positionen.");
+  await sayOver("A long press shows “Up”, “Stop”, “Down”, “Stop”, “Zu” – and fixed positions.");
   {
     const p = await point3d("eg", 1.6, 1.6, 0.05);
     await R.move(p.x, p.y, 0.4);
     await longPress(0.8);
     await R.hold(0.8);
   }
-  await sayOver("Raffstores und Jalousien mit Lamellen bekommen hier und im Raumfenster zusätzlich einen Lamellen-Regler, sobald die Entität das kann.");
+  await sayOver("Venetian blinds with slats also get a slat slider here and in the room panel, as soon as the entity supports it.");
   await R.move(1200, 520, 0.8);
   await R.hold(0.4);
-  await sayOver("Ein Tipp aufs Fenster – egal ob Rahmen, Glas oder Rollladen – öffnet dieses Menü, wie hier in der Küche. Ein Fenster ohne Rollladen zeigt seinen Kontakt.");
+  await sayOver("A tap on the window – frame, glass or blind, it doesn't matter – opens this menu, like here in the kitchen. A window without a blind shows its contact.");
   {
     await away();
     await cam("eg", 6.5, 1.6, { theta: -0.35, phi: 0.78, radius: 9.5, y: 0.6 });
@@ -731,7 +731,7 @@ if (PART === "b") {
     await R.click();
     await R.hold(1.0);
   }
-  await sayOver("Fernseher, Türen und Garagentore lassen sich ebenfalls direkt antippen.");
+  await sayOver("TVs, doors and garage doors can be tapped directly as well.");
   {
     await away();
     await cam("eg", 3.0, 1.6, { theta: -0.35, phi: 0.78, radius: 9, y: 0.6 });
@@ -744,10 +744,10 @@ if (PART === "b") {
   }
 
   // ---------------------------------------------------------------- 5. The room panel
-  await chapter("Das Raumfenster");
-  await sayOver("Tippe ich auf den Raum, fliegt die Kamera hinein, und rechts öffnet sich das Raumfenster. Auf dem Handy und hochkant sitzt es unten.");
+  await chapter("Das Roomfenster");
+  await sayOver("When I tap the room, the camera flies in and the room panel opens on the right. On a phone, and in portrait, it sits at the bottom.");
   await clickLive('button[data-room="wohnen"]', 0.6, 2.2);
-  await sayOver("Oben stehen Name und Raumwerte, darunter die Geräte nach Art. Bei „Licht“ hat jede Lampe ihren Schalter, Helligkeit, Farbtemperatur und Farben.");
+  await sayOver("At the top are the name and the room values, below that the devices by type. Under “Light” – every lamp has its switch, brightness, colour temperature and colours.");
   await moveToText("21,4", 0.6, null, "P");
   await R.hold(0.4);
   {
@@ -756,143 +756,143 @@ if (PART === "b") {
     await R.move(b.x + b.w * 0.6, b.y, 0.6);
     await R.drag(b.x + b.w * 0.9, b.y, 0.9);
   }
-  await sayOver("„Alle aus“ schaltet alle Lichter des Raums. Sind alle aus, steht dort „Alle an“.");
-  await R.moveTo({ text: "Alle aus", exact: true }, 0.6);
+  await sayOver("“All off” – switches off all the room's lights. When they're all off, it says “All on”.");
+  await R.moveTo({ text: "All off", exact: true }, 0.6);
   await R.hold(0.6);
-  await sayOver("Rollläden haben „Auf“, „Stopp“, „Zu“ und die Position, bei mehreren auch „Alle auf“ und „Alle zu“.");
-  await R.moveTo({ text: "Stopp", exact: true }, 0.6);
+  await sayOver("Blinds have “Up”, “Stop”, “Down” and the position, and with several of them also “All up” and “All down”.");
+  await R.moveTo({ text: "Stop", exact: true }, 0.6);
   await R.hold(0.6);
-  await sayOver("Weiter unten: die Heizung mit Solltemperatur und Modus, Medien mit Lautstärke, Schalter, Kameras mit Standbild, Sensoren und die Szenen und Skripte des Bereichs.");
+  await sayOver("Further down: the heating with target temperature and mode, media with volume, switches, cameras with a still picture, sensors, and the area's scenes and scripts.");
   await panelWheel(500, 1.2);
   await R.hold(0.6);
   await panelWheel(700, 1.4);
   await R.hold(0.6);
-  await sayOver("Das Raumfenster zeigt die Geräte, die im Plan im Raum stehen, und alles, was du im Editor mit dem Stern dazugenommen hast. „Weitere Geräte des Bereichs“ blendet den Rest ein.");
+  await sayOver("The room panel shows the devices placed in the room on the plan, plus everything you added with the star in the editor. “More devices of the area” – shows the rest.");
   await panelWheel(1500, 1.0);
   {
     // the panel's last row sits partly under the switch bar: click its right end, which stays free
-    const m = await R.locate({ text: "Weitere Geräte des Bereichs" }).catch(() => null);
+    const m = await R.locate({ text: "More devices of the area" }).catch(() => null);
     if (m) {
       await R.move(m.x + m.w / 2 - 25, m.y, 0.6);
       await R.click();
       await R.hold(0.6);
       await panelWheel(400, 0.6);
-    } else console.log("no „Weitere Geräte des Bereichs“");
+    } else console.log("no “More devices of the area”");
   }
-  await sayOver("Ein Tipp auf einen Gerätenamen öffnet die Details aus Home Assistant, das Kreuz oben schließt das Fenster.");
+  await sayOver("A tap on a device name opens its details from Home Assistant, the cross at the top closes the panel.");
   await panelWheel(-4000, 1.0);
-  await moveToText("Deckenlicht", 0.5, null, "BUTTON");
+  await moveToText("Ceiling light", 0.5, null, "BUTTON");
   await R.hold(0.5);
-  await R.clickOn('button[aria-label="Schließen"]', 0.6);
+  await R.clickOn('button[aria-label="Close"]', 0.6);
   await live(R.time + 0.8);
-  await sayOver("In der Dashboard-Karte lässt sich das Raumfenster abschalten. Dann stehen die Szenen und Skripte des Raums unten als Knöpfe – mehr dazu in Folge 11.");
+  await sayOver("In the dashboard card you can turn the room panel off. Then the room's scenes and scripts appear as buttons at the bottom – more about that in episode 11.");
   await R.move(960, 990, 1.0);
 
   // ---------------------------------------------------------------- 6. The star
-  await chapter("Der Stern: Zentral-Menü und Favoriten");
-  await sayOver("Der Stern unten links öffnet das Zentral-Menü: alle Lichter an oder aus und alle Rollläden auf oder zu – für die Etage, die du gerade siehst.");
+  await chapter("The star: central menu and favourites");
+  await sayOver("The star at the bottom left opens the central menu: all lights on or off and all blinds up or down – for the floor you're looking at.");
   await R.clickOn(STAR, 0.7);
   await R.hold(0.5);
-  await R.clickOn({ text: "Aus", exact: true }, 0.6);
+  await R.clickOn({ text: "Off", exact: true }, 0.6);
   await live(R.time + 1.2);
-  await R.clickOn({ text: "An", exact: true }, 0.5);
+  await R.clickOn({ text: "On", exact: true }, 0.5);
   await live(R.time + 0.8);
-  await sayOver("In der Hausansicht gilt es fürs ganze Haus. Dann fragt der Knopf erst „Sicher?“, und nur ein zweiter Tipp führt es aus. Garagentore zählen dabei nicht als Rollläden.");
-  await R.clickOn({ text: "Alle Etagen", exact: true, nth: 0 }, 0.6);
+  await sayOver("In the house view it applies to the whole house. Then the button first asks “Sure?” – and only a second tap runs it. Garage doors don't count as blinds here.");
+  await R.clickOn({ text: "All floors", exact: true, nth: 0 }, 0.6);
   await live(R.time + 1.0);
   await R.clickOn(STAR, 0.6);
   await R.hold(0.4);
-  await R.clickOn({ text: "Aus", exact: true }, 0.6);
+  await R.clickOn({ text: "Off", exact: true }, 0.6);
   await R.hold(1.6);
-  await sayOver("Darunter stehen deine Favoriten: Szenen, Skripte, Automationen, Tasten und Schalter. Ein Tipp startet die Szene oder schaltet den Schalter um.");
-  await R.clickOn({ text: "Wohnzimmer Film", exact: true }, 0.6);
+  await sayOver("Below are your favourites: scenes, scripts, automations, buttons and switches. A tap starts the scene or toggles the switch.");
+  await R.clickOn({ text: "Living room Film", exact: true }, 0.6);
   await R.hold(0.6);
-  await moveToText("Gute Nacht", 0.5, null, "BUTTON");
-  await sayOver("Und ganz unten deine eigenen Knöpfe: Sie öffnen eine Dashboard-Seite oder die Details einer Entität, rufen einen Dienst auf oder öffnen ein Popup mit deiner eigenen Karte. Ein Knopf leuchtet, solange seine Entität an ist.");
-  await moveToText("Rollos", 0.6, null, "BUTTON");
+  await moveToText("Gute Tot", 0.5, null, "BUTTON");
+  await sayOver("And at the very bottom your own buttons: they open a dashboard page or an entity's details, call a service, or open a popup with your own card. A button lights up while its entity is on.");
+  await moveToText("Blinds", 0.6, null, "BUTTON");
   await R.hold(0.6);
-  await moveToText("Energie", 0.5, null, "BUTTON");
+  await moveToText("Energy", 0.5, null, "BUTTON");
   await R.hold(0.6);
   await R.clickOn(STAR, 0.6);
 
   // ---------------------------------------------------------------- 7. Search
-  await chapter("Suchen: Wo ist …?");
-  await sayOver("Die Lupe darunter öffnet „Wo ist …?“. Tippe einen Gerätenamen oder einen Raum …");
+  await chapter("Search: Where is …?");
+  await sayOver("The magnifier below it opens “Where is …?”. Type a device name or a room …");
   await R.clickOn(FIND, 0.6);
   await R.clickOn('input[type="search"]', 0.4);
   await R.type("Stehl", 0.12);
   await R.hold(0.6);
-  await sayOver("… ein Tipp auf den Treffer fliegt die Kamera hin, und das Gerät blinkt.");
-  await moveToText("Stehlampe", 0.5, null, "B");
+  await sayOver("… a tap on the result flies the camera there, and the device bleft.");
+  await moveToText("Floor lamp", 0.5, null, "W");
   await R.click();
   await live(R.time + 2.6);
-  await sayOver("Ist der Treffer ein Raum, öffnet sich gleich der Raum.");
+  await sayOver("If the result is a room, the room opens right away.");
   await R.clickOn(FIND, 0.6);
   await R.clickOn('input[type="search"]', 0.4);
-  await R.type("Kinder", 0.1);
+  await R.type("Kids", 0.1);
   await R.hold(0.4);
-  await moveToText("Kinderzimmer", 0.5, null, "B");
+  await moveToText("Kids' room", 0.5, null, "W");
   await R.click();
   await live(R.time + 1.0);
 
   // ---------------------------------------------------------------- 8. Warnings
-  await chapter("Warnungen");
+  await chapter("Warnings");
   await fresh("alerts");
   await quiet('button[data-floor="eg"]', 2000);
-  await sayOver("NeonPlan warnt kostenlos und ohne Einrichtung. Hier meldet der Rauchmelder in der Küche Rauch: Der Raum pulsiert rot, und oben erscheint ein Banner.");
+  await sayOver("NeonPlan warns you for free and without any setup. Here the kitchen smoke detector reports smoke: the room pulses red, and a banner appears at the top.");
   await R.move(960, 560, 0.4);
   await live(R.time + 1.0);
-  await moveToText("Rauch", 0.7, null, "BUTTON");
+  await moveToText("Smoke", 0.7, null, "BUTTON");
   await live(R.time + 1.0);
-  await sayOver("Ein Tipp auf die Warnung springt in den Raum.");
+  await sayOver("A tap on the warning jumps into the room.");
   await R.click();
   await live(R.time + 2.0);
-  await sayOver("Warnungen gibt es für Rauch, Gas, Kohlenmonoxid und Wasser, für eine ausgelöste Alarmanlage und für offene Fenster bei Regen – wie das Küchenfenster gerade.");
-  await moveToText("Regen", 0.7, null, "BUTTON");
+  await sayOver("There are warnings for smoke, gas, carbon monoxide and water, for a triggered alarm system, and for open windows in the rain – like the kitchen window right now.");
+  await moveToText("Rain", 0.7, null, "BUTTON");
   await live(R.time + 1.6);
-  await sayOver("Die Regenwarnung nimmt die Wetter-Entität aus den Einstellungen des Plans. Dort lässt sie sich unter „Warnung: Fenster offen bei Regen“ auch einzeln abschalten.");
+  await sayOver("The rain warning uses the weather entity from the plan's settings. There you can also turn it off on its own, under “Warning: window open while it rains”.");
   await live(R.time + 1.0);
 
   // ---------------------------------------------------------------- 9. Sun and daylight
-  await chapter("Sonne und Tageslicht");
+  await chapter("Sun and daylight");
   await fresh();
   await quiet('button[data-floor="eg"]', 1500);
   // cut walls: the sun patch on the bedroom floor is not hidden behind the wall
-  await quiet({ text: "Schnitt", exact: true }, 600);
+  await quiet({ text: "Cut", exact: true }, 600);
   await noMotion();
   await cam("eg", 2.2, 6.3, { theta: 0, phi: 0.85, radius: 9, y: 0.3 });
   await R.sleep(800);
-  await sayOver("Ist im Editor die Nordrichtung eingestellt, fällt das Sonnenlicht aus Home Assistant durch die Fenster, die zur Sonne zeigen – als weiche Flecken auf dem Boden, wie hier im Schlafzimmer.");
+  await sayOver("If the north direction is set in the editor, sunlight from Home Assistant falls through the windows facing the sun – as soft patches on the floor, like here in the bedroom.");
   await glide("eg", 2.2, 6.3, { theta: 0, phi: 0.85, radius: 9, y: 0.3 }, { theta: 0.45, phi: 0.75, radius: 8, y: 0.3 }, 3.0);
-  await sayOver("Heruntergelassene Rollläden machen die Flecken kleiner. Tagsüber wird außerdem der Himmel hinter dem Haus heller.");
+  await sayOver("Lowered blinds make the patches smaller. And in the daytime the sky behind the house gets brighter.");
   await glide("eg", 2.2, 6.3, { theta: 0.45, phi: 0.75, radius: 8, y: 0.3 }, { theta: 0.45, phi: 1.05, radius: 16, y: 0.3 }, 2.6);
-  await sayOver("Wer die Flecken nicht mag, schaltet sie in den Einstellungen mit „Sonnenlicht durch die Fenster“ ab.");
+  await sayOver("If you don't like the patches, turn them off in the settings with “Sunlight through the windows”.");
   await live(R.time + 0.8);
 
   // ---------------------------------------------------------------- 10. Cameras in 3D
-  await chapter("Kameras in 3D");
+  await chapter("Cameras in 3D");
   await cam("eg", 1.6, 1.6, { theta: -0.75, phi: 0.72, radius: 6.8, y: 0.6 });
   await R.sleep(700);
-  await sayOver("Ein Tipp auf eine Kamera oder auf ihren Sichtkegel öffnet das Standbild. Es erneuert sich alle paar Sekunden, und der Kegel ist die viel größere Tippfläche.");
+  await sayOver("A tap on a camera or on its view cone opens the still picture. It refreshes every few seconds, and the cone is the much bigger target.");
   {
     const p = await point3d("eg", 1.2, 0.02, 1.3);
     await R.move(p.x, p.y, 0.7);
     await R.click();
     await R.hold(1.0);
   }
-  await sayOver("Ein Tipp aufs Bild öffnet das Livebild von Home Assistant.");
+  await sayOver("Tapping the picture opens the live view from Home Assistant.");
   await R.moveTo(".qm-camera", 0.6).catch(() => {});
   await R.hold(0.6);
   await away();
 
   // ---------------------------------------------------------------- 11. Start views
-  await chapter("Startansicht für Haus, Etage und Raum");
-  await sayOver("Zum Schluss die Startansichten. Du stellst sie im Editor ein, mit „3D daneben“.");
+  await chapter("Start view for house, floor and room");
+  await sayOver("Finally, the start views. You set them in the editor, with “3D beside”.");
   await R.clickOn({ text: "Editor", exact: true }, 0.6);
   await R.sleep(1200);
-  await R.clickOn({ text: "3D daneben", exact: true }, 0.6);
+  await R.clickOn({ text: "3D beside", exact: true }, 0.6);
   await live(R.time + 1.6);
-  await sayOver("Fürs ganze Haus drehst du die 3D-Ansicht rechts, bis dir das Bild gefällt – zum Beispiel von der Gartenseite.");
+  await sayOver("For the whole house, turn the 3D view on the right until you like the picture – for example from the garden side.");
   {
     const c = await paneCentre();
     await R.move(c.x + 160, c.y + 120, 0.5);
@@ -911,24 +911,24 @@ if (PART === "b") {
     }
     await R.move(c.x - 200, c.y + 120, 0.01);
   }
-  await sayOver("Dann unten in der Seitenleiste „Startansicht“ aufklappen und „Aktuelle 3D-Ansicht als Start merken“. So öffnen 3D-Ansicht, Karte und Kiosk das Haus.");
+  await sayOver("Then, at the bottom of the sidebar, open “Start view” – and click “Remember the current 3D view as the start”. That's how the 3D view, the card and the kiosk open the house.");
   await R.move(1760, 700, 0.5);
-  await R.scrollTo("Startansicht", 300, 0.8);
-  await R.clickOn({ text: "Startansicht", exact: true }, 0.5);
+  await R.scrollTo("Start view", 300, 0.8);
+  await R.clickOn({ text: "Start view", exact: true }, 0.5);
   await R.hold(0.4);
-  await R.clickOn({ text: "Aktuelle 3D-Ansicht als Start merken", exact: true }, 0.6);
+  await R.clickOn({ text: "Remember the current 3D view as the start", exact: true }, 0.6);
   await R.hold(0.6);
-  await sayOver("Darunter steht die Zeile für die YAML einer Karte, falls eine Karte anders starten soll. „Standard“ nimmt die eigene Startansicht wieder zurück.");
+  await sayOver("Below it is the line for a card's YAML, in case a card should start differently. “Default” – takes your own start view back.");
   await R.moveTo(".fp3d-code", 0.6).catch(() => {});
   await R.hold(0.6);
-  await R.moveTo({ text: "Standard", exact: true }, 0.5);
-  await sayOver("Für eine Etage steht oben „Ansicht als Start der Etage“ – das kennst du aus Folge 3.");
+  await R.moveTo({ text: "Default", exact: true }, 0.5);
+  await sayOver("For a floor there's “View as this floor's start” at the top – you know it from episode 3.");
   await R.move(1760, 500, 0.4);
-  await R.scrollTo("Ansicht als Start der Etage", 450, 0.8);
-  await R.moveTo({ text: "Ansicht als Start der Etage", exact: true }, 0.5);
+  await R.scrollTo("View as this floor's start", 450, 0.8);
+  await R.moveTo({ text: "View as this floor's start", exact: true }, 0.5);
   await R.hold(0.6);
-  await sayOver("Und für einen Raum: Raum antippen, die 3D-Ansicht auf den Raum drehen und heranzoomen …");
-  await R.clickOn({ text: "Wohnzimmer", nth: 0 }, 0.6).catch(async () => {
+  await sayOver("And for a room: tap the room, turn the 3D view onto the room and zoom in …");
+  await R.clickOn({ text: "Living room", nth: 0 }, 0.6).catch(async () => {
     await R.editor(`e.selectItem("room", "wohnen");`);
   });
   if ((await R.editor(`return e._roomId;`)) !== "wohnen") await R.editor(`e.selectItem("room", "wohnen");`);
@@ -944,21 +944,21 @@ if (PART === "b") {
       await R.frame(1 / FPS, 40);
     }
   }
-  await sayOver("… dann „Ansicht als Start des Raums“. Der Pfeil daneben nimmt sie wieder weg.");
+  await sayOver("… then “View as this room's start”. The arrow next to it removes it again.");
   await R.move(1760, 500, 0.4);
-  await R.scrollTo("Ansicht als Start des Raums", 520, 0.8);
-  await R.clickOn({ text: "Ansicht als Start des Raums", exact: true }, 0.5);
+  await R.scrollTo("View als Start des Rooms", 520, 0.8);
+  await R.clickOn({ text: "View als Start des Rooms", exact: true }, 0.5);
   await R.hold(0.4);
-  await R.moveTo('button[title="Startansicht des Raums entfernen (wieder von oben)"]', 0.5).catch(() => {});
+  await R.moveTo('button[title="Remove the room\'s start view (from above again)"]', 0.5).catch(() => {});
   await R.hold(0.5);
-  await sayOver("Unter „Favoriten“ legst du fest, was im Stern erscheint, dazu die eigenen Knöpfe.");
-  await R.clickOn({ text: "Zurück zur Etage" }, 0.5);
+  await sayOver("Under “Favourites” – you decide what appears in the star, plus your own buttons.");
+  await R.clickOn({ text: "Back zur Floor" }, 0.5);
   await R.frame(0.1, 300);
   {
     const fav = () =>
       R.page.evaluate(() => {
         const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
-        const sm = [...e.renderRoot.querySelectorAll("summary")].find((x) => x.textContent.trim().startsWith("Favoriten"));
+        const sm = [...e.renderRoot.querySelectorAll("summary")].find((x) => x.textContent.trim().startsWith("Favourites"));
         if (!sm) return null;
         const r = sm.getBoundingClientRect();
         return { x: r.left + 60, y: r.top + r.height / 2 };
@@ -980,12 +980,12 @@ if (PART === "b") {
       await R.click();
       await R.hold(0.4);
       await R.move(f.x + 60, f.y + 260, 0.8);
-    } else console.log("no Favoriten summary");
+    } else console.log("no Favourites summary");
   }
-  await sayOver("Zurück in 3D: Ein Tipp aufs Wohnzimmer – und die Kamera fliegt genau in diese Ansicht.");
+  await sayOver("Back in 3D: a tap on the living room – and the camera flies to exactly this view.");
   await R.clickOn({ text: "3D", exact: true, nth: 0 }, 0.6);
   await R.sleep(1200);
-  await clickLive({ text: "Wohnzimmer", exact: true, nth: 0 }, 0.6, 2.6);
+  await clickLive({ text: "Living room", exact: true, nth: 0 }, 0.6, 2.6);
 
   // ---------------------------------------------------------------- 12. Outro
   await chapter("Zusammenfassung");
@@ -998,14 +998,14 @@ if (PART === "b") {
     const b = { theta: 0.4, phi: 0.85, radius: 24 };
     await cam(null, 0, 0, a);
     await R.sleep(700);
-    const end = await line("Kurz zusammengefasst: antippen schaltet, wischen dimmt, lange drücken öffnet das Schnellmenü. Dazu Raumfenster, Stern, Suche und Warnungen.");
+    const end = await line("In short: tapping switches, swiping dims, a long press opens the quick menu. Plus the room panel, the star, the search and the warnings.");
     await glide(null, 0, 0, a, b, end - R.time);
   }
-  await R.title("Nächste Folge: Dashboard-Karte und Wandtablet", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+  await R.title("Next episode: dashboard card and wall tablet", `HomePlan 3D – also runs on old wall tablets${VERSION}`);
   {
-    let end = await line("In der nächsten Folge bringen wir die 3D-Ansicht als Karte ins Dashboard und aufs Wandtablet.");
+    let end = await line("In the next episode we bring the 3D view into the dashboard as a card, and onto the wall tablet.");
     await live(end);
-    end = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und HomePlan 3D läuft auch auf alten Wandtablets. Bis zum nächsten Mal!");
+    end = await line("Left to the online demo and the manual are in the description. And HomePlan 3D also runs on old wall tablets. See you next time!");
     await live(end + 0.6);
   }
 }

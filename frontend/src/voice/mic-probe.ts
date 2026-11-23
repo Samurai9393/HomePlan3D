@@ -13,58 +13,30 @@ import { audioContext, findPipeline, openMicrophone, transcribe, type Pipeline }
 type Step = { ok: boolean | null; text: string };
 
 const TEXT = {
-  de: {
-    title: "Mikrofon-Probe",
-    intro: "Prüft, ob du auf diesem Gerät mit NeonPlan sprechen kannst. Es wird nichts geschaltet.",
-    secure_ok: "Sichere Verbindung (https)",
-    secure_no: "Keine sichere Verbindung: Über http:// gibt der Browser das Mikrofon nicht frei. Öffne Home Assistant über https (Nabu Casa, eigenes Zertifikat, Reverse Proxy).",
-    api_ok: "Der Browser kann ein Mikrofon ansprechen",
-    api_no: "Dieser Browser bietet keinen Mikrofonzugriff an (WebView zu alt oder Seite nicht sicher).",
-    start: "Mikrofon freigeben",
-    mic_ok: "Mikrofon freigegeben",
-    mic_denied: "Mikrofon verweigert. Fully Kiosk: Einstellungen → Web Content Settings → Mikrofonzugriff einschalten und in Android Fully das Mikrofon erlauben.",
-    mic_none: "Kein Mikrofon gefunden.",
-    mic_other: "Mikrofon nicht nutzbar",
-    level: "Pegel – sprich etwas, der Balken muss sich bewegen",
-    pipe_ok: "Assist-Pipeline",
-    pipe_no: "Keine Assist-Pipeline mit Spracherkennung gefunden. Einstellungen → Sprachassistenten: eine Spracherkennung wählen (z. B. Home Assistant Cloud, Whisper oder Speech-to-Phrase).",
-    talk: "Sprechen (z. B. „Zeig das Wohnzimmer“)",
-    listening: "Ich höre zu …",
-    heard: "Erkannt",
-    nothing: "Nichts erkannt",
-    took: "Dauer",
-    would: "NeonPlan würde zeigen",
-    would_none: "Kein Raum, keine Etage im Satz gefunden",
-    house: "das ganze Haus",
-    close: "Schließen",
-    silent: "Das Mikrofon liefert nur Stille. Meist hält eine andere App es fest – in Fully Kiosk die Bewegungserkennung per Geräusch (Motion Detection → Acoustic Detection) ausschalten und neu laden.",
-  },
-  en: {
-    title: "Microphone probe",
-    intro: "Checks whether you can talk to NeonPlan on this device. Nothing is switched.",
-    secure_ok: "Secure connection (https)",
-    secure_no: "No secure connection: over http:// the browser does not give out the microphone. Open Home Assistant over https (Nabu Casa, own certificate, reverse proxy).",
-    api_ok: "The browser can use a microphone",
-    api_no: "This browser offers no microphone access (WebView too old, or the page is not secure).",
-    start: "Allow the microphone",
-    mic_ok: "Microphone allowed",
-    mic_denied: "Microphone denied. Fully Kiosk: Settings → Web Content Settings → enable microphone access, and allow Fully the microphone in Android.",
-    mic_none: "No microphone found.",
-    mic_other: "Microphone not usable",
-    level: "Level – say something, the bar must move",
-    pipe_ok: "Assist pipeline",
-    pipe_no: "No Assist pipeline with speech to text found. Settings → Voice assistants: choose a speech-to-text engine (e.g. Home Assistant Cloud, Whisper or Speech-to-Phrase).",
-    talk: "Talk (e.g. “Show the living room”)",
-    listening: "Listening …",
-    heard: "Heard",
-    nothing: "Nothing heard",
-    took: "Took",
-    would: "NeonPlan would show",
-    would_none: "No room or floor found in the sentence",
-    house: "the whole house",
-    close: "Close",
-    silent: "The microphone gives only silence. Usually another app holds it – in Fully Kiosk switch off the acoustic motion detection (Motion Detection → Acoustic Detection) and reload.",
-  },
+  title: "Microphone probe",
+  intro: "Checks whether you can talk to NeonPlan on this device. Nothing is switched.",
+  secure_ok: "Secure connection (https)",
+  secure_no: "No secure connection: over http:// the browser does not give out the microphone. Open Home Assistant over https (Nabu Casa, own certificate, reverse proxy).",
+  api_ok: "The browser can use a microphone",
+  api_no: "This browser offers no microphone access (WebView too old, or the page is not secure).",
+  start: "Allow the microphone",
+  mic_ok: "Microphone allowed",
+  mic_denied: "Microphone denied. Fully Kiosk: Settings → Web Content Settings → enable microphone access, and allow Fully the microphone in Android.",
+  mic_none: "No microphone found.",
+  mic_other: "Microphone not usable",
+  level: "Level – say something, the bar must move",
+  pipe_ok: "Assist pipeline",
+  pipe_no: "No Assist pipeline with speech to text found. Settings → Voice assistants: choose a speech-to-text engine (e.g. Home Assistant Cloud, Whisper or Speech-to-Phrase).",
+  talk: "Talk (e.g. “Show the living room”)",
+  listening: "Listening …",
+  heard: "Heard",
+  nothing: "Nothing heard",
+  took: "Took",
+  would: "NeonPlan would show",
+  would_none: "No room or floor found in the sentence",
+  house: "the whole house",
+  close: "Close",
+  silent: "The microphone gives only silence. Usually another app holds it – in Fully Kiosk switch off the acoustic motion detection (Motion Detection → Acoustic Detection) and reload.",
 };
 
 export class MicProbe extends LitElement {
@@ -100,7 +72,7 @@ export class MicProbe extends LitElement {
   }
 
   private get t() {
-    return (this.hass?.language ?? navigator.language).toLowerCase().startsWith("de") ? TEXT.de : TEXT.en;
+    return TEXT;
   }
 
   connectedCallback(): void {
@@ -189,7 +161,7 @@ export class MicProbe extends LitElement {
       const place = text && this.building ? findPlace(text, this.building) : null;
       const where = place ? (place.kind === "house" ? t.house : place.name) : null;
       this._result = [
-        { ok: !!text, text: text ? `${t.heard}: „${text}“ · ${took}` : `${t.nothing} · ${took}` },
+        { ok: !!text, text: text ? `${t.heard}: “${text}” · ${took}` : `${t.nothing} · ${took}` },
         ...(text ? [{ ok: !!where, text: where ? `${t.would}: ${where}` : t.would_none }] : []),
       ];
     } catch (err) {

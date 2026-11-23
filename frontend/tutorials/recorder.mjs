@@ -13,7 +13,7 @@ const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/cs
 
 /**
  * Copy preview/ and the built app files into `dir` (for TUTORIAL_ROOT) and return the app version from the
- * manifest, for the "aufgenommen mit HomePlan 3D …" line.
+ * manifest, for the "recorded with HomePlan 3D …" line.
  */
 export function snapshot(dir) {
   const repo = resolve(import.meta.dirname, "..", "..");
@@ -32,7 +32,7 @@ export function appVersion(root = process.env.TUTORIAL_ROOT || resolve(import.me
 /** Video frame rate of the finished MP4; a "frame" below is one step of the cursor or the camera. */
 export const FPS = 25;
 
-export async function startRecorder({ outDir, width = 1920, height = 1080, lang = "de" }) {
+export async function startRecorder({ outDir, width = 1920, height = 1080, lang = "en" }) {
   // TUTORIAL_ROOT: a snapshot folder with preview/ and custom_components/homeplan3d/frontend/ (same layout as the
   // repo), so a rebuild of the app during a recording cannot break it
   const root = resolve(process.env.TUTORIAL_ROOT || resolve(import.meta.dirname, "..", ".."));
@@ -90,7 +90,7 @@ export async function startRecorder({ outDir, width = 1920, height = 1080, lang 
     hold,
     sleep,
 
-    /** Load the preview with query options (?empty, ?lang=…) and put the cursor back on. */
+    /** Load the preview with query options (?empty …) and put the cursor back on. */
     async open(query = "") {
       const sep = query ? `&${query.replace(/^[?&]/, "")}` : "";
       await page.goto(`${base}?lang=${lang}${sep}`, { waitUntil: "networkidle0", timeout: 120000 });
@@ -283,8 +283,8 @@ export async function startRecorder({ outDir, width = 1920, height = 1080, lang 
 /**
  * Narration timing for an episode. With `audioDir` (the output of tools/tts-elevenlabs.py lines) a line lasts its
  * measured length plus 0.3 s; without it (a draft) an estimate of about 2.9 words a second. `audioDir` may also be a
- * list (the German and the English voice): a line then lasts the longer of the two plus 0.3 s, so neither track is
- * cut off. Every durations.json is keyed by the German line.
+ * list (several voices): a line then lasts the longest recording plus 0.3 s, so no track is
+ * cut off. Every durations.json is keyed by the English line.
  * `say` holds the picture while the line is spoken, `sayOver` lets the next steps run under it (the next line or
  * chapter waits until it is said). `report()` lists every silence longer than `maxGap` seconds between two lines.
  */

@@ -1,4 +1,4 @@
-# Sorts new issues: the answer to "Which part? / Welcher Teil?" in the issue form becomes a "part: …" label.
+# Sorts new issues: the answer to "Which part?" in the issue form becomes a "part: …" label.
 name: Issue labels
 
 on:
@@ -32,8 +32,8 @@ jobs:
               "Installation & update": "part: install & update",
             };
             const body = context.payload.issue.body ?? "";
-            // the form writes "### Which part? / Welcher Teil?" and the picked options below, comma-separated
-            const m = body.match(/### Which part\? \/ Welcher Teil\?\s*\n+([^\n]*)/);
+            // the form writes "### Which part?" and the picked options below, comma-separated
+            const m = body.match(/### Which part\?\s*\n+([^\n]*)/);
             if (!m) return;
             const labels = m[1]
               .split(",")

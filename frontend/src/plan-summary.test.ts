@@ -8,10 +8,10 @@ const room = (id: string, area: string | null, x0: number, panel: string[]): Roo
 
 test("a plan at a glance: lights on, open windows, the mean temperature and the warnings of its rooms", () => {
   const b = emptyBuilding();
-  b.floors = [{ ...newFloor("gh", "Gartenhaus", 0), rooms: [room("werk", "werk", 0, ["light.werk", "binary_sensor.tor", "climate.werk"]), room("lounge", null, 4, ["light.lounge", "climate.lounge"])] }];
+  b.floors = [{ ...newFloor("gh", "Garden shed", 0), rooms: [room("werk", "werk", 0, ["light.werk", "binary_sensor.tor", "climate.werk"]), room("lounge", null, 4, ["light.lounge", "climate.lounge"])] }];
   const st = (state: string, attributes: Record<string, unknown> = {}) => ({ state, attributes, last_changed: "" });
   const hass = {
-    language: "de",
+    language: "en",
     // the water sensor sits in the workshop's area
     entities: { "binary_sensor.wasser": { entity_id: "binary_sensor.wasser", area_id: "werk" } },
     devices: {},

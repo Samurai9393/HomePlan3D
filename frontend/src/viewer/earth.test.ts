@@ -8,7 +8,7 @@ const rect = (id: string, x1: number, z1: number): Room => ({ id, name: id, area
 
 function house(terrain?: Building["settings"]["terrain"]): Building {
   const b = emptyBuilding();
-  b.floors = [{ ...newFloor("ug", "UG", -2.6), height: 2.4, rooms: [rect("k", 10, 8)] }, { ...newFloor("eg", "EG", 0), rooms: [rect("a", 10, 8)] }];
+  b.floors = [{ ...newFloor("ug", "Basement", -2.6), height: 2.4, rooms: [rect("k", 10, 8)] }, { ...newFloor("eg", "Ground floor", 0), rooms: [rect("a", 10, 8)] }];
   b.settings = { ...b.settings, wall_exterior: 0.3, wall_interior: 0.12, terrain };
   setTerrain(b);
   return b;
@@ -132,7 +132,7 @@ test("a balcony on the floor above does not lift a light well below it (#602)", 
   b.floors[0].openings = [win];
   const bare = top(earthOf(b, 0)!);
   // a first floor with a balcony reaching the wall over the well
-  b.floors.push({ ...newFloor("og", "OG", 2.66), rooms: [rect("o", 10, 8)], outdoor: [{ id: "bal", type: "balcony", points: [[3, -1.5], [7, -1.5], [7, 0], [3, 0]] } as never] });
+  b.floors.push({ ...newFloor("og", "Upper floor", 2.66), rooms: [rect("o", 10, 8)], outdoor: [{ id: "bal", type: "balcony", points: [[3, -1.5], [7, -1.5], [7, 0], [3, 0]] } as never] });
   setTerrain(b);
   assert.ok(Math.abs(top(earthOf(b, 0)!) - bare) < 1e-6);
 });

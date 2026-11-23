@@ -1,991 +1,993 @@
-# HomePlan 3D – Anleitung
+# HomePlan 3D – Guide
 
-🇩🇪 Deutsch · [🇬🇧 English](manual.md)
+🇬🇧 English · [🇬🇧 Manual](manual.md)
 
-HomePlan 3D zeichnet dein Zuhause direkt in Home Assistant und zeigt es als 3D-Modell im Neon-Look. Lichter leuchten in ihrer Farbe, Rollläden fahren, Fenster kippen, Türen schwingen auf, Kameras schauen in den Raum und der Fernseher zeigt, was läuft. Alles läuft lokal in Home Assistant, ohne Cloud und ohne externe Programme, und ist für Wandtablets gebaut.
+HomePlan 3D draws your home right inside Home Assistant and shows it as a 3D model in a neon look. Lights glow in their colours, blinds move, windows tilt, doors swing open, cameras look into the room and the TV shows what is playing. Everything runs locally in Home Assistant, without a cloud or external programs, and it is built for wall tablets.
 
-Diese Anleitung beschreibt alle Funktionen der aktuellen Version. HomePlan 3D ist vollständig MIT-open-source: Jede Funktion, einschließlich aller Pro-Erweiterungen, ist kostenlos und über `custom_components/homeplan3d/open-source-config.json` standardmäßig aktiviert. Was sich in welcher Version geändert hat, steht im [Changelog](../CHANGELOG.md) und im Release-Archiv unter `docs/`. Die Bilder stammen aus der Demo mit erfundenen Daten.
+This guide describes every feature of the current version. HomePlan 3D is fully MIT open source: every feature, including all Pro add-ons, is free and enabled by default in `custom_components/homeplan3d/open-source-config.json`. What changed in which version is in the [changelog](../CHANGELOG.md) and in the release archive under `docs/`. The pictures come from the demo with invented data.
 
-![Das Haus in der 3D-Ansicht](images/view-house.jpg)
+![The house in the 3D view](images/view-house.jpg)
 
 ---
 
-## Inhalt
+## Contents
 
 1. [Installation](#1-installation)
-2. [In zehn Minuten zum ersten 3D-Plan](#2-in-zehn-minuten-zum-ersten-3d-plan)
-3. [Die Oberfläche im Überblick](#3-die-oberfläche-im-überblick)
-4. [Der Editor](#4-der-editor)
-5. [Die 3D-Ansicht](#5-die-3d-ansicht)
-6. [Pro-Erweiterungen](#6-pro-erweiterungen)
-7. [Erweiterungen, Packs und Module](#7-erweiterungen-packs-und-module)
-8. [Die Dashboard-Karte](#8-die-dashboard-karte)
-9. [HomePlan 3D auf dem Wandtablet](#9-neonplan-3d-auf-dem-wandtablet)
-10. [Sicherung und Umzug](#10-sicherung-und-umzug)
-11. [Daten und Datenschutz](#11-daten-und-datenschutz)
-12. [Häufige Fragen und Fehlerbehebung](#12-häufige-fragen-und-fehlerbehebung)
+2. [Your first 3D plan in ten minutes](#2-your-first-3d-plan-in-ten-minutes)
+3. [The interface at a glance](#3-the-interface-at-a-glance)
+4. [The editor](#4-the-editor)
+5. [The 3D view](#5-the-3d-view)
+6. [Pro add-ons](#6-pro-add-ons)
+7. [Extensions, packs and modules](#7-extensions-packs-and-modules)
+8. [The dashboard card](#8-the-dashboard-card)
+9. [HomePlan 3D on a wall tablet](#9-neonplan-3d-on-a-wall-tablet)
+10. [Backup and moving](#10-backup-and-moving)
+11. [Data and privacy](#11-data-and-privacy)
+12. [FAQ and troubleshooting](#12-faq-and-troubleshooting)
 
 ---
 
 ## 1. Installation
 
-### Voraussetzungen
+### Requirements
 
-- Home Assistant 2025.1 oder neuer.
-- Ein Browser mit WebGL. Das sind alle aktuellen Browser, die Home-Assistant-App und auch Amazon-Fire-Tablets.
-- Für das Bearbeiten ein Benutzer mit Administratorrechten. Alle anderen Benutzer sehen und bedienen den Plan, ändern ihn aber nicht.
+- Home Assistant 2025.1 or newer.
+- A browser with WebGL. That is every current browser, the Home Assistant app and Amazon Fire tablets.
+- An administrator to edit. All other users see and control the plan but do not change it.
 
-### Über den Marketplace
+### With the Marketplace
 
-Seit Home Assistant 2026.11 ist HACS als **Marketplace** eingebaut. Öffne **Einstellungen → Marketplace** und suche nach HomePlan 3D. Von Hand: geht es so:
+Since Home Assistant 2026.11, HACS is built in as the **Marketplace**. Open **Settings → Marketplace** and search for HomePlan 3D. By hand:
 
-1. **Einstellungen → Marketplace** öffnen. Beim ersten Mal den Hinweis zu Inhalten aus der Community bestätigen.
-2. **HomePlan 3D** suchen, **Installieren** wählen und Home Assistant neu starten.
-3. **Einstellungen → Geräte & Dienste → Integration hinzufügen → HomePlan 3D**, oder direkt über diesen Knopf:
+1. Open **Settings → Marketplace**. The first time, accept the note about community content.
+2. Search for **HomePlan 3D**, select **Install** and restart Home Assistant.
+3. **Settings → Devices & services → Add integration → HomePlan 3D**, or straight with this button:
 
-   [![HomePlan 3D einrichten](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=homeplan3d)
+   [![Open your Home Assistant instance and start setting up HomePlan 3D.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=homeplan3d)
 
-Danach steht **HomePlan 3D** in der Seitenleiste. Die Dashboard-Karte ist ebenfalls sofort verfügbar, eine Ressource musst du nicht eintragen.
+**HomePlan 3D** now appears in the sidebar. The dashboard card is available right away, no resource needed.
 
-**Home Assistant vor 2026.11:** Dort geht es genauso über **HACS**: HACS öffnen, **HomePlan 3D** suchen, herunterladen und neu starten, oder [direkt in HACS öffnen](https://my.home-assistant.io/redirect/hacs_repository/?owner=Samurai9393&repository=HomePlan3D-main&category=integration).
+**Home Assistant before 2026.11:** it works the same with **HACS**: open HACS, search for **HomePlan 3D**, download it and restart, or [open it straight in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=Samurai9393&repository=HomePlan3D-main&category=integration).
 
-Hast du HomePlan 3D früher über HACS installiert, auch als benutzerdefiniertes Repository, musst du nichts tun: Beim Update auf Home Assistant 2026.11 übernimmt der Marketplace es, und Updates kommen weiter wie gewohnt.
+If you installed HomePlan 3D with HACS before, also as a custom repository, there is nothing to do: when you update to Home Assistant 2026.11 the Marketplace takes it over, and updates keep coming as usual.
 
-### Von Hand
+### By hand
 
-Den Ordner `custom_components/homeplan3d` aus dem Repository nach `config/custom_components/` kopieren, Home Assistant neu starten und die Integration wie oben hinzufügen.
+Copy the folder `custom_components/homeplan3d` from the repository into `config/custom_components/`, restart Home Assistant and add the integration as above.
 
 ### Updates
 
-Der Marketplace (oder HACS) meldet neue Versionen von selbst unter **Einstellungen → System → Updates**. Nach jedem Update Home Assistant neu starten. Bis dahin zeigt HomePlan 3D oben einen Hinweis, dass ein Neustart aussteht. Dein Plan bleibt bei Updates immer erhalten, auch wenn du die Integration entfernst und neu hinzufügst.
+The Marketplace (or HACS) reports new versions by itself under **Settings → System → Updates**. Restart Home Assistant after every update. Until then HomePlan 3D shows a note at the top that a restart is pending. Your plan always stays, even if you remove the integration and add it again.
 
 ---
 
-## 2. In zehn Minuten zum ersten 3D-Plan
+## 2. Your first 3D plan in ten minutes
 
-1. **HomePlan 3D** in der Seitenleiste öffnen und oben auf **Editor** wechseln.
-2. Rechts **Etage hinzufügen** wählen. Hast du in Home Assistant Etagen angelegt, bietet HomePlan 3D sie direkt an.
-3. Gibt es Bereiche auf der Etage, legt **„… Räume aus HA-Bereichen anlegen“** für jeden Bereich einen Raum an. Ziehe die Räume dann an die richtige Stelle und passe die Ecken an. Alternativ zeichnest du unter **Bauen → Raum** mit **Rechteck**, **Freie Form** oder **Nach Maß**.
-4. Mit **Tür & Fenster** auf eine Wand tippen, um Türen und Fenster einzusetzen.
-5. Einen Raum antippen und rechts unter **Geräte** bei den gewünschten Geräten **Platzieren** tippen, etwa Lichter, Rollläden, Thermostate, Media Player und Sensoren des Bereichs. Unter der Liste setzt **Alle … platzieren** nach einer Rückfrage alle Hauptgeräte auf einmal.
-6. Mit **Möbel** und **Einrichten …** den Raum möblieren.
-7. Oben auf **3D** wechseln. Fertig: Tippe auf eine Lampe, und sie schaltet.
+1. Open **HomePlan 3D** in the sidebar and switch to **Editor** at the top.
+2. Choose **Add floor** on the right. If you have floors in Home Assistant, HomePlan 3D offers them directly.
+3. If the floor has areas, **"Add … rooms from HA areas"** creates a room for each area. Drag the rooms into place and adjust the corners. Or draw under **Build → Room** with **Rectangle**, **Free shape** or **By measure**.
+4. Tap a wall with **Doors & windows** to add doors and windows.
+5. Tap a room and tap **Place** under **Devices** on the right for the devices you want, e.g. the lights, covers, thermostats, media players and sensors of the area. Below the list, **Place all …** puts all main devices in at once after asking.
+6. Furnish the room with **Furniture** and **Furnish …**.
+7. Switch to **3D** at the top. Done: tap a lamp, and it switches.
 
-Der Plan speichert sich beim Bearbeiten von selbst.
+The plan saves itself while you edit.
 
 ---
 
-## 3. Die Oberfläche im Überblick
+## 3. The interface at a glance
 
-Oben gibt es drei Reiter:
+There are three tabs at the top:
 
-| Reiter | Wofür | Wer sieht ihn |
+| Tab | What for | Who sees it |
 |---|---|---|
-| **3D** | Das Haus ansehen und bedienen | alle |
-| **Editor** | Grundriss zeichnen, Möbel und Geräte platzieren | Administratoren |
-| **✦ Erweiterungen** | Lokale Packs, Pro-Erweiterungen, Module | Administratoren |
+| **3D** | Look at the house and control it | everyone |
+| **Editor** | Draw the floor plan, place furniture and devices | administrators |
+| **✦ Extensions** | Local packs, Pro add-ons, modules | administrators |
 
-Zusätzlich gibt es die Dashboard-Karte, die dieselbe 3D-Ansicht in jedes Dashboard bringt. Mehr dazu in [Kapitel 8](#8-die-dashboard-karte).
+The dashboard card brings the same 3D view into any dashboard. See [chapter 8](#8-the-dashboard-card).
 
-**Sprache:** NeonPlan folgt der Sprache deines Home-Assistant-Nutzers (Profil → Sprache). Deutsch und Englisch sind eingebaut; Französisch, Spanisch, Niederländisch, Italienisch, Ungarisch, Dänisch, Schwedisch, Norwegisch (Bokmål und Nynorsk), Finnisch, Tschechisch, Polnisch, Rumänisch, Slowenisch, Slowakisch, Portugiesisch, Türkisch und Chinesisch (vereinfacht) werden bei Bedarf nachgeladen, so bleiben die Bundles für Wandtablets klein. Fehlt ein Text in einer Sprache, erscheint er auf Englisch.
+**Language:** HomePlan 3D is English-only. Every label is built in, so nothing is fetched per language and the bundles stay small for wall tablets.
 
 ---
 
-## 4. Der Editor
+## 4. The editor
 
-![Der Editor mit der 3D-Ansicht daneben](images/editor-split-3d.jpg)
+![The editor with the 3D view beside it](images/editor-split-3d.jpg)
 
-Der Editor besteht aus dem Grundriss in der Mitte, der Werkzeugleiste oben und der Seitenleiste rechts. Die Seitenleiste zeigt immer, was gerade ausgewählt ist: die Etage, einen Raum, ein Möbel, eine Tür oder ein Gerät.
+The editor has the floor plan in the middle, the toolbar at the top and the sidebar on the right. The sidebar always shows what is selected: the floor, a room, an item, a door or a device.
 
-Zeichnen geht am besten am PC oder Tablet. Auf dem Handy kannst du dein Haus ansehen und bedienen; der Editor sagt das dort einmal (✕ blendet den Hinweis aus).
+Drawing works best on a PC or tablet. On a phone you can look around and control your home; the editor says so there once (✕ hides the hint).
 
-### 4.1 Werkzeuge
+### 4.1 Tools
 
-Die Werkzeugleiste oben ist in Gruppen geordnet. Ganz links steht immer die Etage, auf der du arbeitest, siehe [4.2](#42-etagen).
+The toolbar at the top is grouped. On its far left is always the floor you are working on, see [4.2](#42-floors).
 
-| Knopf | Was er tut |
+| Button | What it does |
 |---|---|
-| **Auswählen** | Räume, Möbel, Türen, Fenster und Geräte antippen, verschieben, Ecken ziehen |
-| **Bauen ▾** | Ein Menü mit **Raum** (**Rechteck** aufziehen, **Freie Form** Punkt für Punkt oder **Nach Maß** mit eingetippten Wandlängen), **Wand** (eine frei stehende Wand, etwa ein Raumteiler), **Tür & Fenster** (auf eine Wand tippen), **Bodenöffnung** (ein Loch im Boden, etwa über dem Treppenaufgang) und **Dach** (siehe [4.19](#419-dach)) |
-| **Draußen ▾** | **Außen** (Art wie Rasen, Weg oder Terrasse und Form Rechteck oder Freie Form direkt im Menü) und **Pool** (Eckig, Rund, Oval oder Frei), siehe [4.17](#417-außenflächen-und-außenleuchten) |
-| **Möbel** | Die Möbelbibliothek öffnen |
-| **Energie** | Solarfelder auf dem Dach und im Garten, Stränge und Energiegeräte, siehe [4.20](#420-energie-solarfelder) |
-| **↶ / ↷** | Rückgängig und Wiederholen (Strg+Z / Strg+Y) |
-| **3D daneben** | Die 3D-Ansicht neben dem Plan, siehe [4.18](#418-3d-daneben) |
-| **Wandansicht** | Eine Wand von vorne ansehen, siehe [4.8](#48-möbel) |
-| **Grundriss komplett** | Holt den ganzen Grundriss der Etage ins Bild; im Werkzeug Außen oder Pool samt Garten |
+| **Select** | Tap rooms, furniture, doors, windows and devices, move them, drag corners |
+| **Build ▾** | A menu with **Room** (drag a **Rectangle**, a **Free shape** corner by corner or **By measure** with typed wall lengths), **Wall** (a free-standing wall, e.g. a partition), **Doors & windows** (tap a wall), **Floor opening** (a hole in the floor, e.g. above the staircase) and **Roof** (see [4.19](#419-roof)) |
+| **Outside ▾** | **Outdoor** (its type such as lawn, path or terrace and its shape, rectangle or free form, right in the menu) and **Pool** (Rectangular, Round, Oval or Free), see [4.17](#417-outdoor-areas-and-outdoor-lights) |
+| **Furniture** | Open the furniture library |
+| **Energy** | Solar fields on the roof and in the garden, strings and energy devices, see [4.20](#420-energy-solar-fields) |
+| **↶ / ↷** | Undo and redo (Ctrl+Z / Ctrl+Y) |
+| **3D beside** | The 3D view next to the plan, see [4.18](#418-3d-beside) |
+| **Wall view** | See a wall from the front, see [4.8](#48-furniture) |
+| **Whole plan** | Brings the floor's whole plan into view; with the garden while drawing outdoor areas or a pool |
 
-Ein Gruppenknopf zeigt, welches Werkzeug gerade läuft, etwa „Raum: Freie Form“ oder „Außen: Rasen“. **Ein Werkzeug bleibt aktiv**, nachdem du etwas gesetzt hast: Du kannst also mehrere Türen, Fenster, Räume oder Flächen hintereinander setzen. **Esc** oder **Auswählen** beendet es. Unten im Plan steht immer ein kurzer Hinweis zum aktiven Werkzeug.
+A group's button names the tool in use, e.g. "Room: Free shape" or "Outdoor: Lawn". **A tool stays in use** after you placed something, so you can set several doors, windows, rooms or areas in a row. **Esc** or **Select** ends it. A short hint for the active tool is always shown at the bottom of the plan.
 
-**Seitenleiste breiter ziehen:** An ihrer linken Kante lässt sich die Seitenleiste mit der Maus oder dem Finger breiter oder schmaler ziehen (280 bis 640 Pixel); der Browser merkt sich die Breite.
+**Dragging the sidebar wider:** at its left edge the sidebar can be dragged wider or narrower with the mouse or a finger (280 to 640 pixels); the browser remembers the width.
 
-**Seitenleiste einklappen:** **Einklappen ›** oben in der Seitenleiste macht sie zu einem schmalen Streifen – der Grundriss bekommt den ganzen Platz, etwa zum Verschieben von Möbeln. **‹** klappt sie wieder auf, ein leuchtendes **⚙** im Streifen öffnet die Einstellungen der Auswahl. Wählst du ein anderes Werkzeug, klappt sie von selbst wieder auf. Der Browser merkt sich die Wahl.
+**Collapsing the sidebar:** **Collapse ›** at the top of the sidebar folds it to a narrow strip – the plan gets all the room, e.g. for moving furniture. **‹** unfolds it, a glowing **⚙** in the strip opens the settings of the selection. Choosing another tool unfolds it again by itself. The browser remembers the choice.
 
-**Maus und Touch:** Mit zwei Fingern ziehst du die Ansicht, mit zwei Fingern zoomst du. Mit der Maus zoomt das Mausrad, die Ansicht ziehst du auf einer leeren Stelle oder überall mit der **rechten oder mittleren Maustaste** (ein Rechtsklick ohne Ziehen öffnet weiter das Menü). Bei gehaltener **Leertaste** verschiebt Ziehen mit der linken Maustaste immer nur die Ansicht, auch über Räumen und Möbeln (seit 3.5.0). **Strg+Z** macht rückgängig, **Strg+Y** oder **Strg+Umschalt+Z** wiederholt, **Entf** löscht das Ausgewählte, **Esc** bricht ab. Die **Pfeiltasten** verschieben das Ausgewählte (Raum, Ecke, Möbel, Gerät, Wand, Außenfläche) um einen Rasterschritt, mit **Umschalt** um 10 cm, mit **Alt** um 1 cm; Türen und Fenster wandern dabei entlang ihrer Wand.
+**Mouse and touch:** Two fingers pan and zoom. With a mouse, the wheel zooms; drag an empty spot or anywhere with the **right or middle mouse button** to pan (a right click without dragging still opens the menu). With the **space bar** held, dragging with the left button always pans, also over rooms and furniture (since 3.5.0). **Ctrl+Z** undoes, **Ctrl+Y** or **Ctrl+Shift+Z** redoes, **Del** deletes the selection, **Esc** cancels. The **arrow keys** nudge the selection (room, corner, furniture, device, wall, outdoor area) by one grid step, with **Shift** by 10 cm, with **Alt** by 1 cm; doors and windows slide along their wall.
 
-**Grundriss sperren und fixieren:** **Grundriss sperren** in den Etagen-Einstellungen (siehe [4.2](#42-etagen)) oder per Rechtsklick auf einen Raum sperrt alle Räume, Wände, Türen, Fenster und Außenflächen, auch neu gezeichnete; ein ausgewählter Raum zeigt dann „🔒 Grundriss gesperrt“, ein Klick darauf entsperrt. Möbel und Geräte fixierst du einzeln, sobald sie an ihrem Platz stehen: mit dem Schloss **🔓 Fixieren** oben im Formular, mit der Taste **L** oder per **Rechtsklick** (auf dem Tablet langes Drücken). Das Rechtsklick-Menü bietet außerdem **Duplizieren**, **Drehen 90°** und **Löschen**. Gesperrtes lässt sich auswählen und im Formular bearbeiten, aber nicht mehr ziehen, nicht mit den Pfeiltasten schieben und nur nach Rückfrage löschen; Ziehen bewegt dann die Ansicht. Fixierte Möbel und Geräte bleiben auch in der 3D-Hälfte stehen.
+**Locking the floor plan and fixing:** **Lock floor plan** in the floor settings (see [4.2](#42-floors)) or by right-clicking a room locks all rooms, walls, doors, windows and outdoor areas, newly drawn ones too; a selected room then shows "🔒 Floor plan locked", a click on it unlocks. Furniture and devices are fixed one by one once they are in place: with the lock **🔓 Fix** at the top of the form, with the key **L** or by **right-click** (long press on a tablet). The right-click menu also offers **Duplicate**, **Turn 90°** and **Delete**. Locked items can be selected and edited in their form, but not dragged, not nudged with the arrow keys and only deleted after asking; dragging then moves the view. Fixed furniture and devices also stay put in the 3D half.
 
-### 4.2 Etagen
+### 4.2 Floors
 
-![Etagen-Einstellungen](images/editor-ha-floors.jpg)
+![Floor settings](images/editor-ha-floors.jpg)
 
-Ganz links in der Werkzeugleiste steht **Etage: Erdgeschoss ▾** – die Etage, auf der du gerade arbeitest. Das Menü ist in jedem Werkzeug da: Es listet alle Etagen (die oberste zuerst, die aktuelle mit ✓), darunter **Etage hinzufügen** und **Etagen-Einstellungen**. Gibt es in Home Assistant Etagen, die noch fehlen, klappt **Etage hinzufügen** sie zur Auswahl auf, dazu **Leere Etage**. **Etagen-Einstellungen** öffnet rechts die Einstellungen der aktuellen Etage; dasselbe zeigt die Seitenleiste, wenn nichts ausgewählt ist:
+On the far left of the toolbar is **Floor: Ground floor ▾** – the floor you are working on. The menu is there in every tool: it lists all floors (the top one first, the current one with ✓), below them **Add floor** and **Floor settings**. If Home Assistant has floors that are still missing, **Add floor** unfolds them to choose from, plus **Empty floor**. **Floor settings** opens the current floor's settings on the right; the sidebar shows the same when nothing is selected:
 
-- **Grundriss sperren** sperrt alle Räume, Wände, Türen, Fenster und Außenflächen, siehe [4.1](#41-werkzeuge).
-- **Name**, **Höhe über Boden** und **Raumhöhe** bestimmen, wo die Etage im 3D-Haus liegt und wie hoch ihre Wände sind. **90° drehen** dreht alles auf der Etage um die Mitte der Räume, wenn eine Etage verdreht gezeichnet wurde. **Etage verschieben** rückt alles auf der Etage (Räume, Möbel, Geräte, Außenflächen, freie Wände, Hintergrundbild) um X und Z, wenn eine Etage gegenüber den anderen versetzt sitzt; Dachflächen und Leitungen bleiben. Mit dem Haken **Alle Etagen mitnehmen** wirken Verschieben und Drehen auf das ganze Haus: alle Etagen samt Dachflächen, Außenflächen, Leitungen, Zähler und Hologramm. **Ansicht als Start der Etage** merkt sich, wie die 3D-Ansicht daneben gerade steht – diese Etage öffnet sich dann von dieser Seite und mit diesem Zoom und Bildausschnitt, etwa das Erdgeschoss von vorn und das Obergeschoss von hinten; ↺ nimmt das zurück.
-- **Hintergrundbild:** Im Abschnitt **Hintergrund** lädst du ein Foto oder einen Scan deines Grundrisses als Vorlage unter den Plan (Deckkraft einstellbar). Mit **Verschieben, skalieren und drehen** bekommt das Bild im Plan Griffe wie ein Möbel: ziehen verschiebt es, die Ecke unten rechts macht es größer oder kleiner, der runde Griff oben dreht es (mit Umschalt in 15°-Schritten). **Fertig** legt es wieder fest, dann zeichnest du ungestört darüber. **Drehung (°)** dreht es auf den Zehntelgrad genau. Am einfachsten geht der Maßstab mit **📏 Maßstab mit Lineal**: Anfang und Ende einer Strecke im Bild antippen, deren Länge du kennst (eine bemaßte Wand), die echte Länge eingeben – das Bild wird passend skaliert, der erste Punkt bleibt stehen. Ein schiefer Scan wird mit **📐 Gerade ausrichten** gerade: zwei Punkte auf eine Wand im Bild tippen, die waagerecht oder senkrecht sein soll – das Bild dreht sich passend. Reihenfolge: erst gerade ausrichten, dann den Maßstab, dann die Räume darüber zeichnen. Ist die Umgebung aus der Karte geladen ([4.26](#426-die-umgebung-aus-der-karte-neu)), geht alles auf einmal mit **🗺 An der Karte ausrichten**: zwei Außenecken des Hauses im Bild antippen, dann dieselben zwei Ecken am gelben Umriss der Karte – das Bild wird gedreht, skaliert und verschoben, sodass es genau auf deinem Haus liegt.
-- **Etage in Home Assistant** verknüpft die Etage mit einer HA-Etage. Dann bietet **„… Räume aus HA-Bereichen anlegen“** die Bereiche dieser Etage als Räume an.
-- **Nach oben** und **Nach unten** ändern die Reihenfolge, **Etage löschen** entfernt sie samt Räumen.
-- **Etage duplizieren** (seit 3.0.1) legt die Etage noch einmal oben aufs Haus: Räume, Wände, Fenster, Türen und Möbel – für Häuser, deren Etagen gleich geschnitten sind. Die Kopie hat keine Verknüpfungen zu Home Assistant (die Geräte oben sind andere): Bereiche, Lichter und Sensoren wählst du dort neu.
-- **Lücken schließen** führt Räume zusammen, die bis zu 60 cm auseinanderliegen. Das ist praktisch, wenn du Innenmaße gemessen hast. Der Abstand wird zur Innenwandstärke.
-- **Schiefe Kanten begradigen** findet Raumkanten, die nur ein paar Zentimeter schief laufen (eine Ecke 1 cm daneben macht in 3D schiefe Wände), und richtet sie in allen Räumen mit dieser Ecke gerade aus. Bewusst schräge Wände bleiben.
+- **Lock floor plan** locks all rooms, walls, doors, windows and outdoor areas, see [4.1](#41-tools).
 
-![Räume aus Bereichen](images/editor-area-rooms.jpg)
+- **Add floor** creates a floor. Home Assistant floors that are still missing are offered.
+- **Name**, **height above the ground** and **ceiling height** set where the floor sits in the 3D house and how tall its walls are. **Turn 90°** turns everything on the floor about the middle of its rooms when a floor was drawn the wrong way round. **Shift the floor** moves everything on the floor (rooms, furniture, devices, outdoor areas, free walls, background image) by X and Z when a floor sits offset against the others; roof sections and cables stay. With **Take every floor along** ticked, shift and turn act on the whole house: every floor with the roof sections, outdoor areas, cables, meter and hologram. **View as this floor's start** remembers how the 3D pane beside stands right now – this floor then opens from that side, with that zoom and framing, e.g. the ground floor from the front and the upper floor from the back; ↺ removes it.
+- **Background picture:** in the **Background** section you load a photo or scan of your floor plan as a template under the plan (opacity adjustable). **Move, scale and turn** gives the picture handles in the plan like a piece of furniture: drag moves it, the lower right corner scales it, the round handle on top turns it (Shift for 15° steps). **Done** fixes it again, so you can draw over it undisturbed. **Rotation (°)** turns it to a tenth of a degree. The easiest way to the scale is **📏 Scale with a ruler**: tap the start and end of a stretch of known length in the picture (a dimensioned wall), enter the real length – the picture is scaled to fit and the first point stays put. A skewed scan is put straight with **📐 Straighten**: tap two points on a wall in the picture that should run horizontally or vertically – the picture turns to fit. Order: straighten first, then the scale, then draw the rooms over it. With the surroundings from the map loaded ([4.26](#426-the-surroundings-from-the-map-new)), **🗺 Align to the map** does it all at once: tap two outer corners of the house in the picture, then the same two corners on the map's yellow outline – the picture is turned, scaled and moved to lie exactly on your house.
+- **Floor in Home Assistant** links the floor to an HA floor. Then **"Add … rooms from HA areas"** offers the areas of that floor as rooms.
+- **Move up** and **Move down** change the order, **Delete floor** removes it with its rooms.
+- **Duplicate floor** (since 3.0.1) puts the floor once more on top of the house: rooms, walls, windows, doors and furniture – for houses whose floors are laid out alike. The copy has no links to Home Assistant (the devices up there are other ones): choose areas, lights and sensors there anew.
+- **Close gaps** joins rooms that are up to 60 cm apart. This helps when you measured inside dimensions. The gap becomes the interior wall thickness.
+- **Straighten slanted edges** finds room edges that are only a few centimetres off straight (a corner 1 cm out makes slanted walls in 3D) and straightens them in every room that shares the corner. Walls drawn slanted on purpose stay.
 
-### 4.3 Räume zeichnen
+![Rooms from areas](images/editor-area-rooms.jpg)
 
-- **Rechteck:** In den Plan tippen und ziehen.
-- **Freie Form:** Punkt für Punkt setzen. Ein Tipp auf den ersten Punkt oder **Enter** schließt den Raum, **Esc** bricht ab. Beim Zeichnen steht an jeder Kante ihre Länge, auch an der gerade gezogenen.
-- **Ecken verschieben:** Mit **Auswählen** einen Raum antippen und die Ecken ziehen. Das **+** auf einer Kante fügt einen neuen Punkt ein.
-- **Fangen:** Ecken rasten am Raster, an Ecken und Kanten anderer Räume und an Fluchtlinien ein. Mit gedrückter **Alt**-Taste bewegst du frei.
+### 4.3 Drawing rooms
 
-![Ein Raum ausgewählt](images/editor-room.jpg)
+- **Rectangle:** Tap the plan and drag.
+- **Free shape:** Set corner after corner. A tap on the first corner or **Enter** closes the room, **Esc** cancels. While you draw, every edge shows its length, the one you are pulling too.
+- **Moving corners:** Tap a room with **Select** and drag its corners. The **+** on an edge inserts a corner.
+- **Snapping:** Corners snap to the grid, to corners and edges of other rooms and to alignments. Hold **Alt** to move freely.
 
-Ein ausgewählter Raum zeigt rechts:
+![A selected room](images/editor-room.jpg)
 
-- **Name** und **Bereich**: Die Verknüpfung mit einem Home-Assistant-Bereich ist das Wichtigste. Darüber findet HomePlan 3D Lichter, Rollläden, Sensoren und Szenen des Raums.
-- **Name verschieben (seit 3.2):** Links neben dem Namen des ausgewählten Raums steht im Plan ein kleiner Griff ✥. Zieh ihn, und der Name steht woanders – im Plan und in 3D, etwa wenn sich bei vielen kleinen Räumen die Namen verdecken. Er wandert mit, wenn du den Raum verschiebst. Doppelt tippen auf den Griff oder **Namen zurück in die Raummitte** setzt ihn zurück. Wie groß die Namen in 3D sind, stellst du unter **⚙ Einstellungen → Haus → Größe der Raumnamen in 3D** ein (50–200 %).
-- **Bodenbelag**: Holz, Eiche, Fliesen, Teppich, Stein oder Beton erscheinen in 3D als dezentes Muster.
-- **Ansicht als Start des Raums**: Schalte **3D daneben** ein, dreh und zoom den Raum so, wie er sich zeigen soll, und tippe den Knopf. Tippst du den Raum später in 3D an, fliegt die Kamera genau dorthin – Blickwinkel, Zoom und Bildausschnitt. ↺ nimmt das zurück, dann wird der Raum wieder von oben gezeigt.
-- Die **ID** des Raums für die Karten-Option `room:` (antippen kopiert sie).
-- **Deckenhöhe**: leer = Raumhöhe der Etage. Mit eigener Höhe enden die Wände des Raums dort (außer ein Nachbarraum ist höher), und Deckenleuchten hängen an dieser Decke – etwa 2,5 m im Wohnraum neben einer 5 m hohen Garage auf derselben Etage.
-- **Fläche und Netto-Fläche**: Die Fläche zählt die gezeichneten Ecken. Netto zieht ab, was Wände im Raum belegen: geteilte Innenwände liegen zur Hälfte im Raum, Außenwände wachsen nach außen; freie Wände im Raum und der Spalt hinter einer Vorwand (Installationsebene vor der Außenwand) zählen nicht mit.
-- **Türen und Fenster** des Raums als Liste: Ein Tipp wählt die Öffnung aus – praktisch, wenn eine Tür im Plan schwer zu treffen ist.
-- Die Liste **Geräte** des Bereichs, siehe [4.10](#410-geräte).
-- **Einrichten …** für fertige Möbelpakete, siehe [4.9](#49-räume-einrichten).
-- **Duplizieren** und **Löschen**.
+A selected room shows on the right:
 
-### 4.4 Wände
+- **Name** and **Area**: The link to a Home Assistant area matters most. Through it HomePlan 3D finds the room's lights, covers, sensors and scenes.
+- **Move the name (since 3.2):** a small handle ✥ stands left of the selected room's name in the plan. Drag it and the name stands elsewhere – in the plan and in 3D, e.g. where the names of many small rooms cover each other. It moves along when you move the room. A double tap on the handle or **Name back to the middle of the room** puts it back. How big the names are in 3D is set under **⚙ Settings → House → Size of the room names in 3D** (50–200 %).
+- **Floor**: wood, oak, tiles, carpet, stone or concrete show as a subtle pattern in 3D.
+- **View as this room's start**: turn on **3D beside**, turn and zoom the room the way it should show, then tap the button. When you tap the room in 3D later, the camera flies right there – angle, zoom and framing. ↺ removes it, and the room is shown from above again.
+- The room's **ID** for the card option `room:` (a tap copies it).
+- **Ceiling height**: empty = the floor's room height. With a height of its own the room's walls end there (unless a neighbouring room is taller), and ceiling lamps hang from that ceiling – e.g. 2.5 m in a living room beside a 5 m garage on the same floor.
+- **Area and net area**: the area counts the drawn corners. Net takes off what walls occupy in the room: shared interior walls stand half in the room, outer walls grow outwards; free walls in the room and the gap behind a wall built in front of another (an installation wall) do not count.
+- The room's **Doors and windows** as a list: a tap selects the opening – handy when a door is hard to hit in the plan.
+- The **Devices** of the area, see [4.10](#410-devices).
+- **Furnish …** for ready-made furniture sets, see [4.9](#49-furnishing-rooms).
+- **Duplicate** and **Delete**.
 
-Wände entstehen automatisch: Jede gemeinsame Kante zweier Räume wird eine Innenwand, jede Außenkante eine Außenwand. Ecken und T-Stöße werden sauber verschnitten. Die Stärken stellst du unter **Einstellungen** ein.
+### 4.4 Walls
 
-**Einzelne Wände:** Mit dem Werkzeug **Wand** ziehst du eine frei stehende Wand, zum Beispiel einen Raumteiler, der nur durch den halben Raum geht. **Umschalt** hält sie gerade, **Alt** zeichnet ohne Fangen. Trifft sie auf eine Raumwand, wird die Ecke verschnitten. Ausgewählt ziehst du die Endpunkte an den Griffen oder die ganze Wand an der Linie. Rechts stellst du **X** und **Y** (die Mitte der Wand, wie bei Möbeln; so setzt du sie zentimetergenau, ohne Raster), **Länge**, **Wandstärke** und **Höhe** ein. In 3D verhält sie sich wie jede Innenwand. Liegen nur auf einer Seite Räume (eine einzelne Wand als Außenwand gezeichnet), gilt die andere Seite als draußen: Rollläden und Fensterbänke sitzen dort, egal in welche Richtung die Wand gezogen wurde, und sie wird wie die übrigen Außenwände zu Glas, wenn sie zur Kamera zeigt. Auch in einzelne Wände setzt du mit **Tür & Fenster** Türen und Fenster ein (siehe 4.7). Löschst du die Wand, verschwinden ihre Türen und Fenster mit. Seit 2.2 kann auch eine einzelne Wand schräg sein: **◢ Schräg** in ihrem Formular gibt ihr eine **Höhe an Ecke 1** und **an Ecke 2** (der Plan nummeriert ihre Enden, solange sie ausgewählt ist), wie bei einer Raumwand (siehe *Schräge Wand* unten). Seit 3.3.1 hat eine einzelne Wand unter **🎨 Farbe** eine eigene Farbe für beide Seiten (zu sehen in den wohnlichen Stilen) – etwa eine halbhohe Vorwand im Bad oder die Wände eines Carports; ↺ nimmt wieder die Farbe der Raumwand bzw. die Fassade.
+Walls are created automatically: every shared edge of two rooms becomes an interior wall, every outer edge an exterior wall. Corners and T-junctions are mitred. You set the thicknesses under **Settings**.
 
-**Wandhöhe:** Jede Wand kann niedriger sein als der Raum, etwa als Brüstung oder Theke. Bei einer einzelnen Wand stellst du die **Höhe** im Formular ein. Bei Räumen (Rechteck und freie Form) wählst du den Raum aus; im Formular steht der Kasten **Wandeinstellungen** mit jeder Wand des Raums, benannt nach ihren Eckpunkten (z. B. „Wand 2–3“, die Nummern stehen im Plan an den Ecken) und mit ihrer Länge. Fährst du über eine Zeile oder tippst in ihr Feld, leuchtet die Wand im Plan auf. ↥ setzt sie auf volle Raumhöhe zurück. Teilen sich zwei Räume die Wand, gilt die niedrigere Einstellung. Fenster und Türen in einer niedrigen Wand enden an der Wandhöhe. Niedrige Wände erscheinen im Plan heller. Soll eine Wand in einer Flucht zwei Höhen haben (2,5 m neben 1,7 m), teilst du sie mit **✂**: Das Teilstück bekommt eine eigene Zeile und Höhe, der Teilpunkt lässt sich im Feld **Teilpunkt ab Ecke** verschieben (im Plan als Strich markiert), **⨉** fügt die Teile wieder zusammen.
+**Single walls:** The **Wall** tool draws a free-standing wall, e.g. a partition that runs through half a room. **Shift** keeps it straight, **Alt** draws without snapping. Where it meets a room wall, the corner is mitred. When selected, drag the handles to move its ends or the line to move the whole wall. On the right you set **X** and **Y** (the middle of the wall, as with furniture; so you place it to the centimetre, off the grid), **Length**, **Wall thickness** and **Height**. In 3D it behaves like any interior wall. With rooms on one side only (a single wall drawn as an outer wall), the other side counts as outside: blinds and sills sit there whichever way the wall was drawn, and it turns to glass like the other outer walls when it faces the camera. You can put doors and windows into single walls too, with **Doors & windows** (see 4.7). Deleting the wall removes its doors and windows as well. Since 2.2 a single wall can slope too: **◢ Sloping** in its form gives it a **height at corner 1** and **at corner 2** (the plan numbers its ends while it is selected), like a room wall (see *Sloping wall* below). Since 3.3.1 a single wall has its own colour for both sides under **🎨 Colour** (shown in the homely styles) – a half-height installation wall in the bathroom or a carport's walls; ↺ goes back to the room wall's colour or the facade.
 
-**Wandstärke je Wand:** Im selben Kasten hat jede Wand ein Feld **Dicke (m)**. Voreingestellt ist die Dicke des Hauses (Außen- oder Innenwand, Kapitel 4.4); eine eigene Angabe macht etwa die 36,5-cm-Außenwand neben einer 24er oder die 11,5-cm-Trennwand. Teilen sich zwei Räume die Wand, gilt die dickere Angabe, die Wand bleibt auf der Raumgrenze mittig. ↺ setzt auf die Hausdicke zurück. Fenster und Türen passen sich der Dicke an.
+**Wall height:** Any wall can be lower than the room, e.g. a parapet or a counter. For a single wall you set its **Height** in the form. For rooms (rectangle and free shape) select the room; the form shows the **Wall settings** box with every wall of the room, named by its corners (e.g. "Wall 2–3", the numbers are shown at the corners in the plan) and with its length. Hovering a row or tapping its field lights the wall up in the plan. ↥ resets it to full room height. If two rooms share the wall, the lower setting applies. Windows and doors in a low wall end at the wall height. Low walls look lighter in the plan. If one wall in line should have two heights (2.5 m next to 1.7 m), split it with **✂**: the part gets a row and a height of its own, the split point can be moved in **Split point from corner** (marked by a tick in the plan), **⨉** joins the parts again.
 
-**Schräge Wand:** **◢ Schräg** in einer Zeile der Wandhöhen gibt der Wand eine eigene Höhe an jeder ihrer beiden Ecken; die Oberkante läuft gerade dazwischen – für ein Pultdach, eine Garage am Hang oder Oberlichter auf der hohen Seite. Die hohe Seite darf über die Etagenhöhe hinausreichen. Fenster und Türen bleiben unter der Oberkante, ein Fenster am niedrigen Ende wird also niedriger. Teilst du die Kante mit einem neuen Eckpunkt, treffen sich beide Hälften auf der Höhe dazwischen. Noch einmal **◢ Schräg** macht die Wand wieder gerade.
+**Thickness per wall:** in the same box every wall has a **Thickness (m)** field. By default it is the house's thickness (exterior or interior wall, chapter 4.4); a setting of its own makes the 36.5 cm outer wall next to a 24 cm one, or the 11.5 cm partition. If two rooms share the wall, the thicker setting applies and the wall stays centred on the room border. ↺ goes back to the house's thickness. Windows and doors follow the thickness.
 
-**Keine Wand:** Bei offenen Grundrissen gehören Flur, Küche und Wohnzimmer baulich zusammen, sind in Home Assistant aber getrennte Bereiche. Dafür hat jede Zeile im Kasten **Wandeinstellungen** den Knopf **Keine Wand**: Die Wand fällt im Grundriss und in 3D ganz weg, auch wenn der Nachbarraum sie teilt. ↥ holt sie zurück. Das Licht folgt dem: Eine Lampe leuchtet durch die weggelassene Wand in den Nachbarraum, als wäre es ein Raum.
+**Sloping wall:** **◢ Sloping** in a row of the wall heights gives the wall a height of its own at each of its two corners; the top runs straight between them – for a lean-to, a garage on a slope or clerestory windows on the tall side. The tall side may reach above the floor height. Windows and doors stay under the top, so a window at the low end gets lower. Splitting the edge with a new corner, both halves meet at the height in between. **◢ Sloping** again makes the wall straight.
 
-**Geteilte Wände:** Teilt ein Nachbarraum eine Wand in mehrere Stücke (etwa zwei kleine Räume an einer langen Wand), bekommt jedes Stück eine eigene Zeile „Wand 2–3 · Teil 1“, „… Teil 2“ mit seiner Länge, und jedes Stück kann seine eigene Höhe haben oder wegfallen.
+**No wall:** In open floor plans the hall, kitchen and living room are one space, yet separate areas in Home Assistant. For that, every row in the **Wall settings** box has a **No wall** button: the wall is left out in the plan and in 3D, even when the neighbouring room shares it. ↥ brings it back. The light follows: a lamp shines through the left-out wall into the neighbouring room as if it were one room.
 
-**Wandfarben (neu in 3.1):** Im Kasten **Wandeinstellungen** steht oben **Wandfarben**: **Alle Wände** färbt jede Wand des Raums auf einmal, die Farbfelder daneben sind schnelle Vorschläge. Danach hat jede Wand in ihrer Zeile ein eigenes Farbfeld; eine eigene Farbe ist blau umrandet, **Zurücksetzen** nimmt sie wieder weg. Gefärbt wird die Seite der Wand, die im Raum liegt – die Seite im Nachbarraum färbt jener Raum. Die Außenseite der Außenwände stellst du unter **⚙ Einstellungen → 🎨 Stile → Fassade** ein. Wandfarben zeigen nur die wohnlichen Stile (siehe [5.12](#512-stile-neu-in-31)); im Neon-Look bleiben die Wände Neon. Damit du die Farben gleich siehst, schaltet **3D daneben** beim Färben auf **Wohnlich** um.
+**Split walls:** When a neighbouring room splits a wall into several parts (say two small rooms along one long wall), every part gets a row of its own, "Wall 2–3 · part 1", "… part 2", with its length, and every part can have its own height or be left out.
 
-### 4.5 Das ⚙ Einstellungen-Menü
+**Wall colours (new in 3.1):** The **Wall settings** box starts with **Wall colours**: **All walls** colours every wall of the room at once, the swatches beside it are quick picks. After that each wall has its own colour well in its row; a colour of its own has a blue frame, **Reset** takes it away again. The side of the wall inside the room is coloured – the side in the neighbouring room belongs to that room. The outside of the outer walls is set under **⚙ Settings → 🎨 Styles → Facade**. Only the homely styles show wall colours (see [5.12](#512-styles-new-in-31)); in the neon look the walls stay neon. So you see the colours right away, **3D beside** switches to **Homely** while you colour.
 
-Alles, was zum ganzen Plan gehört und nicht zu einer Etage, einem Raum oder einem Möbel, steht an einem Ort: **⚙ Einstellungen** rechts in der Werkzeugleiste (auf schmalen Bildschirmen nur das Zahnrad). Der Knopf öffnet ein Fenster über dem Plan, auch während etwas ausgewählt ist: links die Themen in fünf Gruppen, rechts das gewählte Thema. Das Fenster öffnet dort, wo du zuletzt warst; **✕**, **Esc** oder ein Klick daneben schließt es. In einem schmalen Fenster stehen die Themen als Auswahl oben.
+### 4.5 The ⚙ settings menu
 
-![Einstellungen](images/settings.jpg)
+Everything that belongs to the whole plan rather than to a floor, a room or an item sits in one place: **⚙ Settings** on the right of the toolbar (only the gear on narrow screens). The button opens a dialog over the plan, also while something is selected: the topics in five groups on the left, the chosen topic on the right. The dialog opens where you left it; **✕**, **Esc** or a click beside it closes it. In a narrow window the topics are a choice on top.
 
-| Gruppe | Thema | Inhalt |
+![Settings](images/settings.jpg)
+
+| Group | Topic | Content |
 |---|---|---|
-| **Haus & Plan** | **Grundrisse** | mehrere Grundrisse, siehe [4.25](#425-mehrere-grundrisse-und-das-grundstück-neu-in-30) |
-| | **Haus** | Wandstärken, Raster, Längen, Nordrichtung (die Zeilen darunter) |
-| | **Gelände** | siehe [4.21](#421-keller-und-gelände) |
-| | **Umgebung** | die Nachbarschaft aus der Karte, siehe [4.26](#426-die-umgebung-aus-der-karte-neu) |
-| | **Hintergrund** | was hinter dem 3D-Haus liegt (unten) |
-| **Aussehen** | **Stile** | Stile, eigene Stile, Tageszeiten und Fassade, siehe [5.12](#512-stile-neu-in-31) |
-| | **Wetter & Warnungen** | Wetter-Entität und -Effekte, Regenwarnung, Warnungsnamen, Stromausfall-Sensor, Sonnenflecken |
-| | **Favoriten** | das Zentral-Menü der 3D-Ansicht (unten) |
-| **Bildschirme** | **Karten-Vorlagen** | fertige Dashboard-Karten für Wandtablets und Handys, siehe [8.1](#81-karten-vorlagen) |
-| | **Live-Regie** | siehe [6.1](#61-kamera-cockpit) |
-| **Erweiterungen** | **Module** | eingespielte Module (etwa „Das Haus antwortet“) und **Modul einspielen …** für eine lokale Pack-Datei |
-| | **Fun-Packs** | Haustiere und die Packs der Jahreszeiten |
-| | **Sprachsteuerung** | siehe [5.10](#510-sprachsteuerung-neu) |
-| | **Ortung** | siehe [5.11](#511-ortung-neu) |
-| **System** | **Sicherung** | Export, Import, Wiederherstellen, siehe Kapitel 9 |
-| | **Diagnose** | lokale Vorschau; nichts verlässt Home Assistant |
+| **House & plan** | **Floor plans** | several floor plans, see [4.25](#425-several-floor-plans-and-the-property-new-in-30) |
+| | **House** | wall thicknesses, grid, lengths, north (the rows below) |
+| | **Ground** | see [4.21](#421-cellar-and-ground) |
+| | **Surroundings** | the neighbourhood from the map, see [4.26](#426-the-surroundings-from-the-map-new) |
+| | **Background** | what lies behind the 3D house (below) |
+| **Look** | **Styles** | styles, own styles, times of day and facade, see [5.12](#512-styles-new-in-31) |
+| | **Weather & warnings** | weather entity and effects, rain warning, warning names, outage sensor, sun patches |
+| | **Favourites** | the central menu of the 3D view (below) |
+| **Screens** | **Card templates** | ready-made dashboard cards for wall tablets and phones, see [8.1](#81-card-templates) |
+| | **Live director** | see [6.1](#61-camera-cockpit) |
+| **Extensions** | **Modules** | imported modules (e.g. "The house answers") and **Import a module …** for a local pack file |
+| | **Fun packs** | pets and the packs of the seasons |
+| | **Voice control** | see [5.10](#510-voice-control-new) |
+| | **Locating** | see [5.11](#511-locating-new) |
+| **System** | **Backup** | export, import, restore, see chapter 9 |
+| | **Diagnostics** | local preview only; nothing leaves Home Assistant |
 
-Die **Dachform** (kein Dach, Flachdach, Satteldach, First, Neigung, Überstand) steht beim Dach-Werkzeug, siehe [4.19](#419-dach). Die **Startansicht** merkst du dir in der 3D-Ansicht: Haus drehen und zoomen, dann in den Ansicht-Einstellungen (Zahnrad oben rechts) **📌** antippen; **📌✕** setzt sie zurück. 3D-Ansicht, Karte und Kiosk öffnen das Haus dann so, und eine geöffnete Etage wird von derselben Seite gezeigt.
+The **roof shape** (none, flat, gable, ridge, pitch, overhang) sits with the roof tool, see [4.19](#419-roof). The **start view** is remembered in the 3D view: turn and zoom the house, then tap **📌** in the view settings (gear at the top right); **📌✕** resets it. The 3D view, the card and the kiosk then open the house like that, and an opened floor is shown from the same side.
 
-| Einstellung | Bedeutung |
+| Setting | Meaning |
 |---|---|
-| **Außenwand (m)**, **Innenwand (m)** | Wandstärken |
-| **Raster (m)** | Schrittweite beim Zeichnen |
-| **Längen** | **Automatisch** folgt dem Einheitensystem von Home Assistant, sonst **Meter** oder **Fuß und Zoll**. Mit Fuß und Zoll zeigt der Editor alle Längen, Maße und Flächen (ft²) so an und versteht Eingaben wie `8' 2"`, `98in`, `8.2ft` oder auch `2.5m`. Gespeichert wird immer in Metern, du kannst also jederzeit umschalten |
-| **Nordrichtung** | Grad im Uhrzeigersinn von oben. Wird für das Sonnenlicht gebraucht |
-| **Wetter-Entität** | Welche Wetter-Entität das Wetter draußen liefert, siehe [6.2](#62-wetter-draußen) |
-| **Wetter-Effekte in 3D** | Welche Effekte gezeigt werden |
-| **Favoriten** | Szenen, Skripte, Automationen, Tasten und Schalter für das Zentral-Menü (Stern) der 3D-Ansicht: Party, Anwesenheitssimulation, Verschattung, Bewässerung. Auswählen mit der Suche, Reihenfolge mit ↑ ↓, ✕ entfernt. Darunter **Eigene Knöpfe** mit Beschriftung, Symbol und Aktion: **Seite öffnen** (Pfad wie `/lovelace/rollos`), **Details einer Entität**, **Dienst aufrufen** (`domain.service` mit Daten als JSON) oder **fire-dom-event** – damit öffnet ein Knopf ein browser_mod-Popup mit deiner eigenen Karte, z. B. `{"browser_mod": {"service": "browser_mod.popup", "data": {"title": "Rollos", "content": {"type": "custom:meine-rollo-karte"}}}}` |
-| **🖼 Hintergrund** | Was hinter dem 3D-Haus liegt: der Himmel des Looks (Standard), **eine Farbe**, ein **Farbverlauf** oder ein **Bild**. Das Bild legst du in Home Assistant unter `config/www` ab und trägst `/local/dateiname.jpg` ein; **Abdunkeln** legt einen dunklen Schleier darüber, damit die Neonlinien lesbar bleiben. Gilt für Panel und Karten und kostet keine Leistung |
+| **Exterior wall (m)**, **Interior wall (m)** | Wall thicknesses |
+| **Grid (m)** | Drawing step |
+| **Lengths** | **Automatic** follows Home Assistant's unit system, otherwise **Metres** or **Feet and inches**. With feet and inches the editor shows every length, dimension and area (ft²) that way and understands input like `8' 2"`, `98in`, `8.2ft` or even `2.5m`. The plan always stores metres, so you can switch at any time |
+| **North** | Degrees clockwise from up. Needed for sunlight |
+| **Weather entity** | Which weather entity drives the weather outside, see [6.2](#62-weather-outside) |
+| **Weather effects in 3D** | Which effects are shown |
+| **Favourites** | Scenes, scripts, automations, buttons and switches for the central menu (star) of the 3D view: party, presence simulation, shading, watering. Pick them with the search, order them with ↑ ↓, ✕ removes one. Below them **Own buttons** with a label, an icon and an action: **Open a path** (e.g. `/lovelace/blinds`), **Entity details**, **Call a service** (`domain.service` with data as JSON) or **fire-dom-event** – with it a button opens a browser_mod popup with your own card, e.g. `{"browser_mod": {"service": "browser_mod.popup", "data": {"title": "Blinds", "content": {"type": "custom:my-blind-card"}}}}` |
+| **🖼 Background** | What lies behind the 3D house: the look's sky (default), **one colour**, a **gradient** or a **picture**. Put the picture into `config/www` in Home Assistant and enter `/local/filename.jpg`; **Darken** lays a dark veil over it so the neon lines stay readable. Applies to the panel and cards and costs no performance |
 
-### 4.6 Grundriss-Bild als Vorlage
+### 4.6 Floor plan image as a template
 
-Unter **Vorlage (Grundriss-Bild)** lädst du ein Foto oder einen Scan deines Grundrisses unter die Zeichnung. **Breite im Plan (m)** bringt das Bild auf den richtigen Maßstab, **Deckkraft** macht es dezenter. So zeichnest du die Räume einfach nach.
+Under **Template (floor plan image)** you load a photo or scan of your floor plan under the drawing. **Width in plan (m)** brings it to scale, **Opacity** makes it subtler. Then simply trace the rooms.
 
-### 4.7 Türen, Fenster und Garagentore
+### 4.7 Doors, windows and garage doors
 
-![Tür ausgewählt](images/editor-opening.jpg)
+![A selected door](images/editor-opening.jpg)
 
-Mit **Tür & Fenster** tippst du auf eine Wand, eine Raumwand oder eine einzelne Wand. Danach wählst du rechts die **Art**: Tür, Fenster oder Garagentor. Ein Fenster mit Brüstung 0 ist eine Terrassentür; wie bei Türen dreht **⇅ Öffnungsrichtung umdrehen** sie nach außen (in 3D schwingen die Flügel dann nach draußen, gekippt wird weiter nach innen). Die Vorlage **Glaswand** setzt eine feststehende, raumhohe Verglasung mit schmalen Sprossen ohne Flügel – für eine gläserne Innenwand oder Trennwand; Breite und Höhe stellst du frei ein, als Art geht sie auch bei jedem Fenster unter **Stil**. Die Vorlagen **Hebe-Schiebetür** und **Schiebefenster** (seit 3.0.1, Stil **Schiebe**) haben eine feste Scheibe auf der Seite des Anschlags und eine, die auf der inneren Schiene davor fährt – so weit, wie der Kontakt „offen“ meldet; **⇆** wechselt die Seite. **Klappfenster** im Fensterformular hängt das Fenster oben an: Es öffnet unten nach außen, offen und gekippt sehen gleich aus – wie in Skandinavien üblich.
+With **Doors & windows** you tap a wall, a room wall or a single wall. Then you choose the **Type** on the right: door, window or garage door. A window with a sill of 0 is a terrace door; like a door, **⇅ Reverse opening direction** turns it outwards (in 3D its sashes then swing outside; tilting stays inwards). The preset **Glass wall** sets fixed floor-to-ceiling glazing with slim mullions and no sashes – for an indoor glass wall or partition; width and height are free, and any window can take it under **Style**. The presets **Lift-and-slide door** and **Sliding window** (since 3.0.1, style **Sliding**) have a fixed pane on the hinge side and one that runs in front of it on the inner track – as far as the contact reports open; **⇆** swaps the side. **Top-hung** in the window's form hangs the window at the top: its bottom opens outwards, open and tilted look alike – common in Scandinavia.
 
-Stoßen zwei Räume ohne Wand aneinander (offener Übergang) und läuft die Außenwand dort in einer Linie weiter, darf ein Fenster oder eine Tür über den Übergang hinaus in die Wand des Nachbarraums reichen. Die Mitte der Öffnung bleibt auf der Wand ihres eigenen Raums.
+Where two rooms meet without a wall (an open transition) and the outer wall carries on in a straight line, a window or door may reach across the transition into the neighbouring room's wall. The middle of the opening stays on its own room's wall.
 
-![Arten von Öffnungen](images/editor-opening-kinds.jpg)
+![Kinds of openings](images/editor-opening-kinds.jpg)
 
-Jede Öffnung hat:
+Every opening has:
 
-- **Breite**, **Brüstung** und **Höhe**, dazu die Anschlagseite. Mit **Auswählen** schiebst du sie entlang der Wand.
-- **Fensterbank** (nur Fenster): *automatisch* (Standard) zeichnet ab 30 cm Brüstung eine Fensterbank innen und außen – außer bei einem Fenster, das direkt auf einem anderen Fenster oder einer Tür derselben Wand sitzt (Oberlicht, feststehendes Oberteil, in zwei Teile geteilte Glasfront): Das bekommt keine eigene. *Keine*, *nur innen* oder *nur außen* legen es fest, etwa für eine Fensterfront ohne Brett oder ein Fenster über einer Küchenzeile. Von Hand gewählt erscheint sie auch bei einem bodentiefen Fenster oder einer Terrassentür (dann auf Bodenhöhe) und bei einer Glaswand, die von sich aus keine hat.
-- **Stil:** Zimmertür, Haustür, Haustür mit Glasausschnitt, mit einem oder zwei Seitenteilen, Glastür, Schiebetür oder **Durchbruch (ohne Tür)**. Bei Seitenteilen stellst du darunter ihre **Breite** ein (leer = automatisch), bei zweien links und rechts getrennt; ein einzelnes Seitenteil sitzt gegenüber dem Anschlag, mit **Seitenteil an der Anschlagseite** neben den Bändern. Ein Durchbruch ist nur eine Öffnung in der Wand, ohne Zarge und Türblatt; das Licht fällt immer hindurch. Fenster gibt es als Standard oder mit Sprossen. „Automatisch“ wählt eine Haustür für Außentüren.
-- **Flügel:** einflügelig oder zweiflügelig, mit eigenem Kontakt für den zweiten Flügel.
-- **Markieren in 3D:** *Wenn offen* (Standard) lässt offene Fenster und Türen warm leuchten. *Wenn geschlossen* dreht das um, etwa für die WC- oder die Kinderzimmertür: Sie leuchtet, solange sie zu ist. Das braucht einen Kontakt; ohne Sensor wird nichts markiert.
-- **Ohne Sensor geschlossen zeigen:** Eine Tür ohne Kontakt steht in 3D halb offen, damit man sie als Tür erkennt. Der Haken zeichnet sie geschlossen, etwa für eine Haustür oder ein Carport ohne Sensor.
-- **Öffnungswinkel (seit 2.0.6):** Wie weit das Türblatt offen steht: **Standard**, 15°, 30°, 45°, 60° oder 90°. Ohne Sensor steht die Tür immer so weit offen, mit Sensor öffnet sie so weit, sobald er „offen“ meldet. **Standard** bleibt wie bisher: ohne Sensor halb offen, mit Sensor ganz offen.
-- **Smart Lock:** Das Schloss der Tür (Nuki, Aqara, `lock.*`). In 3D steht ein Pin an der Tür: 🔒 zu, rot leuchtend, solange sie offen ist; ein Tipp schließt auf oder ab. Auch ein Tipp auf die Tür selbst (ohne Antrieb) öffnet ihr Menü mit **Abschließen** bzw. **Aufschließen**, immer mit Rückfrage; solange das Schloss offen ist, leuchtet die freie Kante des Türblatts sanft in der Akzentfarbe – egal, was der Türkontakt meldet. An einer zweiflügeligen Tür oder Terrassentür sitzt der Pin am Hauptflügel (auf der Seite des Anschlags). Die Sprache fragt es ab („Ist die Haustür abgeschlossen?“).
-- **Kontakt umkehren:** Für Sensoren, die offen und geschlossen andersherum melden. NeonPlan zeigt dann offen, wenn der Sensor geschlossen meldet, und umgekehrt (Standard: aus).
+- **Width**, **sill** and **height**, plus the hinge side. With **Select** you slide it along the wall.
+- **Sill** (windows only): *automatic* (default) draws a window board inside and a sill outside from a sill height of 30 cm – except for a window that sits directly on another window or a door of the same wall (transom light, fixed upper part, a glass front split in two): that one gets none of its own. *None*, *inside only* or *outside only* fix it, e.g. for a glass front without a board or a window above a kitchen worktop. Chosen by hand it also shows on a window down to the floor or a terrace door (lying at the floor) and on a glass wall, which has none by itself.
+- **Style:** room door, front door, front door with glass, with one or two sidelights, glass door, sliding door or **Opening (no door)**. With sidelights you set their **width** below (empty = automatic), with two the left and the right one separately; a single sidelight sits opposite the hinge, or next to the hinges with **Sidelight on the hinge side**. An opening is just a gap in the wall, without frame and leaf; light always passes through. Windows come as standard or with glazing bars. "Automatic" picks a front door for exterior doors.
+- **Leaves:** single or double, with an own contact for the second leaf.
+- **Highlight in 3D:** *When open* (default) makes open windows and doors glow warm. *When closed* turns this round, e.g. for the WC or a child's room door: it glows while it is shut. This needs a contact; without a sensor nothing is highlighted.
+- **Show closed without a sensor:** a door without a contact stands half open in 3D, so it is seen as a door. The checkbox draws it closed, e.g. for a front door or a carport without a sensor.
+- **Opening angle (since 2.0.6):** how far the leaf stands open: **Default**, 15°, 30°, 45°, 60° or 90°. Without a sensor the door always stands that far open, with one it opens that far as soon as the sensor reports "open". **Default** stays as before: half open without a sensor, fully open with one.
+- **Smart lock:** the door's lock (Nuki, Aqara, `lock.*`). A pin stands at the door in 3D: 🔒 locked, glowing red while it is unlocked; a tap locks or unlocks. A tap on the door itself (without a drive) also opens its menu with **Lock** or **Unlock**, always asking first; while the lock is unlocked, the leaf's free edge glows softly in the accent colour – whatever the door contact says. On a double door or terrace door the pin sits on the main leaf (on the hinge side). The voice asks it ("Is the front door locked?").
+- **Invert contact:** for sensors that report open and closed the other way round. NeonPlan then shows open when the sensor reports closed, and vice versa (default: off).
 
-Türen und Fenster lassen sich im Plan auch an einem breiten Streifen um die Öffnung antippen; ein ausgewählter Raum listet seine Türen und Fenster im Formular.
+Doors and windows can also be tapped in a wide band around the opening in the plan; a selected room lists its doors and windows in its form.
 
-![Haustür](images/editor-front-door.jpg)
+![Front door](images/editor-front-door.jpg)
 
-**Sensoren:**
+**Sensors:**
 
-| Feld | Wirkung in 3D |
+| Field | Effect in 3D |
 |---|---|
-| **Rollladen** | Der Rollladen fährt vor dem Fenster – oder vor einer Tür (Haustür, Terrassentür, Schiebetür) – mit der Position der Cover-Entität |
-| **Positions-Sensor** | Für Rollläden, deren Position über einen eigenen Sensor kommt, etwa bei Homematic. Bei Bedarf umkehrbar |
-| **Rollladen sitzt** (seit 3.1.1) | **außen (Rollladen)** wie bisher, oder **innen (Rollo)**: Die Kassette sitzt dann innen über dem Fenster und der Stoff läuft im Raum herunter. Sonnenflecken und das Fensterlicht folgen dem Rollo genauso |
-| **Lamellen** (seit 3.1.1) | Meldet die Cover-Entität eine Lamellenstellung (Raffstore, Jalousie), zeichnet NeonPlan einzelne Lamellen, die sich mitdrehen: waagerecht bei 100, geschlossen bei 0. Das Sonnenlicht im Raum folgt ihnen – ein heruntergefahrener Raffstore mit offenen Lamellen lässt Licht durch. **Lamellen umkehren (0 = offen)** erscheint dann im Formular, für Integrationen, die den Wert andersherum melden: Er wird in 3D, im Schnellmenü und im Raumfenster gedreht, auch der gesendete |
-| **Vor dem Schalten nachfragen** | Auf, Zu und Positionen fragen im Schnellmenü und im Raumfenster erst nach, und Wischen über das Symbol bewegt den Rollladen nicht mehr (es dreht dann die Ansicht). Stopp fragt nie. Gut für Tablets, auf denen Rollläden oder das Garagentor sonst versehentlich fahren |
-| **Kontakt** | Die Tür schwingt auf, das Fenster öffnet sich. Angeboten werden Binärsensoren der Klasse Tür, Fenster oder Öffnung und solche ohne Klasse (KNX, enOcean, Template-Sensoren haben oft keine) |
-| **Kippkontakt** | Ein zweiter Sensor, der „gekippt“ meldet |
-| **Kippwinkel-Sensor** | Optional: ein Sensor, der den Kippwinkel in Grad liefert (z. B. „Rotation“ eines Shelly BLU Door/Window). Der Flügel kippt in 3D genau so weit; **Winkel für „ganz gekippt“** (Standard 15°), ein **Offset** für den Wert bei geschlossenem Fenster und **andersherum zählen** passen ihn an die Montage an. Ab einem kleinen Winkel gilt das Fenster als gekippt, auch für die Regenwarnung |
-| **Kontakt zweiter Flügel** | Für zweiflügelige Fenster und Türen |
-| **Garagentor** | Ein Garagentor folgt einer Cover-Entität oder einem Kontakt (an = offen; auch Sensoren, die „open“/„closed“ melden). Als Kontakt geht auch ein **Schalter oder input_boolean**, der das Tor antreibt: an = offen, Antippen in 3D schaltet ihn. Gibt dein Antrieb nur einen kurzen Impuls, wählst du den **Schalter, Taster (`button`) oder `input_button` unter Antrieb** und den echten Torkontakt unter Kontakt: Ein Tipp aufs Tor schaltet den Schalter ein bzw. drückt den Taster (mit *Vor dem Schalten nachfragen* erst nach Rückfrage), offen oder zu zeigt der Kontakt. Der offene Teil liegt dann unter der Decke. **Torart (seit 3.2):** **Sektionaltor** (wie bisher: läuft in Teilen unter die Decke) oder **Schwingtor** – eine Platte, deren Unterkante nach außen und oben schwenkt; offen liegt sie unter der Decke, ein Stück ragt wie ein Vordach hinaus. Ein Tor- oder Garagen-Cover an einer **Tür** (z. B. ein Schiebetor) bewegt das Türblatt statt eines Rollladens |
+| **Cover** | The blind moves in front of the window – or of a door (front door, French window, sliding door) – with the cover's position |
+| **Position sensor** | For blinds whose position comes from a separate sensor, e.g. Homematic. Can be inverted |
+| **Blind sits** (since 3.1.1) | **outside (roller shutter)** as before, or **inside (roller shade)**: the cassette then sits inside above the window and the cloth runs down in the room. Sun patches and the window light follow the shade just the same |
+| **Slats** (since 3.1.1) | When the cover reports a slat tilt (a Raffstore, a venetian blind), NeonPlan draws single slats that turn with it: level at 100, shut at 0. The sunlight in the room follows them – a lowered blind with open slats lets light through. **Invert slats (0 = open)** then shows in the form, for integrations that report the value the other way round: it is turned in 3D, in the quick menu and in the room panel, the one sent too |
+| **Ask before switching** | Open, close and positions ask first in the quick menu and the room panel, and a swipe on the marker no longer moves the blind (it turns the view instead). Stop never asks. Good for tablets where blinds or the garage door would otherwise move by accident |
+| **Contact** | The door swings open, the window opens. Offered are binary sensors of the door, window or opening class and ones without a class (KNX, enOcean, template sensors often have none) |
+| **Tilt contact** | A second sensor that reports "tilted" |
+| **Tilt angle sensor** | Optional: a sensor reporting the tilt angle in degrees (e.g. the "Rotation" of a Shelly BLU Door/Window). The sash tilts exactly that far in 3D; **Angle that counts as fully tilted** (15° by default), an **Offset** for the value while closed and **counts the other way round** adapt it to the mounting. Above a small angle the window counts as tilted, also for the rain warning |
+| **Contact second leaf** | For double windows and doors |
+| **Garage door** | A garage door follows a cover entity or a contact (on = open; sensors reporting “open”/“closed” work too). A **switch or input_boolean** that drives the door works as the contact too: on = open, a tap in 3D switches it. If your opener only takes a short pulse, choose the **switch, button or `input_button` under Drive** and the real door contact under Contact: a tap on the door switches the switch on or presses the button (asking first with *Ask before switching*), and open or closed comes from the contact. Its open part lies under the ceiling. **Kind of door (since 3.2):** **Sectional door** (as before: runs in sections under the ceiling) or **Up-and-over door** – one leaf whose bottom edge swings out and up; open, it lies under the ceiling with a part sticking out like a canopy. A gate or garage-door cover on a **door** (e.g. a sliding gate) moves the door leaf instead of a roller shutter |
 
-Rollläden und Kontakte ordnet HomePlan 3D über den Bereich automatisch zu. Du kannst sie jederzeit von Hand ändern.
+HomePlan 3D matches covers and contacts through the area automatically. You can change them by hand at any time.
 
-### 4.8 Möbel
+### 4.8 Furniture
 
-![Die Möbelbibliothek](images/editor-library.jpg)
+![The furniture library](images/editor-library.jpg)
 
-Das Werkzeug **Möbel** öffnet rechts die Bibliothek: die 80 eingebauten Modelle und alles aus deinen installierten Möbel-Packs, zusammen sortiert nach dem, **was** es ist – Sofas, Sitzmöbel, Tische, Schränke & Regale, Betten, Küche, Geräte, Bad, Leuchten, TV & Audio, Büro, Technik & Smart Home, Heizen & Klima, Energie, Haushalt, Deko, Pflanzen, Garten & Außen, Kinder, Fitness, Haustiere, Fahrzeuge, Treppen & Geländer, Architektur. Jede Karte zeigt ein **Bild**, das Maß (Breite × Tiefe) und woher das Möbel kommt („Basis“ oder der Pack-Name). Die Bilder zeichnet NeonPlan beim ersten Aufklappen und merkt sie sich im Browser; auf sehr schwachen Geräten bleiben die Karten ohne Bild, die Vorschau beim Darüberfahren gibt es trotzdem.
+The **Furniture** tool opens the library: the 80 built-in models and everything from your installed furniture packs, sorted together by **what** it is – Sofas, Seating, Tables, Cabinets & shelves, Beds, Kitchen, Appliances, Bathroom, Lights, TV & audio, Office, Tech & smart home, Heating & climate, Energy, Household, Decoration, Plants, Garden & outdoors, Kids, Fitness, Pets, Vehicles, Stairs & railings, Architecture. Every card shows a **picture**, the size (width × depth) and where the item comes from ("Basic" or the pack's name). NeonPlan draws the pictures the first time a section opens and keeps them in the browser; on very weak devices the cards stay without pictures, the hover preview still works.
 
-- **Raum-Chips** oben: Beim Öffnen eines Raums ist sein Raumtyp vorgewählt (ein „Wohnzimmer“ zeigt Wohnen, eine „Küche“ Küche) – die Bibliothek zeigt dann nur, was in diesen Raum passt, plus alles, was überall passt (Leuchten, Technik). **Alle Räume** hebt den Filter auf, jeder andere Chip wechselt ihn.
-- **Filter-Chips:** ⚡ **Verknüpfbar** (nimmt eine Entität), 💡 **Leuchtet** (verknüpft ein Licht), 🌳 **Außen**.
-- **Familien:** Gibt es ein Möbel in mehreren Größen (Esstisch 120 / 160 / 200, Bett 90 bis 200, Unterschrank 30 bis 120), steht es als **eine Karte** mit Chips für die Größen; der Chip legt genau diese Größe ab. So bleibt die Liste auch mit vielen Packs überschaubar. Gibt es ein Möbel nur für eine Seite („Ecksofa links“, „Sofa mit Récamiere links“), bekommt es von selbst einen Chip für die andere Seite – der legt es gespiegelt ab.
-- **★ Favoriten** und **🕘 Zuletzt benutzt** stehen ganz oben, sobald es welche gibt – der Stern an jeder Karte merkt sie, beides bleibt im Browser.
-- Das **Suchfeld** findet deutsche und englische Namen, den Pack-Namen und Alltagswörter („lampe“ findet alle Leuchten, „schrank“ alle Schränke), mehrere Wörter in beliebiger Reihenfolge („sofa ecke“); Escape leert es. Beim Suchen sind alle Abschnitte offen.
-- Lange Abschnitte zeigen zuerst 24 Karten und darunter **„… weitere zeigen“**.
-- **🖼️ Aus Packs** (neu in 3.4): Hinter deinen eigenen Möbeln stehen die Möbel aus Packs; auch die Suche findet sie. Ein Tipp zeigt das große Bild und den Pack-Namen. Es ist nur ein Bild; das Möbel lässt sich wie jedes andere platzieren. Der Chip **Aus Packs** blendet sie aus (gemerkt in diesem Browser).
+- **Room chips** at the top: when you open a room, its room kind is preselected (a "Living room" shows Living, a "Kitchen" Kitchen) – the library then shows only what fits that room, plus everything that fits anywhere (lights, tech). **All rooms** lifts the filter, any other chip switches it.
+- **Filter chips:** ⚡ **Linkable** (takes an entity), 💡 **Lights up** (links a light), 🌳 **Outdoors**.
+- **Families:** an item that comes in several sizes (dining table 120 / 160 / 200, bed 90 to 200, base unit 30 to 120) stands as **one card** with chips for the sizes; the chip places exactly that size. That keeps the list short even with many packs. An item that comes for one side only ("Corner sofa (left)", "Sofa with chaise (left)") gets a chip for the other side by itself – it places the item mirrored.
+- **★ Favourites** and **🕘 Recently used** stand at the top as soon as there are any – the star on every card marks them, both stay in the browser.
+- The **search field** finds names, the pack name and everyday words ("lamp" finds all lights, "cabinet" all cabinets), several words in any order ("corner sofa"); Escape clears it. While searching, every section is open.
+- Long sections show 24 cards first and **"Show … more"** below.
+- **🖼️ From packs** (new in 3.4): after your own furniture come the items supplied by packs; the search finds them too. A tap shows the large picture and the pack name. It is only a picture; the item is placed like any other. The **From packs** chip hides them (remembered in this browser).
 
-Die **Arbeitsplatte** (Küche) ist eine freie Platte ohne Unterbau, für Lücken in der Küche oder einen selbst gebauten Schreibtisch; ihre **Höhe** ist die Oberkante, voreingestellt 91 cm. Unter Sofas stehen neben dem Sofa ein **Ecksofa (L-Form)** und eine **Wohnlandschaft (U-Form)**; mit **Spiegeln** sitzt der Schenkel des Ecksofas auf der anderen Seite. Auf Geräten, die die Karten ohne Bild zeigen, erscheint beim Darüberfahren die größere 3D-Vorschau wie bisher.
+The **Worktop** (Kitchen) is a free top without a base, for gaps in the kitchen or a self-built desk; its **height** is the top edge, 91 cm by default. Under Sofas, next to the sofa, there are a **Corner sofa (L-shaped)** and a **U-shaped sofa**; **Mirror** puts the corner sofa's side section on the other side. On devices that show the cards without pictures, hovering shows the bigger 3D preview as before.
 
-**Symbole an den Einträgen:**
+**Symbols on the entries:**
 
-- 💡 Eine **Leuchte**: Sie lässt sich mit einem Licht verknüpfen und in 3D schalten.
-- ⚡ Ein **elektrisches Möbel**: Es nimmt eine Entität und einen Leistungssensor, etwa ein Fernseher, eine Waschmaschine oder ein Thermostat.
-- ✨ **Lebt** (neu in 3.4): Teile bewegen sich mit Home Assistant – Türen, Schubladen, Füllstände, Status-Lämpchen, Lüfter. Der Chip **✨ Lebt** zeigt nur diese Möbel.
+- 💡 A **lamp**: it links to a light and switches in 3D.
+- ⚡ An **electric item**: it takes an entity and a power sensor, e.g. a TV, a washing machine or a thermostat.
+- ✨ **Live** (new in 3.4): parts move with Home Assistant – doors, drawers, levels, status lights, fans. The **✨ Live** chip shows only these items.
 
-**Platzieren und bearbeiten:**
+**Placing and editing:**
 
-- Einen Raum antippen, dann einen Eintrag wählen. Das Möbel erscheint im Raum.
-- **Ziehen** verschiebt es. In der Nähe einer Wand dreht es sich mit dem Rücken zur Wand und rastet bündig ein. **Alt** schiebt frei.
-- Der **Griff vor dem Möbel** dreht es in 15°-Schritten, die **Ecken** ändern die Größe. Pack-Möbel ab den Packs von Oktober 2026 behalten dabei, was fest ist: Beine, Armlehnen, Platten und Griffe bleiben so dick wie sie sind, Sitzfläche und Korpus wachsen – ein auf 3 m gezogenes Sofa hat weiter 20 cm breite Armlehnen, ein höheres eine höhere Lehne.
-- Rechts stellst du Breite, Tiefe, Höhe, Drehung und **Höhe über Boden** ein. **Spiegeln** vertauscht links und rechts – das L-Sofa andersherum, der Schrank mit der Tür auf der anderen Seite; der Punkt steht auch im Rechtsklick-Menü und in der Möbelleiste der 3D-Ansicht. Mit der Höhe über Boden hängst du einen Netzwerkschrank oder ein Regal an die Wand oder stellst einen Trockner auf die Waschmaschine. Sie zählt immer vom Boden: Ein Oberschrank steht von sich aus auf 1,45 m, ein Wand-Fernseher mittig auf 1,3 m; du kannst beide höher oder tiefer setzen. **Höhe automatisch** setzt sie zurück. Außerhalb der Räume darf die Höhe auch unter 0 liegen (bis −5 m): Außentreppen hinunter zu einer tiefer liegenden Terrasse oder einem Lichtschacht.
-- **Zustand von:** Jedes Möbel kann eine Entität zeigen, die an, belegt oder zu Hause meldet – dann leuchtet seine Oberseite: das Bett mit Belegungsmatte, der Sessel, die Sauna. Eine zweite Entität beleuchtet die andere Hälfte (links/rechts, beim Hochbett unten/oben); stellst du die erste auf *keine*, rückt die zweite an ihre Stelle. Lampen, Energiegeräte und Bildschirme haben ihre eigenen Felder dafür.
-- **Nur zeigen, wenn …** (neu): Das Stück steht in 3D nur, solange eine Entität in einem Zustand ist – der Weihnachtsbaum, solange `input_boolean.weihnachten` an ist, die Gartendeko nur, wenn ein Saison-Sensor „summer“ meldet. Mehrere Zustände trennst du mit Komma, `<20` oder `>80` vergleicht eine Zahl, ein `!` davor dreht es um; leer heißt „on“. Ausgeblendet verschwinden auch sein Licht und sein Symbol. Im Editor bleibt das Stück immer sichtbar, solange es in 3D fehlt, ist es im Plan blass. So stellst du Deko einmal hin und schaltest sie jedes Jahr per Schalter oder Automation ein.
-- **🎨 Ausführung** (neu in 3.4): Eigene Farben für **Holz**, **Stoff** und **Fronten** – ein Sofa in Blau, ein Tisch in Nussbaum, eine Küche in Salbei. Zu sehen in den wohnlichen Stilen; die Neon-Looks färben jedes Möbel selbst. Es gilt für die eingebauten Möbel und alle Pack-Möbel, die aus diesen Teilen bestehen; **Standard** nimmt wieder die Farben des Stils. Seit 3.5.0 gibt es bei Schränken, Kommoden und Küchen zusätzlich **Korpus**: Solange du dort nichts wählst, färbt **Fronten** wie bisher den ganzen Schrank; mit einer eigenen Korpus-Farbe bekommen Seiten, Deckel und Boden diese Farbe und nur Türen und Schubladen die Frontfarbe. Arbeitsplatten nehmen die Holzfarbe, Pack-Leuchten ihre Gehäusefarbe (Pack-Updates ab 3.5.0). **Für alle gleichen im Plan** gibt allen Möbeln dieser Art dieselbe Ausführung.
-- **⚡ Lebende Teile** (neu in 3.4, bei Pack-Möbeln, die welche haben): Teile bewegen sich mit Home Assistant – die Tür des Serverschranks öffnet mit ihrem Kontakt, der Druck im 3D-Drucker wächst mit dem Fortschritt, der Akkuspeicher füllt sich mit dem Ladestand, Status-Lämpchen zeigen grün, aus oder pulsierend rot, Lüfter drehen, Teile leuchten. Wähle für jedes Teil die passende Entität; hat ein Möbel nur eines, nimmt es ohne Wahl die Entität des Möbels. Ohne Entität steht alles wie gezeichnet.
-- **Wandansicht:** **Wandansicht** oben in der Werkzeugleiste und dann in einen Raum klicken (nah an einer Wand öffnet sich genau diese Wand) – oder **▦ Wände dieses Raums von vorne ansehen** im Raumformular, **▦ Wandansicht** im Möbelformular und im Rechtsklick-Menü, **▦** bei jeder Wand unter *Wandhöhen* – zeigt die Wand von vorne – mit Türen und Fenstern und allem, was an ihr steht oder hängt, als echte Ansicht der Möbel von vorne: Schränke, Regale, Oberschränke, Fernseher, Wandleuchten. Ein Möbel ziehst du dort entlang der Wand und, wenn es hängt, in der Höhe; dabei zeigen Maßlinien den Abstand zu den Wandenden und zum Boden, und Kanten rasten an Wandenden, Türen, Fenstern und anderen Möbeln ein (**Alt** zieht frei). Pfeiltasten schieben um 1 cm, mit **Umschalt** um 10 cm; unten stehen **Abstand von links** und **Höhe über Boden** zum Eintippen. Die Pfeile **‹** und **›** links und rechts (ohne gewähltes Möbel auch **←** und **→**) drehen dich zur Wand, die links bzw. rechts anschließt – so gehst du einmal rundherum durch den Raum. Ein Doppelklick öffnet das Möbel im Grundriss. Oben rechts wechselst du zwischen **3D im Raum** und **Wand von vorne**: In 3D stehst du in der Raummitte auf Augenhöhe und schaust auf die Wand – mit allem im Raum, auch dem Tisch vor der Eckbank. Ein Möbel antippen wählt es aus, Ziehen verschiebt es auf dem Boden, der runde Griff **↕** über dem gewählten Möbel hebt oder senkt es (mit Höhenanzeige), Mausrad oder zwei Finger gehen näher heran oder weiter weg, die mittlere oder rechte Maustaste (am Tablet zwei Finger) schaut sich um – die linke Maustaste bleibt so den Möbeln vorbehalten; unten stehen **Abstand von links**, **Abstand zur Wand** und **Höhe über Boden** zum Eintippen, dazu **↺ 45°** / **↻ 45°** und die **Drehung** in Grad – an der Wand gedreht rückt das Möbel von selbst in den Raum. Ein fixiertes Möbel zeigt unten **🔒 Lösen**: erst lösen, dann lässt es sich ziehen. **Wand von vorne** ist die flache Ansicht zum zentimetergenauen Ausrichten an der Wand. Dort zoomst du mit dem Mausrad (dorthin, wo die Maus steht), am Tablet mit zwei Fingern oder mit **＋** / **−** unten rechts; **⤢** zeigt wieder die ganze Wand, vergrößert schieben die Pfeile daneben den Ausschnitt. Mit **Energie Pro** setzt eine Leiste links Stromzähler, Wechselrichter, Stromspeicher und Wallbox direkt an die gezeigte Wand.
+- Tap a room, then pick an entry. The item appears in the room.
+- **Drag** to move it. Near a wall it turns its back to the wall and sits flush. **Alt** moves freely.
+- The **handle in front of the item** turns it in 15° steps, the **corners** resize it. Pack furniture from the October 2026 packs onwards keeps what is fixed while you resize: legs, arms, plates and handles stay as thick as they are, the seat and the body grow – a sofa stretched to 3 m still has 20 cm arms, a taller one a taller back.
+- On the right you set width, depth, height, rotation and **Height above the floor**. **Mirror** swaps left and right – the L-sofa the other way round, the cabinet with its door on the other side; the item is in the right-click menu and in the furnish bar of the 3D view as well. That is how a network cabinet or a shelf hangs on the wall, or a dryer stands on the washing machine. It always counts from the floor: a wall cabinet sits at 1.45 m by default, a wall TV is centred at 1.3 m; you can set both higher or lower. **Automatic height** resets it. Outside the rooms the height may go below 0 (down to −5 m): outdoor steps down to a sunken terrace or a light well.
+- **Wall view:** **Wall view** at the top of the toolbar, then click into a room (near a wall opens exactly that wall) – or **▦ See this room's walls from the front** in the room form, **▦ Wall view** in the furniture form and the right-click menu, **▦** beside each wall under *Wall heights* – shows the wall from the front – with its doors and windows and everything standing or hanging on it, as a real front view of the furniture: cabinets, shelves, wall cabinets, TVs, wall lights. Drag a piece along the wall there and, when it hangs, up or down; dimension lines show the distance to the wall's ends and to the floor, and edges snap to the wall's ends, doors, windows and other furniture (**Alt** drags freely). Arrow keys move by 1 cm, with **Shift** by 10 cm; below, **Distance from the left** and **Height above the floor** can be typed in. The arrows **‹** and **›** at the left and right (and **←** **→** when no piece is chosen) turn you to the wall joining on that side – once round the room. A double click opens the piece in the plan. At the top right you switch between **3D in the room** and **Wall from the front**: in 3D you stand in the middle of the room at eye height looking at the wall – with everything in the room, the table in front of the corner bench too. Tap a piece to choose it, drag to move it on the floor, the round **↕** handle above the chosen piece lifts or lowers it (with its height shown), the mouse wheel or two fingers walk closer or back, the middle or right mouse button (two fingers on a tablet) looks around – so the left button is kept for the furniture; below, **Distance from the left**, **Distance from the wall** and **Height above the floor** can be typed in, with **↺ 45°** / **↻ 45°** and the **Rotation** in degrees – turned at a wall, the piece moves back into the room by itself. A fixed piece shows **🔒 Release** at the bottom: release it first, then it can be dragged. **Wall from the front** is the flat view for lining things up on the wall to the centimetre. Zoom there with the mouse wheel (towards the pointer), two fingers on a tablet or **＋** / **−** at the bottom right; **⤢** shows the whole wall again, and while zoomed the arrows beside them move the view. With **Energy Pro**, a side bar on the left puts the meter, inverter, home battery and wallbox straight onto the wall shown.
 
-![Wandansicht: 3D im Raum und Wand von vorne](images/wall-view.jpg)
+![Wall view: 3D in the room and wall from the front](images/wall-view.jpg)
 
-- **Duplizieren** und **Löschen** stehen ebenfalls dort.
+- **State from:** any piece of furniture can show an entity that reports on, occupied or home – its top then glows: the bed with an occupancy mat, the armchair, the sauna. A second entity lights the other half (left/right, bottom/top for a bunk bed); set the first one to *none* and the second moves up into its place. Lamps, energy devices and screens have fields of their own for this.
+- **Only show while …** (new): the piece stands in 3D only while an entity is in a state – the Christmas tree while `input_boolean.christmas` is on, the garden decoration only while a season sensor says "summer". Separate several states with commas, `<20` or `>80` compares a number, a `!` in front turns it round; empty means "on". Hidden, its light and its marker go too. The editor always shows the piece; while it is missing in 3D it is faint in the plan. So you place decoration once and switch it on every year with a switch or an automation.
+- **🎨 Finish** (new in 3.4): own colours for **wood**, **fabric** and **fronts** – a sofa in blue, a table in walnut, a kitchen in sage. Shown in the homely styles; the neon looks colour every item themselves. It works for the built-in furniture and every pack item made of these parts; **Standard** goes back to the style's colours. Since 3.5.0 cabinets, dressers and kitchens also have **Carcass**: as long as you choose nothing there, **Fronts** colours the whole cabinet as before; with an own carcass colour the sides, top and bottom take it and only doors and drawers take the front colour. Worktops take the wood colour, pack lamps their body colour (pack updates for 3.5.0). **For all the same in the plan** gives every item of this kind the same finish.
+- **⚡ Live parts** (new in 3.4, on pack items that have them): parts move with Home Assistant – the server rack's door opens with its contact, the print in the 3D printer grows with its progress, the home battery fills with its charge, status lights show green, off or a pulsing red, fans turn, parts glow. Pick the fitting entity for each part; an item with only one takes the item's entity without a choice. Without an entity everything stands as drawn.
+- **Duplicate** and **Delete** are there too.
 
-![Ein Möbel ausgewählt](images/editor-furniture.jpg)
+![A selected item](images/editor-furniture.jpg)
 
-**Möbel-Blöcke** (eine Küche, eine Schrankwand): Stell die Möbel einzeln, wie es passt, und fass sie dann zu einem Block zusammen.
+**Furniture blocks** (a kitchen, a wall unit): place the pieces one by one as they fit, then join them into a block.
 
-- **Umschalt + Klick** nimmt ein Möbel zur Auswahl dazu oder wieder heraus, **Umschalt + Ziehen** über eine freie Stelle zieht einen Rahmen – alles, dessen Mitte im Rahmen liegt, ist ausgewählt. Am Tablet ohne Umschalttaste: **Mehrere auswählen** im Möbelformular einschalten, dann nimmt Tippen dazu und Ziehen zieht den Rahmen.
-- Mehrere ausgewählte Möbel verschiebst, drehst (**R**, ↺/↻ 90° – um ihre gemeinsame Mitte), kopierst (**Strg+D**), fixierst oder löschst du zusammen. **Als Block zusammenfassen** macht daraus einen dauerhaften Block (oranger Rahmen mit „Möbel-Block“).
-- Ein Klick auf irgendein Teil wählt danach den **ganzen Block**; Ziehen verschiebt ihn, auch in **3D daneben**. Ein **einzelnes Teil** bearbeitest du per **Doppelklick** (am Tablet zweimal antippen) oder über seinen Namen in der Liste rechts – etwa einen Oberschrank 2 cm höher. **Ganzen Block wählen** führt zurück, **Block auflösen** macht wieder Einzelmöbel daraus. Ist ein Teil fixiert, bleibt der ganze Block stehen – ein Hinweis sagt es, **Alle lösen** gibt ihn frei.
-- **In der Wandansicht** gehen Blöcke genauso – in **Wand von vorne** wie in **3D im Raum**: **Umschalt + Klick** (am Tablet *Mehrere auswählen*) oder **Umschalt + Ziehen** (Rahmen, nur von vorne) wählt mehrere Teile, unten **Als Block zusammenfassen**. Ziehen schiebt den ganzen Block an der Wand entlang (er rastet mit seinen Außenkanten ein), unten schaltest du zwischen **Ganzer Block** und **Nur dieses Teil** um – so richtest du einen einzelnen Schrank aus, ohne den Block aufzulösen. Ein Doppelklick auf ein Teil eines Blocks wählt ebenfalls nur dieses Teil.
-- **An die Wand** (Leiste links in der Wandansicht): wenige Symbole statt einer langen Liste – Unterschränke & Boards, Hängendes, Hochschränke, Sitzen & Liegen, Leuchten, deine Packs (und Energie mit Energie Pro) –, dazu eine Suche und **Zuletzt benutzt**. **Tipp auf eine freie Stelle an der Wand:** NeonPlan misst die Lücke (unten: stehend, oben: hängend) und zeigt nur, was hineinpasst – zuerst, was sie am besten füllt. Schränke nach Maß (Küchenzeile, Hängeschrank, Hochschrank, Sideboard, Regal …) werden auf die Breite der Lücke angepasst (↔), alles andere kommt in seiner Größe an den linken Rand der Lücke. Jedes Möbel zeigt ein kleines Bild. **Größe ändern** in *Wand von vorne*: Am gewählten Möbel ziehen die Anfasser **links und rechts** die Breite, **oben** die Höhe und bei Hängendem **unten** die Unterkante – die andere Seite bleibt stehen, die Kanten rasten an Nachbarn, Wandenden, Türen und Fenstern ein (**Alt** frei), darüber steht live das Maß. Unten tippst du **Breite** und **Höhe** auch ein (auch in *3D im Raum*). Ein gewähltes Teil (oder mehrere) löschst du unten mit **Löschen** oder mit der Taste **Entf**.
+- **Shift + click** adds a piece to the selection or takes it out again, **Shift + drag** over an empty spot draws a frame – everything whose centre lies inside is selected. On a tablet without a Shift key, switch on **Select several** in the furniture form: a tap then adds and a drag draws the frame.
+- Several selected pieces move, turn (**R**, ↺/↻ 90° – about their common centre), copy (**Ctrl+D**), fix or delete together. **Join into a block** makes them a lasting block (orange frame labelled "Furniture block").
+- From then on, a click on any part selects the **whole block**; dragging moves it, in **3D beside** too. Edit a **single part** with a **double click** (double tap on a tablet) or by its name in the list on the right – a wall cabinet 2 cm higher, say. **Select the whole block** goes back, **Break up block** makes single pieces again. If a part is fixed, the whole block stays put – a note says so, **Release all** frees it.
+- **In the wall view** blocks work the same way – in **Wall from the front** and in **3D in the room**: **Shift + click** (*Select several* on a tablet) or **Shift + drag** (a frame, front view only) selects several parts, **Join into a block** at the bottom. Dragging slides the whole block along the wall (it snaps with its outer sides); at the bottom you switch between **Whole block** and **This part only** – to line up a single cabinet without breaking up the block. A double click on a part of a block selects just that part too.
+- **Onto the wall** (side bar on the left of the wall view): a few symbols instead of a long list – base cabinets & boards, hanging, tall cabinets, seating & beds, lights, your packs (and energy with Energy Pro) – plus a search and **Recently used**. **Tap a free spot on the wall:** NeonPlan measures the gap (low: standing, high: hanging) and shows only what fits – what fills it best first. Cabinets built to measure (kitchen unit, wall cabinet, tall cabinet, sideboard, shelf …) take the gap's width (↔), anything else goes to the gap's left end in its own size. Every piece shows a small picture. **Resize** in *Wall from the front*: on the chosen piece the handles **left and right** change its width, the **top** one its height and, for hanging pieces, the **bottom** one its lower edge – the other side stays put, edges snap to neighbours, the wall's ends, doors and windows (**Alt** freely), and the size shows live above it. Below, **Width** and **Height** can be typed in too (in *3D in the room* as well). Delete a chosen part (or several) with **Delete** at the bottom or the **Del** key.
 
-![Ein Möbel-Block: die Küche](images/editor-block.jpg)
+![A furniture block: the kitchen](images/editor-block.jpg)
 
-**Neon-Schild (seit 3.2, unter Deko):** Ein eigener Text in leuchtenden Röhren auf einer dunklen Platte an der Wand. Im Formular stehen **Text** (zwei Zeilen mit `|` trennen) und **Farbe der Röhren**. Mit einem Licht oder Schalter verknüpft, leuchtet es nur, wenn das an ist; ein farbiges Licht gibt seine Farbe vor. Ohne Verknüpfung leuchtet es immer.
+**Neon sign (since 3.2, under Decoration):** an own text in glowing tubes on a dark plate on the wall. Its form has **Text** (split two lines with `|`) and **Colour of the tubes**. Linked to a light or switch it only glows while that is on; a coloured light sets its colour. With nothing linked it always glows.
 
-### 4.9 Räume einrichten
+### 4.9 Furnishing rooms
 
-![Ein Raum mit Paket](images/editor-package.jpg)
+![A room with a set](images/editor-package.jpg)
 
-**Einrichten …** an einem Raum stellt ein ganzes Möbelpaket an die Wände: Küchenzeile, Küche in L-Form, Bad, Schlafzimmer, Wohnzimmer, Esszimmer, Büro, Kinderzimmer oder Flur. Leuchten verbinden sich dabei mit den Lichtern des Bereichs. Danach passt du einzelne Möbel an. **Strg+Z** nimmt das ganze Paket zurück.
+**Furnish …** on a room puts a whole set of furniture against the walls: kitchen row, L-shaped kitchen, bathroom, bedroom, living room, dining room, office, kids' room or hall. Lamps link to the area's lights. Adjust single items afterwards. **Ctrl+Z** takes the whole set back.
 
-### 4.10 Geräte
+### 4.10 Devices
 
-![Geräte eines Raums](images/editor-devices.jpg)
+![Devices of a room](images/editor-devices.jpg)
 
-Ein Raum mit Bereich listet rechts alle Geräte dieses Bereichs, nach Gerät gruppiert. Die Hauptentität steht vorn, weitere wie LED-Anzeigen oder Effekte stehen hinter **„+n mehr“**. Ein Suchfeld hilft bei großen Bereichen. Bringt ein Gerät sehr viele Entitäten mit (z. B. die Segmente eines LED-Streifens aus Govee2MQTT), zeigt die aufgeklappte Liste die ersten 40 – die Suche grenzt weiter ein –, und **„Alle n im Raumfenster ausblenden“** nimmt sie mit einem Klick aus dem Raumfenster (**„Alle n wieder zeigen“** holt sie zurück).
+A room with an area lists all devices of that area on the right, grouped by device. The main entity comes first, further ones such as LED indicators or effects sit behind **"+n more"**. A search field helps with big areas. When a device brings very many entities (such as the segments of an LED strip from Govee2MQTT), the unfolded list shows the first 40 – the search narrows it down – and **"Hide all n in the room panel"** takes them out of the room panel with one click (**"Show all n again"** brings them back).
 
-Sensoren erscheinen, wenn sie etwas für den Raum messen: Temperatur, Luftfeuchte, CO₂ und Luftqualität, Leistung und Energie, Gas- und Wasserzähler, Helligkeit und Luftdruck. Zähler ohne Geräteklasse zählen mit, wenn ihre Einheit passt (m³, l, kWh, lx). Akku- und Signalsensoren bleiben außen vor. Der Wert erscheint mit den Nachkommastellen, die in Home Assistant eingestellt sind. Fehlt ein Gerät, prüfe in Home Assistant, ob es dem Bereich des Raums zugeordnet ist.
+Sensors appear when they measure something for the room: temperature, humidity, CO₂ and air quality, power and energy, gas and water meters, illuminance and pressure. Meters without a device class count too when their unit fits (m³, l, kWh, lx). Battery and signal sensors stay out. The value shows the decimals set in Home Assistant. If a device is missing, check in Home Assistant that it is assigned to the room's area.
 
-Über der Liste wählst du die Quelle: **Dieser Bereich** (Standard), **Andere Bereiche** (die Geräte der übrigen Bereiche, nach Bereich gruppiert; steht ein Gerät schon in einem anderen Raum, steht das dabei, und **Platzieren** holt es hierher) oder **Ohne Bereich** (etwa Template-Lichter, Gruppen und Helfer; hier zählt jeder Sensor mit Zahlenwert und Einheit). Der Bereich in Home Assistant ändert sich dabei nicht.
+Above the list you choose the source: **This area** (default), **Other areas** (the devices of the other areas, grouped by area; if a device already stands in another room, that is shown, and **Place** brings it here) or **No area** (e.g. template lights, groups and helpers; here any sensor with a numeric value and a unit counts). The area in Home Assistant does not change.
 
-**Raumklima:** Im Raumformular legst du unter **Raumklima** fest, welche Sensoren Temperatur, Luftfeuchte und CO₂ des Raums liefern (Heatmap und Raumfenster). *Automatisch* nimmt die Sensoren des Bereichs und die im Raum platzierten, lässt aber Gerätetemperaturen weg, etwa von einem 3D-Drucker oder den Vorlauf einer Wärmepumpe. Hat der Raum keinen eigenen Sensor, zählt die Ist-Temperatur (und Luftfeuchte) seines **Thermostats** (Klima-Entität); ein Thermostat lässt sich auch von Hand wählen. *Keiner* blendet den Wert aus.
+**Room climate:** In the room form, **Room climate** sets which sensors give the room's temperature, humidity and CO₂ (heatmap and room panel). *Automatic* takes the sensors of the area and the ones placed in the room, but leaves out device temperatures, e.g. of a 3D printer or a heat pump's flow. Without a sensor of its own, the room takes the current temperature (and humidity) of its **thermostat** (climate entity); a thermostat can also be chosen by hand. *None* hides the value.
 
-- **Platzieren** setzt ein Gerät in den Raum. **Alle … platzieren** unter der Liste setzt nach einer Rückfrage alle Hauptgeräte auf einmal; **Rückgängig** (Strg+Z) nimmt sie in einem Schritt zurück.
-- Lichter werden dabei als Leuchten aus der Bibliothek gesetzt, damit sie in 3D leuchten.
-- **☆** nimmt ein Gerät ins Raumfenster der 3D-Ansicht auf, ohne es in den Plan zu setzen. **👁** blendet ein Gerät des Bereichs im Raumfenster aus (durchgestrichen in der Liste, 🙈 holt es zurück) – für Entitäten, die dort nur stören. **Aa** blendet nur den Zustand eines Geräts im Raumfenster aus (∅ zeigt ihn wieder), etwa bei einem Rollladen ohne Rückmeldung. Beides geht auch für die weiteren Entitäten eines Geräts unter „mehr“, jede für sich; ein reines „unbekannt“ lässt das Raumfenster bei Schaltern, Rollläden und Lampen ohnehin weg.
-- Ein platziertes Gerät ziehst du im Plan an seinen Platz.
+- **Place** puts a device into the room. **Place all …** below the list puts all main devices in at once after asking; **Undo** (Ctrl+Z) takes them back in one step.
+- Lights are placed as lamps from the library, so they glow in 3D.
+- **☆** adds a device to the room panel of the 3D view without placing it. **👁** hides an entity of the area from the room panel (struck through in the list, 🙈 brings it back) – for entities that only clutter it. **Aa** hides only a device's state in the room panel (∅ shows it again), e.g. for a cover without feedback. Both work for a device's further entities under "more" too, each on its own; a bare "unknown" is left out for switches, covers and lights anyway.
+- Drag a placed device to its spot in the plan.
 
-![Ein Gerät ausgewählt](images/editor-device.jpg)
+![A selected device](images/editor-device.jpg)
 
-Ein ausgewähltes Gerät hat:
+A selected device has:
 
-- **Höhe des Symbols**, **Drehung** und bei Lichtern die **Montage**: Decke, Boden, Tisch oder Wand.
-- **Vor dem Schalten nachfragen:** Beim Antippen in 3D, im Schnellmenü und im Raumfenster erscheint erst eine Rückfrage. Das schützt etwa den Server-Schalter vor einem versehentlichen Tipp. Ein Doppeltipp auf den Raum lässt dieses Gerät aus.
-- **Symbol in 3D:** *Automatisch* folgt dem Schalter Keine / Wichtige / Alle der 3D-Ansicht. *Immer zeigen* zeigt das Symbol auch bei „Wichtige“, etwa für einen Temperatursensor. *Ohne Watt* lässt die Leistung weg, etwa an einer Steckdose. *Nur wenn aktiv* (seit 3.0.1) zeigt das Symbol nur, solange das Gerät an, offen oder ausgelöst ist – etwa einen Bewegungsmelder nur bei Bewegung. *Ausblenden* zeigt nie ein Symbol. Bei „Keine“ bleiben alle Symbole aus.
-- **Eigenes Symbol:** Der Name eines Material-Design-Icons wie in Home Assistant, etwa `mdi:thermometer` oder `mdi:water-alert`, ersetzt das Symbol nach Geräteart im Pin und in der Geräteliste des Raumfensters. Leer lassen = Standard. Gilt genauso für elektrische Möbel und Lampen.
-- **Als Möbel darstellen:** Ersetzt den Pin durch ein passendes Möbel an derselben Stelle, schon mit dem Gerät verknüpft – ein Lautsprecher oder Smart Display für einen Media Player, eine Leuchte für ein Licht, ein Heizkörper für ein Thermostat, der Saugroboter für einen Sauger. Die Liste zeigt nur Möbel, die zur Geräteart passen. Im Möbelformular holt **Wieder als Geräte-Pin** den einfachen Pin zurück; Strg+Z nimmt beides zurück. **Bei einer Kamera** (seit 2.0.7) bleibt der Pin mit allen Kamera-Einstellungen; das gewählte Modell ist nur ihr Aussehen: Es ersetzt das eingebaute Kamera-Modell, wandert und dreht sich mit der Kamera, und eine neue Auswahl tauscht es aus. **Standard-Kameramodell** in derselben Liste holt das eingebaute Modell zurück.
-- **Eigener Name** und **Name unter dem Symbol in 3D zeigen:** Mit Haken steht der eigene Name klein unter dem Pin – drei Thermometer im Garten („Pool Wasser“, „Pool Luft“, „Gewächshaus“) bleiben so unterscheidbar. Der Haken erscheint, sobald ein eigener Name eingetragen ist; Möbel mit eigenem Namen haben ihn genauso. Die Karten-Option `marker_names: true` zeigt die Namen aller Geräte mit eigenem Namen.
-- **In Raummitte** und **Entfernen**.
+- **Marker height**, **rotation** and, for lights, the **mount**: ceiling, floor, table or wall.
+- **Ask before switching:** A tap in 3D, the quick menu and the room panel ask first. This protects, for example, a server switch from an accidental tap. A double tap on the room leaves this device out.
+- **Marker in 3D:** *Automatic* follows the None / Important / All switch of the 3D view. *Always show* shows the marker with "Important" too, e.g. for a temperature sensor. *Without watts* leaves out the power, e.g. on a smart plug. *Only while active* (since 3.0.1) shows the marker only while the device is on, open or triggered – a motion sensor only while it sees motion. *Hide* never shows a marker. With "None" all markers stay off.
+- **Own symbol:** the name of a Material Design icon as in Home Assistant, e.g. `mdi:thermometer` or `mdi:water-alert`, replaces the symbol of the device kind in the pin and in the room panel's device list. Leave it empty for the default. Works for electric furniture and lamps just the same.
+- **Show as furniture:** replaces the pin by a fitting furniture item in the same place, already linked to the device – a speaker or smart display for a media player, a lamp for a light, a radiator for a thermostat, the robot vacuum for a vacuum. The list only shows furniture that fits the kind of device. In the furniture form **Back to a device pin** brings the plain pin back; Ctrl+Z undoes either. **For a camera** (since 2.0.7) the pin stays with all its camera settings; the chosen model is only its look: it replaces the built-in camera model, moves and turns with the camera, and a new choice swaps it. **Built-in camera model** in the same list brings the built-in model back.
+- **Own name** and **Show the name under the marker in 3D:** ticked, the own name sits small under the pin – three thermometers in the garden ("Pool water", "Pool air", "Greenhouse") stay apart. The tick appears as soon as an own name is set; furniture with an own name has it too. The card option `marker_names: true` shows the names of every device with an own name.
+- **To room centre** and **Remove**.
 
-### 4.11 Leuchten
+### 4.11 Lamps
 
-Leuchten sind Möbel mit einem verknüpften Licht. Es gibt Deckenleuchte, Einbauspot, Aufbau-Spot, LED-Panel, Pendelleuchte, Deckenventilator mit Licht, Stehlampe, Deckenfluter, Tischlampe, Wandleuchte, LED-Streifen, Wegleuchte und Garten-Spot.
+Lamps are furniture with a linked light: ceiling light, downlight, surface spot, LED panel, pendant, ceiling fan with light, floor lamp, uplight, table lamp, wall light, LED strip, path light and garden spot.
 
-- Das 3D-Modell leuchtet in Farbe und Helligkeit des Lichts. Boden und Wände des Raums werden mit beleuchtet, zwei farbige Deckenleuchten mischen sich dazwischen. In den Nachbarraum fällt das Licht nur durch Türen. Eine Lampe über einer Treppe oder Deckenöffnung (bis 1,5 m daneben) leuchtet auch durch die Öffnung in die Etage darunter.
-- Farbeffekte wie ein Farbwechsel werden in 3D animiert.
-- Tischlampen stehen auf dem Möbel darunter (unter einer hoch liegenden Arbeitsplatte ab 1,2 m – etwa einer Treppenstufe aus Arbeitsplatten – bleibt, was darunter passt, auf dem Boden), Wandleuchten und LED-Streifen rasten an der Wand ein, bei Pendelleuchten ist die Höhe die Abhängung unter der Decke. Bei Wandleuchten aus Packs sitzen Lichtschein und Licht in den leuchtenden Teilen (dem Glas einer Laterne).
-- **Deckenventilator mit Licht:** Das Licht schaltet die Leuchte unter dem Motor. Unter **Ventilator (fan-Entität)** wählst du den Ventilator: Seine Flügel drehen sich in 3D mit seiner Stufe (bei 100 % etwa einmal pro Sekunde, aus = still). Er bekommt ein eigenes Symbol neben der Leuchte mit seiner Stufe; Tippen schaltet ihn, lange drücken öffnet das Menü mit der Stufe. Die Breite ist die Spannweite der Flügel, die Höhe die Abhängung unter der Decke. Auf alten Tablets drehen die Flügel mit wenigen Bildern pro Sekunde, und nur solange der Ventilator läuft.
-- **Höhe über Boden:** Wandleuchten hängen von sich aus auf 1,75 m, LED-Streifen direkt unter der Decke. Im Formular stellst du für beide eine eigene **Höhe über Boden** ein, etwa für einen Streifen unter den Hängeschränken oder hinter dem TV-Board. **Höhe automatisch** setzt sie zurück. Auch Einbauspots, Aufbau-Spots, Deckenleuchten, LED-Panels und flache Deckenleuchten aus Packs (etwa die Werkstattleuchte) haben das Feld: Von sich aus sitzen sie unter der Decke, mit einer eigenen Höhe etwa unter den Hängeschränken oder unter einer Treppe – Modell und Lichtkegel strahlen dann von dort nach unten auf die Arbeitsplatte. Unter einer Dachschräge hängen Deckenleuchten, Spots und Pendelleuchten an der Dachunterseite statt in der Luft. Ein Streifen unter 1 m Höhe (Sockelleiste, hinter dem Schrank) strahlt nach oben an die Wand, höher montierte strahlen nach unten. Ein Streifen unterhalb der Schnitthöhe bleibt auch bei geschnittenen Wänden sichtbar. **Neigung um die Länge** legt den Streifen an eine Dachschräge oder kippt ihn zur Seite (90° = die Leuchtfläche zeigt seitlich), **Anstieg (°)** lässt ihn entlang seiner Länge ansteigen, etwa die Treppe hinauf oder am Handlauf (rund 35–40°); die Höhe über Boden ist dann seine Mitte. **Senkrecht** stellt ihn hochkant: Dann läuft er von der Höhe über Boden nach oben, am Türrahmen oder als Lichtsäule, und leuchtet rundum.
-- **Farbe und Helligkeit von:** Schaltet ein Relais (Shelly, Schaltaktor) die Lampe, während die Leuchte selbst Farbe und Helligkeit kennt, kommt An/Aus vom Schalter und die Farbe von dieser zweiten Entität.
-- **Feste Farbe in 3D:** Die Lampe leuchtet im Plan immer in dieser Farbe, egal welche Farbe das Licht meldet – an/aus und Helligkeit kommen weiter vom Licht. Für Leuchten, die in Wirklichkeit warmweiß sind, deren Entität aber Farben meldet, oder wenn eine Leuchte im Plan einfach eine bestimmte Farbe haben soll.
-- **Nur leuchten, wenn das Licht diese Farbe zeigt:** Die Lampe leuchtet nur, solange das Licht ungefähr die gewählte Farbe zeigt. So kann ein Farblicht als Signal dienen – gelb für „Wasser“ am Waschbecken –, ohne dass seine anderen Farben (rot, grün, blau für andere Meldungen) dort erscheinen.
-- **Leuchtstärke in 3D (%):** Wie kräftig die Leuchte in 3D leuchtet. Unter 100 % dämpft helle LED-Streifen, damit der Raum nicht überstrahlt, über 100 % lässt eine schwache Lampe stärker leuchten. Gilt auch für Lichter, die als Gerät platziert sind; in Home Assistant schaltet es nichts.
-- Statt eines Lichts geht auch ein Schalter, etwa ein Relais für das Deckenlicht.
-- Mehrere Leuchten dürfen demselben Licht folgen.
+- The 3D model glows in the light's colour and brightness. The room's floor and walls are lit too, two coloured ceiling lights mix in between. Light reaches the next room only through doors. A lamp over a stairwell or floor opening (up to 1.5 m beside it) also shines through the opening into the floor below.
+- Colour effects such as a colour loop are animated in 3D.
+- Table lamps stand on the item below (under a worktop high up from 1.2 m – a step of stairs built from worktops – what fits beneath stays on the floor), wall lights and LED strips snap to the wall, a pendant's height is how far it hangs below the ceiling. On wall lights from packs, the halo and the light sit in the glowing parts (a lantern's glass).
+- **Ceiling fan with light:** the light switches the lamp under the motor. Under **Fan (fan entity)** you choose the fan: its blades turn in 3D with its speed (about once a second at 100 %, still when off). It gets a symbol of its own beside the lamp showing its speed; a tap switches it, a long press opens the menu with the speed. The width is the blade span, the height how far it hangs below the ceiling. On old tablets the blades turn with few frames per second, and only while the fan runs.
+- **Height above floor:** wall lights hang at 1.75 m by default, LED strips right under the ceiling. Under a sloped roof, ceiling lamps, spots and pendants hang from the roof's underside instead of in the air. In the form you set a **Height above floor** of their own, e.g. for a strip under the wall cabinets or behind the TV unit. **Automatic height** resets it. Recessed and surface spots, ceiling lamps, LED panels and flat ceiling lights from packs (such as the workshop light) have the field as well: by default they sit under the ceiling, with a height of their own – under a staircase too – e.g. under the wall cabinets – model and light then shine down from there onto the worktop. A strip below 1 m (skirting board, behind a cabinet) shines up the wall, higher strips shine down. A strip below the cut height stays visible with cut walls. **Tilt about its length** lays the strip against a roof slope or turns it sideways (90° = its face points to the side); **Rise (°)** lets it climb along its length, e.g. up the stairs or along a handrail (about 35–40°), its height above the floor then being its middle; **Upright** stands it on end: it then runs up from the height above the floor, along a door frame or as a light column, and shines all around.
+- **Colour and brightness from:** when a relay (Shelly, switch actuator) switches the lamp while the bulb itself knows its colour and brightness, on/off comes from the switch and the colour from this second entity.
+- **Fixed colour in 3D:** the lamp always glows in this colour in the plan, whatever colour the light reports – on/off and brightness still come from the light. For fixtures that are warm white in reality while their entity reports colours, or when a lamp in the plan should simply have a certain colour.
+- **Glow only while the light shows this colour:** the lamp only glows while the light shows about the chosen colour. A colour light can serve as a signal this way – yellow for "water" at the washbasin – without its other colours (red, green, blue for other alerts) showing there.
+- **Glow in 3D (%):** how strongly the lamp glows in 3D. Below 100 % tones down bright LED strips so the room does not burn out, above 100 % makes a weak lamp glow more. Works for lights placed as devices too; it switches nothing in Home Assistant.
+- A switch works instead of a light too, e.g. a relay for the ceiling light.
+- Several lamps may follow the same light.
 
-![Spots setzen](images/editor-spots.jpg)
+![Place spots](images/editor-spots.jpg)
 
-**Spots setzen** an einem Raum legt ein Raster aus Leuchten an, die alle einem Licht folgen, etwa sechs Einbauspots an einem Dimmer. Spalten und Reihen wählst du vorher.
+**Place spots** on a room lays out a grid of lamps that all follow one light, e.g. six downlights on one dimmer. Choose columns and rows first.
 
-### 4.12 Elektrische Möbel
+### 4.12 Electric furniture
 
-Fernseher, Medienwand, Wohnwand mit TV (die Wohnwand ohne TV ist eine Leuchte: Vitrinen und LED-Leisten leuchten mit der verknüpften Lampe), Schreibtisch mit Monitor, Waschmaschine, Trockner, Spülmaschine, Heizkörper, Saugroboter und viele Pack-Möbel lassen sich mit Entitäten verknüpfen:
+TVs, media walls, the wall unit with a TV (the wall unit without a TV is a lamp: vitrines and LED strips glow with the linked light), desks with monitors, washing machines, dryers, dishwashers, radiators, robot vacuums and many pack items link to entities:
 
-- **Heizkörper – Heizt (Sensor):** Sagt der Thermostat nicht, ob er gerade heizt (Tuya-Ventile melden stattdessen einen Sensor „Work state“), wähle diesen Sensor im Feld **Heizt (Sensor)**: „opened“, „heating“, „on“ oder eine Öffnung über 0 % lässt den Heizkörper glühen.
-- **Gerät** oder **Fernseher (Media-Player oder Steckdose)**: Als Gerät geht auch ein **Status-Sensor**, etwa der Druckstatus eines 3D-Druckers (Bambu Lab u. a.). Das Möbel gilt dann als aktiv, solange der Status „running“, „printing“, „prepare“ oder ähnlich meldet.  Ein Fernseher leuchtet, solange er läuft. Ein älterer Fernseher an einer smarten Steckdose nimmt einfach deren Schalter; der Bildschirm leuchtet, solange die Steckdose an ist, und ein Tipp schaltet sie. Waschmaschine, Trockner und Spülmaschine leuchten, solange sie arbeiten – Waschmaschine und Trockner mit einem Lichtring um die runde Tür. Ein Heizkörper mit Thermostat glüht beim Heizen. Das **Klimagerät (Wand)** hängt oben an der Wand und leuchtet am Luftauslass in der Farbe seines Modus: rot Heizen, blau Kühlen, grün Automatik, gelb Entfeuchten, weiß nur Lüften – hell, solange es arbeitet, gedämpft im Standby. Ein **Herd** glüht auf den Kochfeldern, solange er kocht; ein Betriebszustand-Sensor (z. B. Home Connect: „run“, „ready“, „inactive“) lässt ihn bei „ready“ schwach glühen und bei „inactive“ aus.
-- **Leistungssensor (W)**: Das Möbel zeigt seine Watt. **Läuft ab (Watt)** legt fest, ab wie viel Watt es als laufend gilt und leuchtet (leer: 10 W) – praktisch für Geräte hinter einer Steckdose, die im Standby ein paar Watt ziehen, etwa 100 W. Ist der Wert gesetzt, zeigt der Pin darunter nur den Zustand (oder „Standby“) statt der Standby-Watt.
-- **Zusatzwert am Symbol:** ein Sensor, dessen Wert am Symbol des Möbels steht – die Wassertemperatur einer Gastherme, die Luftfeuchte eines Lüftungsgeräts. Mit dem Zusatzwert zeigt sich das Symbol von selbst.
-- **Vor dem Schalten nachfragen** und **Symbol in 3D** wie bei Geräten.
-- **Bilder nach Zustand** bei Bildschirmen: eine Pro-Erweiterung, siehe [6.3](#63-bildschirme-live).
+- **Radiator – Heating (sensor):** when the thermostat does not say whether it heats (Tuya valves report a "work state" sensor instead), pick that sensor under **Heating (sensor)**: "opened", "heating", "on" or an opening above 0 % makes the radiator glow.
+- **Device** or **TV (media player or smart plug)**: A **status sensor** works as a device too, e.g. the print status of a 3D printer (Bambu Lab and others); the item then counts as active while the status reports "running", "printing", "prepare" or similar. A TV glows while it is on. An older TV on a smart plug simply takes the plug's switch; the screen glows while the plug is on, and a tap switches it. Washing machine, dryer and dishwasher glow while they run – washer and dryer with a ring of light round their round door. A radiator with a thermostat glows while it heats. The **air conditioner (wall)** hangs high on the wall and glows at its air outlet in the colour of its mode: red heating, blue cooling, green automatic, yellow drying, white fan only – bright while it works, dimmed on standby. A **stove** glows on its cooking zones while it cooks; an operating-state sensor (e.g. Home Connect: "run", "ready", "inactive") makes it glow faintly at "ready" and stay dark at "inactive".
+- **Power sensor (W)**: The item shows its watts. **Running from (watts)** sets from how many watts it counts as running and glows (empty: 10 W) – handy for appliances behind a smart plug that draw a few watts on standby, e.g. 100 W. When it is set, the pin shows only the state (or "Standby") below it instead of the standby watts.
+- **Extra value at the symbol:** a sensor whose value stands at the item's symbol – a gas boiler's water temperature, a ventilation unit's humidity. With an extra value the symbol shows by itself.
+- **Ask before switching** and **Marker in 3D** as with devices.
+- **Pictures by state** on screens: a Pro add-on, see [6.3](#63-live-screens).
 
-Steht dort „automatisch“, sucht HomePlan 3D die passende Entität im Bereich selbst.
+"Automatic" means HomePlan 3D finds the matching entity in the area by itself.
 
-### 4.13 Kameras
+### 4.13 Cameras
 
-![Kamera im Plan mit Sichtkegel](images/editor-camera-wedge.jpg)
+![A camera in the plan with its field of view](images/editor-camera-wedge.jpg)
 
-Kameras platzierst du wie jedes Gerät. Danach:
+Place cameras like any device. Then:
 
-- **Montage:** Wand mit Blickrichtung oder Decke als Dome, der rundum schaut.
-- Im Plan zeigt ein **Kegel**, wohin die Kamera schaut. Der **Griff an der Spitze** dreht die Kamera und setzt zugleich die Reichweite.
-- **Sichtwinkel (°)**, **Reichweite (m)** und **Neigung nach unten (°)** stellst du auch als Zahl ein.
-- **Sichtkegel in 3D zeigen** lässt sich je Kamera abschalten. In 3D endet der Kegel an der ersten Wand: Eine Innenkamera sieht nicht durch die Wand in den Nachbarraum.
+- **Mount:** wall, looking along its rotation, or ceiling as a dome that sees all round.
+- In the plan a **wedge** shows where the camera looks. The **handle at its tip** turns the camera and sets its reach at the same time.
+- **Show the field of view in 3D** can be switched off per camera. In 3D the wedge ends at the first wall: an indoor camera does not see through the wall into the next room.
+- **Field of view (°)**, **Reach (m)** and **Tilt down (°)** can be typed in as numbers.
 
-In 3D hängt die Kamera als kleines Modell an der Wand oder Decke, ihr Sichtfeld liegt als Kegel auf dem Boden. Meldet ein Bewegungs- oder Präsenzsensor der Kamera Bewegung, wird der Kegel rot.
+In 3D the camera hangs as a small model on the wall or ceiling, its field of view lies on the floor as a wedge. When a motion or presence sensor of the camera reports motion, the wedge turns red.
 
-### 4.14 Stellplätze und Fahrzeuge
+### 4.14 Parking spots and vehicles
 
-![Stellplatz](images/editor-parking.jpg)
+![A parking spot](images/editor-parking.jpg)
 
-Das Möbel **Stellplatz** in der Gruppe Stellplätze markiert, wo ein Auto steht: in der Garage, in der Einfahrt oder irgendwo auf dem Grundstück. Ein neuer Stellplatz zeigt mit dem Pfeil vom Garagentor des Raums in die Garage hinein, ohne Tor entlang der längeren Raumseite.
+The item **Parking spot** in the Parking group marks where a car stands: in the garage, on the driveway or anywhere on the plot. A new parking spot points with its arrow from the room's garage door into the garage, without a gate along the room's longer side.
 
-- **Sensor „Auto anwesend“:** ein `binary_sensor`, `device_tracker` oder ähnliches. Solange er ein Auto meldet, steht das Fahrzeug da.
-- **Fahrzeug:** das Modell aus dem Pack „Fahrzeuge“.
-- **Fahrzeugtyp-Sensor** (optional): Liefert ein Sensor, welches Auto da ist, etwa aus einer KI-Kameraauswertung, ordnest du jedem Zustand ein Modell zu.
-- **Größe (%)** passt das Modell an den Platz an. Ist das Fahrzeug höher als der Raum, warnt der Editor.
+- **Sensor "car present":** a `binary_sensor`, `device_tracker` or similar. While it reports a car, the vehicle is there.
+- **Vehicle:** the model from the "Vehicles" pack.
+- **Vehicle type sensor** (optional): If a sensor reports which car is there, e.g. from an AI camera analysis, assign a model to each state.
+- **Size (%)** fits the model to the spot. If the vehicle is taller than the room, the editor warns.
 
-![Fahrzeug in der Garage](images/view-garage.jpg)
+![A car in the garage](images/view-garage.jpg)
 
-### 4.15 Saugroboter
+### 4.15 Robot vacuum
 
-Das Möbel Saugroboter – und genauso der **Saugroboter mit Station** aus dem Pack Smart Home – wird mit der `vacuum`-Entität verknüpft. Saugt der Roboter, fährt er in 3D in Bahnen durch den Raum seiner Station und kehrt danach zurück. Die Bahn ist simuliert, weil Home Assistant die echte Position meist nicht kennt. Beim Saugroboter mit Station fährt der Roboter des Modells selbst los: Solange er unterwegs ist, steht die Station leer.
+The robot vacuum item – and the **robot vacuum with dock** from the Smart Home pack just the same – links to the `vacuum` entity. While the robot cleans, it drives lanes through the room of its dock in 3D and then returns. The lanes are simulated because Home Assistant usually does not know the real position. With the robot vacuum with dock, the model's own robot drives off: while it is away, the dock stands empty.
 
-Viele Roboter melden aber den Raum, den sie gerade saugen, zum Beispiel Roborock und Dreame mit einem Sensor „Aktueller Raum“. HomePlan 3D findet diesen Sensor am Gerät des Roboters von selbst; im Feld **Aktueller Raum (Sensor)** kannst du auch einen anderen wählen. Der gemeldete Name wird mit dem Raumnamen und dem Home-Assistant-Bereich verglichen, Groß- und Kleinschreibung und die Schreibweise von Umlauten spielen keine Rolle („Kueche“ passt zu „Küche“). Wechselt der Roboter den Raum, erscheint er in 3D dort und fährt seine Bahnen. Passt kein Raum, bleibt er im Raum seiner Station.
+Many robots do report the room they are cleaning, for example Roborock and Dreame with a "current room" sensor. HomePlan 3D finds this sensor on the robot's device by itself; the **Current room (sensor)** field lets you pick another one. The reported name is compared with the room name and the Home Assistant area, ignoring case and accents ("Cafe" matches "Café"). When the robot changes rooms it appears there in 3D and drives its lanes. If no room matches, it stays in the room of its dock.
 
-Seine Bahnen machen einen Bogen um Möbel, die auf dem Boden stehen: Schränke, Sofas, Betten, Küchenzeilen und Geräte. Unter Tischen, Schreibtischen, Stühlen, Hockern und Bänken fährt er durch, ebenso über Teppiche und unter hängenden Möbeln wie Oberschränken.
+Its lanes keep clear of furniture standing on the floor: cabinets, sofas, beds, kitchen units and appliances. It drives under tables, desks, chairs, stools and benches, over rugs and under anything hung on the wall, such as wall cabinets.
 
-### 4.16 Treppen und Bodenöffnungen
+### 4.16 Stairs and floor openings
 
-- Die **Treppe** aus der Bibliothek steigt von der markierten Vorderkante nach hinten an. Reicht sie bis zur Etage darüber, schneidet sie dort die Treppenöffnung in die Decke.
-- Die **U-Treppe mit Podest** (Arbeiten & Sonstiges) hat zwei Läufe nebeneinander: Sie steigt links von der markierten Vorderkante nach hinten, wendet am Podest und kommt rechts wieder nach vorn hoch. **Spiegeln** dreht die Laufrichtung um. Wie die gerade Treppe bekommt sie beim Einfügen die Höhe bis zur Etage darüber und schneidet dort die Öffnung in die Decke. Voreingestellt ist sie 2,10 × 2,70 m groß.
-- Mit dem Werkzeug **Bodenöffnung** ziehst du ein Loch direkt in den Boden einer Etage auf, etwa über dem Treppenaufgang oder für eine Galerie. Von oben sieht man hindurch. Liegt sie über mehreren Räumen, wird sie in jedem davon ausgeschnitten. Mehrere Öffnungen dürfen sich überlappen, so entsteht zum Beispiel eine L-Form.
-- Weitere Treppen und Geländer bringt das Pack **Treppen & Geländer**.
+- The **Stairs** from the library rise from the marked front edge towards the back. If they reach the floor above, they cut the stairwell into its floor.
+- The **U-stair with landing** (Work & other) has two flights side by side: it rises on the left from the marked front edge towards the back, turns at the landing and comes back up on the right towards the front. **Mirror** turns it the other way. Like the straight stairs it gets the height up to the floor above when you add it and cuts the opening into that floor. Its default size is 2.10 × 2.70 m.
+- The **Floor opening** tool draws a hole straight into a floor, e.g. above the staircase or for a gallery. From above you look through it. Across several rooms it is cut in each of them. Several openings may overlap, for example to make an L shape.
+- More stairs and railings come with the **Stairs & railings** pack.
 
-![Werkzeug Bodenöffnung](images/editor-hole-tool.jpg)
+![The floor opening tool](images/editor-hole-tool.jpg)
 
-### 4.17 Außenflächen und Außenleuchten
+### 4.17 Outdoor areas and outdoor lights
 
-Mit **Draußen → Außen** ziehst du Rasen, Terrasse, Weg, Einfahrt, Beet, Hecke oder Zaun auf. Im Menü wählst du vorher, was du aufziehst; die Art lässt sich danach im Formular noch ändern. Dort wählst du auch **Rechteck** (aufziehen) oder **Freie Form**: Dann setzt du die Ecken einzeln wie bei einem freien Raum – für geschwungene Beete, schräge Grundstücksgrenzen oder einen L-förmigen Weg; ein Tipp auf den ersten Punkt oder **Enter** schließt die Fläche. Eine ausgewählte Außenfläche änderst du an ihren Ecken; ein Rechteck bleibt dabei ein Rechteck. Das **+** in der Mitte einer Kante setzt dort eine neue Ecke (seit 3.1.1), wie bei einem Raum – Tore am Zaun wandern mit. Im Plan stehen dann an den Ecken ihre Nummern (wie in der Liste **Eckpunkte**) und an den Kanten ihre Längen. Unter **Eckpunkte** im Formular tippst du jede Ecke als X und Y ein, wie bei einem Raum – so werden Kanten einer freien Form gerade oder parallel; **×** entfernt eine Ecke (Tore an den beiden Kanten dieser Ecke fallen dabei weg). Hecke und Zaun bekommen im Formular eine **Höhe** (Thuja-Sichtschutz 2,5 m, Beeteinfassung 0,5 m); **Umrisslinie zeigen** ohne Haken lässt die Leuchtlinie am Rand weg, etwa bei einem Grundstück aus mehreren Rasenflächen. **Höhenversatz** senkt eine Fläche unter den Boden oder hebt sie an – die Einfahrt hinunter zur tieferen Garage, die erhöhte Terrasse; Leuchten darauf folgen mit. **Gefälle** neigt eine Fläche: Höhenunterschied in Metern und die Richtung, in die sie fällt (die hohe Kante liegt auf dem Höhenversatz) – eine Einfahrt, die zur Straße abfällt, ein Hang im Garten; Zaunpfosten und Leuchten stehen auf der schrägen Fläche. **Wildfläche** ist eine Art für ungemähte Ecken. **Balkon** ist für obere Etagen: eine dünne Platte auf Höhe der Etage mit einem durchsichtigen Stabgeländer (Höhe im Formular); an Kanten, die an einer Hauswand liegen, entsteht kein Geländer – Balkontüren dahinter bleiben frei. **Aus Flächen darunter ausschneiden** macht eine Fläche zum Loch in jeder vorher gezeichneten Fläche, in der sie ganz liegt – ein Teich oder eine Wildfläche mitten in einem einzigen großen Rasen. **Pergola / Rahmen** zeichnet Eckpfosten, Balken und Sparren in der eingestellten Höhe, mit **X-Verstrebung** an den Seiten – für Pergolen, Carport-Gerüste oder den Unterbau eines Rolldachs. Zaun und Pergola können **offen** bleiben: Die Kante vom letzten zum ersten Punkt fehlt dann, der Zaun lehnt am Haus. **Tore im Zaun (seit 2.2):** Im Formular eines Zauns setzt **+ Tor im Zaun** eine Lücke in eine Seite, wie eine Tür in der Wand – als **Pforte** (ein Flügel), **Flügeltor** (zwei Flügel) oder **Schiebetor**. Du wählst die **Seite** (in der Reihenfolge, in der du die Ecken gesetzt hast), die **Mitte ab Anfang der Seite** und die **Breite**; die Lücke steht im Plan als gelber Strich. **Anschlag auf der anderen Seite** bzw. **Läuft zur anderen Seite auf** dreht die Richtung, **Öffnet nach außen** lässt die Flügel aus dem Grundstück schwenken. Mit **Antrieb oder Schalter** (ein Cover wie ein Torantrieb, ein Schalter, ein input_boolean oder ein Schloss) und/oder einem **Kontakt** öffnet sich das Tor auch in 3D; ein Tipp darauf schaltet es. Meldet der Antrieb nur „öffnet“/„schließt“, läuft das Tor in der **Laufzeit** auf; ein Kontakt hat immer Vorrang. Bäume, Sträucher und Gestrüpp kommen als Möbel aus dem Pack **Garten & Terrasse** (ab Release 3: Eiche, Linde, Birke, Ahorn, Obstbaum, Fichte, Kiefer, Thuja, Strauch, Blühstrauch, Gestrüpp, Baumgruppe); Breite und Höhe im Möbelformular bestimmen Krone und Wuchs. Wegleuchten, Garten-Spots und Außen-Wandleuchten beleuchten die Außenflächen und die Fassade. **Pool:** Pools zeichnest du mit **Draußen → Pool**; im Menü wählst du die Form – **Eckig**, **Rund**, **Oval** oder **Frei** – und ziehst ihn dann auf (rund: so breit wie die kurze Seite des Rahmens). Einen runden oder ovalen Pool vergrößerst du an den vier Ecken seines Rahmens (der Kreis bleibt rund) oder im Formular über Durchmesser bzw. Breite und Tiefe; die Form selbst bleibt. Ein Pool schneidet sich selbst aus dem Rasen darunter aus. **Aufstellpool** stellt ihn als Becken auf den Boden, mit **Beckenhöhe**; sonst ist er eingelassen. **Beckentiefe** ist die Tiefe vom Rand bis zum Boden (sonst 1,50 m), **Rand über dem Rasen** wie weit der Rand herausschaut – ein 1,50 m tiefer Pool, der 20 cm aus dem Rasen schaut: Tiefe 1,50, Rand 0,20. Das Wasser steht 15 cm unter dem Rand; man sieht durch das Wasser auf Wände und Boden des Beckens. Die Tiefe zeigt sich, wenn der Pool in einer Rasen-, Terrassen- oder anderen Fläche liegt – ohne Boden drumherum wäre das Becken von außen zu sehen, dann bleibt er flach.
+With **Outside → Outdoor** you draw lawn, terrace, path, driveway, flower bed, hedge or fence. Choose in the menu first what you draw; the type can still be changed in the form afterwards. There you also choose **Rectangle** (drag it open) or **Free form**: then you place the corners one by one like a free-form room – for curved beds, slanted plot borders or an L-shaped path; a tap on the first corner or **Enter** closes the area. A selected outdoor area is resized at its corners; a rectangle stays a rectangle. The **+** in the middle of an edge puts a new corner there (since 3.1.1), as with a room – gates in a fence move along. The plan then shows each corner's number (as in the **Corners** list) and each edge's length. Under **Corners** in the form you type each corner as X and Y, like a room's – so edges of a free form become straight or parallel; **×** removes a corner (gates on the two edges at that corner go with it). Hedges and fences take a **height** in the form (a 2.5 m thuja screen, a 0.5 m bed border); **Show the outline** unticked leaves out the glowing line along the edge, say on a plot made of several lawns. **Height offset** lowers an area below the ground or raises it – the driveway down to a lower garage, a raised terrace; lamps on it follow. **Slope** tilts an area: the height difference in metres and the direction it falls towards (the high edge sits at the height offset) – a driveway falling to the street, a sloping garden; fence posts and lamps stand on the sloped surface. **Wild patch** is a type for unmown corners. **Balcony** is for upper floors: a thin slab at the floor's level with a see-through railing of bars (height in the form); edges along a house wall get no railing – balcony doors behind it stay in view. **Cut out of the areas beneath** turns an area into a hole in every area drawn before it that contains it whole – a pond or a wild patch in the middle of one single big lawn. **Pergola / frame** draws corner posts, beams and rafters at the set height, with **X-bracing** on the sides – for pergolas, carport frames or the support of a roll-off roof. Fences and pergolas can stay **open**: the edge from the last point back to the first is left out, so the fence leans against the house. **Gates in fences (since 2.2):** in a fence's form, **+ Gate in the fence** puts a gap into one side, like a door in a wall – as a **garden gate** (one leaf), a **double gate** (two leaves) or a **sliding gate**. You choose the **side** (in the order you placed the corners), the **middle from the side's start** and the **width**; the gap shows in the plan as a yellow bar. **Hinge on the other side** or **Opens towards the other side** turns the direction, **Opens outwards** swings the leaves out of the plot. With a **motor or switch** (a cover such as a gate motor, a switch, an input_boolean or a lock) and/or a **contact** the gate opens in 3D too; a tap on it switches it. When the motor only reports "opening"/"closing", the gate runs open in its **run time**; a contact always wins. Trees, shrubs and brush come as furniture from the **Garden & Terrace** pack (from release 3: oak, lime, birch, maple, fruit tree, spruce, pine, thuja, shrub, flowering shrub, brush, group of trees); width and height in the furniture form set crown and growth. Path lights, garden spots and outdoor wall lights light the outdoor areas and the facade. **Pool:** pools are drawn with **Outside → Pool**; in the menu you choose the shape – **Rectangular**, **Round**, **Oval** or **Free** – and then draw it (round: as wide as the short side of the box). A round or oval pool is resized at the four corners of its box (a circle stays round) or in the form by diameter or width and depth; the shape itself stays. A pool cuts itself out of the lawn around it. **Above-ground pool** stands it on the ground as a tub, with a **pool height**; otherwise it is let into the ground. **Basin depth** is the depth from the rim down to the floor (1.50 m by default), **Rim above the lawn** how far the rim stands out – a 1.50 m deep pool standing 20 cm out of the lawn: depth 1.50, rim 0.20. The water stands 15 cm below the rim; you look through the water onto the basin's walls and floor. The depth shows when the pool lies in a lawn, terrace or other area – without ground around it the basin would show from outside, so it stays flat.
 
-**Außenflächen wie Räume:** Gib einer Fläche (Rasen, Terrasse, Balkon, Pool …) im Formular einen **Bereich** aus Home Assistant, etwa „Garten“, und auf Wunsch einen **Namen**. Dann verhält sie sich wie ein Raum: Sie steht in der Raumleiste, ein Tipp in 3D öffnet sie mit den Geräten des Bereichs (Gartenlicht, Steckdosen, Bewässerung), die Kamera rahmt sie ein, und mit **Anzeige → Werte** steht die Außentemperatur an ihrem Namen – Sensoren mit „Außen“ im Namen zählen hier ausdrücklich mit. Im Formular der Fläche stehen die Geräte des Bereichs wie bei einem Raum: **Platzieren**, **☆** zeigt ein Gerät im Raumfenster, ohne es in den Plan zu setzen, **👁** blendet es dort aus, **Aa** lässt seinen Zustandstext weg. Hecken, Zäune und Pergolen haben keinen Bereich.
+**Outdoor areas like rooms:** give an area (lawn, terrace, balcony, pool …) a Home Assistant **area** in its form, say "Garden", and a **name** if you like. It then acts like a room: it is in the room bar, a tap in 3D opens it with the area's devices (garden lights, sockets, irrigation), the camera frames it, and with **Show → Values** the outdoor temperature stands at its name – sensors with "outdoor" in their name count here on purpose. The area's form lists its devices like a room's: **Place**, **☆** shows a device in the room panel without putting it on the plan, **👁** hides it there, **Aa** leaves out its state text. Hedges, fences and pergolas take no area.
 
-![Garten bei Nacht](images/view-garden.jpg)
+![The garden at night](images/view-garden.jpg)
 
-### 4.18 3D daneben
+### 4.18 3D beside
 
-**3D daneben** zeigt die 3D-Ansicht rechts neben dem Plan. Jede Änderung erscheint dort nach einem Augenblick.
+**3D beside** shows the 3D view to the right of the plan. Every change appears there a moment later.
 
-- Die **Leiste zwischen Plan und 3D** ziehst du, um das Verhältnis zu ändern. Der Browser merkt sich die Einstellung.
-- Oben in der 3D-Hälfte schaltest du zwischen **Wände hoch** und **Schnitt**. Daneben steht **Effekte**: aus = kein Wetter, keine Sonne, keine Haustiere und kein Geist in der 3D-Hälfte, ein ruhiges Fenster zum Zeichnen. **Namen** (seit 3.2) blendet die Raumnamen in der 3D-Hälfte aus, wenn sie bei vielen Räumen die Sicht verstellen. Das Gerät merkt sich beide Schalter; die eigentliche 3D-Ansicht bleibt davon unberührt.
-- Ein Möbel oder Gerät kannst du auch in der 3D-Hälfte antippen und ziehen. Unten erscheint dann eine Leiste mit Breite, Tiefe, Höhe, Höhe über Boden, Drehung und Löschen.
-- Ohne Stecknadel klappt die Seitenleiste neben der 3D-Ansicht ein, sobald du dort etwas antippst, und öffnet sich über der 3D-Hälfte; **‹** am rechten Rand holt sie zurück. Mit **📌 Angeheftet** bleibt sie daneben stehen und klappt nur mit **Einklappen** ein.
+- Drag the **divider between plan and 3D** to change the ratio. The browser remembers it.
+- At the top of the 3D half you switch between **Tall walls** and **Cut**. Beside them sits **Effects**: off = no weather, no sun, no pets and no ghost in the 3D half, a quiet pane for drawing. **Names** (since 3.2) hides the room names in the 3D half where many rooms make them crowd the view. The device remembers both switches; the 3D view itself is not affected.
+- You can also tap and drag an item or device in the 3D half. A bar with width, depth, height, height above the floor, rotation and delete appears at the bottom.
+- Without the pin, the sidebar folds away beside the 3D view as soon as you tap something there, and opens over the 3D half; **‹** at the right edge brings it back. With **📌 Pinned** it stays beside it and only folds with **Collapse**.
 
-### 4.19 Dach
+### 4.19 Roof
 
-![Ein Bauernhaus mit Wohnhaus, Scheune und Anbau, jedes mit eigenem Dach](images/view-roof-sections.jpg)
+![A farmhouse with house, barn and extension, each with a roof of its own](images/view-roof-sections.jpg)
 
-Ein einfaches Haus bekommt unter **Bauen → Dach** bei **Dachform** ein Flach- oder Satteldach über das ganze oberste Geschoss, mit First (entlang der langen oder der kurzen Seite, z. B. Reihenhaus), Neigung und Überstand. Für alles andere – ein Haus in L- oder T-Form, ein Wohnhaus mit Scheune, ein Anbau mit Pultdach, ein Dach, das auf einer Seite tief herunterzieht – baust du das Dach aus **Dachflächen**.
+A simple house gets a flat or gable roof over the whole top floor under **Build → Roof** at **Roof shape**, with the ridge (along the long or the short side, e.g. a terraced house), pitch and overhang. For everything else – an L- or T-shaped house, a house with a barn, an extension with a pent roof, a roof that reaches far down on one side – you build the roof from **roof sections**.
 
-- Wähle unter **Dach** die Option **Dachflächen (frei)** oder das Werkzeug **Dach**. Beim ersten Mal schlägt HomePlan 3D die Dachflächen aus deinen Räumen vor: je Etage die Teile, über denen keine höhere Etage liegt, jeweils mit Satteldach. Danach passt du sie an.
-- Im Werkzeug **Dach** ziehst du eine neue Dachfläche im Plan auf. Antippen wählt eine aus, ziehen verschiebt sie, die Ecken ändern die Größe. Oben wählst du die Etage, deren Räume im Plan liegen. Daneben öffnet sich die 3D-Ansicht mit dem ganzen Haus, so siehst du jede Änderung sofort.
-- Mit dem Schloss **🔓 Fixieren** (oder der Taste **L**) sitzt eine fertige Dachfläche fest und verrutscht nicht mehr beim Antippen; **Grundriss sperren** sperrt alle Dachflächen mit.
-- Jede Dachfläche hat eine **Form** – Sattel, Walm, Krüppelwalm (oben abgewalmter Giebel), Zelt (vier Flächen zur Spitze), Mansard (steil unten, flach oben; die Neigung oben stellst du seit 3.5.0 unter **Neigung Oberdach** ein, Standard 30°), Pult, Flach und Attika (Flachdach mit Brüstung) – und eine **Firstrichtung** (↔ oder ↕).
-- Bei Sattel, Walm und Krüppelwalm wählst du unter **Ende links/rechts** (bzw. **oben/unten**) für jedes Ende des Firsts eigens Giebel, Walm oder Krüppelwalm – zum Beispiel ein Walmdach mit einem senkrechten Giebel am anderen Ende. **wie die Form** lässt das Ende so, wie die Form es vorgibt.
-- **Traufe** und **Neigung** stellst du für beide Seiten getrennt ein. Alle Höhen zählen vom Boden. Eine Seite mit tieferer Traufe zieht weiter herunter, so entsteht etwa ein Abschleppdach über einem niedrigen Anbau. Ein Pultdach steigt von der ersten Seite an; **Seiten tauschen** dreht es um.
-- **Drehung:** Steht ein Anbau oder Flügel schräg zum Haus, drehst du seine Dachfläche mit **Drehung** (oder ↺ 15° / ↻ 15°) im Uhrzeigersinn. Gauben und Zwerchgiebel darauf drehen mit, Dachfenster und Solarfelder bleiben auf ihr. Eine gedrehte Fläche verschiebst du durch Ziehen; die Ecken zum Ändern der Größe gibt es erst wieder bei 0° (zurückdrehen, Größe ändern, wieder drehen). Wo ein gedrehter Flügel in ein anderes Dach läuft, schneidet ihn dessen Dachfläche ab. Das gilt seit 3.0.5 auch für eine kleine gedrehte Fläche, die auf einem größeren Dach sitzt (ein um 45° gedrehter Giebel über einem spitzen Erker im Walmdach): Sie wird mit dem Dach darunter verschnitten statt als Gaube ein Loch hineinzuschneiden – Form Sattel, zur Erkerspitze hin **Ende Giebel**, das andere Ende einfach ins Hauptdach laufen lassen. Ab Werk steht jede Dachfläche auf 0°.
-- **Wandoberkante** ist die Höhe, auf der die Wände unter dem Dach enden. Eine neue Dachfläche übernimmt sie von den Räumen darunter, egal welche Etage der Plan gerade zeigt. Von dort werden Giebel und Drempel bis unter das Dach hochgezogen, so ist auch der Raum unter einem Pultdach geschlossen.
-- **Sitzt auf Etage** zeigt, zu welcher Etage die Dachfläche in der 3D-Ansicht gehört, und setzt sie auf die Wandoberkante einer anderen Etage – Wandoberkante und Traufen wandern mit. Das hilft, wenn eine neue Dachfläche auf der falschen Etage gelandet ist, etwa über einem Obergeschoss mit Treppenloch in der Mitte.
-- **Flachdach als freie Form:** Bei einem Flachdach gibt es den Knopf **Umriss des Geschosses übernehmen** – die Fläche bekommt den Umriss der Räume des angezeigten Geschosses (auch L- oder Z-förmig), eine Fläche ohne Kanten statt mehrerer Rechtecke. Die Ecken lassen sich danach im Plan ziehen; **Zurück zum Rechteck** löscht die Form.
-- **Gauben:** Im Formular einer Dachfläche fügt **+ Gaube** eine Gaube auf der gewählten Seite ein – 2 m breit, Front an der Traufwand, Traufe 1,4 m über der Dachtraufe, Satteldach, so tief, dass ihr First auf die Schräge trifft. Eine Gaube ist eine kleine Dachfläche: verschieben, Breite, Höhen und Form (Sattel, Pult) änderst du wie bei jeder anderen. Die Hauptfläche öffnet sich darunter, die Wangen schließen seitlich ab, und die Wand des Dachgeschosses steigt unter der Gaube bis zu ihrer Traufe – dort setzt du mit **Tür & Fenster** das Gaubenfenster.
-- **Zwerchgiebel (Drei-Giebel-Haus):** Ein Giebel, der aus der Traufseite vortritt, ist eine breite Gaube, deren Traufe auf der Wandoberkante liegt: **+ Gaube**, dann Breite ziehen (z. B. 3,4 m) und **Traufe** auf die Wandoberkante setzen. Die Tiefe passt sich von selbst an – die Gaube reicht genau so weit, bis ihr First auf die Schräge trifft, und das Hauptdach öffnet sich nur dort, wo das Gaubendach darüber liegt (Kehlen). Die Dachgeschoss-Wand unter dem Zwerchgiebel steigt bis in den Giebel, das Fenster darin setzt du mit **Tür & Fenster**.
-- **Dachschrägen (Kniestock):** Liegt die Wandoberkante unter der Deckenhöhe des Geschosses darunter (auch wenn die Schräge schon im Geschoss darunter beginnt: dann enden dessen Wände an der Traufseite ebenfalls an der Schräge) – zum Beispiel 0,9 m über dem Boden des Dachgeschosses –, enden dessen Wände an der Dachunterseite: Kniestock an der Traufe, Giebel bis zum First, Innenwände an der Schräge. Fenster passen dann nur, wo die Wand hoch genug ist (im Giebel); an der Traufseite nimmst du Dachfenster. Im Grundriss zeigen gestrichelte Linien, wo unter der Schräge noch 1,5 m und 2 m Kopfhöhe bleiben.
-- Wo eine Dachfläche an einen höheren Teil des Hauses stößt, etwa ein Pultdach an der Hauswand, entfällt dort der Überstand; das Dach endet an der Wand. Das klappt seit 2.2 auch, wenn die Dachfläche bündig an der Außenseite einer dicken Wand gezeichnet ist. **Überstand je Seite** im Formular der Dachfläche legt den Überstand jeder Seite selbst fest (es startet mit den automatischen Werten); aus, ist er wieder automatisch.
-- Unten im Formular steht die **Firsthöhe**. Dachflächen dürfen sich überschneiden: Das niedrigere Dach läuft unter das höhere, wie bei einem echten Anbau.
-- **Neu aus den Räumen erzeugen** ersetzt alle Dachflächen durch einen neuen Vorschlag, **Zurück zu einem Dach** schaltet auf das einfache Dach zurück. Die Dachflächen bleiben dabei für später gespeichert, schneiden aber keine Wände mehr an.
+- Choose **Roof sections (custom)** under **Roof**, or the **Roof** tool. The first time, HomePlan 3D proposes the sections from your rooms: per floor the parts no higher floor covers, each with a gable roof. Then you adjust them.
+- In the **Roof** tool you drag a new section in the plan. Tap selects one, dragging moves it, the corners resize it. At the top you choose the floor whose rooms the plan shows. The 3D view opens beside it with the whole house, so you see every change at once.
+- With the lock **🔓 Fix** (or the key **L**) a finished section stays put and no longer slips when you tap it; **Lock floor plan** locks all sections too.
+- Each section has a **shape** – gable, hip, half-hip (a gable hipped at the top), pyramid (four slopes to a point), mansard (steep below, flatter above; set the upper pitch under **Upper roof pitch** since 3.5.0, default 30°), pent, flat and parapet (a flat roof with a wall ring) – and a **ridge direction** (↔ or ↕).
+- For gable, hip and half-hip, **End left/right** (or **top/bottom**) sets each end of the ridge on its own to a gable, a hip or a half-hip – a hip roof with an upright gable at the other end, for example. **as the shape** leaves the end as the shape has it.
+- **Eave** and **pitch** are set for both sides separately. All heights count from the ground. A side with a lower eave reaches further down, e.g. a catslide over a low extension. A pent roof rises from the first side; **Swap sides** turns it round.
+- **Turn:** if an extension or wing stands at an angle to the house, turn its section with **Turn** (or ↺ 15° / ↻ 15°), clockwise. Dormers and cross gables on it turn along, roof windows and solar fields stay on it. A turned section is moved by dragging; the corners for resizing come back at 0° (turn back, resize, turn again). Where a turned wing runs into another roof, that roof's slopes cut it off. Since 3.0.5 that also holds for a small turned section sitting on a bigger roof (a gable turned 45° over a pointed bay in a hip roof): it meets the roof below like a wing instead of cutting a dormer's hole into it – shape gable, **end gable** towards the bay's point, the other end simply running into the main roof. By default every section stays at 0°.
+- **Top of walls** is the height where the walls below the roof end. A new section takes it from the rooms below, whatever floor the plan shows. Gables and knee walls are built from there up under the roof, so the space under a pent roof is closed too.
+- **Sits on floor** shows which floor the section belongs to in the 3D view and puts it on another floor's wall tops – top of walls and eaves move along. This helps when a new section landed on the wrong floor, e.g. over an upper floor with a stairwell in the middle.
+- **Flat roof as a free shape:** a flat roof has the button **Take the floor's outline** – the surface takes the outline of the shown floor's rooms (L- or Z-shaped too), one surface without seams instead of several rectangles. The corners can be dragged in the plan afterwards; **Back to the rectangle** drops the shape.
+- **Dormers:** in a section's form, **+ Dormer** adds a dormer on the chosen side – 2 m wide, its front at the eave wall, eaves 1.4 m above the roof's eave, gable roof, as deep as its ridge needs to meet the slope. A dormer is a small section: move it and change its width, heights and shape (gable, pent) like any other. The main slope opens under it, the cheeks close its sides, and the attic wall rises under the dormer up to its eave – put the dormer window there with **Door & window**.
+- **Cross gables (a "three-gable house"):** a gable stepping out of the eave side is a wide dormer whose eaves lie on the top of the walls: **+ Dormer**, then drag its width (say 3.4 m) and set its **eave** to the top of walls. Its depth follows by itself – the dormer reaches exactly as far as its ridge meets the slope, and the main roof opens only where the dormer's roof lies above it (the valleys). The attic wall under the cross gable rises into the gable; put its window there with **Door & window**.
+- **Roof slopes (knee walls):** if the top of walls lies below the ceiling height of the floor underneath (also when the slope already starts in the floor below: its walls on the eave side then end at the slope as well) – say 0.9 m above the attic floor – that floor's walls end under the roof: knee walls at the eaves, gables up to the ridge, inner walls cut by the slope. Windows then only fit where the wall is tall enough (in the gable); on the eave side use roof windows. Dashed lines in the plan show where 1.5 m and 2 m of headroom remain under the slope.
+- Where a section meets a taller part of the house, e.g. a pent roof against the house wall, the overhang is left out there; the roof ends at the wall. This also works when the section is drawn flush against the outer face of a thick wall (since 2.2). **Overhang per side** in the section's form sets each side's overhang by hand instead (it starts with the automatic values); off, it is automatic again.
+- The **ridge height** is shown at the bottom of the form. Sections may overlap: the lower roof runs under the higher one, as with a real extension.
+- **Create again from the rooms** replaces all sections with a new proposal, **Back to one roof** switches to the simple roof. The sections are kept for later but no longer cut any walls.
 
-- Unten im Formular steht die **Firsthöhe**. Dachflächen dürfen sich überschneiden: Das niedrigere Dach läuft unter das höhere, wie bei einem echten Anbau – was unter der anderen Fläche liegt, wird weggeschnitten, und wo sich zwei Flächen treffen, zeigt eine Linie die Kehle. Ein Flügel, dessen First quer auf die Schräge eines höheren Dachs trifft (Haus in L- oder T-Form), läuft bis in dieses Dach hinein und endet dort sauber in zwei Kehlen statt mit einem Giebel.
-- **Neu aus den Räumen erzeugen** ersetzt alle Dachflächen durch einen neuen Vorschlag, **Zurück zu einem Dach** schaltet auf das einfache Dach zurück.
-- **Überdachung:** Für ein Terrassendach oder einen Carport ziehst du eine Dachfläche über eine Fläche ohne Raum. Sie wird automatisch zur Überdachung: ein flaches Pultdach auf 2,4 m, getragen von Pfosten und Balken statt Wänden, mit durchsichtiger Dachfläche. An der Hauswand liegt sie auf. Den Schalter **Überdachung** gibt es auch im Formular jeder Dachfläche.
+- The **ridge height** is shown at the bottom of the form. Sections may overlap: the lower roof runs under the higher one, as with a real extension – what lies under the other section is cut away, and a line shows the valley where two sections meet. A wing whose ridge runs at right angles into the slope of a higher roof (an L- or T-shaped house) reaches on into that roof and ends there cleanly in two valleys instead of a gable.
+- **Create again from the rooms** replaces all sections with a new proposal, **Back to one roof** switches to the simple roof.
+- **Canopy:** For a terrace roof or a carport, drag a section over an area without a room. It becomes a canopy by itself: a flat pent roof at 2.4 m, carried by posts and beams instead of walls, with a see-through roof. At the house wall it rests on the wall. The **Canopy** switch is in the form of every section, too.
 
-![Eine Terrassenüberdachung vor dem Haus](images/view-canopy.jpg)
+![A terrace roof in front of the house](images/view-canopy.jpg)
 
-![Das Werkzeug Dach mit einer ausgewählten Dachfläche](images/editor-roof.jpg)
+![The Roof tool with a selected roof section](images/editor-roof.jpg)
 
-#### Dachfenster
+#### Roof windows
 
-Unter den Dachflächen legt **+ Dachfenster** ein Fenster in eine Dachfläche (Standard 78 × 118 cm). Es lässt sich im Grundriss verschieben, auch auf eine andere Dachfläche, und hat wie ein normales Fenster **Rollladen**, **Kontakt** und **Kippkontakt**: Offen klappt der Flügel oben angeschlagen nach außen, gekippt ein Stück, und der Rollladen fährt von oben über die Scheibe.
+Below the roof sections, **+ Roof window** puts a window into a roof face (78 × 118 cm by default). Drag it in the plan, also onto another roof face. Like a window it has a **Blind**, a **Contact** and a **Tilt contact**: open, the sash swings out, hinged at the top; tilted, a little; the blind comes down over the glass from the top.
 
-Zu jedem Dachfenster gehören ein **Name** (optional), **Rollladen**, **Kontakt** und **Kippkontakt** – und ein **Fenstermotor**: Velux, Roto oder Fakro melden die Fensterstellung als Cover, der Flügel öffnet in 3D so weit, wie der Motor steht. Offen oder gekippt leuchtet der Rahmen warm wie bei einem Wandfenster. Liegt das Fenster in einer Dachfläche, schneidet es ein Loch in die Schräge, so sieht man aus dem Dachgeschoss hinaus. Blendet das Dach beim Heranzoomen an eine Etage oder einen Raum aus, blenden die Dachfenster mit aus. Mit **Ohne Dach über dem Raum zeigen** bleibt ein Fenster dann an seiner Stelle über dem Raum stehen – offen, gekippt, mit dem Rollladen. Die Scheibe ist durchsichtig wie bei einem Wandfenster, der Rollladen hat Lamellen; so sieht man auch aus der Ferne, ob er zu ist. Reicht die Schräge über einen Raum der Etage darunter, gehört das Fenster zu dieser Etage und zeigt sich mit ihr. Jedes Dachfenster gehört zu dem Raum darunter: Tippst du den Raum an, stehen Rollladen, Kontakt und Fenstermotor in seiner Raumkarte, und scheint die Sonne auf die Dachfläche, fällt ihr Licht durch das Fenster auf den Boden des Raums (mit dem Rollladen weniger).
+Every roof window has a **name** (optional), a **blind**, a **contact** and a **tilt contact** – and a **window motor**: Velux, Roto or Fakro report the window's position as a cover, and the sash opens in 3D as far as the motor stands. Open or tilted, the frame glows warm like a wall window's. In a roof section the window cuts a hole into the slope, so the attic looks out through it. When the roof fades out as you zoom in on a floor or a room, the roof windows fade out with it. With **Show over the room without the roof** a window stays where it is over the room – open, tilted, with its blind. Its pane is see-through like a wall window's and its blind has slats, so you can tell from afar whether it is down. Where the slope reaches over a room of the floor below, the window belongs to that floor and shows with it. Every roof window belongs to the room below it: tap the room and its blind, contact and window motor are in the room card, and when the sun shines on that roof face, its light falls through the window onto the room's floor (less with the blind down).
 
-### 4.20 Energie: Solarfelder
+### 4.20 Energy: solar fields
 
-Im Werkzeug **Energie** lassen sich nur Solarfelder und Energiegeräte verschieben, im Grundriss wie in 3D; Räume und Möbel sind dort gesperrt, ein Hinweis oben im Grundriss sagt das. Das Werkzeug sammelt alles rund um Energie im Haus, zuerst die **Solarfelder** (Zähler, Heizung und Wärmepumpe folgen). **+ Solarfeld** legt ein Feld auf die sonnigste freie Dachfläche, so groß, wie es passt. **+ Frei aufgeständert** stellt ein Feld auf Gestellen neben das Haus, etwa in den Garten oder auf ein flaches Garagendach. **+ An der Wand** hängt eine Reihe Module an die sonnigste Außenwand der angezeigten Etage (Fassade, Balkon).
+In the **Energy** tool only solar fields and energy devices can be moved, in the plan and in 3D; rooms and furniture are locked there, as a note at the top of the plan says. The tool gathers everything about energy in the house, starting with the **solar fields** (meters, heating and heat pump will follow). **+ Solar field** puts a field on the sunniest free roof face, as large as fits. **+ Free-standing** puts a field on frames beside the house, e.g. in the garden or on a flat garage roof. **+ On a wall** hangs a row of modules on the sunniest outer wall of the floor shown (facade, balcony).
 
-Felder lassen sich im Grundriss und in der **3D-Ansicht daneben** mit der Maus verschieben, auch auf eine andere Dachfläche oder Wand. Dachfenster genauso, im Werkzeug **Dach**. Die Module liegen in der Neigung der Dachfläche, auf einem Flachdach stehen sie aufgeständert. Das klappt beim einfachen Sattel- und Flachdach und auf allen Dachabschnitten (Satteldach, Walmdach, Pultdach, Flachdach). Bei Walm- und Zeltdach stehen auch die beiden dreieckigen **Walmseiten** zur Wahl, etwa die Südseite eines Walmdachs mit Ost-West-First; die Felder werden zur Spitze hin schmaler.
+Drag fields in the plan and in the **3D view beside it**, also onto another roof face or wall. Roof windows work the same way in the **Roof** tool. The modules lie in the slope of the face; on a flat roof they stand on frames. This works on the single gable and flat roof and on all roof sections (gable, hip, pent, flat). On hip and pyramid roofs the two triangular **hip ends** are offered too, e.g. the south end of a hip roof with an east-west ridge; fields get narrower towards the tip.
 
-| Feld | Wirkung |
+| Field | Effect |
 |---|---|
-| **Dachfläche** | Die Fläche mit Himmelsrichtung und Neigung, zum Beispiel „Hauptdach · Süd · 35°“ |
-| **Name** | Zum Beispiel „Strang 1 Süd“; mehrere Felder für mehrere Stränge oder Dachflächen |
-| **Reihen** und **Module pro Reihe** | Größe des Feldes. Eine Liste wie **„4, 4, 3“** gibt jeder Reihe ihre eigene Länge (von der Traufe aus), kürzere Reihen sitzen links, mittig oder rechts. Module, die über die Fläche hinausragen würden, fallen weg |
-| **Module einzeln an/aus** | Im Grundriss einzelne Module wegtippen oder wieder dazunehmen, etwa um einen Schornstein oder ein Dachfenster herum |
-| **Full Black** / **Blau** | Optik der Module: ganz schwarz (Standard) oder klassisch blau |
-| **Modulbreite** / **Modulhöhe** | Größe eines Moduls im Hochformat, Standard 1,13 × 1,72 m |
-| **Modulleistung (Wp)** | Spitzenleistung eines Moduls, Standard 400 – bestimmt die kWp des Feldes und des Strangs und wie hell die lebenden Module (Energie Pro) leuchten |
-| **Strang** | Felder, die zusammen verschaltet sind, auch auf verschiedenen Dächern: etwa 5 Module auf dem Haus und 5 auf der Garage in „Strang 1“. Der Strang hat einen Namen, einen PV-Sensor und ist **angeschlossen an** einen Wechselrichter – oder an einen Stromspeicher mit eigenem Solareingang (eine Powerstation wie EcoFlow); beide legst du unter **Geräte** an |
-| **PV-Leistung dieses Feldes** | Der Leistungssensor seines Strangs, verwendet von Energie Pro |
-| **Hochformat** / **Querformat** | Lage der Module (1,13 × 1,72 m) |
-| **Abstand vom Rand** / **von der Traufe** | Position des Feldes. Im Grundriss lässt es sich mit der Maus verschieben, auch auf eine andere Dachfläche; über den Rand der Fläche hinaus rutscht es nicht |
-| **Neigung der Aufständerung** | Flachdach und Garten: Winkel der Gestelle, dazu die Richtung |
-| **Frei aufgeständert** | Das Feld steht auf Gestellen, frei verschiebbar. **Höhe der Aufstellfläche** hebt es an, z. B. 2,8 m auf ein Garagendach (0 = Boden). **Drehung** richtet die Reihen aus, ebenso die Knöpfe ↺/↻ 15° und der Dreh-Griff im Grundriss; das Feld dreht sich dabei um seine Mitte |
-| **Wand** | Module hängen an einer Außenwand; in der Liste heißt jede Wand nach Etage, Raum und den Eckpunkt-Nummern aus dem Plan („Wand Erdgeschoss · Flur 4–5 · Ost · 1,2 m“), frei stehende Wände heißen „frei stehend“. Auf einer Wand behält das Feld so viele Module, wie in die Reihe passen; für ein liegendes Modul zu kurz, nimmt sie es hochkant, und eine Wand schmaler als ein Modul (etwa eine 0,9-m-Gartenmauer) trägt eins mittig, das über beide Enden ragt. Statt „Abstand von der Traufe“ gibt es die **Höhe über dem Boden**. **Neigung von der Wand** stellt sie schräg: oben abstehend oder unten abstehend, bis 90° als Vordach. Die Etagen-Knöpfe oben wählen, an welcher Etage du arbeitest |
-| **Fläche füllen** | Legt so viele Module auf die Fläche, wie passen |
+| **Roof face** | The face with its compass direction and pitch, e.g. "Main roof · south · 35°" |
+| **Name** | E.g. "String 1 south"; several fields for several strings or roof faces |
+| **Rows** and **Modules per row** | Size of the field. A list like **"4, 4, 3"** gives every row its own length (from the eave); shorter rows sit left, centred or right. Modules that would reach beyond the face are left out |
+| **Modules on/off one by one** | Tap single modules in the plan to take them away or put them back, e.g. around a chimney or a roof window |
+| **Full black** / **Blue** | Look of the modules: all black (default) or classic blue |
+| **Module width** / **Module height** | Size of one module in portrait, 1.13 × 1.72 m by default |
+| **Module power (Wp)** | Peak power of one module, 400 by default – sets the kWp of the field and its string and how bright the living modules (Energy Pro) glow |
+| **String** | Fields wired together, also on different roofs: e.g. 5 modules on the house and 5 on the garage in "String 1". A string has a name, a PV sensor and is **connected to** an inverter – or to a battery with a solar input of its own (a power station such as EcoFlow); add both under **Devices** |
+| **PV power of this field** | The power sensor of its string, used by Energy Pro |
+| **Portrait** / **Landscape** | How the modules (1.13 × 1.72 m) lie |
+| **Distance from the edge** / **from the eave** | Position of the field. Drag it in the plan, also onto another roof face; it does not slide beyond the edge of its face |
+| **Tilt of the frames** | Flat roofs and the garden: the angle of the frames, plus the direction |
+| **Free-standing** | The field stands on frames and moves freely. **Height of the surface** lifts it, e.g. 2.8 m onto a garage roof (0 = ground). **Rotation** turns the rows, as do the ↺/↻ 15° buttons and the turn handle in the plan; the field turns about its middle |
+| **Wall** | Modules hang on an outer wall; in the list every wall is named by floor, room and the corner numbers from the plan (“Wall Ground floor · Hall 4–5 · East · 1.2 m”), free-standing walls say “free-standing”. On a wall the field keeps as many modules as fit in the row; too short for a module lying down, it takes it upright, and a wall narrower than a module (say a 0.9 m garden wall) carries one centred, overhanging both ends. Instead of "distance from the eave" there is the **height above the floor**. **Tilt away from the wall** angles them: standing off at the top or at the bottom, up to 90° as a canopy. The floor buttons at the top choose the floor you work on |
+| **Fill face** | Puts as many modules on the face as fit |
 
-Unter dem Feld steht die Leistung, gerechnet mit 400 W je Modul. Die Grundriss-Sperre hält Solarfelder nicht fest; mit **🔓 Fixieren** im Formular lässt sich ein Feld (und genauso ein Dachfenster) aber einzeln festsetzen. **Geräte:** Wechselrichter, Stromspeicher und Wallbox legst du ebenfalls im Werkzeug **Energie** an, unter **Geräte**, auf der oben gewählten Etage. Die Wallbox kommt von selbst in die Garage, Wechselrichter und Speicher in einen Technikraum (HWR, Keller …), jeweils an eine Wand ohne Tür oder Tor, und der Grundriss springt hin. Ein Tipp auf ein Gerät in der Liste zeigt es im Grundriss. Dort trägt jedes Gerät im Werkzeug Energie eine runde Markierung mit Symbol (⚡ Wechselrichter, 🔋 Speicher, 🔌 Wallbox), an der man es anfasst und verschiebt, auch wenn darüber ein Solarfeld auf dem Dach liegt. Mit einem Leistungssensor zeigen sie ihre Watt. Der **Stromspeicher** zeigt mit dem Feld **Ladestand** zusätzlich seinen Ladestand, etwa „64 % · ▲ 1,5 kW“ (▲ lädt, ▼ entlädt), die **Wallbox** mit einem **Status**-Sensor „lädt · 11 kW“ oder „angesteckt“.
+Below the field you see its power, counted with 400 W per module. The plan lock does not hold solar fields; **🔓 Fix** in the form fixes a single field (and a roof window just the same). **Devices:** solar inverters, home batteries and wallboxes are added in the **Energy** tool as well, under **Devices**, on the floor chosen at the top. A wallbox goes into the garage by itself, inverters and batteries into a utility room (utility room, basement …), each against a wall without a door or gate, and the plan moves there. Tapping a device in the list shows it in the plan. There, in the Energy tool, every device carries a round marker with a symbol (⚡ inverter, 🔋 battery, 🔌 wallbox) to grab and move it by, also below a solar field on the roof. With a power sensor they show their watts. The **home battery** also shows its charge with the **State of charge** field, e.g. "64 % · ▲ 1.5 kW" (▲ charging, ▼ discharging), the **wallbox** "charging · 11 kW" or "plugged in" with a **Status** sensor.
 
-**Stromzähler und Netzanschluss:** Der **Stromzähler** ist das vierte Energiegerät; er bekommt den Netzsensor (W, + = Bezug) und zeigt „Netzbezug 420 W“ oder „Einspeisung 900 W“. Der **Netzanschluss** markiert, wo die Leitung zum Stromanbieter das Grundstück verlässt, etwa am Ende der Einfahrt; er wird dort angelegt, wo die Leitung von selbst enden würde, und lässt sich im Grundriss verschieben. Jedes Gerät hat im Formular ein Feld **Name** („Wechselrichter Nord“), das in Liste, Formular und an den Pins in 3D erscheint, und Wechselrichter und Speicher ein **Modell**: Wandgerät, schmal und hoch oder Hybrid; Turm, Wandspeicher oder kompakter Balkonspeicher. Mehrere Wechselrichter und Speicher gehen, zum Beispiel eine große Anlage und ein Balkonkraftwerk: Jeder bekommt seinen eigenen Sensor. **Kabelknoten (Energie Pro, seit 2.2):** Normalerweise laufen alle Kabel zum Stromzähler. Steht der Zähler am Netzanschluss, weit weg vom Hausverteiler, setze bei den Geräten des Energie-Werkzeugs den Haken **Kabel treffen sich an einem eigenen Punkt** und tippe mit **Punkt im Plan setzen** die Stelle an – dann treffen sich die Kabel dort, und die Checkliste zählt das als erledigt. Im Formular eines Wechselrichters lässt **Kabel endet am Netzanschluss** sein Kabel zum Netzanschluss statt zum Zähler laufen.
+**Meter and grid connection:** The **electricity meter** is the fourth energy device; it takes the grid sensor (W, + = import) and shows "Grid import 420 W" or "Export 900 W". The **grid connection** marks where the cable to the utility leaves the plot, e.g. at the end of the driveway; it is added where the cable would end by itself and can be dragged in the plan. Every device has a **Name** field in its form ("Inverter north") that shows in the list, the form and on the pins in 3D, and inverters and batteries a **Model**: wall unit, slim and tall or hybrid; tower, wall battery or compact balcony battery. Several inverters and batteries work, e.g. a big plant and a balcony plant: each gets its own sensor. **Cable hub (Energy Pro, since 2.2.0):** normally every cable runs to the meter. If the meter stands at the grid connection, far from the house board, tick **Cables meet at a point of their own** in the energy tool's devices and **Set the point in the plan** with a tap – the cables then meet there, and the checklist counts it as done. In an inverter's form, **Cable ends at the grid point** lets its cable run to the grid connection instead of the meter.
 
-**Energiebilanz:** Netz, Solar und Akku holt NeonPlan von den Geräten im Plan (Zähler, Wechselrichter, Speicher; mehrere werden zusammengezählt, Ladestände gemittelt). Im Abschnitt **Energiebilanz** wählst du andere Sensoren, drehst Vorzeichen um und gibst den Hausverbrauch an. **Aus dem Energie-Dashboard übernehmen** holt die Sensoren, die du im Energie-Dashboard von Home Assistant eingetragen hast: zu jeder Energie-Statistik den Leistungssensor desselben Geräts, dazu Gas- und Wasserzähler. Prüfe danach die Vorzeichen. **Gaszähler** und **Wasserzähler** sind Zähler (Zählerstand, etwa in m³); mit Energie Pro zeigt die Haus-Karte, wie viel davon heute verbraucht wurde.
+**Energy balance:** NeonPlan takes grid, solar and battery from the devices in the plan (meter, inverters, batteries; several add up, charges are averaged). In the **Energy balance** section you choose other sensors, flip signs and set the house consumption. **Take over from the energy dashboard** fetches the sensors you set up in Home Assistant's energy dashboard: for every energy statistic the power sensor of the same device, plus the gas and water meters. Check the signs afterwards. **Gas meter** and **water meter** are counters (a meter reading, e.g. in m³); with Energy Pro the house card shows how much was used today.
 
-**Energie Pro** ist enthalten und standardmäßig aktiviert. Alles, was du hier einrichtest, fließt direkt in die Darstellung ein.
+**Energy Pro** is included and enabled by default. Everything you set up here feeds its display directly.
 
-### 4.21 Keller und Gelände
+### 4.21 Cellar and ground
 
-Ein **Keller** ist eine Etage mit negativer **Höhe über Boden**, etwa −2,6 m. Unter **⚙ Einstellungen → Gelände** stellst du ein:
+A **cellar** is a floor with a negative **elevation**, e.g. −2.6 m. Under **⚙ Settings → Ground** you set:
 
-- **Geländehöhe** (in Metern, Erdgeschoss = 0) sagt, wo der Boden um das Haus liegt. Rasen, Wege und Terrassen liegen darauf. Für ein **Souterrain** oder Hochparterre senkst du sie so weit, wie der Keller herausschauen soll, etwa auf −1,2 m. Steht das Haus dadurch höher als das Gelände, bekommt es in 3D einen **Sockel** bis zum Boden – nichts schwebt.
-- **Keller in der Erde zeigen:** Etagen unter dem Gelände stecken in 3D im Erdreich. Öffnest du den Keller, siehst du ihn wie in einer Baugrube, mit den Erdwänden ringsum. Ohne Haken stehen sie frei wie bisher.
-- **Gelände zurücksetzen** stellt alles auf den Anfang.
+- **Ground height** (in metres, ground floor = 0) says where the ground lies around the house. Lawns, paths and terraces lie on it. For a **semi-basement** or raised ground floor you lower it as far as the cellar should show, e.g. to −1.2 m. If the house then stands higher than the ground, it gets a **plinth** down to the ground in 3D – nothing floats.
+- **Show cellars in the earth:** floors below the ground sit in the earth in 3D. Open the cellar and you see it as in a building pit, with the earth walls around it. Unticked, they stand free as before.
+- **Reset the ground** sets everything back.
 
-**Kellerfenster:** Im Formular eines Fensters setzt **Kellerfenster** die passende Größe – 100 × 50 cm, 25 cm unter der Decke. Liegt ein Fenster unter dem Gelände, bekommt es in 3D von selbst einen **Lichtschacht** mit Gitterrost. Der Haken **Lichtschacht** steht im Fensterformular genau dann, wenn 3D einen Schacht zeichnet (Fenster in einer Außenwand unter dem Gelände), und nimmt ihn wieder weg (etwa wenn außen ein Weg vorbeiführt); **Rand über dem Gelände** hebt Rand und Gitter an, damit ein Kies- oder Plattenweg ums Haus sie nicht verdeckt. Liegt im Garten-Werkzeug ein Rasen, Weg oder eine Terrasse bis ans Haus über dem Schacht, steht sein Rand von selbst knapp über dieser Fläche. Seit 2.2 zählt auch ein Rasen oder Weg, der bis ans Haus angehoben ist, als Gelände: Ein Kellerfenster darunter bekommt seinen Schacht, auch wenn die Geländehöhe im Plan tiefer liegt. **Tiefe vor der Wand (m)** legt fest, wie weit der Schacht hinausreicht (Standard 0,8 m), damit er in einem schmalen Weg bleibt.
+**Cellar window:** in a window's form, **Cellar window** sets the right size – 100 × 50 cm, 25 cm under the ceiling. A window below the ground gets a **light well** with a grate in 3D by itself. The tick **Light well** is in the window form exactly when 3D draws a well (a window in an outer wall below the ground) and takes it away again (e.g. where a path runs past outside); **Rim above the ground** raises the rim and grate so a gravel or paved path around the house does not cover them. Where a lawn, path or terrace of the garden tool reaches over the well up to the house, its rim stands just above that surface by itself. Since 2.2 a lawn or path raised up to the house counts as the ground too: a cellar window under it gets its well even when the plan's ground level lies lower. **Depth from the wall (m)** sets how far the well reaches out (0.8 m by default), so it stays within a narrow path.
 
-### 4.22 Markisen
+### 4.22 Awnings
 
-Unter **Möbel → Terrasse & Balkon** gibt es die **Markise**. Sie fährt in 3D mit ihrem Cover aus und ein – wie ein Rollladen.
+Under **Furniture → Terrace & balcony** there is the **Awning**. In 3D it runs out and in with its cover – like a blind.
 
-- **Art:** **Gelenkarm** (die Klassiker über der Terrasse), **Fallarm** (Balkon, Fenster – die Arme schwenken nach vorn und unten), **Senkrecht / ZIP** (das Tuch fährt in Seitenschienen senkrecht herunter), **Pergola / Wintergarten** (fester Rahmen mit Pfosten, das Tuch fährt oben aus) und **Seitenmarkise** (Sichtschutz, aus einem Pfosten zur Seite gezogen). Mit der Art setzt NeonPlan passende Maße, die du danach anpasst.
-- **Größe:** Breite ist die Markise entlang der Wand, Tiefe der Ausfall ganz ausgefahren (beim Fallarm die Armlänge, bei der Pergola bis zu den Pfosten). Die Rückseite des Rahmens kommt an die Hauswand; **Höhe über Boden** ist die Unterkante der Kassette (bei der Seitenmarkise die Höhe des Tuchs). **Neigung** ist das Gefälle des Tuchs.
-- **Markise (Cover):** das Cover aus Home Assistant. Meldet es seine Position auch während der Fahrt, fährt die Markise in 3D langsam mit; meldet es nur „öffnet“/„schließt“, fährt sie in der **Laufzeit ganz aus**. Ein eigener **Positionssensor** geht auch. **Richtung umkehren** hilft bei Covers, die 100 % melden, wenn die Markise eingefahren ist.
-- **Volant:** die herunterhängende Stoffkante vorne, abschaltbar.
+- **Kind:** **Folding-arm** (the classic over a terrace), **Drop-arm** (balcony, window – the arms swing out and down), **Vertical / ZIP** (the fabric runs straight down in side rails), **Pergola / conservatory** (a fixed frame with posts, the fabric runs out on top) and **Side awning** (a privacy screen pulled out sideways from a post). Choosing a kind sets its usual sizes, which you then adjust.
+- **Size:** width is the awning along the wall, depth its projection fully out (for a drop-arm the arm length, for a pergola up to the posts). The back of the frame goes against the house wall; **Height above the floor** is the cassette's underside (for a side awning the fabric's height). **Fall** is the fabric's slope.
+- **Awning (cover):** the cover from Home Assistant. If it reports its position while it runs, the awning runs out slowly in 3D; if it only says opening/closing, it moves at its **Run time fully out**. A separate **Position sensor** works too. **Reverse direction** helps with covers that report 100 % while the awning is in.
+- **Valance:** the fabric edge hanging at the front, can be switched off.
 
-### 4.23 Mülltonnen und Briefkästen
+### 4.23 Waste bins and mailboxes
 
-Unter **Möbel → Haushalt** stehen **Mülltonne** und **Briefkasten**.
+Under **Furniture → Household** you find the **waste bin** and the **mailbox**.
 
-- **Mülltonne – Bauform:** Rolltonne 120 l oder 240 l, Container 1100 l, Mehrkammer-Tonne, Sack, Eimer / Caddy oder Unterflur-Container (von dem nur die Einwurfsäule aus dem Boden ragt). Mit der Bauform setzt NeonPlan die üblichen Maße.
-- **Abfallart:** Restmüll, Bio, Papier, Verpackung, Glas, Garten, Recycling oder Sonstiges. Sie gibt der Tonne die Farben, die in deinem Land üblich sind (nach dem Land in Home Assistant: in Deutschland etwa Papier blau, Bio braun, Gelbe Tonne gelb; in Australien zeigt der Deckel die Sorte). **Farbe** und **Deckel** kannst du danach frei wählen.
-- **Briefkasten – Bauform:** Wandbriefkasten (hängt auf 1 m), Briefkasten auf Pfosten mit Fähnchen, Standbriefkasten mit Zeitungsfach, Paketbox oder Briefkastenanlage.
+- **Waste bin – shape:** wheelie bin 120 l or 240 l, 1100 l container, multi-compartment bin, bag, caddy / pail or underground container (only its column stands out of the ground). The shape sets the usual size.
+- **Waste:** general, food / organic, paper, packaging, glass, garden, recycling or other. It gives the bin the colours usual in your country (by the country set in Home Assistant: in Germany paper is blue and food waste brown, in the US recycling is blue; in Australia the lid tells the kind). **Colour** and **lid** can be changed freely afterwards.
+- **Mailbox – shape:** wall mailbox (hanging at 1 m), mailbox on a post with a flag, post box with a newspaper holder, parcel box or mailbox bank.
 
-### 4.24 Haustechnik: Lichtschalter, Steckdosen, WLAN und Warmwasser
+### 4.24 Home technology: light switches, sockets, Wi-Fi and hot water
 
-Unter **Möbel → Haustechnik** (in der Wandansicht unter 🔌 **Schalter**) stehen **Lichtschalter** und **Steckdose**. Sie hängen an der Wand: der Schalter auf 1,05 m, die Steckdose auf 0,3 m (die Außensteckdose auf 0,5 m); mit **Höhe über Boden** setzt du eine eigene Höhe. Liegt die Dose beim Platzieren ein Stück in der Wand, zeigt 3D sie vorn auf der Wand; an einer niedrigen Wand (etwa einer Balkonbrüstung) rutscht sie ohne eigene Höhe so weit herunter, dass sie unter der Wandkante bleibt.
+Under **Furniture → Home technology** (in the wall view under 🔌 **Switches**) you find the **light switch** and the **socket**. They hang on the wall: the switch at 1.05 m, the socket at 0.3 m (the outdoor socket at 0.5 m); **Height above floor** sets your own. A socket placed a little into the wall is shown on the wall's face in 3D; on a low wall (a balcony parapet, say) it comes down, without a height of its own, far enough to stay below the wall's top.
 
-- **Tasten / Dosen im Rahmen:** 1 bis 4 in einem Rahmen; der Rahmen wird dabei passend breiter.
-- **Jede Taste, jede Dose bekommt ihre eigene Entität:** ein Licht, ein Schalter (das Relais, der Zwischenstecker) oder ein Lüfter. Sie leuchtet in 3D, solange die Entität an ist – eine Steckdose grün, die Taste eines Lichtschalters sanft: bei einem Licht in seiner Farbe, sonst in der Akzentfarbe.
-- **Dieselbe Entität an mehreren Dosen:** Schaltet ein Relais zwei Steckdosen (innen und außen, oder eine Doppeldose), wählst du bei beiden dieselbe Entität. Das geht über beliebig viele Rahmen.
-- **Leistung (nur Steckdosen):** pro Dose optional ein Leistungssensor. Die Dose leuchtet heller, je mehr sie zieht, und zählt als Verbraucher mit.
-- **Bauform (Steckdose):** innen oder **Außensteckdose mit Klappe**.
-- **Antippen:** Mit nur einer Entität schaltet ein Tippen sie direkt. Bei mehreren öffnet sich ein kleines Menü mit einer Schaltfläche pro Taste. **Vor dem Schalten fragen** gilt für alle Tasten.
-- Das Symbol über dem Rahmen zeigt bei mehreren Tasten, wie viele an sind (z. B. „1/2“), bei Steckdosen auch die Leistung.
+- **Buttons / sockets in the frame:** 1 to 4 in one frame; the frame grows wider to fit.
+- **Every button, every socket gets its own entity:** a light, a switch (the relay, the smart plug) or a fan. It glows in 3D while the entity is on – a socket green, a light switch's button softly: for a light in its colour, otherwise in the accent colour.
+- **The same entity on several sockets:** when one relay switches two sockets (inside and outside, or a double socket), choose the same entity for both. This works across any number of frames.
+- **Power (sockets only):** an optional power sensor per socket. The socket glows brighter the more it draws and counts as a consumer.
+- **Kind (socket):** indoor or **outdoor socket with lid**.
+- **Tap:** with one entity a tap switches it right away. With several, a small menu opens with one button per gang. **Ask before switching** applies to every gang.
+- With several gangs, the symbol above the frame shows how many are on (e.g. "1/2"); sockets show their power too.
 
-**WLAN-Access-Point:** eine flache Scheibe unter der Decke oder eine Platte an der Wand (**Montage**). Als **Status** nimmst du, was sagt, ob er da ist – einen Verbindungs-Sensor, den Zustand, einen device_tracker; auch Diagnose-Entitäten (etwa von UniFi) stehen zur Wahl. Sein Ring leuchtet blau, solange er da ist, und rot, wenn er fehlt; dann zeigt sich auch sein Symbol mit „Offline“. Mit dem Sensor **verbundene Geräte** steht deren Zahl am Symbol.
+**Wi-Fi access point:** a flat disc under the ceiling or a plate on the wall (**Mounting**). As its **status** pick whatever says whether it is there – a connectivity sensor, its state, a device_tracker; diagnostic entities (UniFi's, for example) are offered too. Its ring glows blue while it is there and red when it is gone; its symbol then shows with "Offline". With the **connected clients** sensor their number stands at the symbol.
 
-**Warmwasserspeicher:** ein Standspeicher oder ein flacher Speicher an der Wand (auf 1,1 m). Verknüpft wird die water_heater-Entität, ein Thermostat oder der Schalter des Heizstabs, dazu optional ein Sensor mit der **Wassertemperatur** und ein Leistungssensor. Er glüht warm, solange er heizt (Thermostat „heizt“, Schalter an oder Leistung über der Schwelle), schwach, solange er bereit ist, und zeigt die Wassertemperatur. Die **Wärmepumpe (innen)**, Therme, Pufferspeicher und Warmwasserspeicher aus den Packs nehmen ebenfalls eine water_heater-Entität; ihr Pin zeigt Betriebsart und Wassertemperatur.
+**Water heater:** a standing tank or a slim tank on the wall (at 1.1 m). Link the water_heater entity, a thermostat or the heating element's switch, plus optionally a sensor with the **water temperature** and a power sensor. It glows warm while it heats (thermostat heating, switch on or power above the threshold), faintly while it is ready, and shows the water temperature. The **heat pump (indoor unit)**, gas boiler, buffer tank and water heater from the packs take a water_heater entity as well; their pin shows the mode and the water temperature.
 
-### 4.25 Mehrere Grundrisse und das Grundstück (neu in 3.0)
+### 4.25 Several floor plans and the property (new in 3.0)
 
-![Grundriss wählen](images/plans-picker.jpg)
+![Choosing a floor plan](images/plans-picker.jpg)
 
-Eine Installation kann mehrere Grundrisse haben: das Haus, die Garage, das Gartenhaus, eine Einliegerwohnung oder die Ferienwohnung am Meer. Jeder Grundriss hat eigene Etagen, Räume, Möbel, Geräte, Karten-Vorlagen und Wiederherstellungspunkte. Dein bisheriger Plan bleibt, wie er ist – er ist der erste Grundriss.
+One installation can hold several floor plans: the house, the garage, the garden house, a granny flat or the holiday flat by the sea. Each floor plan has its own floors, rooms, furniture, devices, card templates and restore points. Your plan so far stays as it is – it is the first floor plan.
 
-- **Anlegen:** ⚙ Einstellungen → 🏘 **Grundrisse** → **Neuer Grundriss**: Namen eintippen, wählen woraus (**Leer**, **Kopie von …** oder **Aus einer Datei** – ein Export oder ein aus dem Editor importierter Plan) und **Anlegen**. Der neue Grundriss öffnet sich sofort im Editor.
-- **Wechseln:** Oben neben „HomePlan 3D“ steht die Auswahl mit allen Grundrissen; dort legen Admins auch gleich mit **＋ Neuer Grundriss** einen an. Andere Benutzer sehen die Auswahl, sobald es zwei gibt. Jedes Gerät merkt sich, welcher zuletzt offen war. Ein Link mit `?plan=<ID>` öffnet direkt einen bestimmten.
-- **Verwalten:** In derselben Liste änderst du den Namen, wählst ein Symbol (🏠 🏡 🏢 🏖️ …), sortierst mit ↑ ↓ und öffnest mit **Öffnen**. 🗑 legt einen Grundriss in den **Papierkorb**: Er bleibt 30 Tage wiederherstellbar, erst dann wird er gelöscht. Der erste Grundriss lässt sich nicht löschen. Neben jedem Grundriss steht seine ID für die Dashboard-Karte.
-- **Alle Grundrisse:** In der Auswahl zeigt **▦ Alle Grundrisse** eine Kachel pro Grundriss mit den Lichtern, die an sind, offenen Fenstern und Türen, der Temperatur und Warnungen. Ein Tipp öffnet ihn.
-- **Warnungen von überall:** Meldet der Wassermelder im Gartenhaus etwas, während das Haus offen ist, erscheint oben „Gartenhaus: Werkstatt · Wasser …“ mit **Ansehen**. Das springt direkt in den Raum. Am Knopf der Auswahl steht die Zahl der Warnungen.
-- **Das Grundstück:** Unter ⚙ → 🏘 Grundrisse → **Grundstück** stellst du die anderen Gebäude neben das Haus: Haken setzen, in der Draufsicht an ihren Platz ziehen (Raster 0,5 m), mit ↺ ↻ in 15°-Schritten oder mit **90°** drehen. Ohne Haken steht ein Grundriss woanders, etwa die Ferienwohnung. Dann zeigt **🏘 Grundstück** in der Auswahl alle Gebäude zusammen in 3D, mit Licht, Geräten und Warnungen. Ein Tipp auf einen Raum eines Nebengebäudes öffnet dessen Grundriss in diesem Raum. Die Grundstücks-Ansicht ist zum Ansehen und Bedienen da; bearbeitet wird jeder Grundriss für sich. Jedes Gebäude bringt sein eigenes Dach mit.
-- **Live Presence** arbeitet mit einem Grundriss. Welchem, wählst du unten in der Liste.
-- **Durchsagen** finden Räume in allen Grundrissen. Ohne Raum gehen sie an die Grundrisse auf dem Grundstück, mit **Grundriss** (`plan:`) nur an einen.
+- **Create:** ⚙ Settings → 🏘 **Floor plans** → **New floor plan**: type a name, choose where it comes from (**Empty**, **Copy of …** or **From a file** – an export or a converted plan from the editor's import) and **Create**. The new floor plan opens in the editor at once.
+- **Switch:** the picker with every floor plan sits at the top next to "HomePlan 3D"; admins also create one there with **＋ New floor plan**. Other users see the picker once there are two. Each device remembers which one was open last. A link with `?plan=<id>` opens a particular one.
+- **Manage:** in the same list you rename a plan, choose an icon (🏠 🏡 🏢 🏖️ …), sort with ↑ ↓ and open it with **Open**. 🗑 moves a floor plan to the **bin**: it can be restored for 30 days, only then is it deleted. The first floor plan cannot be deleted. Each floor plan shows its id for the dashboard card.
+- **All floor plans:** in the picker, **▦ All floor plans** shows a tile per floor plan with the lights that are on, open windows and doors, the temperature and warnings. A tap opens it.
+- **Warnings from everywhere:** if the water sensor in the garden house goes off while the house is open, "Garden house: Workshop · Water …" shows at the top with **Show**, which jumps straight into the room. The picker's button shows the number of warnings.
+- **The property:** under ⚙ → 🏘 Floor plans → **Property** you place the other buildings beside the house: tick one, drag it to its place in the view from above (0.5 m grid), turn it in 15° steps with ↺ ↻ or by **90°**. Unticked, a floor plan is somewhere else, like the holiday flat. **🏘 Property** in the picker then shows every building together in 3D, with lights, devices and warnings. A tap on a room of another building opens its floor plan in that room. The property view is for looking and switching; each floor plan is edited on its own. Every building brings its own roof.
+- **Live Presence** works with one floor plan. Which one, you choose at the bottom of the list.
+- **Announcements** find rooms in every floor plan. Without a room they go to the floor plans on the property; with **Floor plan** (`plan:`) to one only.
 
-![Das Grundstück in 3D](images/plans-site.jpg)
+![The property in 3D](images/plans-site.jpg)
 
 ---
 
-### 4.26 Die Umgebung aus der Karte (neu)
+### 4.26 The surroundings from the map (new)
 
-![Die Umgebung aus der Karte](images/surroundings-wide.jpg)
+![The surroundings from the map](images/surroundings-wide.jpg)
 
-**Mit der Karte starten:** Ist das Erdgeschoss noch leer, schlägt NeonPlan vor, mit der Karte anzufangen. **Karte laden** holt die Umgebung; dein Haus von der Karte steht dann gelb gestrichelt im Plan, gerade zum Raster gedreht und mit einer Ecke am Nullpunkt, der Norden ist schon richtig gesetzt. Zeichne die Außenwände darauf (die Ecken des Umrisses rasten ein) oder lade dein Grundriss-Bild und lege es mit **🗺 An der Karte ausrichten** genau darauf (siehe [4.2](#42-etagen)). Wie genau der Umriss ist, hängt von der Gegend ab; prüfe eine Wandlänge mit dem Zollstock.
+**Start with the map:** while the ground floor is still empty, NeonPlan offers to start with the map. **Load the map** fetches the surroundings; your house from the map then stands dashed yellow in the plan, turned square to the grid with a corner at the origin, and north is already set. Draw the outer walls on it (the outline's corners snap) or load your floor-plan picture and lay it exactly onto it with **🗺 Align to the map** (see [4.2](#42-floors)). How exact the outline is depends on the area; check one wall's length with a tape measure.
 
-Unter **⚙ Einstellungen → 🗺 Umgebung** holt NeonPlan die Nachbarschaft deines Hauses aus der freien Karte **OpenStreetMap**: die Häuser der Nachbarn als Blöcke in ihrer Höhe, Straßen, Wege, Bahngleise, Bäche, Teiche, Parks, Wälder und einzelne Bäume. Das funktioniert weltweit; wie viele Häuser die Karte kennt, hängt von der Gegend ab.
+Under **⚙ Settings → 🗺 Surroundings** NeonPlan brings in your house's neighbourhood from the free map **OpenStreetMap**: the neighbours' houses as blocks at their height, streets, paths, railways, streams, ponds, parks, woods and single trees. It works worldwide; how many houses the map knows depends on the area.
 
-- **Umgebung laden** holt alles im gewählten **Umkreis** (100, 150 oder 250 m) um den Standort, der in Home Assistant eingetragen ist (Einstellungen → System → Allgemein). Dazu wird dieser Standort **einmal** an den öffentlichen OpenStreetMap-Dienst Overpass geschickt. Danach liegt die Umgebung im Plan; neu geholt wird sie nur, wenn du **Neu laden** antippst. Sind die Kartenserver gerade ausgelastet, kann das Laden eine Minute dauern oder um einen späteren Versuch bitten.
-- NeonPlan sucht auf der Karte **dein Haus** (das Gebäude an deinem Standort), legt es auf deinen Grundriss und dreht den **Norden** so, dass Haus und Räume am besten übereinanderliegen (auch mit einer angebauten Garage; ein Gartenhaus abseits zählt nicht mit). Damit stimmen auch Sonnenbahn und Schatten. Dein Haus von der Karte steht im Grundriss **gelb gestrichelt**; Häuser der Karte, die in deinen Räumen stehen (etwa eine Garage, die du selbst gezeichnet hast), werden nicht doppelt gezeichnet.
-- Passt es nicht ganz, drehst du die Karte unter **Ausrichten** in Schritten von 90° oder 1° und schiebst sie mit den Pfeilen um 50 cm. Das Haus bleibt dabei stehen, die Karte dreht sich darum. Als dein Haus gilt danach das Haus der Karte, das unter deinem Plan liegt; hat NeonPlan ein Nachbarhaus für deins gehalten (dein Standort liegt auf keinem Haus der Karte), erscheint es wieder, sobald du die Karte davon wegschiebst. **Neu ausrichten** legt sie wieder automatisch an.
-- Die **Nachbarhäuser werfen ihre Schatten** in deinen Garten, solange **Sonnenbahn und Hausschatten** an ist (siehe 5.7), in der Ansicht **Alle Etagen** und nicht auf der Stufe **Tablet**.
-- **In 3D zeigen** blendet die Umgebung aus und ein, **Entfernen** löscht sie aus dem Plan. Raumkarten zeigen nur ihre Räume, ohne Umgebung.
-- Unter **Häuser ein- und ausblenden** zeigt eine kleine Karte dein Haus und die Häuser drumherum. Tippst du ein Haus an, wird es aus- oder wieder eingeblendet (gelb gestrichelt = ausgeblendet). Gebäude der Karte, die zum größten Teil auf dem stehen, was du selbst gezeichnet hast, blendet NeonPlan selbst aus: auf deinen Räumen (auch auf einer eigenen Etage für den Garten), unter deinen Dachabschnitten (ein Carport, ein Gartenhaus) oder auf einer Pergola – etwa eine Garage, die auf der Karte ein eigenes Gebäude ist. Seit 3.3.1 zeigt der Grundriss die Karte auf jeder Etage in Höhe des Erdgeschosses.
-- **Nachbarhäuser nur als Grundriss** zeigt die Häuser der Nachbarn flach als Umriss auf dem Boden statt als Block; sie werfen dann keine Schatten.
-- **Nachbarhäuser mit Satteldach** gibt den Häusern der Nachbarn ein einfaches Dach mit dem First entlang ihrer längeren Seite statt einer flachen Oberseite. Die Höhe aus der Karte ist dann der First. Hallen, Wohnblöcke und verwinkelte Gebäude bleiben Blöcke. Die Karte kennt nur Umriss und Höhe; wie das Dach wirklich aussieht, weiß sie nicht.
-- **Höhe der Umgebung (m)** verschiebt die ganze Karte nach oben (+) oder unten (−) – für eine Straße, die höher oder tiefer liegt als das Erdgeschoss (Hanglage, schräge Einfahrt). Standard 0.
+- **Load surroundings** fetches everything within the chosen **radius** (100, 150 or 250 m) around the location set in Home Assistant (Settings → System → General). For this, that location is sent **once** to the public OpenStreetMap service Overpass. The neighbourhood then stays in the plan; it is only fetched again when you tap **Load again**. When the map servers are busy, loading can take a minute or ask you to try again later.
+- NeonPlan finds **your house** on the map (the building at your location), lays it onto your plan and turns **north** so that house and rooms lie on top of each other best (an attached garage included; a garden shed apart does not count). That puts the sun's path and the shadows right too. Your house from the map is **dashed yellow** in the plan; map buildings standing in your rooms (a garage you drew yourself, say) are not drawn twice.
+- If it does not fit quite, turn the map under **Align** in steps of 90° or 1° and move it by 50 cm with the arrows. The house stays where it is, the map turns around it. Your house is then the map's house under your plan; if NeonPlan took a neighbour's house for yours (your location lies on no house of the map), it shows again as soon as you move the map off it. **Align again** places it automatically once more.
+- **The neighbours' houses cast their shadows** into your garden while **Sun arc and house shadow** is on (see 5.7), in the **All floors** view and not at the **Tablet** level.
+- **Show in 3D** hides and shows the surroundings, **Remove** deletes them from the plan. Room cards show only their rooms, without surroundings.
+- Under **Show and hide houses** a small map shows your house and the houses around it. Tap a house to hide it or show it again (dashed yellow = hidden). Map buildings standing mostly on what you drew yourself are hidden by NeonPlan itself: on your rooms (on a floor of its own for the garden too), under your roof sections (a carport, a garden house) or on a pergola – such as a garage the map keeps as a building of its own. Since 3.3.1 the plan shows the map on every floor at the ground floor's level.
+- **Neighbours' houses as outlines only** shows the neighbours' houses flat as an outline on the ground instead of as blocks; they then cast no shadows.
+- **Neighbours' houses with a gable roof** gives the neighbours' houses a simple roof with the ridge along their longer side instead of a flat top. The map's height is then the ridge. Halls, blocks of flats and winding buildings stay blocks. The map only knows outline and height, not what the roof really looks like.
+- **Height of the surroundings (m)** moves the whole map up (+) or down (−) – for a street that lies higher or lower than the ground floor (a slope, a sloping drive). Default 0.
 
-Unten rechts in der 3D-Ansicht steht „© OpenStreetMap“: Die Kartendaten stammen von den OpenStreetMap-Mitwirkenden und stehen unter der Open Database Licence.
+Bottom right in the 3D view it says "© OpenStreetMap": the map data comes from the OpenStreetMap contributors under the Open Database Licence.
 
-## 5. Die 3D-Ansicht
+## 5. The 3D view
 
-![Eine Etage](images/view-floor-eg.jpg)
+![A floor](images/view-floor-eg.jpg)
 
-### 5.1 Haus, Etage, Raum
+### 5.1 House, floor, room
 
-Die 3D-Ansicht hat drei Ebenen:
+The 3D view has three levels:
 
-1. **Das ganze Haus** mit einer Beschriftung je Etage: Räume, Lichter an, offene Fenster.
-2. **Eine Etage:** Die Etagen darüber fliegen weg, die darunter bleiben je nach Einstellung abgedunkelt, gestapelt oder ausgeblendet.
-3. **Ein Raum:** Die Kamera fliegt hinein, das Raumfenster öffnet sich.
+1. **The whole house** with a label per floor: rooms, lights on, open windows.
+2. **One floor:** The floors above fly away, the ones below stay dimmed, stacked or hidden, as you choose.
+3. **One room:** The camera flies in, the room panel opens.
 
-**Navigieren:**
+**Navigating:**
 
-- Eine Etagenbeschriftung oder einen Raum antippen geht eine Ebene tiefer.
-- **Doppeltipp** auf eine freie Stelle, **Esc** oder **Zurück** geht eine Ebene höher.
-- Ziehen dreht die Ansicht, zwei Finger oder das Mausrad zoomen.
-- Links wechseln die **Etagen-Miniaturen** direkt zu einer Etage. Der kleine Pfeil darüber klappt sie zu schlichten Etagen-Knöpfen ein (das Gerät merkt sich das), in der Karte schaltet `floor_thumbs: false` sie ab.
-- Oben stehen Knöpfe für alle Etagen und für die Räume der offenen Etage.
+- Tap a floor label or a room to go one level down.
+- **Double tap** an empty spot, **Esc** or **Back** go one level up.
+- Drag to turn the view, two fingers or the mouse wheel zoom.
+- The **floor pictures** on the left jump straight to a floor. The small arrow above them folds them into plain floor buttons (the device remembers it); in the card `floor_thumbs: false` turns them off.
+- Buttons at the top list all floors and the rooms of the open floor.
 
-### 5.2 Die Schalter unten
+### 5.2 The switches at the bottom
 
-Die Schalter für Wände, Etagen, Dach, Heatmap und die Pro-Anzeigen stecken unten links im Menü **Anzeige ▾**; ein Tipp daneben schließt es.
+The switches for walls, floors, roof, heat map and the Pro displays are in the **Show ▾** menu at the bottom left; a tap beside it closes it.
 
-| Schalter | Wirkung |
+| Switch | Effect |
 |---|---|
-| **Wände hoch** / **Schnitt** | Wände in voller Höhe, die vorderen als getöntes Glas, oder alle Wände in Hüfthöhe geschnitten – hohe Möbel (Schrank, Treppe, Hochschrank) werden mitgeschnitten, damit sie nichts dahinter verdecken. Die Wahl merkt sich jedes Gerät |
-| **Mit Möbeln** / **Nur Grundriss** | Nur Grundriss (seit 2.2): Wände, Türen, Fenster und Treppen ohne Möbel – Geräte und ihre Symbole bleiben. Die Wahl merkt sich jedes Gerät |
-| **Auseinander** / **Gestapelt** | In der Hausansicht: Etagen auseinandergezogen oder aufeinander |
-| **Dach bleibt** | In der Hausansicht: Das Dach bleibt beim Heranzoomen liegen, statt sich zu heben und auszublenden (im Editor gilt das im Werkzeug Dach und Energie immer) |
-| **Abgedunkelt** / **Gestapelt** / **Einzeln** | Bei einer offenen Etage: Was mit den Etagen darunter passiert |
-| **Normal** / **Temp.** / **Feuchte** / **CO₂** / **Werte** | Heatmap: Böden in der Farbe des Raumwerts; **Werte** färbt nichts, sondern schreibt Temperatur, Feuchte und CO₂ als Zahlen unter die Raumnamen |
-| **Raumnamen** | Namen der Räume ein- oder ausblenden |
-| **Spur** | Bewegungsspur, Pro, siehe [6.1](#61-kamera-cockpit) |
-| **Wetter** | Wetter draußen, Pro, siehe [6.2](#62-wetter-draußen) |
-| **⏪ Zeitreise** | Die letzten 24 Stunden im Haus abspielen, nur ansehen, Pro, siehe [6.7](#67-zeitreise) |
-| **≡ / ↔** (rechts in der Etagen- und Raumleiste) | Die Leiste oben auf mehrere Zeilen umbrechen, wenn viele Räume nicht in eine Zeile passen, oder zurück in eine Zeile; in einer Zeile scrollt sie seitlich, am PC auch mit dem Mausrad. In der Hausansicht steht vor den Räumen jeder Etage ihr Name. Die Reihenfolge der Räume änderst du im Editor: ohne Auswahl in der Raumliste der Etage mit **↑** und **↓** |
-| **⚙** (oben neben der Version) | Klappt die Ansichtsoptionen Qualität, Look, Symbole und FPS auf und wieder zu; so bleibt die Kopfzeile schlank |
-| **Auge** (unten links, neben der Lupe) | Blendet alles aus, was nicht die 3D-Ansicht ist: Kopfzeile, Etagen- und Raumleiste, Energiewerte, Etagenbilder, Schalter. Übrig bleibt die Bühne – auf dem Handy die halbe Bildschirmhöhe mehr. Ein Tipp aufs Auge holt alles zurück; ein Raum lässt sich weiter antippen. Das Gerät merkt sich die Wahl |
+| **Tall walls** / **Cut** | Walls at full height, the front ones as tinted glass, or all walls cut at hip height – tall furniture (wardrobe, stairs, tall units) is cut with them, so it hides nothing behind it. Each device remembers the choice |
+| **With furniture** / **Floor plan only** | Floor plan only (since 2.2): walls, doors, windows and stairs without furniture – devices and their markers stay. Each device remembers the choice |
+| **Apart** / **Stacked** | In the house view: floors pulled apart or on top of each other |
+| **Roof stays** | In the house view: the roof stays while zooming in instead of lifting and fading (in the editor's roof and energy tools it always stays) |
+| **Dimmed** / **Stacked** / **Alone** | With an open floor: what happens to the floors below |
+| **Normal** / **Temp.** / **Humidity** / **CO₂** / **Values** | Heatmap: floors coloured by the room's value; **Values** colours nothing and writes temperature, humidity and CO₂ as numbers under the room names |
+| **Room names** | Show or hide the room names |
+| **Trail** | Motion trail, Pro, see [6.1](#61-camera-cockpit) |
+| **Weather** | Weather outside, Pro, see [6.2](#62-weather-outside) |
+| **⏪ Time travel** | Replay the last 24 hours in the house, view only, Pro, see [6.7](#67-time-travel) |
+| **≡ / ↔** (right end of the floor and room bar) | Wrap the bar at the top onto several lines when many rooms do not fit in one, or back to one line; in one line it scrolls sideways, on a PC with the mouse wheel too. In the house view the rooms of every floor follow its name. You change the order of the rooms in the editor: with nothing selected, **↑** and **↓** in the floor's room list |
+| **⚙** (at the top next to the version) | Unfolds and folds the view options quality, look, icons and FPS; so the header stays slim |
+| **Eye** (bottom left, next to the magnifier) | Hides everything that is not the 3D view: header, floor and room bar, energy values, floor pictures, switches. The stage alone remains – half a screen more on a phone. A tap on the eye brings it all back; rooms can still be tapped. The device remembers the choice |
 
-![Schnittansicht](images/view-cut.jpg)
+![Cut view](images/view-cut.jpg)
 
-Oben rechts stehen:
+At the top right:
 
-| Schalter | Wirkung |
+| Switch | Effect |
 |---|---|
-| **Auto** / **Tablet** / **Hoch** | Qualitätsstufe. Tablet lässt Muster, Schatten und Halos weg und wird auf Fire-Tablets und langsamen Geräten automatisch gewählt. Hoch zeigt zusätzlich Lichtkegel unter Spots |
-| **Uhr** | Datum und Uhrzeit in einer Ecke der Ansicht (↖ ↗ ↙ ↘) oder aus – pro Gerät; in der Karte `clock: tr`. 12 oder 24 Stunden wie im Home-Assistant-Profil unter **Zeitformat** eingestellt |
-| **🎨** | Der Stil: Neon, Blueprint, Tag, die wohnlichen und gestalteten Stile, deine eigenen Stile, **Auto** (Tag, solange die Sonne über dem Horizont steht, danach Neon) oder **Hausplan**, siehe [5.12](#512-stile-neu-in-31). In der Karte `theme: cozy`. Das Farbfeld daneben setzt eine **eigene Akzentfarbe**: Im Neon-Look nehmen Linien und Leuchtkanten sie an, die Knöpfe und Pins in jedem Look; ↺ bringt das Cyan zurück |
-| **Keine** / **Im Raum** / **Wichtige** / **Alle** | Welche Gerätesymbole erscheinen. Wichtige zeigt nur Geräte ohne eigenes 3D-Modell und Werte wie Watt oder die laufende App. **Im Raum** zeigt in der Haus- und Etagenansicht keine Symbole und in einem geöffneten Raum nur dessen eigene – praktisch bei vielen Steckdosen und Sensoren |
-| **Klein** / **Normal** / **Groß** | Wie groß die Gerätesymbole sind; das Gerät merkt sich die Wahl (Karte: `marker_size`) |
-| **◧ / ◨** | Etagenbilder, Stern, Suche und Auge links oder rechts – praktisch, wenn die Ansicht am linken Rand des Dashboards sitzt |
-| **⌖ Ansicht halten** | Beim Wechsel zwischen Haus und Etagen bleibt die Kamera, wo sie ist; nur die Höhe wandert mit |
-| **🔒 3D-Sperre** | Der Blickwinkel bleibt fest: Ziehen verschiebt die Ansicht, Zoomen geht weiter, Flüge zu Räumen behalten den Winkel; eine gespeicherte Startansicht (Haus, Etage oder Raum) nimmt ihren eigenen Winkel – auf einem Wandtablet dreht niemand das Haus aus Versehen. Gilt pro Gerät; in der Karte `angle_lock: true` |
-| **FPS** | Bildrate, langsamstes Bild und Grund für jedes gezeichnete Bild. Im Ruhezustand steht dort 0 B/s |
+| **Auto** / **Tablet** / **High** | Quality level. Tablet leaves out patterns, shadows and halos and is chosen automatically on Fire tablets and slow devices. High adds light cones under spots |
+| **Clock** | Date and time in a corner of the view (↖ ↗ ↙ ↘) or off – per device; in the card `clock: tr`. 12 or 24 hours as set in your Home Assistant profile under **Time format** |
+| **🎨** | The style: Neon, Blueprint, Day, the homely and designed styles, your own styles, **Auto** (Day while the sun is above the horizon, then Neon) or **House plan**, see [5.12](#512-styles-new-in-31). In the card `theme: cozy`. The colour well beside it sets an **accent colour of your own**: in the neon look lines and glowing edges take it, the buttons and pins in every look; ↺ brings the cyan back |
+| **None** / **In the room** / **Important** / **All** | Which device markers appear. Important shows only devices without their own 3D model and values such as watts or the running app. **In the room** shows no markers in the house and floor views and, in an open room, only that room's own – handy with many sockets and sensors |
+| **Small** / **Normal** / **Large** | How large the device markers are; the device remembers the choice (card: `marker_size`) |
+| **◧ / ◨** | Floor pictures, star, search and eye on the left or on the right – handy when the view sits at the left edge of a dashboard |
+| **⌖ Keep view** | Switching between the house and the floors keeps the camera where it is; only its height follows |
+| **🔒 3D lock** | The angle stays fixed: a drag moves the view, zooming still works, flights to rooms keep the angle; a saved start view (house, floor or room) brings its own angle – nobody turns the house on a wall tablet by accident. Per device; in the card `angle_lock: true` |
+| **FPS** | Frame rate, slowest frame and the reason for every drawn frame. At rest it reads 0 fps |
 
-Ganz rechts in der Kopfzeile steht die installierte Version (z. B. v1.11.0); der Mauszeiger darauf zeigt, welche Version die Integration in Home Assistant meldet.
+At the far right of the header stands the installed version (e.g. v1.11.0); hovering it shows which version the integration in Home Assistant reports.
 
-Alle Schalter merkt sich das jeweilige Gerät.
+Each device remembers these switches.
 
 ![Blueprint](images/view-blueprint.jpg)
 
-![Tag](images/view-day.jpg)
+![Day](images/view-day.jpg)
 
-### 5.3 Bedienen
+### 5.3 Controlling
 
-![Lampe antippen](images/view-tap-lamp.jpg)
+![Tapping a lamp](images/view-tap-lamp.jpg)
 
-- **Antippen** schaltet Lampen und Schalter. Die Lampe blinkt kurz zur Bestätigung.
-- **Senkrecht wischen** auf einer Lampe dimmt, auf einem Rollladen oder Fenster fährt der Rollladen. Der Wert erscheint am Finger. Geräte und Fenster mit „Vor dem Schalten nachfragen“ reagieren nicht auf Wischen.
-- **Lange drücken** öffnet das Schnellmenü: bei Lichtern Helligkeit, Farbtemperatur und Farben, bei Rollläden Auf, Stopp, Zu und feste Positionen. Raffstores und Jalousien mit Lamellen bekommen dort und im Raumfenster einen **Lamellen**-Regler (oder Lamellen auf/zu), sobald die Entität das kann. Rollläden, Garagentore und Vorhänge bekommen sie nur, wenn sie eine Lamellen-Stellung melden (manche Integrationen wie KNX kündigen Lamellen-Knöpfe auch bei Rollläden an).
-- Ein **Fenster** antippen, egal ob Rahmen, Glas oder Rollladen, öffnet das Rollladen-Menü oder zeigt den Kontakt.
-- **Doppeltipp auf einen Raum** schaltet alle Lichter des Raums ein oder aus. Geräte mit „Vor dem Schalten nachfragen“ bleiben außen vor.
-- Fernseher, Türen und Garagentore lassen sich ebenfalls direkt antippen.
+- **Tap** switches lamps and switches. The lamp flashes briefly to confirm.
+- **Swipe up or down** on a lamp dims it; on a blind or window it moves the blind. The value appears at your finger. Devices and windows with "Ask before switching" do not react to a swipe.
+- **Long press** opens the quick menu: brightness, colour temperature and colours for lights; up, stop, down and fixed positions for blinds. Venetian blinds and Raffstores get a **Slats** slider there and in the room panel (or slats open/closed) as soon as the entity supports it. Roller shutters, garage doors and curtains only get them when they report a slat position (some integrations such as KNX announce slat buttons for roller shutters, too).
+- Tap a **window** – frame, glass or blind – to open the blind menu or show the contact.
+- **Double tap a room** switches all its lights on or off. Devices with "Ask before switching" stay out.
+- TVs, doors and garage doors can be tapped directly as well.
 
-![Schnellmenü Licht](images/view-quickmenu.jpg)
+![Quick menu for a light](images/view-quickmenu.jpg)
 
-![Schnellmenü Rollladen](images/view-quickmenu-cover.jpg)
+![Quick menu for a blind](images/view-quickmenu-cover.jpg)
 
-![Wischen zum Dimmen](images/view-swipe.jpg)
+![Swiping to dim](images/view-swipe.jpg)
 
-### 5.4 Das Raumfenster
+### 5.4 The room panel
 
-![Raumfenster](images/view-room-panel.jpg)
+![Room panel](images/view-room-panel.jpg)
 
-In einem Raum öffnet sich rechts das Raumfenster, auf Handys und hochkant unten. Es zeigt die Geräte des Raums nach Art: Licht mit Helligkeit, Farbtemperatur und Farben, **Alle an** und **Alle aus**, Rollläden mit **Alle auf** und **Alle zu**, Heizung, Medien, Schalter, Kameras mit Standbild, Sensoren sowie Szenen & Skripte.
+In a room the room panel opens on the right, at the bottom on phones and portrait tablets. It shows the room's devices by kind: lights with brightness, colour temperature and colours, **All on** and **All off**, covers with **All up** and **All down**, heating, media, switches, cameras with snapshot, sensors, and scenes & scripts.
 
-Es zeigt die Geräte, die im Plan im Raum stehen, und alles, was du im Editor mit ☆ hinzugefügt hast. **Weitere Geräte des Bereichs** blendet den Rest ein.
+It shows the devices placed in the room and everything you added with ☆ in the editor. **More devices of the area** shows the rest.
 
-Bei einem ausgewählten Raum ohne offenes Raumfenster erscheinen unten die **Szenen und Skripte** des Bereichs als Knöpfe.
+With a selected room and no open room panel, the area's **scenes and scripts** appear as buttons at the bottom.
 
-### 5.5 Suchen
+### 5.5 Search
 
-![Suche](images/view-find.jpg)
+![Search](images/view-find.jpg)
 
-Der **Stern** über der Lupe öffnet das **Zentral-Menü**: Lichter an oder aus und Rollläden auf oder zu für die gezeigte Etage – in der Hausansicht für das ganze Haus, dann mit einer Rückfrage („Sicher?“, ein zweiter Tipp führt es aus). Garagentore und Tore zählen nicht als Rollläden. Darunter stehen die **Favoriten** aus dem Editor; ein Tipp startet eine Szene oder ein Skript, drückt eine Taste oder schaltet einen Schalter um. In der Karte blendet `central: false` den Stern aus.
+The **star** above the magnifier opens the **central menu**: lights on or off and blinds up or down for the floor shown – in the house view for the whole house, then with a confirmation ("Sure?", a second tap runs it). Garage doors and gates do not count as blinds. Below it the **favourites** from the editor; a tap starts a scene or script, presses a button or toggles a switch. In the card, `central: false` hides the star.
 
-**⚙ Einstellungen (seit 2.0.7):** Oben im Zentral-Menü öffnet **⚙ Einstellungen** die wichtigsten Einstellungen direkt in der 3D-Ansicht, ohne den Editor: **Darstellung** (Sonnenbahn und Hausschatten, Fenster leuchten nachts nach draußen, Sonnenlicht durch die Fenster, seit 2.1.0 die **Größe der Glas-Kacheln** für Energie, Wärmepumpe, Auto und Geräte), **Bedienung** und **Warnungen** (Fenster offen bei Regen, Kontakt nicht verfügbar, Gerätenamen in Warnungen). Darunter hat jedes Modul mit Einstellungen seinen eigenen Abschnitt, etwa die **Durchsagen** (7.5). Die Einstellungen gelten für das ganze Haus; ändern dürfen sie nur Administratoren. Alles Weitere steht wie bisher im Editor unter ⚙ Einstellungen.
+**⚙ Settings (since 2.0.7):** at the top of the central menu, **⚙ Settings** opens the most used settings right in the 3D view, without the editor: **Look** (sun path and house shadow, windows glowing out at night, sunlight through the windows, since 2.1.0 the **size of the glass cards** for energy, heat pump, car and devices), **Controls** and **Warnings** (window open while it rains, contact unavailable, device names in warnings). Below, every module with settings has a section of its own, such as the **Announcements** (7.5). The settings apply to the whole house; only administrators can change them. Everything else stays in the editor under ⚙ Settings.
 
-**Geräte nur im geöffneten Raum schalten (seit 2.0.11, ab Werk aus):** In der 3D-Ansicht unter **⭐ (Stern über der Lupe) → ⚙ Einstellungen → Bedienung**, im Editor unter **⚙ Einstellungen → Wetter & Warnungen**. In der Ansicht **Alle Etagen** und in einer Etage öffnet ein Tipp auf ein Gerät, einen Pin oder ein verknüpftes Möbel dann seinen Raum, statt es zu schalten. So fährt kein Rollladen los, wenn du eigentlich das Erdgeschoss antippen wolltest. Im geöffneten Raum schaltet ein Tipp wie gewohnt – aber nur, was in diesem Raum ist: Ein Gerät eines anderen Raums (etwa ein Rollladen des Hauses, vom geöffneten Garten aus gesehen) öffnet seit 3.1.1 seinen Raum. Ein Gerät, das in keinem Raum liegt (etwa eine Kamera außen an der Wand), schaltet seit 3.3.1 in seiner Etage direkt; in **Alle Etagen** öffnet der Tipp seine Etage. Langes Drücken öffnet überall das Menü des Geräts. Gut für Wand-Tablets.
+**Switch devices only in the opened room (since 2.0.11, off by default):** in the 3D view under **⭐ (the star above the magnifier) → ⚙ Settings → Controls**, in the editor under **⚙ Settings → Weather & warnings**. In the **All floors** view and on a floor, a tap on a device, a pin or a linked piece of furniture then opens its room instead of switching it, so no blind starts moving when you only meant to tap the ground floor. In the opened room a tap switches as usual – but only what is in that room: a device of another room (a blind of the house, seen from the opened garden) opens its own room since 3.1.1. A device that lies in no room (a camera on the outer wall, say) acts directly on its own floor since 3.3.1; in **All floors** the tap opens its floor. A long press opens the device's menu everywhere. Good for wall tablets.
 
-**Rechtsklick geht eine Ebene zurück (seit 2.2, ab Werk aus):** Unter **⭐ → ⚙ Einstellungen → Bedienung**. Ein kurzer Rechtsklick in der 3D-Ansicht schließt dann den geöffneten Raum bzw. geht vom Stockwerk zurück zum ganzen Haus – wie ein Doppeltipp ins Leere. Ziehen mit der rechten Maustaste verschiebt die Ansicht weiter wie bisher. Ausgeschaltet wirkt ein Rechtsklick wie ein Klick.
+**Right click goes one step back (since 2.2, off by default):** under **⭐ → ⚙ Settings → Controls**. A short right click in the 3D view then closes the opened room or goes from the floor back to the whole house – like a double tap on empty space. Dragging with the right mouse button still pans the view. Switched off, a right click works like a click.
 
-Bietet ein Modul etwas fürs ganze Haus an (📢 **Durchsage**), steht es ebenfalls im Zentral-Menü.
+When a module offers something for the whole house (📢 **Announcement**), it is in the central menu too.
 
-Die Lupe unten links öffnet **„Wo ist …?“**. Tippe einen Gerätenamen oder Raum. Ein Treffer fliegt die Kamera dorthin, das Gerät blinkt.
+The magnifier at the bottom left opens **"Where is …?"**. Type a device or room name. A hit flies the camera there and the device flashes.
 
-**Rundgang:** Der Knopf **🚶 Rundgang** oben rechts startet einen **Rundgang durchs Haus**: Du stehst auf Augenhöhe im gewählten Raum (sonst im größten der gezeigten Etage) und gehst hindurch. **Ziehen** schaut dich um, ein **Tipp auf den Boden** läuft dorthin – auch durch Türen in andere Räume –, **W A S D** oder die **Pfeiltasten** laufen, auf dem Tablet der **Knüppel** unten rechts. Wände halten dich auf, Türen lassen dich durch. Das Haus lebt dabei weiter: Lichter, Fernseher, Sonnenflecken, Glaskarten. Oben steht der Raum, in dem du gerade bist; **✕ Beenden** oder **Esc** führt zurück. Ist ein Raum offen, startet der Knopf **🚶** in seinem Raumfenster (neben ✕) den Rundgang direkt in diesem Raum; das Raumfenster tritt so lange zur Seite. In der Karte blendet `walk: false` den Knopf aus. Beim Rundgang zeigen sich nur die Glaskarten des Raums, in dem du stehst.
+**Walk:** the **🚶 Walk** button at the top right starts a **walk through the house**: you stand at eye height in the chosen room (else the biggest of the floor shown) and walk through it. **Drag** to look around, **tap the floor** to walk there – through doors into other rooms too –, **W A S D** or the **arrow keys** walk, on a tablet the **stick** at the bottom right. Walls stop you, doors let you through. The house lives on around you: lights, TVs, sun patches, glass cards. At the top you see the room you are in; **✕ End** or **Esc** takes you back. With a room open, the **🚶** button in its room panel (beside ✕) starts the walk right in that room; the panel steps aside meanwhile. In the card, `walk: false` hides the button. While walking, only the glass cards of the room you stand in show.
 
-![Rundgang: Wohnzimmer und Küche auf Augenhöhe](images/walk.jpg)
+![Walk: the living room and the kitchen at eye height](images/walk.jpg)
 
 
 ### 5.6 Heatmap
 
-![Heatmap Temperatur](images/view-heat.jpg)
+![Temperature heatmap](images/view-heat.jpg)
 
-**Temp.**, **Feuchte** und **CO₂** färben die Böden nach den Sensoren des Bereichs, mit einer Farbskala am Rand. Temperaturen erscheinen in der Einheit, die in Home Assistant eingestellt ist (°C oder °F); Sensoren in °F werden richtig umgerechnet.
+**Temp.**, **Humidity** and **CO₂** colour the floors by the area's sensors, with a colour scale at the edge. Temperatures appear in the unit set in Home Assistant (°C or °F); sensors in °F are converted correctly.
 
-### 5.7 Sonne und Tageslicht
+### 5.7 Sun and daylight
 
-![Sonnenlicht](images/view-sun.jpg)
+![Sunlight](images/view-sun.jpg)
 
-Ist die Nordrichtung eingestellt, fällt das Sonnenlicht aus `sun.sun` durch die Fenster, die zur Sonne zeigen, als weiche Flecken auf den Boden. Heruntergelassene Rollläden verkleinern die Flecken. Wer die Flecken nicht mag, schaltet sie unter **Einstellungen** mit **Sonnenlicht durch die Fenster** ab. Tagsüber wird der Himmel hinter dem Haus heller.
+With north set, sunlight from `sun.sun` falls through the windows facing the sun as soft patches on the floor. Lowered blinds make the patches smaller. If you do not like the patches, switch off **Sunlight through the windows** in **Settings**. By day the sky behind the house gets lighter.
 
-**Sonnenbahn und Hausschatten (seit 2.0.7):** Ein gepunkteter Bogen um das Haus zeigt den Weg der Sonne heute, mit den Uhrzeiten von Sonnenauf- und -untergang an seinen Enden. Ein glühender Punkt darauf ist die Sonne jetzt, ein heller Punkt markiert jede volle Stunde. Auf dem Boden liegt der Schatten des Hauses und wandert mit der Sonne: So siehst du, wann die Terrasse Sonne hat. Der Schatten zeigt sich in der Ansicht **Alle Etagen** und nicht auf der Stufe **Tablet**, der Bogen auf jeder Stufe. Beides braucht die Nordrichtung und den Ort in Home Assistant; abschalten im ⭐ Zentral-Menü unter **⚙ Einstellungen** (oder im Editor unter Einstellungen) mit **Sonnenbahn und Hausschatten**. Auf einem großen Grundstück legt **Sonnenbogen um: das ganze Grundstück** (an derselben Stelle, seit 2.2) Bogen und Kompassring um alles Gezeichnete – Räume, Außenflächen, Zäune und freie Wände – statt nur um das Haus.
+**Sun arc and house shadow (since 2.0.7):** a dotted arc around the house shows the sun's way today, with the times of sunrise and sunset at its ends. A glowing dot on it is the sun now, a brighter dot marks every full hour. The house's shadow lies on the ground and moves with the sun, so you can see when the terrace gets sun. The shadow shows in the **All floors** view and not on the **Tablet** level, the arc on every level. Both need the north direction and the home's location in Home Assistant; switch them off in the ⭐ central menu under **⚙ Settings** (or in the editor's settings) with **Sun arc and house shadow**. On a large plot, **Sun arc around: the whole plot** (in the same place, since 2.2.0) puts the arc and the compass ring around everything drawn – rooms, outdoor areas, fences and free walls – instead of only the house.
 
-**Echter Himmel (seit 3.5.0):** Hinter dem Haus steht ein Himmel nach dem echten Sonnenstand: Abendrot, die blaue Stunde, nachts Sterne, die mit der Nacht wandern, und der Mond in seiner echten Phase. Er dreht sich mit, wenn du die Ansicht drehst. Mit **Wetter draußen** (6.2) ziehen Wolken nach dem echten Wetter mit dem Wind. In den wohnlichen Tag-Stilen malt er den ganzen Himmel, im Neon-Look und in den Abend-Stilen kommen Sterne, Mond, Abendrot und Wolken über den eigenen Hintergrund des Looks. Aus mit einem eigenen Hintergrund und im Bauplan-Look; auf der Stufe **Tablet** ein ruhiges Standbild. Abschalten im Editor unter **Einstellungen → Wetter & Warnungen** mit **Echter Himmel** (in der 3D-Ansicht auch unter ☆ → **⚙ Einstellungen**).
+**Real sky (since 3.5.0):** behind the house stands a sky that follows the real sun: sunset colours, the blue hour, at night stars that move through the night and the moon in its real phase. It turns with the view. With **Weather outside** (6.2) clouds drift with the real weather and wind. In the homely day styles it paints the whole sky; in the neon look and the evening styles stars, moon, sunset glow and clouds come over the look's own background. Off with an own background and in the blueprint look; a still picture on the **Tablet** level. Switch it off in the editor under **Settings → Weather & warnings** with **Real sky** (in the 3D view also under ☆ → **⚙ Settings**).
 
-**Anflug aus dem All (seit 3.5.0, Option):** Mit **Anflug aus dem All** (im Editor unter **Einstellungen → Wetter & Warnungen**, direkt unter **Echter Himmel**; in der 3D-Ansicht auch unter ☆ → **⚙ Einstellungen**) dreht sich beim Öffnen ein Neon-Globus zu deinem Zuhause (dem Ort in Home Assistant), ein Lichtstrahl markiert es, die Ansicht taucht hinein und die Kamera fliegt von hoch oben aufs Haus. Einmal pro Laden der Seite, ein Tipp überspringt ihn. Nicht im Editor und nicht auf der Stufe **Tablet**; eingeschaltet spielt er einmal sofort.
+**Fly in from space (since 3.5.0, option):** with **Fly in from space** (in the editor under **Settings → Weather & warnings**, right below **Real sky**; in the 3D view also under ☆ → **⚙ Settings**), a neon globe turns to your home (the location in Home Assistant) when the view opens, a beam marks it, the view dives in and the camera comes down from high above onto the house. Once per page load, a tap skips it. Not in the editor and not on the **Tablet** level; switched on, it plays once right away.
 
-**Fenster leuchten nachts nach draußen (seit 2.0.7):** Ist es draußen dunkel, fällt das Licht beleuchteter Räume im Erdgeschoss als warmer Schein durch die Fenster auf Rasen und Terrasse davor, in der Farbe der Lampe. Seit 3.0.5 ist der Schein der Lichtkegel der einzelnen Lampe durch die Fensteröffnung: Er liegt von der Lampe weg versetzt (eine Lampe links vom Fenster beleuchtet den Boden rechts davor), wird mit dem Abstand zur Lampe schwächer, und eine Lampe um die Ecke, die das Fenster hinter einer Wand nicht sieht, wirft nichts hinaus. Eine gedimmte Lampe leuchtet entsprechend schwächer nach draußen. Heruntergelassene Rollläden dämpfen ihn. Ein Fenster über einem Balkon beleuchtet den Balkon; der Schein endet an seiner Kante. Abschalten im ⭐ Zentral-Menü unter **⚙ Einstellungen** (oder im Editor unter Einstellungen) mit **Fenster leuchten nachts nach draußen**.
+**Windows glow outside at night (since 2.0.7):** when it is dark outside, the light of lit rooms on the ground floor falls out of the windows as a warm glow onto the lawn and terrace in front, in the lamp's colour. Since 3.0.5 the glow is each lamp's cone through the window opening: it lies shifted away from the lamp (a lamp to the left of the window lights the ground to its right), fades with the distance from the lamp, and a lamp around the corner that cannot see the window past a wall throws nothing out. A dimmed lamp glows correspondingly less outside. Lowered blinds dim it. A window over a balcony lights the balcony; the glow ends at its edge. Switch it off in the ⭐ central menu under **⚙ Settings** (or in the editor's settings) with **Windows glow outside at night**.
 
-### 5.8 Warnungen
+### 5.8 Warnings
 
-![Warnung](images/view-alert-banner.jpg)
+![A warning](images/view-alert-banner.jpg)
 
-HomePlan 3D warnt kostenlos und ohne Einrichtung:
+HomePlan 3D warns for free and without setup:
 
-| Warnung | Auslöser |
+| Warning | Trigger |
 |---|---|
-| Rauch, Gas, Kohlenmonoxid, Wasser | `binary_sensor` dieser Geräteklasse im Bereich meldet „an“ |
-| Alarm | Ein `alarm_control_panel` ist ausgelöst oder löst gleich aus |
-| Fenster offen bei Regen | Ein Fenster ist offen oder gekippt, und die Wetter-Entität meldet Regen, Gewitterregen, Hagel oder Schneeregen |
-| Stromausfall | Die Entität aus den Plan-Einstellungen (**Stromausfall melden mit**) meldet einen Ausfall: ein Netz-Sensor der Klasse power steht auf „aus“, eine USV läuft auf Batterie, die Netzspannung liegt unter 100 V, ein Netz-Status steht auf „Off Grid“, oder ein eigener Helfer ist „an“. Die Auswahl zeigt seit 2.0.8 nur dafür passende Entitäten, keine Schalter. Der Netzanschluss in 3D wird dabei durchgestrichen |
+| Smoke, gas, carbon monoxide, water | A `binary_sensor` of that device class in the area reports on |
+| Alarm | An `alarm_control_panel` is triggered or about to trigger |
+| Power outage | The entity from the plan settings (**Report a power outage with**) reports an outage: a grid sensor of class power is "off", a UPS runs on battery, the mains voltage is below 100 V, a grid status says "Off Grid", or a helper of your own is "on". Since 2.0.8 the list only offers entities that fit, no switches. The grid connection in 3D is crossed out meanwhile |
+| Window open in the rain | A window is open or tilted while the weather entity reports rain, lightning rain, hail or sleet |
 
-Der betroffene Raum pulsiert rot, oben erscheint ein Banner. Ein Tipp auf die Warnung springt in den Raum. Die Regenwarnung nimmt die Wetter-Entität aus den Plan-Einstellungen und lässt sich dort unter **Warnung: Fenster offen bei Regen** einzeln abschalten. Ein einzelnes Fenster, das bei Regen offen bleiben darf (etwa unter dem Vordach), bekommt in seinem Formular den Haken **Bei Regen nicht warnen**. Hast du eine eigene Wetterstation, wählst du unter **Regen von eigener Wetterstation** ihren Regensensor (an = Regen) oder ihre Regenrate (mm/h): Dann zählt, ob es am Haus wirklich regnet – für die Warnung und, mit „Wetter draußen“, auch für den Regen in 3D.
+The room pulses red and a banner appears at the top. A tap on the warning jumps into the room. The rain warning uses the weather entity from the plan settings and can be switched off there on its own under **Warning: window open while it rains**. A single window that may stay open in the rain (under a canopy, say) gets the tick **No rain warning** in its form. With a weather station of your own, choose its rain sensor (on = rain) or rain rate (mm/h) under **Rain from your own weather station**: then what counts is whether it really rains at the house – for the warning and, with Weather outside, for the rain in 3D.
 
-Auf einem Wandtablet kann das Banner lang werden: „Gäste-WC · Fenster offen bei Regen: Fenster Gästebad“. Schaltest du in den Plan-Einstellungen **Gerätenamen in Warnungen zeigen** aus, steht dort nur „Gäste-WC · Fenster offen bei Regen“. Eine Warnung ohne Raum behält den Gerätenamen.
+On a wall tablet the banner can get long: "Guest WC · Window open in the rain: Guest bathroom window". Switch off **Show device names in warnings** in the plan settings, and it reads "Guest WC · Window open in the rain". A warning without a room keeps the device name.
 
-**Kontakt nicht verfügbar (seit 2.0.6, ab Werk aus):** Meldet ein Fenster- oder Türkontakt 10 Minuten lang „nicht verfügbar“ (leere Batterie, außer Funkreichweite), sieht das Fenster in 3D zu aus, obwohl es niemand weiß. Schaltest du in den Einstellungen unter **Wetter & Warnungen** den Haken **Warnen, wenn ein Fenster- oder Türkontakt nicht verfügbar ist** ein, kommt dann eine Warnung mit dem Namen des Kontakts. Ein kurzer Aussetzer beim Neustart von Home Assistant warnt nicht.
+**Contact unavailable (since 2.0.6, off by default):** when a window or door contact has been "unavailable" for 10 minutes (empty battery, out of radio reach), the window looks shut in 3D although nobody knows. Switch on **Warn when a window or door contact is unavailable** in the settings under **Weather & warnings**, and a warning names the contact. A short gap while Home Assistant restarts does not warn.
 
-### 5.9 Kameras in 3D
+### 5.9 Cameras in 3D
 
-![Kamera in 3D](images/view-camera-model.jpg)
+![A camera in 3D](images/view-camera-model.jpg)
 
-Ein Tipp auf die Kamera oder auf ihren Sichtkegel öffnet das Standbild, das sich alle paar Sekunden erneuert. Ein Tipp auf das Bild öffnet das Livebild von Home Assistant. Der Kegel ist eine viel größere Tippfläche als die kleine Kamera.
+A tap on the camera or on its wedge opens the snapshot, which refreshes every few seconds. A tap on the picture opens the Home Assistant live view. The wedge is a much bigger target than the small camera.
 
-![Kamera-Standbild](images/view-camera.jpg)
+![Camera snapshot](images/view-camera.jpg)
 
-### 5.10 Sprachsteuerung (neu)
+### 5.10 Voice control (new)
 
-> **Neu in 1.20 und noch in Entwicklung.** Die Sprachsteuerung ist für alle freigeschaltet, kostenlos, und funktioniert schon gut. Wenn ein Satz nicht so verstanden wird, wie du ihn meinst, schreib uns den Satz in ein GitHub-Issue.
+> **New in 1.20 and still in development.** Voice control is switched on for everyone, free, and already works well. If a sentence is not understood the way you mean it, send us the sentence in a GitHub issue.
 
-Sprich mit deinem Haus. Unten links in der 3D-Ansicht erscheint ein **Mikrofon-Knopf** 🎙️. Antippen, dann wird er rot und darüber steht „Ich höre zu …“. Sprich deinen Satz und mach eine kurze Pause, dann reagiert NeonPlan.
+Talk to your house. A **microphone button** 🎙️ appears at the bottom left of the 3D view. Tap it: it turns red and "Listening …" shows above it. Say your sentence and pause briefly, and NeonPlan responds.
 
-**Was du sagen kannst:**
+**What you can say:**
 
-| Du sagst | Was passiert |
+| You say | What happens |
 |---|---|
-| „Zeig das Wohnzimmer“, „Geh in die Küche“ oder einfach „Bad“ | Der Raum öffnet sich, auf seiner Etage. |
-| „Zeig das Obergeschoss“, „Keller“ | Die Etage öffnet sich. |
-| „Zeig das ganze Haus“ | Zurück zur Hausansicht. |
-| „Zeig den Garten“, „Terrasse“ | Eine Außenfläche mit Namen und Bereich öffnet sich wie ein Raum. Heißen ein Raum und eine Außenfläche (oder deren Home-Assistant-Bereich) gleich, gewinnt der eigene Name des Raums: „Zeig die Garage“ öffnet den Raum Garage, nicht die Einfahrt im Bereich Garage. |
-| „Zeig die Waschmaschine“, „Wo ist die Stehlampe?“, „Zeig den Fernseher“, „Wo ist der Trockner?“ | Die Ansicht fliegt zum Gerät oder Möbel, und es blinkt kurz auf. Möbel hören auf ihre Art („Trockner“, „Poolpumpe“), ihren eigenen Namen und Alltagswörter („TV“, „Glotze“, „Heizung“, „Auto“) – auch ohne verknüpfte Entität. Steht der Sensor als „Waschmaschine Leistung“ im Plan, reicht „Waschmaschine“. Gibt es ein Möbel mehrfach, nennst du den Raum dazu („die Heizung im Wohnzimmer“). |
-| „Zeig die Kamera Haustür“, „Zeig die Kamera im Garten“ | Die Ansicht schaut durch die Kamera (mit dem Kamera-Cockpit). |
-| „Zeig die Kameras“ | Die Kamera-Wand öffnet sich (mit dem Kamera-Cockpit). |
-| „Was ist offen?“, „Wo ist es kalt?“, „Läuft die Waschmaschine?“, „Was zieht Strom?“, „Wer ist zu Hause?“, „Wie ist das Wetter?“, „Ist alles in Ordnung?“, „Was steht heute an?“, „Guten Morgen“, „Gute Nacht“ … | Mit dem Modul **Das Haus antwortet** (enthalten, siehe unten): Die Antwort erscheint als Sprechblase, wird über die Sprachausgabe von Assist vorgelesen, und das Haus zeigt sie – offene Fenster blinken, der kälteste Raum öffnet sich, die Ansicht fliegt zur Waschmaschine. Die ganze Liste steht unten. |
-| „NeonPlan Stil Wohnlich“, „Haus auf Synthwave“, „Stil zurück“ | Der Bildschirm wechselt den Stil, siehe [5.12](#512-stile-neu-in-31). |
-| „Licht im Flur an“, „Mach die Rollläden runter“ | Befehle gehen an **Assist** von Home Assistant. Die Antwort erscheint als Sprechblase. |
+| "Show the living room", "Go to the kitchen" or just "Bathroom" | The room opens, on its floor. |
+| "Show the upper floor", "Cellar" | The floor opens. |
+| "Show the whole house" | Back to the house view. |
+| "Show the garden", "Terrace" | An outdoor area with a name and an area opens like a room. When a room and an outdoor area (or its Home Assistant area) share a name, the room's own name wins: "Show the garage" opens the room Garage, not the driveway in the garage's area. |
+| "Show the washing machine", "Where is the floor lamp?", "Show the TV", "Where is the dryer?" | The view flies to the device or piece of furniture and it flashes. Furniture answers to its kind ("dryer", "pool pump"), its own name and everyday words ("TV", "telly", "heating", "car") – with or without a linked entity. If the sensor is called "Washing machine power" in the plan, "washing machine" is enough. With several of a kind, name the room too ("the heating in the living room"). |
+| "Show the front door camera", "Show the camera in the garden" | The view looks through the camera (with the Camera Cockpit). |
+| "Show the cameras" | The camera wall opens (with the Camera Cockpit). |
+| "What is open?", "Where is it cold?", "Is the washing machine running?", "What is drawing power?", "Who is home?", "What is the weather like?", "Is everything OK?", "What is on today?", "Good morning", "Good night" … | With the module **The house answers** (included, see below): the answer shows as a speech bubble, is spoken through Assist's text-to-speech, and the house shows it – open windows flash, the coldest room opens, the view flies to the washing machine. The full list is below. |
+| "NeonPlan style homely", "House to synthwave", "Style back" | The screen changes its style, see [5.12](#512-styles-new-in-31). |
+| "Turn on the hall light", "Lower the blinds" | Commands go to Home Assistant's **Assist**. The answer shows as a speech bubble. |
 
-Zusammengesetzte Wörter versteht es auch: „Auffahrtkamera“ trifft die Kamera „Auffahrt“, „Flurlicht“ das Licht im Flur. Unter **⚙ Einstellungen → Sprachsteuerung** steht die Liste **Das versteht NeonPlan**, mit den Sätzen der eingespielten Module.
+Compounds work too: "driveway camera" said as one word finds the camera "Driveway". Under **⚙ Settings → Voice control** the list **What NeonPlan understands** shows the sentences, with those of the installed modules.
 
-NeonPlan erkennt die Namen aus **deinem Plan**: Räume, Außenflächen, Etagen, Geräte und Möbel. Ein Raum hört auch auf den Namen seines Home-Assistant-Bereichs. Bei Geräten braucht es ein „zeig“ oder „wo ist“. So bleibt „Licht im Wohnzimmer an“ ein Befehl für Assist und schaltet das Licht, statt nur hinzufliegen.
+NeonPlan knows the names from **your plan**: rooms, outdoor areas, floors, devices and furniture. A room also answers to the name of its Home Assistant area. Devices need a "show" or "where is", so "turn on the living room light" stays a command for Assist and switches the light instead of flying there.
 
-**Weitere Namen.** Heißt dein Fernseher in Home Assistant „Smart TV Pro“, du sagst aber „Wohnzimmerfernseher“ oder „Glotze“: Jeder Raum, jedes Möbel und jedes platzierte Gerät hat im Editor unter dem Namen das Feld **Weitere Namen für die Sprache** (mit Komma getrennt, bis zu zwölf). Die Namen gelten für die Sprachsteuerung und die Suche.
+**Further names.** Your TV is called "Smart TV Pro" in Home Assistant, but you say "living room TV" or "telly": every room, piece of furniture and placed device has the field **Further names for the voice** below its name in the editor (comma separated, up to twelve). They count for voice control and the search.
 
-**Das Haus antwortet – die Fragen.** Das Modul (siehe unten) beantwortet Fragen aus deinem Plan und deinen Sensoren, ohne KI, alles lokal:
+**The house answers – the questions.** The module (see below) answers from your plan and your sensors, without AI, all local:
 
-| Thema | Du fragst zum Beispiel |
+| Topic | You ask, for example |
 |---|---|
-| Offen | „Was ist offen?“, „Welche Fenster sind offen?“, „Ist im Bad ein Fenster offen?“, „Ist die Garage zu?“, „Wie lange ist das Fenster schon offen?“ – die Ansicht fliegt zu jedem offenen Fenster, von innen, und sagt dort, was es ist |
-| Temperatur | „Wo ist es kalt?“, „Wo ist es am wärmsten?“, „Wie warm ist es im Wohnzimmer?“, „Wie warm ist es draußen?“ |
-| Luft | „Wie feucht ist es im Bad?“, „Wie ist die Luft im Schlafzimmer?“ (CO₂), „Soll ich lüften?“ |
-| Heizung | „Auf was steht die Heizung im Wohnzimmer?“, „Heizt die Heizung?“ (Thermostate des Raums) |
-| Geräte | „Läuft die Waschmaschine noch?“, „Ist der Fernseher an?“, „Was läuft gerade alles?“, mit Haushalt Pro: „Wie lange läuft die Waschmaschine noch?“, „Wann ist die Wäsche fertig?“ |
-| Medien | „Was läuft im Fernseher?“, „Welche Musik läuft?“ |
-| Energie | „Was zieht gerade Strom?“, „Was macht die Solaranlage?“, „Wie voll ist der Akku?“ |
-| Licht, Rollläden, Schlösser | „Welche Lichter sind an?“, „Ist im Flur noch Licht an?“, „Sind die Rollläden unten?“, „Ist die Haustür abgeschlossen?“ |
-| Personen | „Wer ist zu Hause?“, „Wo ist Anna?“, „Ist jemand im Wohnzimmer?“, „Wo ist Bewegung?“ |
-| Warnungen | „Ist alles in Ordnung?“, „Gibt es Warnungen?“ (Rauch, Wasser, Fenster bei Regen, Stromausfall …) |
-| Haushalt (Haushalt Pro) | „Was steht heute an?“, „Wann kommt die Mülltonne?“, „Ist Post da?“, „Müssen die Pflanzen gegossen werden?“ |
-| Auto (Auto Pro) | „Wie voll ist das Auto?“, „Lädt das Auto?“, „Wie weit komme ich noch?“, „Ist das Auto abgeschlossen?“, „Wo steht das Auto?“ |
-| Wetter, Zeit | „Wie ist das Wetter?“, „Regnet es?“, „Wie spät ist es?“, „Welcher Tag ist heute?“, „Wann geht die Sonne unter?“ |
-| Das Haus | „Wie viele Räume hat das Haus?“, „Wie groß ist das Wohnzimmer?“, „Wie viele Fenster hat das Haus?“ |
-| Der Tag | „Guten Morgen“ – der Morgenbericht: Wetter, Warnungen, was offen ist, was heute ansteht, wer da ist, das Auto. „Gute Nacht“ – der Nacht-Check: offene Fenster und Türen, nicht abgeschlossene Schlösser, Lichter, laufende Geräte, mit Rundflug |
-| Und sonst | „Wer bist du?“, „Wie geht's dir?“, „Erzähl einen Witz“, „Danke“, „Hallo“, „Was kannst du?“ |
+| Open | "What is open?", "Which windows are open?", "Is a window open in the bathroom?", "Is the garage closed?", "How long has the window been open?" – the view flies to each open window, from inside, and says there what it is |
+| Temperature | "Where is it cold?", "Where is it warmest?", "How warm is it in the living room?", "How warm is it outside?" |
+| Air | "How humid is the bathroom?", "How is the air in the bedroom?" (CO₂), "Should I air the house?" |
+| Heating | "What is the heating set to in the living room?", "Is the heating on?" (the room's thermostats) |
+| Appliances | "Is the washing machine still running?", "Is the TV on?", "What is running right now?", with Household Pro: "How long does the washing machine need?", "When is the laundry done?" |
+| Media | "What is playing on the TV?", "What music is playing?" |
+| Energy | "What is drawing power?", "What is the solar doing?", "How full is the battery?" |
+| Lights, blinds, locks | "Which lights are on?", "Is a light still on in the hall?", "Are the blinds down?", "Is the front door locked?" |
+| People | "Who is home?", "Where is Anna?", "Is anyone in the living room?", "Where is motion?" |
+| Warnings | "Is everything OK?", "Any warnings?" (smoke, water, a window in the rain, a power outage …) |
+| Household (Household Pro) | "What is on today?", "When is the bin collected?", "Is there mail?", "Do the plants need water?" |
+| Car (Car Pro) | "How full is the car?", "Is the car charging?", "How far can I still go?", "Is the car locked?", "Where is the car?" |
+| Weather, time | "What is the weather like?", "Is it raining?", "What time is it?", "What day is it?", "When does the sun set?" |
+| The house | "How many rooms does the house have?", "How big is the living room?", "How many windows does the house have?" |
+| The day | "Good morning" – the morning report: weather, warnings, what is open, what is on today, who is home, the car. "Good night" – the night check: open windows and doors, unlocked locks, lights, running appliances, with a tour |
+| And more | "Who are you?", "How are you?", "Tell me a joke", "Thank you", "Hello", "What can you do?" |
 
-Befehle („Mach das Licht an“, „Stell die Heizung auf 22 Grad“) gehen weiter an Assist. Die Antworten kommen in der Sprache deines Nutzers (Deutsch oder Englisch).
+Commands ("turn on the light", "set the heating to 22 degrees") still go to Assist. The answers come in English.
 
-**Module.** Manche Fähigkeiten kommen als **Modul** in einem lokalen JSON-Pack, das Code mitbringt. Das erste Modul ist **Das Haus antwortet** (enthalten). Du spielst die Datei unter **⚙ Einstellungen → 🧩 Module → Modul einspielen …** ein (oder auf der Seite Erweiterungen im Abschnitt **Module**); seine Sätze erscheinen unter 🎙 Sprachsteuerung. Der Code läuft erst, wenn ein Administrator ihn gesehen und freigegeben hat. Für das Vorlesen braucht die Assist-Pipeline eine Sprachausgabe (Einstellungen → Sprachassistenten → Text-zu-Sprache); ohne sie bleibt es bei der Sprechblase.
+**Modules.** Some abilities come as a **module** in a local JSON pack that carries code. The first module is **The house answers** (included). Import the pack under **⚙ Settings → 🧩 Modules → Import a module …** (or on the Extensions page in the **Modules** section); its sentences then show under 🎙 Voice control. Module code runs only after an administrator has reviewed and approved it. Speaking needs text-to-speech in the Assist pipeline (Settings → Voice assistants → Text-to-speech); without it the speech bubble stays.
 
-**Einschalten.** Standardmäßig ist die Sprachsteuerung aus. Du schaltest sie dort ein, wo du sprechen willst:
+**Switching it on.** Voice control is off by default. You switch it on where you want to speak:
 
-- **NeonPlan-Seite (Panel):** Editor → **⚙ Einstellungen → 🎙 Sprachsteuerung** → **Auf diesem Gerät einschalten**. Das gilt nur für diesen Browser, also zum Beispiel das Wandtablet, aber nicht das Handy.
-- **Dashboard-Karte:** Dashboard bearbeiten → NeonPlan-Karte → **Funktionen** → **Sprachsteuerung (Mikrofon-Knopf)**, oder im YAML `voice: true`. Die Karten-Einstellung gilt auf allen Geräten, die dieses Dashboard zeigen. Du kannst sie bequem am PC setzen, auch wenn sie für das Tablet gedacht ist.
+- **NeonPlan page (panel):** editor → **⚙ Settings → 🎙 Voice control** → **Switch on on this device**. This only applies to this browser, e.g. the wall tablet but not the phone.
+- **Dashboard card:** edit the dashboard → NeonPlan card → **Features** → **Voice control (microphone button)**, or `voice: true` in YAML. The card setting applies on every device that shows this dashboard, so you can set it on the PC even when it is meant for the tablet.
 
-**Was du dafür brauchst:**
+**What you need:**
 
-1. **Eine Assist-Pipeline mit Spracherkennung** in Home Assistant: Einstellungen → Sprachassistenten. Gut geeignet sind Home Assistant Cloud, Whisper oder **Speech-to-Phrase**, das lokal und schnell ist, auch auf einem Raspberry Pi. NeonPlan nimmt die **bevorzugte** Pipeline, also die mit dem Stern. Unter **Assist-Pipeline auf diesem Gerät** kannst du pro Gerät eine andere wählen.
-2. **https:** Browser geben das Mikrofon nur auf sicheren Seiten frei. Über `http://192.168…` geht es nicht, über Nabu Casa, ein eigenes Zertifikat oder einen Reverse Proxy schon.
-3. **Die Mikrofon-Freigabe:**
-   - im Browser beim ersten Antippen „Zulassen“;
-   - in **Fully Kiosk**: Einstellungen → Web Content Settings → Mikrofonzugriff einschalten, dazu in Android die Mikrofon-Berechtigung für Fully.
+1. **An Assist pipeline with speech to text** in Home Assistant: Settings → Voice assistants. Home Assistant Cloud, Whisper or **Speech-to-Phrase** (local and fast, even on a Raspberry Pi) all work well. NeonPlan uses the **preferred** pipeline, the starred one. Under **Assist pipeline on this device** you can choose another one per device.
+2. **https:** browsers only give out the microphone on secure pages. It does not work over `http://192.168…`, but it does over Nabu Casa, your own certificate or a reverse proxy.
+3. **The microphone allowed:**
+   - in the browser, "Allow" on the first tap;
+   - in **Fully Kiosk**: Settings → Web Content Settings → enable microphone access, plus Fully's microphone permission in Android.
 
-**Über Assist fragen – ohne Mikrofon am Tablet.** Alles, was NeonPlan versteht, kannst du auch Assist sagen: einem Voice-Satelliten (Home Assistant Voice, ESPHome), dem Assist-Dialog oder der App. Dafür braucht Assist eine Satzdatei: NeonPlan legt `custom_sentences/de/homeplan3d.yaml` und `…/en/…` in deinem Konfigurationsordner **erst an, wenn du unter Sätze für Assist eine Auswahl triffst** (seit 1.24 – vorher geschah das beim Start). Sagst du Assist „Zeig das Wohnzimmer“ oder „Was ist offen?“, geht der Satz an **jede offene NeonPlan-Ansicht** – das Wandtablet zeigt den Raum oder die offenen Fenster, und Assist spricht die Antwort dort, wo du gefragt hast. Das Tablet selbst bleibt dabei still. Welche Sätze dort stehen, wählst du unter **⚙ Einstellungen → 🎙 Sprachsteuerung → Sätze für Assist**: **Nur eindeutige** („zeig …“, „geh …“, „frag das Haus …“, „NeonPlan, …“, „Guten Morgen“, „Gute Nacht“ – nichts davon sagt man Home Assistant selbst), **Alle Fragen** (dazu „welche Fenster sind offen“, „wo ist …“, „läuft die Waschmaschine“ – Vorsicht, einige davon beantwortet Home Assistant sonst selbst) oder **Keine** (Standard: keine Datei; eine vorhandene Datei von NeonPlan wird entfernt). Hast du die Datei selbst geändert, überschreibt oder löscht NeonPlan sie nie – der Dialog sagt dir dann, welche Sprache er in Ruhe gelassen hat. Entfernst du die Integration, verschwinden NeonPlans Satzdateien mit ihr. Mit „Frag das Haus, welche Fenster offen sind“ erreichst du NeonPlan in jedem Modus. Eigene Sätze legst du in einer weiteren Datei unter `custom_sentences` für den Intent `NeonPlanAsk` an.
+**Asking through Assist – without a microphone on the tablet.** Everything NeonPlan understands you can also say to Assist: a voice satellite (Home Assistant Voice, ESPHome), the Assist dialog or the app. Assist needs a sentence file for that: NeonPlan writes `custom_sentences/en/homeplan3d.yaml` and `…/de/…` into your configuration folder **only once you make a choice under Sentences for Assist** (since 1.24 – before, this happened on start). Say "Show the living room" or "What is open?" to Assist and the sentence goes to **every open NeonPlan view** – the wall tablet shows the room or the open windows, and Assist speaks the answer where you asked. The tablet itself stays quiet. Which sentences stand there you choose under **⚙ Settings → 🎙 Voice control → Sentences for Assist**: **Only distinct ones** ("show …", "go to …", "ask the house …", "NeonPlan, …", "good morning", "good night" – nobody says those to Home Assistant itself), **All questions** (adds "which windows are open", "where is …", "is the washer running" – careful, some of these Home Assistant answers itself otherwise) or **None** (default: no file; a file NeonPlan wrote is removed). A file you changed yourself is never overwritten or deleted by NeonPlan – the dialog tells you which language it left alone. Removing the integration takes NeonPlan's sentence files with it. "Ask the house which windows are open" reaches NeonPlan in every mode. Your own sentences go into a further file under `custom_sentences` for the intent `NeonPlanAsk`.
 
-**Der Dienst `homeplan3d.ask`.** Für Automationen und Skripte: Felder **Satz** (`text`), **Bildschirm** (`screen`, optional) und **Sprechen** (`speak`, Standard aus). Der Dienst liefert die Antwort zurück (`answer`, `answered`, `screen_open`), zum Beispiel für eine Benachrichtigung. Mit `speak: true` spricht die Ansicht die Antwort selbst über die Sprachausgabe ihrer Assist-Pipeline. Beispiel – jeden Abend um 22 Uhr der Nacht-Check am Wandtablet:
+**The service `homeplan3d.ask`.** For automations and scripts: fields **Sentence** (`text`), **Screen** (`screen`, optional) and **Speak** (`speak`, off by default). The service returns the answer (`answer`, `answered`, `screen_open`), e.g. for a notification. With `speak: true` the view speaks the answer itself through its Assist pipeline's text-to-speech. Example – the night check on the wall tablet every evening at 10 pm:
 
 ```yaml
 action: homeplan3d.ask
 data:
-  text: "Gute Nacht"
-  screen: "Flur"
+  text: "Good night"
+  screen: "Hall"
   speak: true
 ```
 
-**Bildschirmnamen.** Hast du mehrere Tablets, gib jeder Ansicht einen Namen: im Editor unter **⚙ Einstellungen → 🎙 Sprachsteuerung → Bildschirmname** (gilt für dieses Gerät) oder an der Karte mit der Option `screen: Küche`. Nennt der Dienst einen Bildschirm, reagiert nur die Ansicht mit diesem Namen; ohne Angabe reagieren alle. Ist keine Ansicht offen, antwortet Assist „Kein NeonPlan-Bildschirm ist gerade offen“.
+**Screen names.** With several tablets, give each view a name: in the editor under **⚙ Settings → 🎙 Voice control → Screen name** (for this device) or on the card with the option `screen: Kitchen`. When the service names a screen, only the view with that name reacts; without one, all of them do. With no view open, Assist answers "No NeonPlan screen is open right now".
 
-**Raum dieses Geräts – „hier“** (neu in 2.1). Hängt ein Tablet fest in einem Raum, wählst du unter **⚙ Einstellungen → 🎙 Sprachsteuerung → Raum dieses Geräts** den Raum (gilt für dieses Gerät, ab Werk leer). Dann reichen Sätze ohne Raumnamen: „Licht an“, „Mach hier das Licht aus“ oder „Rollladen runter“ schalten nur in diesem Raum. Nennst du einen Raum („Licht in der Küche an“), gilt der genannte. Zur Auswahl stehen die Räume (und Außenbereiche) mit Home-Assistant-Bereich, denn Assist schaltet nach Bereichen: NeonPlan gibt den Satz so an Assist, als hätte ihn ein Gerät in diesem Bereich gehört. Auf einem **Dashboard** stellst du das an der Karte ein: Dashboard bearbeiten → NeonPlan-Karte → **Funktionen** → **Raum für „hier“**, oder im YAML `voice_area: kueche` (die Bereichs-ID aus Home Assistant). Die Karte gilt auf jedem Gerät, das dieses Dashboard zeigt; ohne Auswahl gilt der Raum, der auf dem Gerät eingestellt ist. Ein Sprach-Satellit wie der Voice PE braucht diese Einstellung nicht, er kennt seinen Bereich selbst.
+**Room of this device – "here"** (new in 2.1). When a tablet hangs in one room, choose it under **⚙ Settings → 🎙 Voice control → Room of this device** (for this device, empty by default). Then sentences without a room name are enough: "Lights on", "Turn off the lights here" or "Close the blinds" switch only in that room. When you name a room ("Turn on the kitchen lights"), that room counts. You can choose the rooms (and outdoor areas) that have a Home Assistant area, because Assist switches by area: NeonPlan hands the sentence to Assist as if a device in that area had heard it. On a **dashboard** you set it on the card: edit the dashboard → NeonPlan card → **Features** → **Room for "here"**, or in YAML `voice_area: kitchen` (the area id from Home Assistant). The card applies on every device that shows this dashboard; without a choice, the room set on the device counts. A voice satellite like the Voice PE does not need this setting, it knows its area itself.
 
-**„da“ – der angetippte Raum.** Hast du in der 3D-Ansicht einen Raum geöffnet, meint „da“ diesen Raum: Auf dem Küchentablet ins Wohnzimmer getippt, dann „Mach da das Licht aus“ oder „Fernseher da aus“. „hier“ bleibt der Raum des Tablets.
+**"there" – the room you tapped.** With a room open in the 3D view, "there" means that room: on the kitchen tablet tap into the living room, then "turn off the lights there" or "TV there off". "here" stays the tablet's room.
 
-**Saugen und „Alles aus“ pro Raum.** Im Editor hat jeder Raum das Feld **Reinigung (Saugroboter)**: das Skript oder den Knopf, der deinen Roboter in diesen Raum schickt (die Raumreinigung deiner Roboter-Integration, z. B. ein Skript mit den Raum-Segmenten). Dann zeigt das Raumfenster **🧹 Saugen**, und per Sprache gehen „Saug hier“, „Saug die Küche“ oder „Saug da“. **⏻ Alles aus** im Raumfenster und per Sprache („Alles aus“, „Mach da alles aus“, „Alles aus in der Küche“) schaltet die Lichter und Ventilatoren des Raums aus, den Fernseher ab und hält laufende Lautsprecher an. Schaltsteckdosen nur, wenn im Plan eine Lampe daran hängt, damit nie der Kühlschrank ausgeht.
+**Vacuum and "everything off" per room.** In the editor every room has the field **Cleaning (robot vacuum)**: the script or button that sends your robot to this room (the room cleaning of your robot's integration, e.g. a script with the room segments). The room panel then shows **🧹 Vacuum**, and by voice "vacuum here", "vacuum the kitchen" or "vacuum there" work. **⏻ Everything off** in the room panel and by voice ("everything off", "turn everything off there", "everything off in the kitchen") switches off the room's lights and fans, turns off the TV and pauses playing speakers. Plain switched sockets only when a lamp hangs on them in the plan, so the fridge never goes off.
 
-**Testen:** Im Abschnitt **🎙️ Sprachsteuerung** startet **🎙️ Mikrofon testen** eine Probe. Sie prüft der Reihe nach https, Mikrofon, Pegel und Assist. Sie zeigt auch, welchen Raum ein gesprochener Satz öffnen würde, und schaltet dabei nichts. Steht irgendwo ein ✖, steht daneben, was zu tun ist.
+**Testing:** in the **🎙️ Voice control** section, **🎙️ Test the microphone** starts a probe. It checks https, the microphone, the level and Assist one after the other. It also shows which room a spoken sentence would open, and switches nothing while doing so. Wherever there is a ✖, the fix stands next to it.
 
-**Gut zu wissen:**
+**Good to know:**
 
-- Das Mikrofon ist **nur offen, solange du sprichst**. Es lauscht nicht dauerhaft, deshalb gibt es kein Aktivierungswort. Das schont auch alte Tablets.
-- Die Erkennung übernimmt **deine** Assist-Pipeline. Wie schnell und genau sie ist, hängt von ihr ab. Mit Speech-to-Phrase oder der Cloud dauert ein Satz meist ein bis zwei Sekunden.
-- Hast du die Live-Regie an, unterbricht sie dich nicht, während du sprichst.
+- The microphone is **only open while you speak**. It does not listen all the time, so there is no wake word. That also spares old tablets.
+- Speech to text is done by **your** Assist pipeline, so how fast and accurate it is depends on that pipeline. With Speech-to-Phrase or the cloud a sentence usually takes one to two seconds.
+- If the live director is on, it does not interrupt you while you speak.
 
-### 5.11 Ortung (neu)
+### 5.11 Locating (new)
 
-> **Neu in 2.0, kostenlos.** Wer und was ist wo im Haus – ohne Bermuda, ohne ESPresense, ohne neue Hardware. NeonPlan nutzt die Bluetooth-Empfänger, die Home Assistant schon kennt.
+> **New in 2.0, free.** Who and what is where in the house – without Bermuda, without ESPresense, without new hardware. NeonPlan uses the Bluetooth scanners Home Assistant already knows.
 
-NeonPlan zeigt, in welchem Raum du gerade bist – und wo dein iPhone oder dein Schlüsselbund liegt. Personen stehen als leuchtende Figur im Raum und gleiten beim Raumwechsel hinüber. Für jedes Gerät gibt es einen Sensor in Home Assistant („Torstens Uhr Raum: Küche“), und per Sprache fragst du „Wo ist mein iPhone?“.
+NeonPlan shows which room you are in right now – and where your iPhone or your keys are. People stand as a glowing figure in the room and glide over when they change rooms. Every device gets a sensor in Home Assistant ("Torsten's watch room: Kitchen"), and by voice you ask "Where is my iPhone?".
 
-**Was du brauchst:**
+**What you need:**
 
-- **Bluetooth-Empfänger in Home Assistant** – was du schon hast, reicht:
-  - **Shelly** der 2. und 3. Generation (Steckdosen, Unterputz). Im Shelly-Gerät unter **Konfigurieren → Bluetooth-Scan** auf **passiv** stellen.
-  - **ESPHome-Bluetooth-Proxys** (ein ESP32). Sie melden häufiger als Shellys, Raumwechsel kommen damit schneller an.
-  - den Bluetooth-Stick am Home-Assistant-Rechner.
+- **Bluetooth scanners in Home Assistant** – what you already have is enough:
+  - **Shelly** Gen2 and Gen3 (plugs, in-wall). In the Shelly device set **Configure → Bluetooth scanning** to **passive**.
+  - **ESPHome Bluetooth proxies** (an ESP32). They report more often than Shellys, so room changes arrive faster.
+  - the Bluetooth adapter of the Home Assistant machine.
 
-  Ideal ist ungefähr ein Empfänger pro Raum. Räume ohne eigenen Empfänger (Flur, Gäste-WC) erkennt NeonPlan trotzdem: Das Einlernen merkt sich, wie sie für die Empfänger in den Nachbarräumen aussehen.
-- **Etwas, das du dabei hast:**
-  - **Apple Watch und iPhone** mit ihrem Schlüssel (IRK) – den liest der Schlüssel-Helfer in drei Minuten aus (siehe unten). Die Uhr am Handgelenk ist ideal: Ein iPhone in der Tasche wird bei dunklem Bildschirm nach etwa einer Minute still.
-  - **Android-Handys:** In der Home-Assistant-App unter **Einstellungen → Companion-App → Sensoren verwalten → BLE-Sender** einschalten. Kein Schlüssel nötig. Stell dort die **Sendeleistung auf „Hoch“** und den **Sendemodus auf „Niedrige Latenz“**: Ab Werk sendet die App so schwach, dass die Empfänger sie kaum hören. NeonPlan findet das Handy dann von selbst und zeigt einen Hinweis, wenn eine Einstellung zu schwach ist.
-  - **Android über den Schlüssel-Helfer koppeln bringt nichts:** Android sendet diesen Schlüssel im Hintergrund nicht, das Gerät bleibt „nicht gehört“.
-  - **Schlüsselanhänger** mit fester Adresse oder als iBeacon (z. B. Nut, Tile, iBeacon-Tags). **AirTags gehen nicht** – sie wechseln ihre Adresse, und Apple gibt keinen Schlüssel heraus.
+  About one scanner per room is ideal. Rooms without a scanner of their own (hall, guest toilet) are still recognised: learning remembers how they look to the scanners in the rooms next door.
+- **Something you carry:**
+  - **Apple Watch and iPhone** with their key (IRK) – the key helper reads it in three minutes (see below). The watch on the wrist is ideal: an iPhone in a pocket goes quiet about a minute after its screen turns off.
+  - **Android phones:** in the Home Assistant app switch on **Settings → Companion app → Manage sensors → BLE Transmitter**. No key needed. Set the **transmit power to "High"** and the **advertise mode to "Low latency"** there: out of the box the app sends so weakly that the scanners barely hear it. NeonPlan then finds the phone by itself and shows a hint when a setting is too weak.
+  - **Pairing Android through the key helper does not help:** Android does not send this key in the background, so the device stays "not heard".
+  - **Key tags** with a fixed address or as an iBeacon (e.g. Nut, Tile, iBeacon tags). **AirTags do not work** – they change their address, and Apple gives no key.
 
-**Einrichten** (Editor → **⚙ Einstellungen → 📡 Ortung**, nur Admins):
+**Setting up** (editor → **⚙ Settings → 📡 Locating**, admins only):
 
-1. **Empfänger:** NeonPlan listet alle Bluetooth-Empfänger von Home Assistant und schlägt ihren Raum vor – aus dem Home-Assistant-Bereich des Geräts, aus einem Pin oder Möbel im Plan (die Waschmaschine mit dem Strommesser der Shelly-Steckdose) oder aus dem Namen („PC Büro Steckdose“). Außenflächen mit einem Home-Assistant-Bereich (Terrasse, Garten) stehen mit in der Liste und zählen als Räume, verbunden mit dem Raum, dessen Tür auf sie führt. Nach dem Einlernen weiß NeonPlan aus den Signalen selbst, wo jeder Empfänger steht, und bietet bei Abweichungen **„Signal sagt: … – übernehmen“** an.
-2. **Geräte:** Uhr und iPhone über den **🔑 Schlüssel-Helfer**, Android-Handys stehen unter **📱 Android mit der Home-Assistant-App** von selbst in der Liste, Anhänger über **📱 Android-Handy oder Schlüsselanhänger hinzufügen** (das Gerät direkt an einen Empfänger halten). Hört gerade kein Empfänger ein Gerät, steht **⚠ nicht gehört** daneben; einen Schlüssel, den du schon hast, trägst du unter **🔑 Eigenen Schlüssel einfügen** ein. Gib jedem Gerät einen Namen, ordne es einer Person zu und – für „Lass mein iPhone klingeln“ – die Home-Assistant-App des Handys.
-3. **Einlernen:** Hake an, welche Geräte du gerade **dabei hast**. Geh in jeden Raum, tippe ihn an und lauf **90 Sekunden** langsam herum, auch in die Ecken und an den Wänden entlang. Ein Handy dabei in die **Tasche** (Bildschirm aus), so wie im Alltag – zum Antippen nimmst du am besten ein anderes Tablet oder Handy. **Einmal einlernen reicht:** Geräte ohne eigene Lerndaten nutzen die der anderen mit. Der Countdown läuft mit, bei 0 ist der Raum fertig (✓). Danach zeigt **Trefferquote prüfen**, wie sicher jeder Raum erkannt wird. Einen schwachen Raum lernst du einfach noch einmal ein.
-4. **Live:** Ortung einschalten und durchs Haus gehen – die Liste zeigt sofort, wo NeonPlan dich sieht.
+1. **Scanners:** NeonPlan lists all Bluetooth scanners of Home Assistant and suggests their room – from the device's Home Assistant area, a pin or a piece of furniture in the plan (the washing machine with the Shelly plug's power sensor) or the name ("PC office plug"). Outdoor areas with a Home Assistant area (a terrace, the garden) are in the list too and count as rooms, joined to the room whose door opens onto them. After learning NeonPlan knows from the signals where each scanner stands and offers **"Signals say: … – use it"** when they disagree.
+2. **Devices:** the watch and the iPhone through the **🔑 Key helper**, Android phones appear by themselves under **📱 Android with the Home Assistant app**, key tags through **📱 Add an Android phone or a key tag** (hold the device right next to a scanner). When no scanner hears a device right now, it says **⚠ not heard**; a key you already have goes in under **🔑 Paste a key you already have**. Give every device a name, a person and – for "ring my iPhone" – the phone's Home Assistant app.
+3. **Learning:** tick the devices you are **carrying**. Go into every room, tap it and walk around slowly for **90 seconds**, into the corners and along the walls. Keep a phone in your **pocket** (screen off), as in everyday life – best tap with another tablet or phone. **Learning once is enough:** devices without learning of their own use the others'. The countdown runs; at 0 the room is done (✓). **Check accuracy** then shows how surely each room is recognised. Simply learn a weak room again.
+4. **Live:** switch locating on and walk through the house – the list shows at once where NeonPlan sees you.
 
-**In der 3D-Ansicht:**
+**In the 3D view:**
 
-- **Uhr und Handy einer Person:** Was am Körper getragen wird (Uhr, Band – Haken **⌚ am Körper**, bei „Watch“ oder „Uhr“ im Namen schon gesetzt) bestimmt, wo die Person steht, solange es in den letzten zwei Minuten gehört wurde; sonst das zuletzt gehörte Gerät. Melden Uhr und Handy gleichzeitig verschiedene Räume (typisch an einer gemeinsamen Wand), gewinnt das Handy nur, wenn es sich deutlich sicherer ist (mehr als 15 Prozentpunkte). Ein Handy, das in einem anderen Raum liegen geblieben ist, während du mit der Uhr weitergegangen bist, erscheint dort als eigenes kleines Symbol. **Präsenzsensoren mit Zonen** (z. B. Aqara FP2): Meldet eine Zone, die wie ein Möbel im Raum heißt („Sofa“, „Sessel“, „Esstisch“, „Bett“ oder der eigene Name eines Möbels), dass dort jemand ist, steht die Figur an diesem Möbel statt in der Raummitte. Eine Zone an einer Tür („Eingang Flur“, „Terrassentür“) stellt die Figur vor die Tür zum Raum dieses Namens oder vor eine Tür nach draußen; „restlicher Raum“ bleibt die Raummitte. Der Sensor gehört über seinen Home-Assistant-Bereich zum Raum. Umgekehrt genauso: Liegt die Uhr seit zehn Minuten im selben Raum, während das Handy danach den Raum gewechselt hat, gilt sie als abgelegt – dann bestimmt das Handy, wo die Person ist, und die Uhr steht als Symbol dort, wo sie liegt.
-- Personen stehen als **leuchtende Figur** in ihrer Farbe im Raum, mit dem Namen darüber. Dinge (Schlüssel, ein iPhone ohne Person) sind kleine runde Symbole. Antippen zeigt Raum, Sicherheit und seit wann.
-- Im Assistenten unter **4 · Live → Personen in 3D**: **Figur, Pin oder aus** – einmal fürs ganze Haus.
-- Das **Raumfenster** zeigt unter dem Namen, wer gerade hier ist, und die Etagen zählen die Personen mit.
-- **Personen nur für Admins zeigen** (im Schritt Live) blendet sie für alle anderen Benutzer aus.
+- **A person's watch and phone:** what is worn on the body (watch, band – tick **⌚ worn**, already set for "watch" in the name) tells where the person stands while it was heard in the last two minutes; otherwise the device heard last. When the watch and the phone are heard at the same time in different rooms (typically at a shared wall), the phone only wins when it is clearly surer (by more than 15 percentage points). A phone left lying in another room while you walked on with the watch shows there as a small symbol of its own. **Presence sensors with zones** (such as an Aqara FP2): when a zone named like a piece of furniture in the room ("Sofa", "Armchair", "Dining table", "Bed", or the furniture's own name) reports someone there, the figure stands at that furniture instead of in the middle of the room. A zone at a door ("Entrance hall", "Terrace door") puts the figure in front of the door to the room of that name, or of a door to the outside; "rest of the room" keeps the middle. The sensor belongs to the room by its Home Assistant area. The other way round too: a watch that has lain in one room for ten minutes while the phone changed rooms after it counts as taken off – the phone then tells where the person is, and the watch stands as a symbol where it lies.
+- People stand as a **glowing figure** in their colour in the room, with the name above. Things (keys, an iPhone without a person) are small round symbols. A tap shows the room, the certainty and since when.
+- In the assistant under **4 · Live → People in 3D**: **figure, pin or off** – once for the whole house.
+- The **room panel** shows under its name who is here now, and the floors count the people.
+- **Show people to admins only** (in the Live step) hides them from all other users.
 
-**Schneller mit Präsenzmeldern:** Bewegungs- und Präsenzmelder (auch Radar wie Aqara FP2), die in Home Assistant einem Bereich zugeordnet sind, beschleunigen die Ortung von selbst: Bluetooth sagt, **wer** es ist, der Melder sagt, **wann** jemand den Raum betritt. Ohne Melder dauert ein Raumwechsel zwei bis fünf Sekunden – mit Melder oft nur einen Augenblick.
+**Faster with presence sensors:** motion and presence sensors (radar like the Aqara FP2 too) that belong to an area in Home Assistant speed locating up by themselves: Bluetooth tells **who** it is, the sensor tells **when** someone enters the room. Without sensors a room change takes two to five seconds – with one often just a moment.
 
-**Sprache** (mit den Assist-Sätzen unter **⚙ Einstellungen → Sprachsteuerung**): „Wo ist mein iPhone?“, „Wo ist Torsten?“, „Wer ist zu Hause?“, „Lass mein iPhone klingeln“. Die Antwort kommt direkt aus Home Assistant – auch ohne offenen NeonPlan-Bildschirm. Offene NeonPlan-Ansichten fliegen dabei in den Raum der Antwort, bei „Wer ist zu Hause?“ nacheinander in alle Räume, in denen jemand ist (Antippen stoppt). Ausschalten lässt sich das im Ortungs-Assistenten unter **Live**; solange Personen nur Admins gezeigt werden, fliegen nur die Ansichten von Admins zu ihnen. „Wo ist Frauke?“ mit den Namen aus der Ortung versteht Assist auch dann, wenn ein KI-Agent (z. B. Gemini) die übrigen Fragen beantwortet. Klingeln schickt eine laute Mitteilung an die Home-Assistant-App (auf dem iPhone als kritische Mitteilung, die auch im Lautlos-Modus klingelt).
+**Voice** (with the Assist sentences under **⚙ Settings → Voice control**): "Where is my iPhone?", "Where is Torsten?", "Who is home?", "Ring my iPhone". The answer comes straight from Home Assistant – even without an open NeonPlan screen. Open NeonPlan views fly into the room of the answer, on "Who is home?" into every room with someone in it, one after another (a tap stops it). Switch it off in the locating assistant under **Live**; while people are shown to admins only, only admins' views fly to them. "Where is Anna?" with the names locating knows is understood by Assist even when an AI agent (such as Gemini) answers everything else. Ringing sends a loud notification to the Home Assistant app (on an iPhone a critical alert that rings in silent mode too).
 
-**Für Automationen:** Jedes Gerät hat einen Sensor, z. B. `sensor.torstens_uhr_raum`. Sein Zustand ist der Raumname; die Attribute sind `room_id`, `area_id` (der Home-Assistant-Bereich des Raums), `floor`, `probability` (Sicherheit 0–1), `since` und `last_seen`. Beispiel – Licht folgt dir:
+**For automations:** every device has a sensor, e.g. `sensor.torstens_watch_room`. Its state is the room name; the attributes are `room_id`, `area_id` (the room's Home Assistant area), `floor`, `probability` (certainty 0–1), `since` and `last_seen`. Example – the light follows you:
 
 ```yaml
 triggers:
   - trigger: state
-    entity_id: sensor.torstens_uhr_raum
-    to: Küche
+    entity_id: sensor.torstens_watch_room
+    to: Kitchen
 actions:
   - action: light.turn_on
     target:
-      area_id: kueche
+      area_id: kitchen
 ```
 
-**Wie schnell ein Raumwechsel ankommt:** meist nach **zwei bis fünf Sekunden**. Das liegt an den Empfängern, nicht an NeonPlan: Ein **Shelly** meldet ein Gerät nur etwa **alle drei bis vier Sekunden** weiter, ein **ESP32-Bluetooth-Proxy etwa jede Sekunde**. Uhren senden ein- bis zweimal pro Sekunde, ein iPhone in der Tasche deutlich seltener. NeonPlan wartet zudem zwei, drei Messungen ab, damit die Anzeige nicht zwischen zwei Räumen hin- und herspringt. Schneller wird es mit **ESP32-Proxys** statt Shellys – und mit **Präsenzmeldern**, dann fast sofort.
+**How fast a room change shows:** usually after **two to five seconds**. That comes from the scanners, not from NeonPlan: a **Shelly** passes a device on only about **every three to four seconds**, an **ESP32 Bluetooth proxy about every second**. Watches send once or twice a second, an iPhone in a pocket much less often. NeonPlan also waits for two or three readings so the view does not jump between two rooms. It gets faster with **ESP32 proxies** instead of Shellys – and with **presence sensors**, then almost at once.
 
-**Wo die Empfänger am besten stehen:**
+**Where scanners work best:**
 
-- **In einer Ecke oder an einer Außenwand des Raums – nicht an der Wand zum Nachbarraum.** Eine Steckdose direkt hinter der Wand hört dich im Nachbarraum fast genauso laut wie in ihrem eigenen Raum; dann springt die Anzeige zwischen beiden. (Beispiel: Du sitzt in der Küche, der Shelly des Wohnzimmers steckt direkt hinter dir in der gemeinsamen Wand.)
-- **Nicht Rücken an Rücken:** zwei Empfänger auf beiden Seiten derselben Wand machen die beiden Räume schwer zu unterscheiden.
-- **Frei statt verdeckt:** nicht hinter Kühlschrank, Heizkörper, Spiegel oder im Metall-Schaltschrank – Metall und Wasser schlucken Bluetooth.
-- **Ungefähr einer pro Raum.** Räume ohne eigenen Empfänger gehen trotzdem; große oder verwinkelte Räume profitieren von einem zweiten.
-- Wer einen Empfänger umsteckt, lernt die Räume daneben kurz neu ein.
+- **In a corner or on an outside wall of the room – not on the wall to the next room.** A plug right behind the wall hears you in the next room almost as loudly as in its own; then the view jumps between the two. (Example: you sit in the kitchen, and the living room's Shelly is plugged in right behind you in the shared wall.)
+- **Not back to back:** two scanners on both sides of the same wall make the two rooms hard to tell apart.
+- **In the open, not hidden:** not behind a fridge, radiator or mirror or in a metal cabinet – metal and water swallow Bluetooth.
+- **About one per room.** Rooms without a scanner of their own still work; large or angled rooms gain from a second one.
+- After moving a scanner, learn the rooms around it again briefly.
 
-**Gut zu wissen:**
+**Good to know:**
 
-- **Raumgenau, nicht zentimetergenau.** Bluetooth schwankt (schon der eigene Körper dämpft das Signal). NeonPlan sagt zuverlässig den Raum, nicht die Stelle im Raum.
-- **Alles bleibt im Haus.** Die Signale werden nur in Home Assistant ausgewertet, nichts geht ins Internet.
-- **Neu einlernen**, wenn du Empfänger umstellst oder neue dazukommen.
-- **Bermuda oder ESPresense im Einsatz?** NeonPlan läuft parallel und stört sie nicht. Richte deine Geräte einfach hier ein; wenn alles sicher läuft, stellst du deine Automationen auf die neuen Sensoren um und kannst die alten Werkzeuge entfernen.
+- **Room-level, not to the centimetre.** Bluetooth wavers (your own body damps the signal). NeonPlan reliably tells the room, not the spot in it.
+- **Everything stays in the house.** The signals are only evaluated in Home Assistant, nothing goes to the internet.
+- **Learn again** when you move scanners or add new ones.
+- **Using Bermuda or ESPresense?** NeonPlan runs alongside and does not disturb them. Just set your devices up here; once everything works, switch your automations to the new sensors and remove the old tools.
 
-**Den Schlüssel (IRK) von iPhone und Apple Watch bekommen:** am einfachsten mit dem **NeonPlan Schlüssel-Helfer** – ohne Mac, auch für die Apple Watch:
+**Getting the key (IRK) of an iPhone or Apple Watch:** the easiest way is the **NeonPlan key helper** – no Mac needed, the Apple Watch too:
 
-1. Einen **ESP32** (ESP32, ESP32-C3 oder ESP32-S3) per USB an den Computer stecken und mit einem lokalen Bluetooth-Schlüssel-Helfer in Chrome oder Edge flashen. Danach das WLAN eintragen.
-2. Home Assistant findet **NeonPlan Key** als ESPHome-Gerät: **Einstellungen → Geräte & Dienste → Entdeckt → Hinzufügen**.
-3. Im Assistenten unter **Geräte → 🔑 Schlüssel-Helfer** „Für Apple Watch“ oder „Für iPhone“ wählen und koppeln: auf der Uhr unter **Einstellungen → Bluetooth → Gesundheitsgeräte** „NeonPlan Key“ antippen, am Handy unter **Einstellungen → Bluetooth**. Der Schlüssel erscheint sofort – **Hinzufügen** tippen. Danach „NeonPlan Key“ in den Bluetooth-Einstellungen wieder entfernen.
-4. **Weitere Geräte:** vorher **🔄 Nächstes Gerät** tippen – der Helfer bekommt eine neue Bluetooth-Kennung, damit sich das zuvor gekoppelte Gerät nicht wieder dazwischen verbindet.
+1. Plug an **ESP32** (ESP32, ESP32-C3 or ESP32-S3) into the computer and flash it with a local Bluetooth-key helper in Chrome or Edge. Then enter your Wi-Fi.
+2. Home Assistant finds **NeonPlan Key** as an ESPHome device: **Settings → Devices & services → Discovered → Add**.
+3. In the assistant under **Devices → 🔑 Key helper** pick "For an Apple Watch" or "For an iPhone" and pair: on the watch tap "NeonPlan Key" under **Settings → Bluetooth → Health devices**, on the phone under **Settings → Bluetooth**. The key appears at once – tap **Add**. Afterwards remove "NeonPlan Key" from the Bluetooth settings again.
+4. **More devices:** tap **🔄 Next device** first – the helper gets a new Bluetooth identity, so the device paired before does not connect in between.
 
-Den ESP32 kannst du danach weiterverwenden, am besten als ESPHome-Bluetooth-Proxy – dann macht er die Ortung sogar schneller. Der Helfer baut auf [irk-capture](https://github.com/DerekSeaman/irk-capture) von Derek Seaman auf (MIT-Lizenz) – danke! Andere Wege: mit einem **Mac** über die Schlüsselbundverwaltung (der Mac muss im selben iCloud-Konto sein). Den Schlüssel fügst du dann im Assistenten unter **Geräte → Schlüssel einfügen** ein (als 32 Zeichen oder so, wie der Mac ihn zeigt).
+You can reuse the ESP32 afterwards, best as an ESPHome Bluetooth proxy – it then even makes locating faster. The helper is built on [irk-capture](https://github.com/DerekSeaman/irk-capture) by Derek Seaman (MIT licence) – thank you! Another way: with a **Mac** through Keychain Access (the Mac must be on the same iCloud account). Then paste the key in the assistant under **Devices → Paste a key** (as 32 characters or the way the Mac shows it).
 
 ---
 
-### 5.12 Stile (neu in 3.1)
+### 5.12 Styles (new in 3.1)
 
-> **Neon war erst der Anfang.** Seit 3.1 zeigt NeonPlan dein Haus in vielen Stilen, kostenlos für alle. Editor und Bedienung bleiben Neon, das Haus darf wohnlich werden. Alle Stile laufen auch auf alten Wandtablets: Sie färben nur anders ein und brauchen keine zusätzliche Rechenleistung.
+> **Neon was just the beginning.** Since 3.1 NeonPlan shows your home in many styles, free for everyone. The editor and the controls stay neon, the house may become homely. Every style also runs on old wall tablets: the styles only colour differently and need no extra computing power.
 
-![Ein Haus – viele Stile](images/styles-hero-de.jpg)
+![One house – many styles](images/styles-hero-en.jpg)
 
-**Stil wählen.** In der 3D-Ansicht: **⚙** (oben neben der Version) → **🎨**. Jedes Gerät merkt sich seinen Stil. Die Liste ist in Gruppen geordnet:
+**Choosing a style.** In the 3D view: **⚙** (top, next to the version) → **🎨**. Every device remembers its style. The list is grouped:
 
-| Gruppe | Stile |
+| Group | Styles |
 |---|---|
-| **Automatisch** | **Auto** (Tag, solange die Sonne scheint, danach Neon – wie bisher) und **Hausplan (Tag / Abend / Nacht)**, siehe unten |
-| **Neon & Klassik** | Neon (Standard), Blueprint, Tag, Nacht / Fokus |
-| **Wohnlich – echte Materialien** | Wohnlich, Wohnlich Abend, Winterabend: Holzböden, Fliesen, helle Wände mit deinen Wandfarben, weiche Schatten unter den Möbeln. Die Abend-Stile dunkeln das Haus warm ab |
-| **Gestaltet** | Synthwave, Architekturmodell, Pastell, Warm / Holz & Papier |
-| **Eigene Stile** | Was du selbst angelegt hast (unten) |
+| **Automatic** | **Auto** (Day while the sun is up, then Neon – as before) and **House plan (day / evening / night)**, see below |
+| **Neon & classic** | Neon (default), Blueprint, Day, Night / Focus |
+| **Homely – real materials** | Homely, Homely evening, Winter evening: wooden floors, tiles, light walls with your wall colours, soft shadows under the furniture. The evening styles dim the house warmly |
+| **Designed** | Synthwave, Architect's model, Pastel, Warm / Wood & paper |
+| **Own styles** | What you made yourself (below) |
 
-Lichter, offene Fenster und aktive Geräte behalten in jedem Stil ihre Signalfarbe, damit du auf einen Blick siehst, was los ist. Wandfarben und Fassade zeigen nur die wohnlichen Stile (siehe [4.4](#44-wände)).
+Lights, open windows and active devices keep their signal colour in every style, so you see at a glance what is going on. Only the homely styles show wall colours and the facade (see [4.4](#44-walls)).
 
-**Die Stile im Editor.** **⚙ Einstellungen → 🎨 Stile** zeigt oben das Haus groß im gewählten Stil, darunter jeden Stil als Kachel. **In „3D daneben“ zeigen** übernimmt ihn in die 3D-Ansicht neben dem Plan; dafür steht dort auch eine Stil-Auswahl neben **Effekte**. **Fassade** setzt die Farbe der Außenwände in den wohnlichen Stilen.
+**The styles in the editor.** **⚙ Settings → 🎨 Styles** shows the house large in the style chosen, with every style as a tile below. **Show in "3D beside"** takes it into the 3D view next to the plan; there is also a style list next to **Effects** for that. **Facade** sets the colour of the outer walls in the homely styles.
 
-**Eigene Stile.** **＋ Als eigenen Stil anlegen** macht aus jedem Stil eine Kopie mit allen Einstellungen: Name, **Echte Materialien** oder eine eigene Farbpalette (Linien, dunkle und helle Flächen, Farbanteil, Grundhelligkeit, Kontrast), **Dunkler Stil – Linien leuchten**, **Abendstimmung**, **Bodenstruktur**, **Licht nach Richtung**, **Raumecken**, **Kontaktschatten unter Möbeln**, **Aktive Geräte farbig** und der Hintergrund oben und unten. Jede Änderung siehst du sofort im großen Bild. Eigene Stile stehen danach in jeder Stil-Liste (Ansicht, Karte, Vorlagen) und hören auf ihren Namen in der Sprachsteuerung.
+**Own styles.** **＋ Make an own style from it** copies any style with all its settings: name, **Real materials** or a colour palette of your own (lines, dark and light surfaces, amount of colour, base brightness, contrast), **Dark style – lines glow**, **Evening mood**, **Floor texture**, **Light by direction**, **Room corners**, **Contact shadows under furniture**, **Active devices in colour** and the background at the top and bottom. You see every change right away in the large picture. Own styles then appear in every style list (view, card, templates) and answer to their name in voice control.
 
-**Tageszeiten (Hausplan).** Unter **🕒 Tageszeiten (Hausplan)** legst du fest, welcher Stil **tagsüber**, **abends** und **nachts** gilt, zum Beispiel Wohnlich, Wohnlich Abend und Nacht / Fokus. **Umschalten nach Sonne**: Tag, solange die Sonne oben ist, danach Abend bis **Nacht ab**. **Nach Uhrzeit**: die drei Zeiten **Tag ab**, **Abend ab** und **Nacht ab**. Der Plan gilt für jeden Bildschirm, dessen Stil **Hausplan** ist – vor allem das Panel auf dem Wandtablet.
+**Times of day (house plan).** Under **🕒 Times of day (house plan)** you set which style applies **during the day**, **in the evening** and **at night**, for example Homely, Homely evening and Night / Focus. **Switch by the sun**: day while the sun is up, then evening until **Night from**. **By the clock**: the three times **Day from**, **Evening from** and **Night from**. The plan applies to every screen whose style is **House plan** – above all the panel on the wall tablet.
 
-**Beim Hineinzoomen (seit 3.2).** Direkt unter der Stil-Auswahl wählst du einen zweiten Stil, in den das Haus beim Hineinzoomen fließend übergeht – von weitem Neon, nah im Raum zum Beispiel Wohnlich, ohne Neuladen. Der Regler **früh … spät** legt fest, wann er einsetzt (früh: schon bei einer geöffneten Etage, spät: erst nah im Raum). **Alle Räume** oder **Nur der Raum**: Bei *Nur der Raum* wird nur der Raum, in den du zoomst oder den du antippst, wohnlich; der Rest des Hauses bleibt im eingestellten Look. Das wirkt, wenn oben Neon, Blueprint oder Tag gewählt ist. In der Dashboard-Karte steht es im Karten-Dialog, per YAML: `zoom_style: cozy`, `zoom_late: 50`, `zoom_scope: room`.
+**When zooming in (since 3.2).** Right below the style choice you pick a second style the house flows into as you zoom in – neon from afar, homely close up in a room, without reloading. The slider **early … late** sets when it begins (early: with a floor opened, late: only close in a room). **All rooms** or **Only the room**: with *Only the room* only the room you zoom into or tap turns homely; the rest of the house keeps the set look. It works while Neon, Blueprint or Day is chosen above. In a dashboard card it is in the card dialog, via YAML: `zoom_style: cozy`, `zoom_late: 50`, `zoom_scope: room`.
 
-**Dashboard-Karte.** Im Karten-Dialog wählst du unter **Stil** jeden Stil, **Auto** oder **Hausplan**. Hat die Karte einen festen Stil, kann sie zusätzlich **Stil abends** und **Stil nachts** haben; umgeschaltet wird nach dem Hausplan (Sonne oder Uhrzeit). In YAML: `theme`, `theme_evening`, `theme_night` (siehe [8.2](#82-alle-optionen-in-yaml)). Karten-Vorlagen übernehmen den Stil genauso.
+**Dashboard card.** In the card dialog you pick any style, **Auto** or **House plan** under **Style**. With a fixed style the card can also have a **Style in the evening** and a **Style at night**; it switches by the house plan (sun or clock). In YAML: `theme`, `theme_evening`, `theme_night` (see [8.2](#82-all-options-in-yaml)). Card templates take the style the same way.
 
-**Per Sprache.** „NeonPlan Stil Wohnlich“, „Haus auf Synthwave“, „Stil Winterabend“ – der Stil gilt sofort auf dem Bildschirm, auf dem du sprichst. „Stil zurück“ (oder „Stil normal“) holt den eingestellten Stil zurück. Über Assist geht das mit dem Satzanfang „NeonPlan …“ oder „Haus …“.
+**By voice.** "NeonPlan style homely", "House to synthwave", "Style winter evening" – the style applies at once on the screen you speak to. "Style back" (or "style normal") brings the set style back. Through Assist this works with the sentence starting "NeonPlan …" or "House …".
 
-**Aus Automationen.** Die Aktion **HomePlan 3D: Stil setzen** (`homeplan3d.set_style`) schaltet die offenen NeonPlan-Bildschirme um:
+**From automations.** The action **HomePlan 3D: Set style** (`homeplan3d.set_style`) switches the open NeonPlan screens:
 
 ```yaml
 action: homeplan3d.set_style
 data:
-  style: evening        # neon, blueprint, day, focus, synth, cozy, evening, winter, model, pastel, warm – oder der Name
-  screens: [kueche]     # optional: nur diese Bildschirmnamen; leer = alle
-  minutes: 60           # optional: so lange, dann zurück; leer = bis zur nächsten Änderung
+  style: evening        # neon, blueprint, day, focus, synth, cozy, evening, winter, model, pastel, warm – or the name
+  screens: [kitchen]    # optional: only these screen names; empty = all
+  minutes: 60           # optional: for this long, then back; empty = until changed again
 ```
 
-`style: reset` stellt den eingestellten Stil wieder her. **Stil aus Helfer-Entität:** Unter **🕒 Tageszeiten** (für das ganze Haus) oder in der Karte (`style_entity`) trägst du einen `input_select` oder `input_text` ein. Solange sein Zustand einen Stil nennt (z. B. „Wohnlich“), gilt dieser Stil.
+`style: reset` brings the set style back. **Style from a helper entity:** under **🕒 Times of day** (for the whole house) or in the card (`style_entity`) you enter an `input_select` or `input_text`. While its state names a style (e.g. "Homely"), that style applies.
 
-**Was gewinnt?** Die neueste Einstellung. Ein Stil per Sprache oder Aktion gilt, bis du ihn zurücksetzt, die Minuten ablaufen oder du für den Bildschirm (Gerät, Karte oder Vorlage) einen Stil neu wählst. Danach kommen die Helfer-Entität und dann der eingestellte Stil.
+**What wins?** The newest setting. A style set by voice or an action applies until you reset it, its minutes run out, or you choose a style anew for the screen (device, card or template). After that comes the helper entity, then the style set.
 
-### 5.13 Am Handy: die Handy-Ansicht (neu)
+### 5.13 On the phone: the phone view (new)
 
-NeonPlan ist für Wandtablet und PC gebaut. Am Handy will man zwei Dinge: schnell sehen, ob zu Hause alles in Ordnung ist, und mit dem Daumen in jeden Raum kommen. Dafür gibt es die Handy-Ansicht: das Haus ohne Kopfzeile und lose Knöpfe, unten eine Leiste.
+NeonPlan is made for wall tablets and PCs. On a phone you want two things: see at a glance whether all is well at home, and reach every room with your thumb. That is what the phone view is for: the house without the header and loose buttons, and a bar at the bottom.
 
-| Das Haus | Die Räume | „Was ist los?“ |
+| The house | The rooms | "What is going on?" |
 | --- | --- | --- |
-| ![Handy-Ansicht](images/phone-start.jpg) | ![Räume](images/phone-rooms.jpg) | ![Was ist los?](images/phone-now.jpg) |
+| ![Phone view](images/phone-start.jpg) | ![Rooms](images/phone-rooms.jpg) | ![What is going on?](images/phone-now.jpg) |
 
-**Einschalten:** Am Handy fragt NeonPlan einmal, ob du sie ausprobieren willst. Am PC oder Tablet schaltest du sie oben unter **⚙ → 📱 Handy-Ansicht** ein, zurück geht es mit **Mehr → Handy-Ansicht aus**. Die Wahl gilt nur für dieses Gerät.
+**Switching it on:** on a phone NeonPlan asks once whether you want to try it. On a PC or tablet you switch it on at the top under **⚙ → 📱 Phone view**; **More → Phone view off** takes you back. The choice counts for this device only.
 
-**In der Dashboard-Karte:** Mit `phone: true` läuft die Karte in der Handy-Ansicht – am besten zusammen mit `fill: true` auf einer eigenen Ansicht des Dashboards:
+**In the dashboard card:** with `phone: true` the card runs in the phone view – best together with `fill: true` on a dashboard view of its own:
 
 ```yaml
 type: custom:homeplan3d-card
@@ -993,697 +995,697 @@ phone: true
 fill: true
 ```
 
-**Die Leiste unten:**
+**The bar at the bottom:**
 
-| Platz | Was er öffnet | Zahl daran |
+| Place | What it opens | The number on it |
 | --- | --- | --- |
-| **Jetzt** | Die Liste „Was ist los?“ | Was einen Blick braucht; der Punkt ist grün, gelb oder rot |
-| **Etage** bzw. **Räume** | Die Räume als Kacheln mit Temperatur, Lichtern, offenen Fenstern und Musik. Ein Haus mit zwei Etagen hat für jede einen Platz, sonst teilen sich alle den Platz **Räume** | Eingeschaltete Lichter |
-| **Rollläden** | Alle Rollläden nach Etage, mit **Alle auf**, **Alle zu** und ▲ ■ ▼ je Rollladen | Geschlossene Rollläden |
-| **Mehr** | Suchen, Haus-Check, Ganzes Haus, Raum einzeln, in der Integration außerdem Anzeige, Zeitreise und das Menü von Home Assistant | – |
+| **Now** | the list "What's going on?" | what needs a look; the dot is green, yellow or red |
+| **Floor** or **Rooms** | the rooms as tiles with temperature, lights, open windows and music. A house with two floors has a place for each, otherwise all share the place **Rooms** | lights that are on |
+| **Blinds** | all blinds by floor, with **All up**, **All down** and ▲ ■ ▼ per blind | blinds that are shut |
+| **More** | search, house check, whole house, room on its own; in the integration also the show menu, time travel and Home Assistant's menu | – |
 
-Braucht etwas einen Blick, steht es zusätzlich in einer Zeile über der Leiste („2 Fenster und Türen offen · 4 Lichter an“).
+When something needs a look, it also stands in a line above the bar ("2 windows and doors open · 4 lights on").
 
-**In einen Raum springen:** Ein Tipp auf eine Kachel fliegt im Haus in den Raum und öffnet sein Raumfenster ([5.4](#54-das-raumfenster)) mit Licht, Rollläden, Klima und Medien. **Ganze Etage** zeigt die Etage. Mit **Mehr → Raum einzeln** steht ein Raum, in den du springst, allein im Bild, ohne den Rest des Hauses.
+**Jumping into a room:** a tap on a tile flies into the room in the house and opens its room panel ([5.4](#54-the-room-panel)) with lights, blinds, climate and media. **Whole floor** shows the floor. With **More → Room on its own** a room you jump into stands alone in the picture, without the rest of the house.
 
-**Die Liste „Was ist los?“** zeigt das Dringende zuerst:
+**The list "What's going on?"** shows the urgent first:
 
-| Zeile | Was sie zeigt |
+| Line | What it shows |
 | --- | --- |
-| ⚠️ Warnungen | Rauch, Wasser, Alarm, Regen bei offenem Fenster – alles aus [5.8](#58-warnungen) |
-| 🪟 Offen | Fenster, Türen und Garagentore mit Kontakt, die offen oder gekippt sind |
-| 🔓 Nicht abgeschlossen | Türen mit Schloss, mit dem Knopf **Abschließen** |
-| 👤 Wer ist da | Die Personen aus Home Assistant: zu Hause (mit Raum, wenn NeonPlan ihn kennt) und unterwegs |
-| 🧺 Haushalt | Die Zeilen der Karte „Heute im Haushalt“: fertige Waschmaschine, Tonne, Post, Pflanzen |
-| 💡 Licht | Wie viele Lichter in welchen Räumen an sind, mit dem Knopf **Alle aus** |
-| 🚗 Auto, ⚡ Energie | Ladestand und Laden, Verbrauch, Solar, Netz und Akku (mit den passenden Erweiterungen) |
+| ⚠️ Warnings | smoke, water, alarm, rain on an open window – everything from [5.8](#58-warnings) |
+| 🪟 Open | windows, doors and garage doors with a contact that stand open or are tilted |
+| 🔓 Not locked | doors with a lock, with the button **Lock** |
+| 👤 Who is in | Home Assistant's persons: at home (with the room when NeonPlan knows it) and away |
+| 🧺 Household | the lines of the card "Today in the household": a finished washing machine, bins, post, plants |
+| 💡 Lights | how many lights are on in which rooms, with the button **All off** |
+| 🚗 Car, ⚡ Energy | charge and charging, consumption, solar, grid and battery (with the matching add-ons) |
 
-Oben auf der Liste stehen die **Favoriten** des Hauses als Knöpfe. Ist nichts zu tun, steht dort **Alles in Ordnung**. Bist du selbst nicht zu Hause, rückt „Wer ist da“ direkt hinter die Warnungen. Ein Tipp auf eine Zeile schließt die Liste und zeigt die Stelle im Haus; hat eine Zeile mehrere Stellen (sechs offene Fenster), klappt sie auf, und du wählst eine.
+The house's **favourites** stand as buttons on top of the list. With nothing to do, it says **All is well**. When you are not at home yourself, "Who is in" comes right after the warnings. A tap on a line closes the list and shows the place in the house; a line with several places (six open windows) unfolds, and you pick one.
 
-**Haus-Check:** Der Knopf unten in der Liste (auch unter **Mehr**) geht vor dem Gehen oder Schlafen alles durch, was offen oder an ist: erst die Fenster und Türen (die schließt du von Hand), dann die Schlösser, dann Raum für Raum die Lichter. Das Haus zeigt jede Stelle, darunter steht **Alle aus** bzw. **Abschließen** und **Weiter**. Ab dem ersten Raum mit Licht gibt es **Alle Lichter aus** für den Rest.
+**House check:** the button at the bottom of the list (also under **More**) goes through everything open or switched on before you leave or go to bed: first the windows and doors (you shut those by hand), then the locks, then the lights room by room. The house shows each place, with **All off** or **Lock** and **Next** below it. From the first lit room on there is **All lights off** for the rest.
 
-**Das Raumfenster am Handy:** Es öffnet eingeklappt – Name, Temperatur und seine Knöpfe –, damit der Raum zu sehen bleibt und du seine Geräte im Haus antippen kannst. **Geräte zeigen** klappt die Liste auf, höchstens bis etwa 60 % der Höhe.
+**The room panel on a phone:** it opens folded – the name, the temperature and its buttons – so the room stays in sight and you can tap its devices in the house. **Show devices** unfolds the list, up to about 60 % of the height.
 
-**Die Leiste selbst gestalten (Dashboard-Karte):** Im Kartenformular wählst du oben **Handy** statt **Tablet oder großer Bildschirm**. Dann stehen dort die Optionen der Leiste:
+**Designing the bar yourself (dashboard card):** in the card form choose **Phone** instead of **Tablet or large screen** at the top. The bar's options then stand there:
 
-| Option | YAML | Bedeutung |
+| Option | YAML | Meaning |
 | --- | --- | --- |
-| Räume / Rollläden in der Leiste, Favoriten auf der Liste | `phone_hide: [rooms, covers, favorites]` | lässt den Platz bzw. die Favoriten weg, etwa in einem Haus ohne Rollläden |
-| Raum einzeln | `phone_solo: true` | ein Raum, in den du springst, steht allein im Bild |
-| Mit der Liste öffnen | `phone_start: now` | die Karte öffnet mit „Was ist los?“ statt mit dem Haus |
-| Eigener Platz 1 und 2 | `phone_places` | bis zu zwei eigene Plätze, siehe unten |
-| Umgebung aus der Karte zeigen | `surroundings: false` | diese Karte zeichnet das Haus ohne die Umgebung (der Plan behält sie) |
+| Rooms / blinds in the bar, favourites on the list | `phone_hide: [rooms, covers, favorites]` | leaves the place or the favourites out, e.g. in a house without blinds |
+| Room on its own | `phone_solo: true` | a room you jump into stands alone in the picture |
+| Open with the list | `phone_start: now` | the card opens with "What is going on?" instead of the house |
+| Own place 1 and 2 | `phone_places` | up to two places of your own, see below |
+| Show the surroundings from the map | `surroundings: false` | this card draws the house without the surroundings (the plan keeps them) |
 
-Ein **eigener Platz** ist eines von vier Dingen, jeweils mit eigenem Wort (`name`) und Symbol (`icon`):
+An **own place** is one of four things, each with a word (`name`) and a symbol (`icon`) of its own:
 
-| `kind` | Was der Platz tut | Braucht |
+| `kind` | What the place does | Needs |
 | --- | --- | --- |
-| `lights` | öffnet alle Lampen nach Etage, mit **Alle an** / **Alle aus**; am Platz steht die Zahl der Lichter, die an sind | – |
-| `climate` | öffnet alle Thermostate nach Etage | – |
-| `action` | führt eine Szene oder ein Skript aus | `entity` |
-| `link` | öffnet eine Seite eines Dashboards | `path` |
+| `lights` | opens all lamps by floor, with **All on** / **All off**; the place shows the number of lights that are on | – |
+| `climate` | opens all thermostats by floor | – |
+| `action` | runs a scene or a script | `entity` |
+| `link` | opens a page of a dashboard | `path` |
 
 ```yaml
 type: custom:homeplan3d-card
 phone: true
 fill: true
-phone_hide: [covers]        # ein Haus ohne Rollläden
+phone_hide: [covers]        # a house without blinds
 phone_places:
   - kind: lights
   - kind: action
-    name: Gute Nacht
-    entity: script.gute_nacht
+    name: Good night
+    entity: script.good_night
 ```
 
-Die Leiste hat höchstens fünf Plätze. Wird es mehr, teilen sich zuerst zwei Etagen den Platz **Räume**, danach wandern eigene Plätze und die Rollläden unter **Mehr**. Ein Platz ohne passende Geräte bleibt weg.
+The bar holds at most five places. With more, two floors first share the place **Rooms**, then own places and the blinds move under **More**. A place with no matching devices stays away.
 
-**Aus einer Benachrichtigung direkt an die Stelle:** Die Integration öffnet sich mit diesen Adressen am richtigen Ort:
+**From a notification straight to the place:** these addresses open the integration in the right spot:
 
-| Adresse | Öffnet |
+| Address | Opens |
 | --- | --- |
-| `/homeplan3d?view=now` | die Liste „Was ist los?“ |
-| `/homeplan3d?room=Bad` | den Raum (Name oder ID) |
-| `/homeplan3d?show=binary_sensor.fenster_bad` | fliegt zu diesem Gerät, Fenster oder dieser Tür |
+| `/homeplan3d?view=now` | the list "What's going on?" |
+| `/homeplan3d?room=Bath` | the room (name or id) |
+| `/homeplan3d?show=binary_sensor.window_bath` | flies to this device, window or door |
 
-So sieht das in einer Automation für die Companion-App aus – ein Tipp auf die Meldung zeigt das Fenster im Haus:
+In an automation for the Companion app it looks like this – a tap on the message shows the window in the house:
 
 ```yaml
-action: notify.mobile_app_mein_handy
+action: notify.mobile_app_my_phone
 data:
-  title: Fenster offen
-  message: Das Fenster im Bad ist seit 30 Minuten offen.
+  title: Window open
+  message: The bathroom window has been open for 30 minutes.
   data:
-    clickAction: /homeplan3d?show=binary_sensor.fenster_bad   # Android
-    url: /homeplan3d?show=binary_sensor.fenster_bad           # iPhone
+    clickAction: /homeplan3d?show=binary_sensor.window_bath   # Android
+    url: /homeplan3d?show=binary_sensor.window_bath           # iPhone
 ```
 
-## 6. Pro-Erweiterungen
+## 6. Pro add-ons
 
-Jede Pro-Erweiterung in diesem Kapitel ist Teil des MIT-Repositories und über `custom_components/homeplan3d/open-source-config.json` standardmäßig aktiviert. Die Schalter sind sofort nutzbar.
+Every Pro add-on in this chapter is part of the MIT repository and enabled by default in `custom_components/homeplan3d/open-source-config.json`. The switches are ready to use.
 
-### 6.1 Kamera-Cockpit
+### 6.1 Camera cockpit
 
-**Durch die Kamera schauen:** Im Standbild-Menü einer Kamera und im Raumfenster steht „Durch die Kamera schauen“. Die 3D-Ansicht fliegt an die Stelle der Kamera und blickt in ihre Richtung, das Livebild liegt halbtransparent über der Szene. Mit dem Regler unten stellst du die Überblendung ein, „Zurück zur Ansicht“ fliegt zurück. **⛶ Vollbild** zeigt das Kamerabild auf dem ganzen Bildschirm; wo der Browser das nicht kann (alte Tablets), öffnet sich die Kameraansicht von Home Assistant, dort auch mit Ton. Die Ansicht übernimmt dabei den **Sichtwinkel** der Kamera (seit 3.1.1; ohne Angabe 90°, eine Dome-Kamera 100°), und das Bild erscheint, sobald der Flug angekommen ist. Passt das Bild nicht genau, korrigierst du Drehung, Neigung, Höhe und Sichtwinkel der Kamera im Editor.
+**Look through the camera:** The snapshot menu of a camera and the room panel offer "Look through the camera". The 3D view flies to the camera's spot and looks along its direction, with the live picture blended over the scene. The slider at the bottom sets the blend, "Back to the view" flies back. **⛶ Full screen** shows the camera picture on the whole screen; where the browser cannot (old tablets), Home Assistant's camera view opens, with sound there too. The view takes the camera's **field of view** meanwhile (since 3.1.1; 90° when none is set, a dome camera 100°), and the picture appears once the flight has arrived. If the picture does not line up, correct the camera's rotation, tilt, height and field of view in the editor.
 
-![Durch die Kamera schauen](images/view-camera-through.jpg)
+![Looking through the camera](images/view-camera-through.jpg)
 
-**Bewegungsspur:** Der Schalter **Spur** zeigt, wo in den letzten 30 Minuten Bewegung gemeldet wurde: leuchtende Punkte mit Uhrzeit, in zeitlicher Folge verbunden, ältere verblassen. Quellen sind Bewegungs-, Präsenz- und Belegungssensoren. Im Plan platzierte Sensoren liegen an ihrem Platz, Kamerasensoren an der Kamera, alle anderen in der Raummitte. Die Daten kommen aus dem Verlauf von Home Assistant und werden jede Minute neu geladen.
+**Motion trail:** The **Trail** switch shows where motion was reported in the last 30 minutes: glowing spots with the time, joined in order, older ones fading. Sources are motion, presence and occupancy sensors. Sensors placed in the plan sit at their spot, camera sensors at the camera, all others in the middle of their room. The data comes from Home Assistant's history and reloads every minute.
 
-![Bewegungsspur](images/view-trail.jpg)
+![Motion trail](images/view-trail.jpg)
 
-**Erkennungs-Pins:** Meldet ein Sensor der Kamera gerade eine Erkennung (Frigate, UniFi Protect, Reolink und ähnliche liefern je Objekt einen Sensor: Person, Fahrzeug, Tier, Bewegung), steht vor der Kamera ein Pin mit Symbol, Art und Uhrzeit – „Person · 18:42“. Antippen öffnet den Sensor. Mehrere Objekte zugleich ergeben mehrere Pins übereinander. Wem das zu unruhig ist: **Erkennungs-Symbole zeigen** im Formular der Kamera abschalten – dann färbt sich bei einer Erkennung nur der Sichtkegel rot. **Bei neuer Erkennung das Bild kurz einblenden** (seit 3.0.1, aus von Haus aus) zeigt bei jeder neuen Erkennung das Bild der Kamera 20 Sekunden unten rechts – wer war das? Ein Tipp darauf schaut durch die Kamera, ✕ schließt es.
+**Detection pins:** when one of a camera's sensors reports a detection right now (Frigate, UniFi Protect, Reolink and the like give one sensor per object: person, vehicle, animal, motion), a pin stands in front of the camera with a symbol, the kind and the time – "Person · 18:42". A tap opens the sensor. Several objects at once give several pins on top of each other. Too busy? Switch off **Show detection symbols** in the camera's form – a detection then only turns the field of view red. **Pop up the picture on a new detection** (since 3.0.1, off by default) shows the camera's picture for 20 seconds at the bottom right on every new detection – who was that? A tap on it looks through the camera, ✕ closes it.
 
-**Welche Sensoren zählen (seit 2.0.7):** Ab Werk nimmt NeonPlan alle Bewegungs-, Belegungs- und Präsenzsensoren am Gerät der Kamera. Sind die zu empfindlich – oder kommt die Erkennung von einem anderen Gerät, z. B. Frigate für eine Reolink-Kamera –, hake im Formular der Kamera **Erkennungs-Sensoren selbst wählen** an: Dann zählen nur die angehakten Sensoren, und unter **Sensor hinzufügen** wählst du Sensoren anderer Geräte dazu (etwa Frigates `…_person_occupancy`). Das gilt für die Pins, die Bewegungsspur und die Live-Regie.
+**Which sensors count (since 2.0.7):** by default NeonPlan takes every motion, occupancy and presence sensor of the camera's device. If they are too eager – or the detection comes from another device, e.g. Frigate for a Reolink camera – tick **Choose the detection sensors yourself** in the camera's form: then only the ticked sensors count, and **Add a sensor** adds sensors of other devices (such as Frigate's `…_person_occupancy`). This applies to the pins, the motion trail and the live director.
 
-**Kamera-Wand:** Der Schalter **Kameras** unten (in der Karte die Option `camera_wall: true`) legt alle Livebilder deiner platzierten Kameras als Wand über die Szene, alle paar Sekunden aufgefrischt. Eine Kamera, die gerade Bewegung sieht, bekommt einen roten Rahmen; eine, die aufnimmt, einen roten Punkt. Die Kacheln teilen sich die Wand: Das Raster wählt so viele Spalten, dass alle Kameras möglichst groß und ohne Überlappen hineinpassen (eine Kamera füllt sie, zwei stehen nebeneinander, 22 etwa als 6 × 4); bei sehr vielen Kameras wird die Wand scrollbar. Die Kacheln sind Standbilder, alle 5 Sekunden neu (auf der Tablet-Stufe alle 10, ein kleiner Hinweis im Kopf sagt es) – zehn Livestreams würden ein altes Tablet überfordern. Auch beim Durchschauen in 3D ist das Bild ein Standbild; die Leiste unten sagt es. Antippen zeigt das Bild groß, und zwar als **Livestream** über den Player von Home Assistant, sobald die Kamera streamen kann (sonst bleibt das Standbild); von dort führt **Durch die Kamera schauen** in die 3D-Ansicht, und **Zurück zur Ansicht** bringt dich wieder zur Wand. **‹ Alle Kameras** geht zurück zum Raster, ✕ schließt die Wand.
+**Camera wall:** the **Cameras** switch at the bottom (in the card the option `camera_wall: true`) lays every placed camera's live picture over the scene as a wall, refreshed every few seconds. A camera that sees motion right now gets a red frame; one that records, a red dot. The tiles share the wall: the grid picks as many columns as make every camera as large as possible without overlapping (one camera fills it, two sit side by side, 22 e.g. as 6 × 4); with very many cameras the wall scrolls. The tiles are stills, refreshed every 5 seconds (every 10 on the tablet level; a small note in the header says so) – ten live streams would overwhelm an old tablet. The look-through in 3D is a still as well; the bar at the bottom says so. A tap shows the picture big, as a **live stream** through Home Assistant’s player as soon as the camera can stream (otherwise the still stays); from there **Look through the camera** goes into the 3D view, and **Back to the view** brings the wall back. **‹ All cameras** returns to the grid, ✕ closes the wall.
 
-**Live-Regie:** Ein Bildschirm, meist das Wandtablet, zeigt von selbst, was im Haus passiert. Klingelt es, fliegt die Ansicht zur Haustür und schaut durch die Kamera dort. Sieht eine Kamera jemanden, ist die Waschmaschine fertig oder kommt eine Warnung, fliegt sie ebenfalls dorthin. Danach kehrt sie zurück, wo sie war. Alles ist **aus**, bis du es einschaltest, und zwar an zwei Stellen:
+**Live director:** a screen, usually the wall tablet, shows by itself what happens in the house. When the doorbell rings, the view flies to the front door and looks through the camera there. When a camera sees someone, the washer is done or a warning comes up, it flies there too. Afterwards it goes back to where it was. Everything is **off** until you switch it on, in two places:
 
-1. **Welche Ereignisse:** Editor → **⚙ Einstellungen → 🎬 Live-Regie**. Jedes Ereignis hat einen eigenen Schalter:
-   - **Es klingelt:** Die Klingel findet NeonPlan selbst, nämlich eine Ereignis-Entität der Klasse „Türklingel“ (Ring, UniFi Protect …) oder einen Sensor wie Reolinks „Besucher“. Du kannst sie auch selbst wählen, ebenso die Kamera an der Tür. Ohne Wahl nimmt NeonPlan die Kamera desselben Geräts oder eine im selben Bereich. Die Kamera muss im Plan platziert sein, sonst fliegt die Ansicht nur zur Klingel.
-   - **Eine Kamera sieht jemanden:** „Nur Personen“ oder „Jede Bewegung“, für alle platzierten Kameras.
-   - **Waschmaschine, Trockner oder Spülmaschine fertig:** Das Gerät muss als Möbel mit Strommessung oder Status verknüpft sein. Als fertig gilt es, wenn es nach dem Lauf 3 Minuten ruht. Eine Pause im Programm zählt also nicht.
-   - **Neue Warnung:** Rauch, Wasser, Alarm, Fenster bei Regen und so weiter.
-   - **Zurück nach:** die Sekunden bis zur Rückkehr (Standard 30). Die Klingel bleibt doppelt so lange.
-   - **Eigene Auslöser:** weitere Entitäten, jeweils mit einer Kamera. Geht eine davon an oder auf, z. B. eine zweite Klingel, das Garagentor oder das Gartentor, fliegt die Ansicht hin und schaut durch diese Kamera. Ohne Kamera fliegt sie zum Gerät.
-   - **Livebild beim Durchschauen:** Statt eines Standbilds alle paar Sekunden läuft das Video der Kamera. Das gilt auch für „Durch die Kamera schauen“ von Hand. Braucht mehr Leistung, auf sehr alten Tablets lieber aus lassen.
-2. **Auf welchem Bildschirm:** im selben Abschnitt **Auf diesem Gerät einschalten**. Das gilt nur für diesen Browser, also zum Beispiel das Wandtablet mit dem NeonPlan-Panel. Auf einer Dashboard-Karte schaltest du stattdessen **Live-Regie** in den Karten-Einstellungen ein (`director: true`).
+1. **Which events:** editor → **⚙ Settings → 🎬 Live director**. Every event has its own switch:
+   - **Doorbell rings:** NeonPlan finds the doorbell itself, as an event entity of the class "doorbell" (Ring, UniFi Protect …) or a sensor like Reolink's "Visitor". You can also choose it yourself, and the camera at the door too. Without a choice NeonPlan takes the camera of the same device, or one in the same area. The camera has to be placed in the plan; otherwise the view only flies to the doorbell.
+   - **A camera sees someone:** "People only" or "Any motion", for all placed cameras.
+   - **Washer, dryer or dishwasher finished:** the appliance has to be furniture linked to a power sensor or a status. It counts as finished once it rests for 3 minutes after its run, so a pause in the programme does not count.
+   - **New warning:** smoke, water, alarm, a window in the rain and so on.
+   - **Back after:** the seconds before the view goes back (default 30). The doorbell stays twice as long.
+   - **Own triggers:** further entities, each with a camera. When one goes on or open, e.g. a second doorbell, the garage door or the garden gate, the view flies there and looks through that camera. Without a camera it flies to the device.
+   - **Live picture when looking through:** instead of a still every few seconds the camera's video runs, also for "Look through the camera" by hand. Needs more power; better leave it off on very old tablets.
+2. **On which screen:** in the same section, **Switch on on this device**. This only applies to this browser, e.g. the wall tablet with the NeonPlan panel. On a dashboard card you switch on **Live director** in the card settings instead (`director: true`).
 
-Wer das Tablet gerade bedient, wird nur von der Klingel und von Warnungen unterbrochen. Berührst du den Bildschirm, während die Regie etwas zeigt, bleibt die Ansicht, wo sie ist. Teil des Kamera-Cockpits.
+Someone using the tablet is only interrupted by the doorbell and by warnings. If you touch the screen while the director shows something, the view stays where it is. Part of the camera cockpit.
 
-**Personen aus Kameras (Release 2, seit NeonPlan 3.5.0):** Sieht eine Kamera eine Person, ein Auto oder ein Tier, steht auf dem Grundstück eine Figur – eine Person als Neon-Silhouette, Auto und Tier als Symbol. Mit **Frigate** (Frigate-Integration) genau dort, wo sie ist, und die Figur läuft mit: NeonPlan rechnet den Fußpunkt aus Frigates Erkennung mit der Kamera im Plan (Ort, Höhe, Drehung, Neigung, Öffnungswinkel) auf den Boden um – stell diese Werte möglichst genau ein. Mit anderen Kameras (Reolink, UniFi Protect …) steht die Figur im Blickfeld der Kamera, solange ihr Personen-, Fahrzeug- oder Tier-Sensor meldet. Ein Tipp auf die Figur öffnet die Kamera. Abschalten unter **⚙ Einstellungen** im Abschnitt **Personen aus Kameras**. Die Funktion ist enthalten; Modul-Code braucht weiterhin einmal die Freigabe unter **Erweiterungen → Module**.
+**People from cameras (release 2, since NeonPlan 3.5.0):** when a camera sees a person, a car or an animal, a figure stands on the plot – a person as a neon silhouette, a car and an animal as a symbol. With **Frigate** (the Frigate integration) right where it is, and the figure moves along: NeonPlan turns the foot point of Frigate's detection into a spot on the ground using the camera in the plan (place, height, turn, tilt, angle) – set these as exactly as you can. With other cameras (Reolink, UniFi Protect …) the figure stands in the camera's view while its person, vehicle or animal sensor reports. A tap on the figure opens the camera. Switch it off under **⚙ Settings** in the section **People from cameras**. It is included in this build; module code still needs one administrator approval under **Extensions → Modules**.
 
-### 6.2 Wetter draußen
+### 6.2 Weather outside
 
-![Regen](images/view-weather-rain.jpg)
+![Rain](images/view-weather-rain.jpg)
 
-Das Wetter rund ums Haus folgt deiner Wetter-Entität:
+The weather around the house follows your weather entity:
 
-| Zustand | In 3D |
+| State | In 3D |
 |---|---|
-| rainy, pouring, hail | Regen, dazu Wolken |
-| snowy, snowy-rainy | Schnee, bei Schneeregen beides |
-| lightning, lightning-rainy | Blitze, beim Gewitterregen auch Regen |
-| fog | Nebel, nur wenn eingeschaltet |
-| cloudy, partlycloudy | Wolken dunkeln Himmel und Sonnenlicht |
-| windy | Wind treibt Regen und Schnee schräg |
-| sunny, clear-night | Sonne am Tag, Mond in der Nacht |
+| rainy, pouring, hail | Rain, with clouds |
+| snowy, snowy-rainy | Snow, both for sleet |
+| lightning, lightning-rainy | Lightning, with rain for the second |
+| fog | Fog, only if switched on |
+| cloudy, partlycloudy | Clouds dim the sky and the sunlight |
+| windy | Wind drives rain and snow at an angle |
+| sunny, clear-night | Sun by day, moon by night |
 
-Liefert die Entität `cloud_coverage` und `wind_speed`, nutzt HomePlan 3D diese Werte.
+If the entity provides `cloud_coverage` and `wind_speed`, HomePlan 3D uses them.
 
-![Schnee](images/view-weather-snow.jpg)
+![Snow](images/view-weather-snow.jpg)
 
-**Einstellungen** im Editor: Unter **Wetter-Entität** wählst du die Entität, unter **Wetter-Effekte in 3D** schaltest du einzelne Effekte ab. Nebel ist anfangs aus; eingeschaltet graut er den Hintergrund hinter dem Haus ein, und weiche Nebelschwaden ziehen dicht über dem Boden ums Haus – die Räume und ihre Lichter bleiben klar. Auf der Qualitätsstufe Tablet bleibt nur die Abdunkelung durch Wolken.
+**Settings** in the editor: **Weather entity** picks the entity, **Weather effects in 3D** switches single effects off. Fog starts off; switched on, it greys the background behind the house and soft swathes of mist drift low over the ground around it – the rooms and their lights stay clear. At the Tablet quality level only the dimming by clouds remains.
 
-### 6.3 Bildschirme live
+### 6.3 Live screens
 
-Ohne diese Erweiterung leuchtet ein Fernseher nur, solange er an ist. Mit ihr:
+Without this add-on a TV only glows while it is on. With it:
 
-- Fernseher und Monitore zeigen die **Farbe der laufenden App** und das **Cover** des Media Players.
-- **Bilder nach Zustand:** Am Bildschirm-Möbel legst du Regeln an. Ist eine Entität in einem bestimmten Zustand oder hat ein Attribut einen Wert, zeigt der Bildschirm ein Bild. Beispiel: Attribut `app_name` des Fernsehers enthält „netflix“, dann erscheint das Netflix-Logo. Der Wert passt, wenn er gleich ist oder im Text vorkommt, `*` passt immer. Die erste passende Regel gewinnt.
-- Als Bild geht ein Upload, der auf 512 Pixel verkleinert wird, eine Bild-URL oder eine **Kamera**. Ein Kamerabild erneuert sich alle 5 Sekunden, solange es zu sehen ist.
-- **Bildschirm hinter dem Bild:** dunkel oder weiß, je nachdem, ob das Logo hell oder dunkel ist.
-- „✓ passt gerade“ an einer Regel zeigt, welches Bild im Moment zu sehen ist. Hochgeladene Bilder lassen sich an anderen Bildschirmen wiederverwenden.
+- TVs and monitors show the **colour of the running app** and the media player's **artwork**.
+- **Pictures by state:** Add rules to a screen item. When an entity is in a certain state or an attribute has a value, the screen shows a picture. Example: the TV's attribute `app_name` contains "netflix", so the Netflix logo appears. A value matches when it is equal or contained in the text, `*` always matches. The first matching rule wins.
+- A picture can be an upload, scaled to 512 pixels, a picture URL or a **camera**. A camera picture refreshes every 5 seconds while it is visible.
+- **Screen behind the picture:** dark or white, depending on whether the logo is light or dark.
+- "✓ matches now" on a rule shows which picture is visible right now. Uploaded pictures can be reused on other screens.
 
-![Bildregeln](images/editor-picture-rules.jpg)
+![Picture rules](images/editor-picture-rules.jpg)
 
-![Medienwand mit Logo](images/view-media-wall.jpg)
+![A media wall with a logo](images/view-media-wall.jpg)
 
-![Kamerabild auf dem Monitor](images/view-camera-screen.jpg)
+![A camera picture on the monitor](images/view-camera-screen.jpg)
 
 ---
 
-### 6.4 Energie Pro
+### 6.4 Energy Pro
 
-Energie Pro macht aus dem Energie-Werkzeug ein lebendiges Bild deiner Anlage: Strom fließt sichtbar durchs Haus, die Solarmodule leben mit der Sonne, und ein Hologramm aus Glas zeigt die Bilanz. Energie Pro ist enthalten und standardmäßig aktiviert. Alles, was du dafür einrichtest, steht in [4.20](#420-energie-solarfelder). Gas und Wasser stehen seit 1.14.0 mit dem heutigen Verbrauch auf der Haus-Karte (Gas in m³, Wasser in Litern); Wärme folgt als Update im selben Pack.
+Energy Pro turns the Energy tool into a living picture of your plant: power visibly flows through the house, the solar modules live with the sun, and a glass hologram shows the balance. Everything you set up for it is included and described in [4.20](#420-energy-solar-fields); the Pro display is enabled by default. Since 1.14.0 gas and water show on the house card with today's use (gas in m³, water in litres); heat follows as an update of the same pack.
 
-**In fünf Minuten eingerichtet**
+**Set up in five minutes**
 
-Oben im Werkzeug **Energie** steht die **Einrichtung**: eine Liste, die abhakt, was schon da ist, und beim Antippen an die richtige Stelle springt.
+At the top of the **Energy** tool sits the **Setup** list: it ticks off what is in place and jumps to the right spot when tapped.
 
-1. **Solarfeld:** + Solarfeld legt Module auf die sonnigste Dachfläche (4.20).
-2. **Geräte:** Stromzähler, Wechselrichter, Stromspeicher, Wallbox und Netzanschluss anlegen. Sie kommen von selbst in Garage oder Technikraum und lassen sich im Grundriss verschieben.
-3. **Sensoren:** Am einfachsten **Aus dem Energie-Dashboard übernehmen** (Abschnitt Energiebilanz): NeonPlan nimmt die Statistiken deines Energie-Dashboards, sucht zu jeder den Leistungssensor desselben Geräts und trägt ihn beim Zähler (Netz), Wechselrichter (PV) und Speicher (Leistung, Ladestand) ein. Fehlende Geräte werden dabei angelegt. Sonst wählst du die Sensoren im Formular jedes Geräts von Hand: Zähler = Netzleistung in Watt (+ = Bezug), Wechselrichter = PV-Leistung, Speicher = Leistung (+ = Entladen) und Ladestand in Prozent, Wallbox = Leistung und Status.
-4. **Vorzeichen prüfen:** Meldet der Zähler nachts „Einspeisung“ oder lädt der Speicher ohne Sonne, zählt ein Sensor andersherum. Die Energiebilanz sagt das und bietet **Vorzeichen umkehren** an.
-5. **Netzanschluss** (optional): Dorthin läuft die Netzleitung, zum Beispiel ans Ende der Einfahrt. Ohne ihn endet sie am Rand deiner Außenflächen.
+1. **Solar field:** + Solar field puts modules on the sunniest roof face (4.20).
+2. **Devices:** add the meter, inverter, home battery, wallbox and grid connection. They land in the garage or utility room by themselves and can be dragged in the plan.
+3. **Sensors:** easiest with **Take over from the energy dashboard** (Energy balance section): NeonPlan takes the statistics of your energy dashboard, finds the power sensor of the same device for each and puts it on the meter (grid), the inverter (PV) and the battery (power, charge). Missing devices are created. Otherwise pick the sensors in each device's form by hand: meter = grid power in watts (+ = import), inverter = PV power, battery = power (+ = discharging) and charge in percent, wallbox = power and status.
+4. **Check the signs:** if the meter reports "export" at night or the battery charges without sun, a sensor counts the other way round. The energy balance says so and offers **Flip the sign**.
+5. **Grid connection** (optional): the grid cable runs there, e.g. to the end of the driveway. Without it the cable ends at the edge of your outdoor areas.
 
-Mehrere Anlagen (Dach und Balkonkraftwerk) gehen: zweiter Wechselrichter, zweiter Speicher, jeder mit eigenem Sensor; das Balkonfeld als Solarfeld an der Wand oder frei aufgeständert und einem Strang mit diesem Wechselrichter zugeordnet. Jede Anlage bekommt dann ihre eigene Anlagenkarte über ihrem Feld (Leistung, Tageskurve, Akku) – auch die, an deren Feld das Haupthologramm hängt; das rückt dann ein Stück neben das Feld, solange du es nicht selbst versetzt hast. Im Wechselrichterformular schaltest du die Anlagenkarte einer Anlage ab oder versetzt sie mit **Seitlich versetzt** und **Nach oben versetzt** auf ihrem Feld, wie das Haupthologramm; dort steht auch, welche Stränge an diesem Wechselrichter hängen. Beim Solarfeld erscheinen die Wechselrichter mit ihrem eigenen Namen (oder dem Namen ihrer Entität). Speicher, die Laden und Entladen in zwei Sensoren melden (etwa Anker Solix), bekommen den Entlade-Sensor als **Leistung** und den Lade-Sensor als **Ladeleistung**. Genauso der Zähler: Meldet er Bezug und Einspeisung getrennt (Growatt, Tibber Pulse, viele Shelly-Templates), kommt der Bezugs-Sensor in **Leistung** und der Einspeise-Sensor in **Einspeiseleistung**; ein Sensor mit Vorzeichen braucht das nicht. Die Leistungsfelder bieten alle Sensoren in W oder kW an, auch ohne Geräteklasse. Trage in der Energiebilanz nur dann einen Solar-Sensor ein, wenn er die ganze Erzeugung liefert – sonst überdeckt er die Summe der Wechselrichter.
+Several plants (roof and balcony) work: a second inverter, a second battery, each with its own sensor; the balcony field as a solar field on the wall or free-standing, assigned to a string with that inverter. Every plant then gets its own plant card over its field (power, day curve, battery) – including the one whose field carries the main hologram; that one steps aside next to the field as long as you have not moved it yourself. The inverter form switches a plant’s card off or moves it on its field with **Sideways offset** and **Upward offset**, like the main hologram, and shows which strings feed that inverter. At a solar field the inverters appear with their own name (or their entity’s name). Batteries that report charging and discharging in two sensors (e.g. Anker Solix) take the discharging sensor as **Power** and the charging sensor as **Charging power**. The same for the meter: if it reports import and export separately (Growatt, Tibber Pulse, many Shelly templates), the import sensor goes into **Power** and the export sensor into **Export power**; a signed sensor does not need this. The power fields offer every sensor in W or kW, even without a device class. Put a solar sensor into the energy balance only if it reports the whole production – otherwise it overrides the sum of the inverters.
 
-**Leitungen**
+**Cables**
 
-In der 3D-Ansicht schaltet der ⚡-Knopf der Energieleiste die Leitungen ein. Dünne Leitungen mit wandernden Lichtpunkten zeigen, wohin der Strom gerade fließt; die Punkte sind Kometen, die Richtung ist auch im Stillstand klar. Gelb Solar (vom Feld durch das Dach, innen an der Wand hinunter zum Wechselrichter), grün Speicher (die Richtung dreht beim Laden und Entladen), blau Wallbox, hellblau die Verbraucher im Haus, cyan Einspeisung und rot-violett Netzbezug, vom Zähler bis zum Netzanschluss mit einem Pin, der den Wert zeigt. Je mehr Leistung, desto schneller und dichter die Punkte.
+In the 3D view the ⚡ button of the energy bar switches the cables on. Thin cables with moving light dots show where the power flows right now; the dots are comets, so the direction is clear even on a still picture. Yellow solar (from the field through the roof, down the wall inside to the inverter), green battery (the direction turns between charging and discharging), blue wallbox, light blue the consumers in the house, cyan export and red-violet import, from the meter to the grid connection with a pin showing the value. More power means faster and denser dots.
 
-Jede Leitung findet ihren Weg von selbst (gestrichelt im Grundriss); das letzte Stück zum Gerät läuft im rechten Winkel, nicht schräg durch die Ecke. Willst du sie anders führen, etwa außen an der Fassade oder unter der Decke: im Abschnitt **Leitungen** auswählen und **Selbst verlegen**, oder die gestrichelte Leitung im Grundriss einfach anfassen. Dann ziehst du Punkte, ein Klick auf die Leitung fügt einen Punkt ein, ein Doppelklick entfernt ihn, und **Höhe über dem Boden** legt fest, wo sie läuft. Mehrere Leitungen lassen sich so nebeneinander zum Zähler führen. **Fixieren** schützt eine fertige Leitung, **Wieder automatisch** löscht deinen Weg.
+Every cable finds its own way (dashed in the plan); the last piece to a device runs at a right angle, not slant through the corner. To route it differently, say along the facade outside or under the ceiling: pick it in the **Cables** section and press **Lay by hand**, or just grab the dashed cable in the plan. Then you drag points, a click on the cable adds a point, a double click removes it, and **Height above the floor** sets where it runs. Several cables can run side by side to the meter this way. **Fix** protects a finished cable, **Automatic again** removes your way.
 
-**Lebende Module**
+**Living modules**
 
-Die Module bekommen eine leuchtende Zellstruktur, über die ein Lichtband Richtung Traufe wandert, je mehr Leistung, desto heller und schneller. Nachts ruhen sie. Die Leistung je Feld kommt vom Sensor des Feldes, sonst vom Strang (nach Modulzahl verteilt), sonst anteilig aus der Gesamtleistung.
+The modules get a glowing cell structure with a band of light sweeping towards the eave, brighter and faster with more power. At night they rest. The power per field comes from the field's sensor, else from its string (shared by module count), else as a share of the total.
 
-**Hologramm**
+**Hologram**
 
-In der Hausansicht hängt ein Hologramm aus Glas am größten Solarfeld (ohne Feld neben dem Haus), verbunden durch einen Leuchtstrich. Es zeigt PV jetzt, Ertrag heute und Spitze, die Tageskurve seit Mitternacht (aus den Statistiken deines PV-Sensors), bei mehreren Anlagen eine Zeile je Wechselrichter, Akku mit Pfeil, Netz, Haus, Wallbox und den Balken **Autarkie jetzt** (der Anteil des Hausverbrauchs, der gerade nicht aus dem Netz kommt; ohne Netzwert bleibt er weg). Es behält seine Größe in der Welt, wird beim Rauszoomen also kleiner; von hinten siehst du es gespiegelt wie eine Glasscheibe (abschaltbar mit **Von hinten gespiegelt (wie Glas)**, dann bleibt es von überall lesbar). Antippen klappt es auf die große Zahl zusammen. Im Abschnitt **Hologramm** wählst du Feld, Größe und Versatz – der Abschnitt steht auch ohne Solarfeld da (Spiegelung, Größe, Geräte-Karten), nur die Feld-Einstellungen warten auf ein Feld – oder **Frei im Plan**: Dann steht im Plan ein Griff ◈, den du dorthin ziehst, wo die Karte schweben soll, etwa über die Terrasse; Höhe über dem Boden dazu. Die Karte zeigt vom Haus weg.
+In the house view a glass hologram hangs on the largest solar field (beside the house without one), joined by a glowing line. It shows PV now, today's yield and peak, the day curve since midnight (from the statistics of your PV sensor), with several plants a line per inverter, the battery with an arrow, grid, house, wallbox and the **Self-sufficiency now** bar (the share of the house's use not coming from the grid right now; without a grid reading it stays away). It keeps its size in the world, so it shrinks as you zoom out; from behind you see it mirrored like a pane of glass (switch off **Mirrored from behind (like glass)** to keep it readable from everywhere). A tap folds it down to the big number. In the **Hologram** section you choose its field, size and offset – the section is there without a solar field too (mirroring, size, device cards), only the field settings wait for a field – or **Free in the plan**: then a handle ◈ stands in the plan, which you drag to where the card should float, say over the terrace, plus its height above the ground. The card faces away from the house.
 
-**Geräte-Hologramme**
+**Device holograms**
 
-Auch ohne Solaranlage: Jedes Gerät mit Leistungssensor (Fernseher, Waschmaschine, Kühlschrank, Wärmepumpe, PC, Wallbox) kann eine kleine Glaskarte über sich tragen – Leistung jetzt, Verbrauch heute und die Tageskurve aus den Statistiken seines Sensors. Im Möbelformular den Haken **Hologramm über dem Gerät** setzen – genauso im Formular eines platzierten Geräts mit Leistungssensor, etwa einer smarten Steckdose. Stehen Geräte dicht nebeneinander (Waschmaschine und Trockner), weichen ihre Karten einander nach oben aus. Die Karten zeigen sich in der Hausansicht und auf der Etage des Geräts; Antippen klappt sie zusammen. Zehn Karten kosten weniger als eine Leitung, auch auf dem Wandtablet.
+Also without a solar system: every device with a power sensor (TV, washing machine, fridge, heat pump, PC, wallbox) can carry a small glass card over itself – power now, today's consumption and the day curve from its sensor's statistics. Tick **Hologram over the device** in the furniture form – or in the form of a placed device with a power sensor, such as a smart plug. When devices stand close together (washer and dryer), their cards step out of each other's way. The cards show in the house view and on the device's floor; a tap folds them. Ten cards cost less than one cable, on the wall tablet too.
 
-**Hausbilanz und Anlagen-Karten auch in Etagenansichten** (aus von Haus aus) lässt die große Karte und die Karten der Anlagen sichtbar, wenn eine Etage geöffnet ist – auf der Etage ihres Solarfelds, etwa einer Anlage im Garten auf der Außen-Etage. In den Hologramm-Einstellungen blendet **Geräte-Karten auch in der Hausansicht** sie in der Hausansicht aus (dann nur auf ihrer Etage), **Geräte-Karten im geöffneten Raum** zeigt beim Öffnen eines Raums die Karten seiner Geräte, und **Geräte-Karten ausblenden unter (W)** lässt Karten verschwinden, solange ihr Gerät weniger zieht – etwa 1 W für „aus“.
+**House balance and plant cards in floor views too** (off by default) keeps the big card and the plant cards visible when a floor is open – on the floor of their solar field, e.g. a plant in the garden on the outdoor floor. In the hologram settings, **Device cards in the house view too** keeps them out of the house view (then only on their floor), **Device cards in an opened room** shows the cards of a room's devices when you open it, and **Hide device cards below (W)** hides a card while its device draws less – e.g. 1 W for "off".
 
-Der Knopf **Hologramme** in der Energieleiste (neben ⚡) blendet alle Karten aus und wieder ein – praktisch, wenn viele Geräte eine tragen. In der Karte gibt es den Knopf ebenfalls, oder du legst es mit `holograms` fest.
+The **Holograms** button in the energy bar (next to ⚡) hides all cards and shows them again – handy when many devices carry one. The card has the button too, or you fix it with `holograms`.
 
-**Wandtablet:** Auf der Tablet-Stufe laufen die Hologramme ohne Glaseffekt, die Leitungen mit etwa 5 Bildern pro Sekunde; 30 Sekunden nach der letzten Berührung bleiben sie stehen, bis jemand wieder tippt.
+**Wall tablet:** on the tablet level the holograms run without the glass effect and the cables at about 5 frames a second; 30 seconds after the last touch they stand still until someone taps again.
 
-**Wenn etwas fehlt:** Die Einrichtung oben im Werkzeug zeigt, was noch nicht passt. Kein Hologramm bedeutet meist: kein Sensor am Wechselrichter oder keine Hausansicht (Etagen- und Raumansichten haben keins). Keine Leitung zu einem Gerät: Das Gerät hat keinen Leistungssensor.
+**When something is missing:** the Setup list at the top of the tool shows what does not fit yet. No hologram usually means: no sensor on the inverter, or not the house view (floor and room views have none). No cable to a device: the device has no power sensor.
 
-### 6.5 Klang & Kino
+### 6.5 Sound & Cinema
 
-Klang & Kino bringt die Musik ins 3D-Haus. Voraussetzung ist ein Lautsprecher im Plan: ein Media Player als Gerät platziert (Kapitel 4.11) oder ein Möbel aus dem Heimkino-Pack (Standlautsprecher, Soundbar, Deckenlautsprecher …) mit dem Media Player als **Gerät** im Möbelformular.
+Sound & Cinema brings the music into the 3D house. It needs a speaker in the plan: a media player placed as a device (chapter 4.11), or an item from the Home Cinema pack (floor-standing speaker, soundbar, ceiling speaker …) with the media player as its **Device** in the furniture form.
 
-**Läuft-gerade-Karte:** Sobald ein Lautsprecher spielt (oder pausiert), schwebt über ihm eine Glaskarte mit Cover, Titel, Interpret und Lautstärke. Eine pausierte Karte bleibt seit 2.0.7 höchstens 10 Minuten stehen – Echos bleiben nach dem Stoppen oft stundenlang auf „pausiert“. Darauf: Zurück, Abspielen/Pause, Weiter und ein Lautstärkeregler – ohne den Raum zu öffnen. Antippen der Kopfzeile klappt die Karte zusammen. Die Karten gehorchen dem Schalter **Hologramme** (neben ⚡ in der Energieleiste; ohne Energie Pro ist der Schalter nicht da, dann sind sie immer an).
+**Now-playing card:** as soon as a speaker plays (or pauses), a glass card floats over it with cover, title, artist and volume. Since 2.0.7 a paused card stays for ten minutes at most – Echos often stay "paused" for hours after the music was stopped. On it: previous, play/pause, next and a volume slider – without opening the room. A tap on its header folds the card. The cards follow the **Holograms** switch (next to ⚡ in the energy bar; without Energy Pro the switch is not there and they are always on).
 
-**Schallringe:** Um jeden spielenden Lautsprecher wandern leuchtende Ringe über den Boden nach außen – je lauter, desto weiter und kräftiger. So siehst du aus der Hausansicht, wo Musik läuft.
+**Sound rings:** glowing rings travel outwards over the floor around every playing speaker – the louder, the wider and stronger. So you see from the house view where music is on.
 
-**Multiroom-Gruppen:** Spielen Lautsprecher als Gruppe (Sonos, HA-Gruppen, alles mit `group_members`), verbindet eine leuchtende Linie die Mitglieder auf derselben Etage.
+**Multiroom groups:** when speakers play as a group (Sonos, HA groups, anything with `group_members`), a glowing line joins the members on the same floor.
 
-**Schnellmenü:** Lange drücken auf einen Media Player öffnet jetzt Cover mit Abspielen/Pause in der Mitte, Zurück und Weiter daneben, Lautstärke darunter – statt nur An/Aus. Darunter steht **Abspielen**: deine Sender und Playlists (im Editor unter **Favoriten → Sender und Playlists** angelegt) und die Quellen des Players, etwa Sonos-Favoriten oder die Eingänge eines Receivers. Ein Sender ist ein `media_player.play_media` mit Art und Inhalt: für einen Echo die Art `SPOTIFY`, `AMAZON_MUSIC` oder `TUNEIN` und als Inhalt, was du sagen würdest („Rock Antenne“); für Sonos, Music Assistant und andere `music` oder `url` mit einer Stream-Adresse oder URI.
+**Quick menu:** a long press on a media player now opens the cover with play/pause in the middle, previous and next beside it, the volume below – instead of on/off only. Below it **Play**: your stations and playlists (set in the editor under **Favourites → Stations and playlists**) and the player's sources, such as Sonos favourites or a receiver's inputs. A station is a `media_player.play_media` with a type and a content: for an Echo the type `SPOTIFY`, `AMAZON_MUSIC` or `TUNEIN` and as content what you would say ("Rock Antenne"); for Sonos, Music Assistant and others `music` or `url` with a stream address or URI.
 
-**Smart Speaker und Displays:** Das Pack **Heimkino & Hi-Fi** hat ab Release 2 Smart Speaker als Kugel, Zylinder, Puck, Pod, hoch und oval, einen Kompakt- und einen tragbaren Multiroom-Lautsprecher, eine Premium-Soundbar und Smart Displays mit 5″, 7″, 8″ und 15″ (Wand) – passend für Echo, Nest, HomePod, Sonos und Co. Mit Klang & Kino leuchtet ihr Lichtring in der App-Farbe, solange sie spielen, und die Displays zeigen das Cover. Solange die Karte über einem Lautsprecher schwebt, tritt sein Pin zur Seite und kommt wieder, wenn die Musik endet. Fernseher und Bildschirme bekommen ihre Farben und Bilder weiter über **Bildschirme live** (6.3).
+**Smart speakers and displays:** from release 2 the **Home Cinema & Hi-Fi** pack has smart speakers as a ball, cylinder, puck, pod, tall and oval, a compact and a portable multiroom speaker, a premium soundbar and smart displays of 5″, 7″, 8″ and 15″ (wall) – fitting Echo, Nest, HomePod, Sonos and co. With Sound & Cinema their light ring glows in the app's colour while they play, and the displays show the cover. While the card floats over a speaker, its pin steps aside and comes back when the music ends. TVs and screens keep their colours and pictures through **Live screens** (6.3).
 
-**Wandtablet:** Auf der Tablet-Stufe laufen die Ringe mit etwa 5 Bildern pro Sekunde und ruhen 30 Sekunden nach der letzten Berührung, die Karten ohne Glaseffekt.
+**Wall tablet:** on the tablet level the rings run at about 5 frames a second and rest 30 seconds after the last touch, the cards without the glass effect.
 
-**Welche Lautsprecher passen?** NeonPlan nutzt die Standard-Schnittstelle der Media Player von Home Assistant: Was im Media-Player-Fenster von Home Assistant geht, geht auch hier. Das ist eine Einschätzung nach Dokumentation und Erfahrungen, keine Garantie für jedes Modell:
+**Which speakers fit?** NeonPlan uses Home Assistant's standard media player interface: what works in Home Assistant's media player dialog works here too. This is an assessment from documentation and experience, not a guarantee for every model:
 
-| Integration | Cover und Titel | Lautstärke | Multiroom-Linien |
+| Integration | Cover and title | Volume | Multiroom lines |
 |---|---|---|---|
-| Sonos | ja | ja, lokal | ja |
-| Music Assistant (alle Player, auch Echos) | ja | ja | ja |
-| Denon/Marantz HEOS, Yamaha MusicCast, Bluesound, Squeezebox/Lyrion | ja | ja | ja |
-| Google Cast (Nest Audio, Nest Hub, Chromecast) | ja | ja | meist nicht |
-| Apple TV / HomePod | ja | je nach Modell | nein |
-| Fernseher und AV-Receiver | je nach App | ja | nein |
-| Amazon Echo über Alexa Media Player | ja | **oft nicht oder verzögert** | nein |
+| Sonos | yes | yes, local | yes |
+| Music Assistant (every player, Echos too) | yes | yes | yes |
+| Denon/Marantz HEOS, Yamaha MusicCast, Bluesound, Squeezebox/Lyrion | yes | yes | yes |
+| Google Cast (Nest Audio, Nest Hub, Chromecast) | yes | yes | mostly not |
+| Apple TV / HomePod | yes | depends on the model | no |
+| TVs and AV receivers | depends on the app | yes | no |
+| Amazon Echo through Alexa Media Player | yes | **often not, or delayed** | no |
 
-Was ein Player mitbringen sollte: den Zustand `playing`/`paused`, `media_title` und `media_artist` (sonst zeigt die Karte App oder Quelle), `entity_picture` für das Cover, `volume_level` für Regler und Ringe, `group_members` für die Linien.
+What a player should bring: the state `playing`/`paused`, `media_title` and `media_artist` (else the card shows the app or source), `entity_picture` for the cover, `volume_level` for the slider and rings, `group_members` for the lines.
 
-**Ein Gerät, ein Player:** Jeder Media Player hat genau eine Karte. Ein Möbel, dem du den Player selbst zugewiesen hast, hat Vorrang vor einem als Gerät platzierten Player. Hast du denselben Lautsprecher doppelt in Home Assistant (etwa einen Echo über Alexa Media Player **und** über Music Assistant, erkennbar an „_2“ am Ende), wähle den, über den du wirklich abspielst – der andere meldet nie „spielt“.
+**One device, one player:** every media player has exactly one card. Furniture you linked to the player by hand wins over the player placed as a device. If the same speaker exists twice in Home Assistant (e.g. an Echo through Alexa Media Player **and** through Music Assistant, recognisable by "_2" at the end), pick the one you really play through – the other never reports "playing".
 
-**Echo-Geräte (Alexa Media Player):** Abspielen, Pause und Titelwechsel gehen. Die **Lautstärke** lässt sich je nach Gerät und Version von Alexa Media Player nicht oder nur verzögert setzen, und der neue Wert kommt oft erst Minuten später zurück. Das liegt an der inoffiziellen Amazon-Schnittstelle, nicht an NeonPlan; dieselbe Grenze hat das Media-Player-Fenster von Home Assistant. Echos, die du über Music Assistant steuerst, folgen der Lautstärke in der Regel zuverlässiger.
+**Echo devices (Alexa Media Player):** play, pause and track change work. The **volume** cannot be set on some devices and versions of Alexa Media Player, or only with a delay, and the new value often comes back minutes later. This is down to the unofficial Amazon interface, not NeonPlan; Home Assistant's own media player dialog has the same limit. Echos controlled through Music Assistant usually follow the volume more reliably.
 
-**Musik folgt dir (Release 2, seit NeonPlan 3.5.0):** Gehst du in einen anderen Raum, kommt die Musik mit: Sobald der Raum mit der Musik leer ist, spielt sie im neuen Raum weiter, und in 3D fliegen Noten von einem Lautsprecher zum anderen. Dafür braucht es **Music Assistant**: Die Lautsprecher im Plan müssen Music-Assistant-Player sein, und jeder Raum braucht einen Präsenz- oder Bewegungsmelder in seinem Bereich. Unter **⚙ Einstellungen → Musik folgt dir** zeigt NeonPlan, welche Räume bereit sind, und **Einrichten** legt in Home Assistant die Automation „NeonPlan – Musik folgt dir“ an – sie läuft auch, wenn kein Tablet offen ist. Ändern sich Räume oder Lautsprecher, einmal **Neu einrichten**. Das Modul muss einmal unter **Erweiterungen → Module** freigegeben werden.
+**Music follows you (release 2, since NeonPlan 3.5.0):** walk into another room and the music comes along: once the room with the music is empty, it plays on in the new room, and in 3D notes fly from one speaker to the other. It needs **Music Assistant**: the speakers in the plan have to be Music Assistant players, and every room needs a presence or motion sensor in its area. Under **⚙ Settings → Music follows you** NeonPlan shows which rooms are ready, and **Set up** creates the automation "NeonPlan – Music follows you" in Home Assistant – it runs even when no tablet is open. When rooms or speakers change, **Set up again** once. The module has to be approved once under **Extensions → Modules**.
 
-### 6.6 Auto Pro
+### 6.6 Car Pro
 
-Auto Pro holt das Auto in den Plan, so wie es seine Integration meldet (Tesla, VW We Connect, BMW, Hyundai/Kia, Renault, Smart, Polestar, Audi, Skoda, Cupra, Ford …). Voraussetzung ist ein **Stellplatz** mit Fahrzeug (4.10) und die Integration des Autos in Home Assistant.
+Car Pro brings the car into the plan the way its integration reports it (Tesla, VW We Connect, BMW, Hyundai/Kia, Renault, Smart, Polestar, Audi, Skoda, Cupra, Ford …). It needs a **parking spot** with a vehicle (4.10) and the car's integration in Home Assistant.
 
-> **Ein Kleinwagen ist dabei:** Auto Pro bringt einen Kleinwagen mit, den du im Stellplatz-Formular unter **Fahrzeug** wählst – Auto Pro läuft also ohne weiteres Pack. 14 weitere Fahrzeuge (SUV, Kombi, Transporter, Wohnmobil …) gibt es im Möbel-Pack **Fahrzeuge**. Ohne Fahrzeug auf dem Stellplatz zeigt Auto Pro nichts an.
+> **A compact car is included:** Car Pro brings a compact car that you choose under **Vehicle** in the parking spot's form – so Car Pro works without another pack. 14 more vehicles (SUV, estate, van, motorhome …) come in the furniture pack **Vehicles**. Without a vehicle on the spot, Car Pro shows nothing.
 
-Auto Pro hängt am **Stellplatz**, nicht am Fahrzeug-Möbel. Steht dein Auto als einfaches Möbel im Plan, macht **In Stellplatz umwandeln** in dessen Formular daraus einen Stellplatz mit diesem Fahrzeug.
+Car Pro lives on the **parking spot**, not on the vehicle furniture. If your car stands in the plan as plain furniture, **Turn into a parking spot** in its form makes it a parking spot with this vehicle.
 
-**Einrichten:** Im Stellplatz-Formular unten der Abschnitt **Auto Pro**. Wähle unter **Fahrzeug** irgendeine Entität des Autos – NeonPlan findet die übrigen am selben Gerät: Ladestand, Reichweite, Ladeleistung oder Ladezustand, Kabel, Schloss, Klima oder Vorheizen, Standort. Jede Rolle kannst du von Hand setzen oder mit „Keine“ abschalten. Das Schloss darf auch ein Text-Sensor sein, der `locked`/`secured` oder `unlocked` meldet (wie bei BMW). Hat der Stellplatz einen Sensor „Auto anwesend“, dient der auch als Ausgangspunkt der Suche.
+**Setup:** at the bottom of the parking spot form, the **Car Pro** section. Under **Car** choose any entity of the car – NeonPlan finds the others on the same device: charge, range, charging power or state, cable, lock, climate or preheating, location. Every role can be set by hand or switched off with "None". The lock can also be a text sensor that reports `locked`/`secured` or `unlocked` (as BMW does). A "car present" sensor on the spot serves as the starting point of the search as well.
 
-**Im Haus:** Das Fahrzeug trägt ein **Lichtband** in der Farbe des Ladestands (grün über 50 %, gelb bis 20 %, rot darunter), kräftiger, solange es lädt. Läuft die Klima oder das Vorheizen, glimmt das Auto warm. Der **Pin am Stellplatz** zeigt „78 % · 312 km · ⚡ 7,4 kW · 🔒“. Ist das Auto weg, bleibt der Stellplatz leer und der Pin sagt **unterwegs**, mit der Zone des Trackers, wenn es eine gibt („unterwegs · Arbeit“).
+**In the house:** the vehicle wears a **light band** in the colour of its charge (green above 50 %, yellow down to 20 %, red below), stronger while it charges. While the climate or preheating runs, the car glows warm. The **pin at the spot** reads "78 % · 312 km · ⚡ 7.4 kW · 🔒". When the car is out, the spot stays empty and the pin says **away**, with the tracker's zone when there is one ("away · Work").
 
-**Glaskarte:** Über dem Auto schwebt eine Karte im Look von Energie Pro und Klang & Kino: Ladestand groß in seiner Farbe mit Balken, Reichweite, Ladeleistung beim Laden, dazu Knöpfe für Schloss (Entriegeln fragt nach), Klima und – bei einem Lade-Schalter – Laden. Ist das Auto entriegelt, leuchten Scheinwerfer und Rücklichter orange wie Blinker; verriegelt bleiben sie dunkel. Läuft die Klima, leuchten die Scheiben des Autos von innen – warm beim Heizen, kühl-blau, wenn eine Klima-Entität „kühlen“ meldet. Ein Tipp auf den Kopf klappt die Karte zusammen. Solange die Karte steht, tritt der Pin zur Seite; ist das Auto weg, zeigt der Pin „unterwegs“.
+**Glass card:** a card floats over the car in the look of Energy Pro and Sound & Cinema: the charge large in its colour with a bar, the range, the charging power while charging, and buttons for the lock (unlocking asks), the climate and – with a charge switch – charging. When the car is unlocked, its head- and taillights glow amber like indicators; locked they stay dark. While the climate runs, the car's windows glow from inside – warm while heating, cool blue when a climate entity reports cooling. A tap on its head folds the card. While the card shows, the pin steps aside; when the car is out, the pin says "away".
 
-**Schnellmenü:** Lange drücken auf den Pin: **Verriegeln / Entriegeln** (Entriegeln fragt nach), **Klima an / aus**, **Laden starten / stoppen** (bei einem Lade-Schalter), dazu Ladestand und Reichweite.
+**Quick menu:** a long press on the pin: **Lock / Unlock** (unlocking asks first), **Climate on / off**, **Start / stop charging** (with a charge switch), plus charge and range.
 
-**Wandtablet:** keine Animation nötig – Auto Pro läuft auf jeder Stufe gleich.
+**Wall tablet:** no animation needed – Car Pro runs the same on every level.
 
-### 6.7 Zeitreise
+### 6.7 Time travel
 
-![Zeitreise: die Etage um 07:42 mit Zeitleiste](images/view-timetravel.jpg)
+![Time travel: the floor at 07:42 with the time bar](images/view-timetravel.jpg)
 
-> Die Zeitreise ist enthalten und standardmäßig aktiviert. Danke an alle, die sie in der Beta getestet haben.
+> Time travel is included and enabled by default. Thanks to everyone who tested it in the beta.
 
-Die Zeitreise spielt die letzten 24 Stunden – auf Wunsch die letzten 7 Tage – im Haus ab, aus dem Verlauf, den Home Assistant ohnehin aufzeichnet (Recorder): Lichter mit Helligkeit und Farbe, Türen und Fenster, Rollläden, Bewegung, Heizung, Fernseher und Lautsprecher, Temperaturen, Leistung, Wetter und Sonnenstand. Alles bleibt in Home Assistant, und **nichts wird geschaltet** – die Zeitreise zeigt nur.
+Time travel replays the last 24 hours – or, if you like, the last 7 days – in the house, from the history Home Assistant records anyway (the recorder): lights with brightness and colour, doors and windows, blinds, motion, heating, TV and speakers, temperatures, power, weather and the sun's position. Everything stays in Home Assistant, and **nothing is switched** – time travel only shows.
 
-**Starten:** Unten in der Schalterleiste **⏪ Zeitreise** antippen; in der Dashboard-Karte erscheint der Knopf mit `time_travel: true` (Kapitel 8). Die Ansicht bekommt einen bernsteinfarbenen Rahmen, oben in der Mitte steht groß der gezeigte Moment („Do 07:42 · vor 6 h 14 min“). Sie beginnt angehalten, eine Stunde vor jetzt. **● Live** oder **Esc** führt zurück in die Gegenwart; in der Karte auch die Rückkehr zur Startansicht (`idle_return`).
+**Start:** tap **⏪ Time travel** in the switch bar at the bottom; in the dashboard card the button appears with `time_travel: true` (chapter 8). The view gets an amber frame, and the moment shown stands large at the top centre ("Thu 07:42 · 6 h 14 min ago"). It starts paused, one hour before now. **● Live** or **Esc** takes you back to the present; in the card the return to the start view does too (`idle_return`).
 
-**Die Zeitleiste unten:**
+**The time bar at the bottom:**
 
-| Element | Wirkung |
+| Element | What it does |
 |---|---|
-| **⏮** / **⏭** | Zum vorigen oder nächsten Ereignis springen; die Wiedergabe hält dort an |
-| **▶** / **⏸** | Abspielen und Anhalten. Am Ende angekommen, beginnt ▶ wieder von vorn |
-| **Leiste** | Antippen oder ziehen springt zu diesem Moment. Dunkle Flächen sind die Nacht (nach dem Sonnenstand am Standort von Home Assistant), grau ist die Zeit, aus der der Recorder noch nichts hat, schraffiert eine Lücke – Home Assistant war aus oder startete neu |
-| **Punkte** | Ereignisse. Ein Tipp springt hin und hält an, langes Drücken zeigt, was passiert ist. Liegen mehrere dicht beieinander, werden sie ein Punkt mit Zahl in der Farbe des wichtigsten |
-| **24 h** / **7 T** | Der Zeitraum: der letzte Tag oder die letzte Woche (siehe „Mehrere Tage“) |
-| **☰** | Die Seitenleiste mit **Ereignisse**, **Während du weg warst** und **Tag** |
-| **360×** | Das Tempo: 60× (eine Stunde in einer Minute), 360× (in 10 Sekunden, Standard), 900× (in 4 Sekunden), 3600× (in einer Sekunde), in der Woche auch 14400× (ein Tag in 6 Sekunden) |
-| **● Live** | Zurück in die Gegenwart. Läuft die Wiedergabe bis jetzt, steht dort „Gegenwart erreicht · Live“ |
+| **⏮** / **⏭** | Jump to the previous or next event; playback pauses there |
+| **▶** / **⏸** | Play and pause. At the end, ▶ starts from the beginning again |
+| **Track** | Tap or drag to jump to that moment. Dark areas are the night (from the sun's position at Home Assistant's location), grey is time the recorder has nothing of yet, hatched is a gap – Home Assistant was off or restarting |
+| **Dots** | Events. A tap jumps there and pauses, a long press tells what happened. Several close together become one dot with a number, in the colour of the most important one |
+| **24 h** / **7 d** | The range: the last day or the last week (see "Several days") |
+| **☰** | The side sheet with **Events**, **While you were away** and **Day** |
+| **360×** | The speed: 60× (one hour in one minute), 360× (in 10 seconds, default), 900× (in 4 seconds), 3600× (in one second), over the week also 14400× (a day in 6 seconds) |
+| **● Live** | Back to the present. When playback runs up to now, it reads "Present reached · Live" |
 
-Am PC: **Leertaste** spielt ab oder hält an, die **Pfeiltasten** springen 5 Minuten (mit Umschalt eine Stunde).
+On a PC: **space** plays or pauses, the **arrow keys** jump 5 minutes (with Shift one hour).
 
-**Ereignisse:** die Haustür (eine Tür mit Kontakt in einer Außenwand oder im Haustür-Look), Garagentor und Tor, ein Schloss wird entriegelt, der Alarm löst aus, Rauch, Gas, Kohlenmonoxid, Wasser, ein Stromausfall (die Entität aus **Stromausfall melden mit**), ein Fenster steht offen, während es regnet, Bewegung in der Nacht (23 bis 5 Uhr, nur Bewegungsmelder – tagsüber zeigt die Leiste Bewegung nicht als Punkt, damit sie nicht voll wird; beim Scrubben sieht man sie trotzdem), was eine **im Plan platzierte Kamera** erkennt (Bewegung, Person, Auto – Tag und Nacht; dieselbe Kamera erst nach fünf Minuten wieder), der Saugroboter startet und ist fertig, Waschmaschine, Trockner und Spülmaschine sind fertig (die Leistung fällt nach einem Lauf; der Leistungssensor hängt am Möbel oder ist als Gerät direkt daneben platziert). Dasselbe kurz hintereinander zählt einmal. **Personen sind nie ein Ereignis**, und wo jemand war, zeigt die Zeitreise nicht.
+**Events:** the front door (a door with a contact in an outer wall or with the front door look), garage door and gate, a lock is unlocked, the alarm goes off, smoke, gas, carbon monoxide, water, a power outage (the entity under **Report a power outage with**), a window is open while it rains, motion at night (11 pm to 5 am, motion sensors only – by day motion gets no dot, or the bar would fill up; scrubbing still shows it), what a **camera placed in the plan** detects (motion, person, car – day and night; the same camera again only after five minutes), the robot vacuum starts and is done, washing machine, dryer and dishwasher are done (the power drops after a run; the power sensor is linked to the item or placed as a device right next to it). The same thing again shortly after counts once. **People are never an event**, and time travel does not show where anyone was.
 
-**Nur ansehen:** Ein Tipp auf ein Gerät zeigt seinen damaligen Zustand („An · 35 % · seit 19:29“). Das Raumfenster zeigt die Werte des Moments, nimmt aber keine Eingaben an. Stern-Menü, Szenen-Knöpfe, Wischen, Doppeltipp, Schnellmenü, Kamera-Wand und die Knöpfe auf den Glaskarten ruhen, bis du wieder live bist.
+**View only:** a tap on a device shows its state at that moment ("On · 35 % · since 19:29"). The room panel shows the values of the moment but takes no input. The star menu, scene buttons, swiping, double tap, quick menu, camera wall and the buttons on the glass cards rest until you are live again.
 
-**Was die Zeitreise zeigt:**
+**What time travel shows:**
 
-- Lichter mit Helligkeit, Farbe und Farbtemperatur, Rollläden mit Position (fahrend dazwischen), Fenster offen oder gekippt, Türen, Garagentore
-- Temperatur, Feuchte, CO₂ und Leistung aus den Fünf-Minuten-Statistiken, gleitend dazwischen – auch als **Heatmap** und **Werte**
-- Warnungen, wie sie damals waren (Rauch, Wasser, Fenster offen bei Regen)
-- Wetter draußen (mit dem Pro „Wetter draußen“) aus dem Verlauf der Wetter-Entität, Sonne und Sonnenlicht nach dem damaligen Sonnenstand
-- Energie (mit Energie Pro): die Werte oben, die Glaskarten und die Leitungen mit den damaligen Leistungen; die Tageskurven der Glaskarten zeigen den Tag des gezeigten Moments bis zu diesem Moment
-- Auto (mit Auto Pro): ob das Auto auf seinem Stellplatz steht und sein Ladestand – aus den Entitäten des Autos selbst (Tracker des Autos nur als „zu Hause“ oder „weg“, nie der Ort). Tracker von Personen bleiben draußen, auch wenn ein Stellplatz einen nutzt
-- Musik und Fernseher: spielt oder nicht, Titel und Lautstärke-Ringe von damals (ohne Cover-Bild – das gibt es nur live)
-- Saugroboter: sein Zustand und, während er saugt, eine grüne Spur durch die Räume, die er in dieser Runde schon gereinigt hat (aus seinem Raum-Sensor oder dem Attribut `current_room`)
-- Kurze Schaltungen bei hohem Tempo: Ein Licht, das zwischen zwei Bildern an- und wieder ausging, blitzt kurz auf, statt unterzugehen
+- lights with brightness, colour and colour temperature, blinds with their position (moving in between), windows open or tilted, doors, garage doors
+- temperature, humidity, CO₂ and power from the five-minute statistics, smooth in between – also as **heatmap** and **values**
+- warnings as they were (smoke, water, window open in the rain)
+- the weather outside (with the Pro "Weather outside") from the weather entity's history, the sun and sunlight from the sun's position at the time
+- energy (with Energy Pro): the values at the top, the glass cards and the cables with the power of that moment; the day curves of the glass cards show the day of the moment shown, up to that moment
+- car (with Car Pro): whether the car stands in its parking spot and its charge – from the car's own entities (the car's tracker only as "home" or "away", never the place). People's trackers stay out, even when a parking spot uses one
+- music and TV: playing or not, title and volume rings of that time (without the cover picture – there is one only live)
+- robot vacuum: its state and, while it cleans, a green trail through the rooms it has cleaned in this run so far (from its room sensor or the `current_room` attribute)
+- short switching at high speed: a light that went on and off between two frames flashes briefly instead of being missed
 
-Nicht dabei sind Kamerabilder (der Recorder speichert keine) sowie Personen und ihre Tracker. Was der Recorder nicht aufzeichnet, steht als „unbekannt“ da.
+Not included are camera pictures (the recorder keeps none) and people and their trackers. Whatever the recorder does not record reads "unknown".
 
-**Mehrere Tage:** **24 h** wechselt auf **7 T**. Der letzte Tag ist sofort da, ältere Tage lädt die Zeitreise im Hintergrund nach, den neuesten zuerst und immer nur einen auf einmal; auf der Leiste steht dabei „lade Mo …“. Um Mitternacht steht der Wochentag mit Datum auf der Leiste. Was der Recorder nicht mehr hat (`purge_keep_days`), bleibt grau mit „Recorder: 5 Tage“. Ein sehr belebtes Haus hält die Woche unter 10 MB: Dafür fallen bei Bedarf sehr kurze Bewegungs-Meldungen (unter einer Minute) weg. Auf der Stufe **Tablet** reicht die Woche zwei Tage zurück – außer die Karte setzt `time_travel_range: 7d`.
+**Several days:** **24 h** switches to **7 d**. The last day is there at once, older days load in the background, the newest first and always one at a time; the track says "loading Mon …" meanwhile. At midnight the weekday and date stand on the track. What the recorder no longer has (`purge_keep_days`) stays grey with "Recorder: 5 days". A very busy house keeps the week below 10 MB: if needed, very short motion reports (under a minute) are dropped for that. At the **Tablet** level the week reaches back two days – unless the card sets `time_travel_range: 7d`.
 
-**Bis in die Gegenwart:** Spielt die Zeitreise bis kurz vor jetzt, kommen die Änderungen seit dem Start der Zeitreise dazu, und die Wiedergabe läuft bis in die Gegenwart. Dort hält sie an und bietet **Live** an.
+**Into the present:** when time travel plays up to shortly before now, the changes since time travel started are added, and playback runs into the present. There it stops and offers **Live**.
 
-![Zeitreise: die Seitenleiste mit den Ereignissen](images/view-timetravel-events.jpg)
+![Time travel: the side sheet with the events](images/view-timetravel-events.jpg)
 
-**Ereignisse (☰):** alle Ereignisse nach Stunden, die neuesten oben – auch die, die keinen Punkt auf der Leiste bekommen (ein Fenster wird geöffnet, mit Energie Pro „Speicher voll“ und die höchste PV-Leistung des Tages). Die Filter **Sicherheit**, **Türen & Fenster**, **Geräte** und **Energie** blenden Gruppen aus. Ein Tipp springt zum Moment und fliegt zum Raum. **Kamera folgt Ereignissen** fliegt beim Abspielen mit; **Bei wichtigen Ereignissen anhalten** (Alarm, Rauch, Gas, Kohlenmonoxid, Wasser) hält ab 900× dort an, statt vorbeizurauschen.
+**Events (☰):** all events by hour, newest at the top – also those that get no dot on the track (a window is opened, with Energy Pro "battery full" and the day's highest solar power). The filters **Safety**, **Doors & windows**, **Devices** and **Energy** hide groups. A tap jumps to the moment and flies to the room. **Camera follows events** flies along while playing; **Stop at important events** (alarm, smoke, gas, carbon monoxide, water) stops there from 900× on instead of rushing past.
 
-![Zeitreise: Während du weg warst](images/view-timetravel-away.jpg)
+![Time travel: while you were away](images/view-timetravel-away.jpg)
 
-**Während du weg warst:** was zwischen zwei Momenten passiert ist – ohne Personen. Die Zeitreise schlägt selbst eine ruhige Zeit vor (mindestens zwei Stunden ohne Bewegung im Haus, überwiegend am Tag), daneben „letzter Zeitreise“ oder eine eigene Uhrzeit („seit 08:00“). Die Liste nennt Alarme, wie oft Türen und Fenster geöffnet wurden, Bewegung, Lichter, die anblieben (mit Dauer), Fenster, die offen standen, und Geräte, die liefen. Ein Tipp springt hin.
+**While you were away:** what happened between two moments – without people. Time travel suggests a quiet time itself (at least two hours without motion in the house, mostly by day), next to it "last time travel" or a time of your own ("since 08:00"). The list names alarms, how often doors and windows were opened, motion, lights that stayed on (with duration), windows that stood open and appliances that ran. A tap jumps there.
 
-![Zeitreise: Tagesübersicht mit Vortag](images/view-timetravel-day.jpg)
+![Time travel: day summary with the day before](images/view-timetravel-day.jpg)
 
-**Tag:** die Übersicht für den Tag am Abspielkopf – je Raum, wie lange Licht brannte, ein Fenster offen stand und geheizt wurde, dazu die tiefste und höchste Temperatur; mit Energie Pro PV, Verbrauch, Netzbezug, Einspeisung (kWh) und Autarkie. **Mit dem Vortag vergleichen** stellt die Zahlen des Vortags darunter, **⟲ Gestern um diese Zeit** springt 24 Stunden zurück (die Woche wird dafür bei Bedarf geladen).
+**Day:** the summary of the day at the playhead – per room how long a light was on, a window open and the heating on, plus the lowest and highest temperature; with Energy Pro solar, consumption, grid import, export (kWh) and self-sufficiency. **Compare with the day before** puts the day before's numbers below, **⟲ Yesterday at this time** jumps back 24 hours (the week is loaded for it if needed).
 
-**Wandtablet:** Beim Abspielen rechnet die Ansicht auf der Stufe **Tablet** zweimal in der Sekunde (Auto viermal, Hoch sechsmal; ein Wechsel der Stufe gilt sofort), angehalten läuft gar nichts (0 B/s). Der Verlauf eines Tages wird einmal geladen und braucht nur wenige hundert Kilobyte; geändert wird nur, was sich wirklich ändert. Auf der Stufe Tablet beginnt die Zeitreise mit 24 Stunden und hält höchstens zwei Tage.
+**Wall tablet:** while playing, the view updates twice a second at the **Tablet** level (Auto four times, High six times; a change of the level applies at once); paused, nothing runs at all (0 B/s). A day of history is loaded once and needs only a few hundred kilobytes; only what really changes is redrawn. At the Tablet level time travel starts with 24 hours and holds two days at most.
 
-**Voraussetzungen:** der Recorder von Home Assistant (er läuft standardmäßig) und Home Assistant nach dem Update einmal neu gestartet. Wie weit der Verlauf zurückreicht, bestimmt `purge_keep_days` des Recorders (Standard 10 Tage); die Zeitreise braucht davon 24 Stunden, für die ganze Woche mindestens 7 Tage. Wer die Woche nutzen will, lässt `purge_keep_days` also bei 7 oder mehr.
+**Requirements:** Home Assistant's recorder (it runs by default) and Home Assistant restarted once after the update. How far back the history reaches is set by the recorder's `purge_keep_days` (default 10 days); time travel needs 24 hours of it, the whole week at least 7 days. If you want the week, keep `purge_keep_days` at 7 or more.
 
-### 6.8 Haushalt Pro
+### 6.8 Household Pro
 
-> Haushalt Pro ist enthalten und standardmäßig aktiviert. Danke an alle, die es in der Beta getestet haben.
+> Household Pro is included and enabled by default. Thanks to everyone who tested it in the beta.
 
-Haushalt Pro zeigt im Haus, was im Haushalt ansteht – dort, wo es passiert. Die Mülltonnen und Briefkästen selbst gibt es für alle (Kapitel 4.23), ebenso Waschmaschine, Trockner, Spüler, Kühlschrank und Pflanzen – Haushalt Pro braucht kein weiteres Pack; Haushalt Pro bringt sie und andere Geräte zum Leben. Die Felder dazu stehen im Formular des Möbels unter **🏠 Haushalt Pro**.
+Household Pro shows what is due in the household, right where it happens. The waste bins and mailboxes themselves are for everyone (chapter 4.23), and so are washers, dryers, dishwashers, fridges and plants – Household Pro needs no other pack; Household Pro brings them and other appliances to life. Its fields are in the item's form under **🏠 Household Pro**.
 
-- **Mülltonnen:** Wähle unter **Abfallkalender oder Sensor** einen Kalender (z. B. von *Waste Collection Schedule*) oder einen Sensor. Aus einem Kalender sucht NeonPlan die Einträge nach den Wörtern der Abfallart heraus (Papier, Bio, Gelber Sack, PMD, GFT, Recycling … in vielen Sprachen); passt das nicht, trägst du ein eigenes **Stichwort** ein. Ein Sensor darf die Tage bis zur Abholung, ein Datum oder „morgen“/„in 3 Tagen“ melden. Der Kalender wird sechs Wochen im Voraus gelesen. Jede Tonne mit Termin trägt ein kleines **Schildchen** auf dem Deckel – „Heute“, „Morgen“, „in 3 Tagen“ – in heller Schrift auf dunklem Grund mit einem Rand in ihrer Farbe; heute und morgen stehen hervor. Stehen mehrere Tonnen beieinander, teilen sie sich **ein Schild** mit einer Zeile je Tonne in der Reihenfolge der Abholung; Schilder, die sich sonst verdecken würden, rücken nach oben. Die Schildchen (auch die von Briefkasten und Pflanzen) wachsen mit der **Symbolgröße** wie die Beschriftung der Pins und werden auch von weitem nicht winzig. Ein Tipp auf die Tonne zeigt die nächsten Termine. **Leuchten ab / bis** legt fest, ab wann am Vortag bis wann am Abholtag eine Tonne als „dran“ gilt (für alle Tonnen). In den Looks Tag und Blueprint behalten Tonnen und Pack-Möbel mit eigenen Farben (etwa ein Halloween-Kürbis) ihre Farbe bis zum Boden.
-  - **Nur die nächste Abholung beschriften:** Nur die Tonne(n) mit dem frühesten Termin tragen ein Schild. **Schilder erst … Tage vorher zeigen:** Ein Schild erscheint erst so viele Tage vor der Abholung (leer = immer, 0 = nur am Abholtag). Beide gelten für alle Tonnen; Tonnen ohne Schild stehen weiter in „Heute im Haushalt“ und zeigen beim Antippen ihre Termine. Ohne diese Einstellungen bleibt alles wie bisher.
-  - **Rausgestellt:** Optional ein Helfer (`input_boolean`), Schalter oder Binärsensor, der an ist, solange die Tonne draußen steht. Dann leuchtet die Tonne nicht mehr, ihr Schild sagt „rausgestellt ✓“ (grüner Rand), und in „Heute im Haushalt“ steht sie abgehakt. Ein Tipp auf die Tonne zeigt unter den Terminen **Als rausgestellt markieren** – das schaltet einen Helfer oder Schalter um. Typisch: eine Automation, die den Helfer jede Nacht (oder nach der Abholung) wieder ausschaltet.
-- **Briefkasten:** Ein **Sensor für Post** – ein Merker (z. B. ein input_boolean „Post da“ aus einer Automation) oder die Einwurfklappe – und optional der **Sensor der Entnahmetür**. Liegt Post drin, leuchtet der Briefkasten und zeigt „Post da“, bis er geleert wurde. Von weitem zeigt er statt der kleinen Schrift ein rundes **Briefsymbol**; die Schrift erscheint beim Heranzoomen.
-- **Pflanzen:** Eine Pflanze (plant.*) oder ein Feuchtesensor; unter dem eingestellten Wert (Standard 20 %) zeigt sie „Durst“ – von weitem als rundes **Pflanzensymbol**.
-- **Pinnwand:** Unter **⚙ Einstellungen → Haus → Pinnwand (Text-Helfer)** wählst du einen Text-Helfer (`input_text`) oder Sensor. Sein Text steht oben in „Heute im Haushalt“, mehrere Zeilen mit `|` getrennt – Automationen schreiben hinein („Paket für Alla liegt in der Garage“, „Morgen 10 Uhr kommt der Handwerker“), die Karte zeigt es.
-- **Waschmaschine, Trockner, Spüler, Backofen** (auch die Einbaugeräte aus dem Küchen-Pack): Mit einem **Restzeit-Sensor** zeigt die Markierung „noch 23 min“; danach „Fertig!“, bis die Tür aufgeht (**Tür-Sensor**) oder das Gerät wieder läuft. „Fertig“ erkennt NeonPlan am Zustand des Geräts (finished, beendet …) oder daran, dass es zu laufen aufgehört hat. Die Restzeit steht nur da, solange das Gerät läuft: Sagt sein Zustand aus, bereit oder Standby oder liegt seine Leistung im Standby, zeigt NeonPlan keine Restzeit – auch wenn der Restzeit-Sensor (etwa nach einem Stromausfall) noch Minuten meldet.
-- **Wartung und Verbrauchsteile:** An jedem elektrischen Möbel kann ein Sensor für Filter, Salz oder Klarspüler stehen – ein Binärsensor (an = fällig), eine Zahl (Prozent oder Tage übrig, fällig ab dem eingestellten Wert) oder ein Datum. Fällig leuchtet das Gerät gelb. Sobald ein Sensor gewählt ist, gibt es eine **Zweite Wartung** mit eigenem Schwellwert – etwa beim Saugroboter Bürste am Roboter und Beutel der Station. Jede fällige steht als eigene Zeile in „Heute im Haushalt“.
-- **Kühlschrank:** Steht eine Tür länger offen als eingestellt (Standard 2 Minuten), warnt NeonPlan oben im Bild. Dazu gehört der **Smart-Kühlschrank** (Side-by-Side mit beweglichen Türen) in der Möbel-Bibliothek.
-- **Kalender (seit 3.2):** Unter **⚙ Einstellungen → Haus → Kalender in „Heute im Haushalt“** hakst du Kalender an. Ihre heutigen Termine stehen auf der Karte, ganztägige zuerst, dann nach Uhrzeit („14:30 Zahnarzt“). Vorbei ist vorbei; was in der nächsten Stunde beginnt, steht gelb. Ein Tipp öffnet den Kalender.
-- **Heute im Haushalt:** Eine Glaskarte oben rechts listet, was gerade ansteht – Tonnen heute und morgen, Post, fertige Geräte, durstige Pflanzen, fällige Wartung, offene Kühlschranktüren. Ein Tipp öffnet das Gerät, der Kopf klappt sie ein. In der Dashboard-Karte schaltet `household_card: false` sie ab.
+- **Waste bins:** under **Waste calendar or sensor** pick a calendar (e.g. from *Waste Collection Schedule*) or a sensor. In a calendar NeonPlan finds the entries by the words of the bin's waste (paper, food, packaging, PMD, recycling … in many languages); if that does not fit, enter a **word** of your own. A sensor may report the days to the pickup, a date or "tomorrow"/"in 3 days". The calendar is read six weeks ahead. Every bin with a pickup wears a small **tag** on its lid – "Today", "Tomorrow", "in 3 days" – in light letters on a dark plate with an edge in its colour; today and tomorrow stand out. Bins standing together share **one tag** with a line per bin in pickup order; tags that would cover each other move up. The tags (the mailbox's and the plants' too) grow with the **Symbol size** like the pins' labels and never shrink to unreadable from afar. A tap on the bin shows its next pickups. **Glow from / until** sets from when the day before until when on pickup day a bin counts as due (for all bins). In the Day and Blueprint looks, bins and pack furniture with colours of their own (a Halloween pumpkin, say) keep their colour down to the ground.
+  - **Label only the next pickup:** only the bin(s) with the earliest pickup wear a tag. **Show tags only … days before:** a tag appears only that many days before the pickup (empty = always, 0 = on pickup day only). Both apply to all bins; bins without a tag still show in "Today in the household" and show their pickups when tapped. Without these settings everything stays as before.
+  - **Put out:** optionally a helper (`input_boolean`), switch or binary sensor that is on while the bin stands outside. The bin then stops glowing, its tag says "put out ✓" (green edge) and "Today in the household" ticks it off. A tap on the bin shows **Mark as put out** below its pickups – it switches a helper or switch. Typical: an automation that switches the helper off again every night (or after the pickup).
+- **Mailbox:** a **post sensor** – a flag (e.g. an input_boolean "post" set by an automation) or the letter flap – and optionally the **sensor of the emptying door**. While post is in it, the mailbox glows and shows "Post" until it is emptied. From afar it shows a round **letter symbol** instead of the small text; the text appears when you zoom in.
+- **Plants:** a plant (plant.*) or a moisture sensor; below the set value (default 20 %) it shows "Thirsty" – from afar as a round **plant symbol**.
+- **Pinboard:** under **⚙ Settings → House → Pinboard (text helper)** pick a text helper (`input_text`) or sensor. Its text stands at the top of "Today in the household", several lines separated by `|` – automations write into it ("parcel for Alla is in the garage", "plumber tomorrow at 10"), the card shows it.
+- **Washer, dryer, dishwasher, oven** (the built-in appliances of the kitchen pack too): with a **time-left sensor** the pin shows "23 min left"; afterwards "Done!" until the door opens (**door sensor**) or it runs again. NeonPlan tells "done" from the appliance's state (finished, done …) or from it having stopped running. The time left shows only while the appliance runs: when its state says off, ready or standby, or its power is at standby, NeonPlan shows no time left – even if the time-left sensor still reports minutes (after a power cut, say).
+- **Service and consumables:** any electric item can have a sensor for a filter, salt or rinse aid – a binary sensor (on = due), a number (percent or days left, due at the set value) or a date. When due the item glows yellow. Once a sensor is chosen there is a **Second service** with its own threshold – a robot vacuum's brush and its dock's dust bag, say. Each one due is a line of its own in "Today in the household".
+- **Fridge:** when a door stands open longer than set (default 2 minutes), NeonPlan warns at the top of the view. The **smart fridge** (side-by-side with moving doors) in the furniture library comes with it.
+- **Calendars (since 3.2):** under **⚙ Settings → House → Calendars in "Today in the household"** tick calendars. Their entries of today stand on the card, all-day ones first, then by time ("14:30 Dentist"). Ended ones drop off; one starting within the hour stands in amber. A tap opens the calendar.
+- **Today in the household:** a glass card at the top right lists what is due – bins today and tomorrow, post, finished appliances, thirsty plants, services due, open fridge doors. A tap opens the device, its header folds it. In the dashboard card `household_card: false` switches it off.
 
-**Saug genau hier (Release 2, seit NeonPlan 3.5.0):** Im ⭐ Zentral-Menü schickt **🧹 Saug genau hier** den Saugroboter an eine Stelle: **📍 Stelle antippen** und dann im Plan auf die Krümel tippen – er reinigt ein Quadrat darum (1, 1,5, 2 oder 3 m). Einmal pro Roboter wird er eingemessen: Er steht in seiner Station – **1 · Station antippen** und die Station im Plan antippen; dann steht er an einer anderen Stelle (mindestens 2 m weiter) – **2 · Zweite Stelle antippen**. Mit **Testfahrt** prüfst du, ob er genau hinfährt; liegt er spiegelverkehrt, hilft **Karte gespiegelt**. Geht mit **Roborock**, **Dreame** (Dreame Vacuum) und **Xiaomi** (mit dem Xiaomi Cloud Map Extractor); andere Roboter behalten die Raumreinigung. Das Modul muss einmal unter **Erweiterungen → Module** freigegeben werden.
+**Clean right here (release 2, since NeonPlan 3.5.0):** in the ⭐ central menu, **🧹 Clean right here** sends the robot vacuum to a spot: **📍 Tap the spot** and then tap the crumbs in the plan – it cleans a square round it (1, 1.5, 2 or 3 m). Each robot is measured in once: it stands in its dock – **1 · Tap the dock** and tap the dock in the plan; then it stands somewhere else (at least 2 m away) – **2 · Tap a second spot**. **Test drive** checks that it drives exactly there; if it is mirrored, **Map mirrored** helps. Works with **Roborock**, **Dreame** (Dreame Vacuum) and **Xiaomi** (with the Xiaomi Cloud Map Extractor); other robots keep room cleaning. The module has to be approved once under **Extensions → Modules**.
 
-### 6.9 Digitale Bilderrahmen
+### 6.9 Digital picture frames
 
-> Das Pack **Digitale Bilderrahmen** ist mit diesem Repository enthalten (seit 3.0.5).
+> The **Digital Picture Frames** pack is included with this repository (since 3.0.5).
 
-Bilderrahmen, die leben: Rahmen fürs Hoch- und Querformat in drei Größen, quadratisch, ein Posterrahmen, digitale Rahmen mit schmalem Rand für Wand und Sideboard und ein Standrahmen aus Holz. Jeder Rahmen hat eine lebende Fläche; der **digitale Bilderrahmen aus dem Deko-Pack** macht mit, sobald das Pack installiert ist. Was die Fläche zeigt, stellst du im Möbelformular unter **🖼️ Bilderrahmen → Zeigt** ein; **ein Tipp auf den Rahmen in 3D öffnet den Inhalt groß** in der Mitte der Ansicht (schließt per Tipp daneben, auf dem Tablet nach einer Minute von selbst).
+Picture frames that live: portrait and landscape frames in three sizes, a square one, a poster frame, slim digital frames for the wall and the sideboard and a standing wooden frame. Every frame has a living face; the **digital frame of the Deco pack** joins in once the pack is installed. What the face shows is set in the furniture form under **🖼️ Picture frame → Shows**; **a tap on the frame in 3D opens the content large** in the middle of the view (closes on a tap beside it, on a tablet by itself after a minute).
 
-- **Kalender:** ein oder mehrere Kalender (jeder bekommt eine eigene Farbe). Die Fläche zeigt die nächsten Tage, heute zuerst; was gerade läuft, steht als „jetzt“, was gleich beginnt, als „in 20 min“ in der Akzentfarbe, Geburtstage bekommen ein 🎂. Im Pop-up stehen sieben Tage; ein Tipp auf einen Tag klappt Uhrzeiten und Beschreibung auf, **＋ Termin eintragen** schreibt einen neuen Termin in den Kalender (bei lokalen und Google-Kalendern, die schreiben dürfen). **Erinnern (Minuten vorher):** so viele Minuten vor einem Termin erscheint ein Hinweis auf den Bildschirmen, mit dem Durchsagen-Modul auch als Durchsage.
-- **Einkaufs- / To-do-Liste:** eine Liste aus Home Assistant (`todo.*`). Offene Punkte mit Kästchen, erledigte durchgestrichen; im Pop-up hakst du ab und trägst neue Punkte ein.
-- **Familienboard:** Kalender (heute und morgen), wer zuhause ist (grüne Punkte), mit Haushalt Pro die Tonnen von morgen, das Wetter oben rechts – der Küchenbildschirm in einem Rahmen.
-- **Personen:** alle Personen oder ausgewählte – zuhause oder unterwegs, mit Ortung der Raum, und seit wann.
-- **Kamera:** das Standbild, alle 5 Sekunden frisch (Tablet-Stufe: 10). **Groß aufspringen bei:** Klingel, Bewegungsmelder, Ereignis oder die Erkennung der Kamera selbst (Kamera-Cockpit) – dann springt der Rahmen 30 Sekunden groß auf, der **Türklingel-Rahmen**. Mit eingeschaltetem Live-Regisseur zeigt das Pop-up den Stream.
-- **Musik / Fernseher:** Cover und Titel des laufenden Players, im Pop-up mit Zurück, Pause und Weiter.
-- **Person:** das Bild aus Home Assistant, zuhause hell, unterwegs gedimmt.
-- **Foto:** eine URL oder hochgeladene Fotos (mehrere auf einmal). Mehrere Fotos wechseln sich ab (**Sekunden je Foto**), nachts dimmt die Fläche mit dem Kiosk.
-- **Wetter:** jetzt mit Temperatur und Symbol, dazu drei Tage Vorhersage und eine Regenwarnung aus der Stundenvorhersage („Regen in 3 h (75 %)“).
+- **Calendar:** one or several calendars (each gets its own colour). The face shows the next days, today first; what runs now reads "now", what starts shortly "in 20 min" in the accent colour, birthdays get a 🎂. The pop-up holds seven days; a tap on a day unfolds times and descriptions, **＋ Add an event** writes a new event into the calendar (local and Google calendars that allow writing). **Remind (minutes before):** that many minutes before an event a note shows on the screens, with the announcements module also spoken.
+- **Shopping / to-do list:** a Home Assistant list (`todo.*`). Open items with a box, done ones struck through; in the pop-up you tick them off and add new ones.
+- **Family board:** calendar (today and tomorrow), who is home (green dots), with Household Pro tomorrow's bins, the weather top right – the kitchen screen in one frame.
+- **People:** everyone or chosen persons – home or away, with Live Presence the room, and for how long.
+- **Camera:** the still, fresh every 5 seconds (tablet level: 10). **Pops up large on:** a doorbell, a motion sensor, an event or the camera's own detection (Camera Cockpit) – the frame then pops up large for 30 seconds, the **doorbell frame**. With the live director on, the pop-up shows the stream.
+- **Music / TV:** cover and title of the running player, in the pop-up with previous, pause and next.
+- **Person:** the picture from Home Assistant, bright at home, dimmed when away.
+- **Photo:** a URL or uploaded photos (several at once). Several photos take turns (**seconds per photo**); at night the face dims with the kiosk.
+- **Weather:** now with temperature and symbol, plus a three-day forecast and a rain warning from the hourly forecast ("Rain in 3 h (75 %)").
 
-Die Flächen folgen dem Look: hell im Tag-Look, dunkel in Neon und Blueprint.
+The faces follow the look: pale in the Day look, dark in Neon and Blueprint.
 
-## 7. Erweiterungen, Packs und Module
+## 7. Extensions, packs and modules
 
-![Erweiterungen](images/extensions.jpg)
+![Extensions](images/extensions.jpg)
 
-Der Reiter **✦ Erweiterungen** bündelt alles, was du zu HomePlan 3D dazubekommen kannst. Alle Pro-Erweiterungen sind bereits enthalten und über `custom_components/homeplan3d/open-source-config.json` standardmäßig aktiviert.
+The **✦ Extensions** tab gathers everything you can add to HomePlan 3D. All Pro add-ons are already included and enabled by default in `custom_components/homeplan3d/open-source-config.json`.
 
-### 7.1 Lokale Packs
+### 7.1 Local packs
 
-Möbel- und Modul-Packs sind lokale JSON-Dateien. Importiere sie unter **Möbel-Packs importieren …** oder **Modul einspielen …**; mehrere Dateien lassen sich auf einmal wählen. Sie lassen sich ohne Signatur und ohne Server-Verbindung importieren.
+Furniture and module packs are local JSON files. Import them under **Import furniture packs …** or **Import a module …**; several files can be selected at once. They can be imported and used unsigned.
 
-- Importierte Packs bleiben installiert und funktionieren offline.
-- Eine neuere Version eines Packs ersetzt die alte, ohne dass im Plan etwas verloren geht.
-- Entfernst du ein Pack, bleiben seine Möbel als einfache Kästen im Plan stehen; importiere es wieder.
-- Modul-Code läuft erst, wenn ein Administrator ihn gesehen und freigegeben hat. Auch ein Update wartet auf Freigabe.
+- Imported packs stay installed and work offline.
+- A newer version of a pack replaces the old one without losing anything in the plan.
+- If you remove a pack, its furniture stays in the plan as plain boxes; import it again to restore it.
+- Module code is never run until an administrator has reviewed and approved it. A new release waits for approval too.
 
-### 7.2 Pro-Erweiterungen
+### 7.2 Pro add-ons
 
-Die mittlere Kachelreihe zeigt die Pro-Erweiterungen. Jede Erweiterung ist enthalten und standardmäßig aktiviert; gesperrte Einträge gibt es nicht.
+The middle row of tiles shows the Pro add-ons. Every add-on is included and enabled by default; there are no locked entries.
 
-**Passt zu deinem Zuhause** (neu in 3.4): Erweiterungen, die zu deinem Home Assistant passen, stehen vorn mit einem kleinen Hinweis – Kamera-Cockpit bei Kameras („📷 3“), Energie Pro bei einem PV- oder Netzsensor, Klang & Kino bei Mediaplayern, Auto Pro bei einer Wallbox oder einem Stellplatz, Wetter draußen bei einer Wetter-Entität, Haushalt Pro bei Müllabfuhr-Sensoren. Das prüft nur dein Browser; es wird nichts gesendet. Pool Pro und die Raumleiste sind ebenfalls enthalten.
+**Fits your home** (new in 3.4): add-ons that fit your Home Assistant come first with a small sign – Camera Cockpit with cameras ("📷 3"), Energy Pro with a solar or grid sensor, Sound & Cinema with media players, Car Pro with a wallbox or a parking spot, Weather Outside with a weather entity, Household Pro with waste collection sensors. Only your browser checks this; nothing is sent. Pool Pro and the room bar are included as well.
 
-### 7.3 Möbel-Packs
+### 7.3 Furniture packs
 
-| Pack | Inhalt |
+| Pack | Contents |
 |---|---|
-| Wohnzimmer | Sofas, Wohnwände, Kamine, Medienmöbel und mehr |
-| Küche | Unterschränke, Hochschränke, Inseln, Geräte |
-| Schlafzimmer | Betten, Schränke, Kommoden, Nachttische |
-| Bad | Waschtische, Duschen, Wannen, WCs |
-| Kinderzimmer, Büro & Gaming, Garten & Terrasse, Garage & Werkstatt, Fitness, Smart-Home & Technik | Möbel und Geräte für den jeweiligen Bereich |
-| Digitale Bilderrahmen | Rahmen mit lebender Fläche: Kalender, Einkaufsliste, Familienboard, Personen, Kamera, Musik, Foto-Diashow, Wetter – Kapitel 6.9 |
-| Fahrzeuge | Autos, Transporter, Motorräder und mehr für Stellplätze |
-| Treppen & Geländer (16) | Gerade, L- und U-Treppen, gerade Treppen unten offen, viertelgewendelt oder mit Eckpodest, offene U-Treppe zweimal viertelgewendelt, Wendeltreppe, Raumspartreppe, Außentreppe, Podest, Geländer aus Metall, Glas und Holz |
-| Heimkino & Hi-Fi | Leinwand, Beamer, Lautsprecher, Subwoofer, AV-Receiver, Plattenspieler, Kinosessel, Smart Speaker und Smart Displays – Geräte leuchten beim Abspielen; die ausrollbare Leinwand fährt mit dem Cover ihres Motors hoch und runter (Laufzeit, Positionssensor und Richtung umkehren wie beim Vorhang) |
-| Hauswirtschaft & Haustechnik | Therme, Wärmepumpe, Pufferspeicher, Lüftung, Zählerschrank, Wasserenthärter, Gefriertruhe, Bügelstation |
-| Haustiere | Kratzbaum, Hundebett, Futterautomat, Trinkbrunnen, Katzenklo, Käfige, Aquarium und Terrarium mit Licht |
-| Homelab & Werkstatt | Smart-Home-Server, Einplatinen-Cluster, Rack-Switch, USV, Server-Tower, 10-Zoll-Mini-Rack, Funk-Stick, Druckerregal mit drei 3D-Druckern, Filamenttrockner, Lasergravierer, Lötstation, Werkbank mit Lochwand, Akku-Ladestation – mit lebenden Teilen (ab 3.4, siehe 4.8) |
-| Architektur & Ausbau | Säulen, Balken, Schornstein, Kamin, Glastrennwand, Schiebewand, Lichtvoute, LED-Nische, Podest, motorisierter Vorhang (öffnet sich mit seinem Cover, zu beiden Seiten oder unter **Öffnet nach** nur nach links oder rechts; unter **Antrieb (Cover)** dazu Laufzeit, ein Live-Positionssensor wie bei Rollläden und **Richtung umkehren**) |
+| Living room | Sofas, wall units, fireplaces, media furniture and more |
+| Kitchen | Base units, tall units, islands, appliances |
+| Bedroom | Beds, wardrobes, chests of drawers, nightstands |
+| Bathroom | Washbasins, showers, bathtubs, WCs |
+| Kids, Office & gaming, Garden & terrace, Garage & workshop, Fitness, Smart home & tech | Furniture and devices for each area |
+| Digital Picture Frames | frames with a living face: calendar, shopping list, family board, people, camera, music, photo slideshow, weather – chapter 6.9 |
+| Vehicles | Cars, vans, motorbikes and more for parking spots |
+| Stairs & railings (16) | Straight, L- and U-shaped stairs, straight stairs open below, with winders or with a corner landing at the foot, open U-stairs with two quarter turns, spiral stairs, space-saver stairs, outdoor steps, landing, railings in metal, glass and wood |
+| Home cinema & hi-fi | Screen, projector, speakers, subwoofer, AV receiver, turntable, cinema seats, smart speakers and smart displays – devices glow while playing; the roll-down screen goes up and down with its motor's cover (run time, position sensor and reverse direction as for the curtain) |
+| Utility & building services | Boiler, heat pump, buffer tank, ventilation, meter cabinet, water softener, chest freezer, ironing station |
+| Pets | Cat tree, dog bed, feeder, water fountain, litter box, cages, aquarium and terrarium with light |
+| Homelab & Workshop | Smart home server, single-board computer cluster, rack switch, UPS, server tower, 10-inch mini rack, radio stick, printer shelf with three 3D printers, filament dryer, laser engraver, soldering station, workbench with pegboard, tool battery charger – with live parts (from 3.4, see 4.8) |
+| Architecture & fit-out | Columns, beams, chimney, fireplace, glass partition, sliding wall, light cove, LED niche, platform, motorised curtain (opens with its cover, to both sides or, under **Opens to**, only to the left or right; under **Motor (cover)** also run time, a live position sensor as for blinds and **Reverse direction**) |
 
-Geräte in Packs haben eine kleine Leuchtfläche (Display, Status-LED): Verknüpft mit einem Media-Player, Schalter oder Licht leuchtet sie, solange das Gerät läuft; ein Aquarium leuchtet in der Farbe seines Lichts.
+Devices in packs have a small glowing part (display, status LED): linked to a media player, a switch or a light it lights up while the device runs; an aquarium glows in its light's colour.
 
-Unten auf der Seite fasst ein **Balken** deine installierten Packs zusammen (Möbel-Packs mit der Zahl ihrer Möbel und Erweiterungen); **Liste zeigen** klappt die Liste mit **Entfernen** auf. Darunter liegt **Möbel-Packs importieren …** für lokale JSON-Dateien. Mehrere Dateien lassen sich auf einmal wählen. Der Abschnitt **Module** darunter listet eingespielte Module (siehe 5.10) mit **Modul einspielen …** und **Entfernen**.
+At the bottom of the page a **bar** sums up your installed packs (furniture packs with their number of items, and add-ons); **Show the list** opens the list with **Remove**. Below is **Import furniture packs …** for local JSON pack files. You can pick several files at once. The **Modules** section below lists imported modules (see 5.10) with **Import a module …** and **Remove**.
 
-**Gut zu wissen:**
+**Good to know:**
 
-- Lokale JSON-Packs lassen sich ohne Signatur importieren und nutzen.
-- Entfernst du ein Pack, bleiben seine Möbel als einfache Kästen im Plan stehen. Importierst du es wieder, sind sie zurück, mit allen Verknüpfungen.
-- Eine neuere Version eines Packs ersetzt die alte, ohne dass im Plan etwas verloren geht.
+- Local JSON packs can be imported and used unsigned.
+- If you remove a pack, its furniture stays in the plan as plain boxes. Import it again and it is back, with all its links.
+- A newer version of a pack replaces the old one without losing anything in the plan.
 
-### 7.4 Fun-Packs
+### 7.4 Fun packs
 
-**Fun-Packs** sind enthaltene Extras zum Spaß. Sie sind standardmäßig aktiviert:
+**Fun packs** are included extras just for fun. They are enabled by default:
 
-- Unter **Erweiterungen** stehen sie bei deinen Packs; Home Assistant meldet ein neues Fun-Pack höchstens einmal unter Benachrichtigungen.
-- Du schaltest sie im Editor unter **⚙ Einstellungen → 🎈 Fun-Packs** ein und aus (oder über den Hinweis in der 3D-Ansicht).
+- Under **Extensions** they are among your packs; Home Assistant may announce a new fun pack once under Notifications.
+- You switch them on and off in the editor under **⚙ Settings → 🎈 Fun packs** (or from the notice in the 3D view).
 
-Eingestellt werden die Fun-Packs im Editor unter **⚙ Einstellungen → 🎈 Fun-Packs** (neu; vorher unter Erweiterungen). Dort schaltest du sie ein und aus und legst z. B. die Haustiere an; unter Erweiterungen führt ein Knopf **Zu den Fun-Pack-Einstellungen** direkt dorthin.
+The fun packs are set in the editor under **⚙ Settings → 🎈 Fun packs** (new; they used to be under Extensions). There you switch them on and off and set up the pets, for instance; under Extensions a button **Open the fun pack settings** leads straight there.
 
-**Haustiere:** Katze, Kaninchen oder Hund – als Dackel, Mops, Terrier, Labrador oder Schäferhund – leben in deinem 3D-Haus. **+ Haustier hinzufügen** legt ein Tier an: Art, Rasse (bei Hunden), Name, Fell und die Etage, auf der es startet. **Haustiere zeigen** schaltet alle auf einmal ein und aus; in der Dashboard-Karte blendet die Option **Haustiere zeigen** (YAML `pets: false`) sie für diese Karte aus, etwa am Wandtablet.
+**Pets:** a cat, a rabbit or a dog – as a dachshund, pug, terrier, labrador or shepherd – lives in your 3D house. **+ Add a pet** sets one up: kind, breed (for dogs), name, fur and the floor it starts on. **Show the pets** switches all of them on and off; in the dashboard card the option **Show the pets** (YAML `pets: false`) leaves them out of that card, e.g. on the wall tablet.
 
-- Die Tiere laufen durch die Türen von Raum zu Raum und **die Treppe hoch und runter** – so sind sie im ganzen Haus unterwegs. Eine Tür, deren Kontakt „zu“ meldet, ist für sie zu; Türen ohne Sensor gelten als offen.
-- Sie laufen **um Möbel herum** statt hindurch – um Sofa, Tisch und Schrank; Teppiche, Lampen und was an der Wand hängt, sind kein Hindernis. Auf ihren Platz auf dem Sofa oder Bett springen sie zum Schluss hinauf.
-- Sie ruhen an ihren Lieblingsplätzen: Die Katze läuft vor ein **Sofa, einen Sessel oder ein Bett** und springt von vorne hinauf, der Hund legt sich davor. Aus dem Pack Haustiere mögen Katzen Katzenbett, Katzenhöhle und Kratzbaum, Hunde Hundebett, Hundekorb und Hundehütte; am **Napf**, Futterautomaten und Trinkbrunnen schauen sie kurz vorbei.
-- **Nachts** (die Sonne in Home Assistant ist untergegangen) schlafen sie eingerollt, mit einem kleinen „z Z“.
-- In den **Aquarien** des Packs Haustiere schwimmen bunte **Fische**.
-- Gezeichnet wird nur, solange sich ein Tier bewegt – ruhend kosten sie nichts, auch nicht auf alten Wandtablets.
+- The pets walk through the doors from room to room and **up and down the stairs** – they get around the whole house. A door whose contact reports it shut stops them; doors without a sensor count as open.
+- They walk **around furniture** instead of through it – round the sofa, table and cupboard; rugs, lamps and what hangs on a wall are no obstacle. Onto their place on the sofa or bed they hop at the end.
+- They rest at their favourite places: a cat walks up to a **sofa, an armchair or a bed** and jumps on from the front, a dog lies down in front of it. From the Pets pack, cats like the cat bed, cave and scratching tree, dogs the dog bed, basket and kennel; they drop by the **bowls**, the feeder and the water fountain.
+- **At night** (the sun in Home Assistant has set) they sleep curled up, with a little "z Z".
+- Colourful **fish** swim in the Pets pack's **aquariums**.
+- They are only drawn while one moves – resting, they cost nothing, even on old wall tablets.
 
-**Halloween:** 13 Deko-Möbel in der Möbel-Bibliothek unter **Fun-Pack: Halloween** – Kürbis mit Gesicht, kleiner Kürbis, Kürbis-Trio, Spinnennetz (für die Ecke unter der Decke), Fledermaus-Girlande, zwei Grabsteine, Skelett, Hexenkessel, Kerzenständer, orange Lichterkette, Gespenst-Figur und Hexenbesen. Kürbis, Kessel und Kerzen leuchten, wenn du ein Licht verknüpfst. Dazu schwebt ab und zu ein kleiner **Geist** durchs Haus – mitten durch die Wände, nachts öfter. **Geist schweben lassen** unter **🎈 Fun-Packs** schaltet ihn ab; in der Dashboard-Karte blendet die Option **Halloween-Geist zeigen** (YAML `ghost: false`) ihn für diese Karte aus. Auch der Geist wird nur gezeichnet, solange er unterwegs ist.
+**Halloween:** 13 decorations in the furniture library under **Fun pack: Halloween** – a jack-o'-lantern, a small pumpkin, a pumpkin trio, a cobweb (for the corner under the ceiling), a bat garland, two gravestones, a skeleton, a witch's cauldron, a candelabra, orange string lights, a ghost figure and a witch's broom. Pumpkin, cauldron and candles glow when you link a light. A little **ghost** floats through the house now and then – right through the walls, more often at night. **Let the ghost float** under **🎈 Fun packs** switches it off; in the dashboard card the option **Show the Halloween ghost** (YAML `ghost: false`) leaves it out of that card. The ghost, too, is only drawn while it is on its way.
 
-**Winter & Weihnachten** (neu): 11 Deko-Möbel in der Möbel-Bibliothek unter **Fun-Pack: Winter & Weihnachten** – Weihnachtsbaum mit Lichterkette (für die Steckdose), kleiner Tannenbaum, **Adventskranz**, der seine Kerzen nach Datum anzündet (am 1. Advent eine, am 4. Advent alle vier), leuchtender Fensterstern, Schwibbogen, Leucht-Rentier für den Garten, Schneemann, Geschenke-Stapel, Lichterketten warmweiß und bunt sowie ein Weihnachtsstern. Was leuchtet, leuchtet mit einem verknüpften Licht oder einer Steckdose. Mit **Nur zeigen, wenn …** (siehe [4.8](#48-möbel)) kommt die Deko jeden Dezember von selbst wieder, etwa solange ein Kalender oder ein Helfer „Weihnachtszeit“ an ist. Unter **⚙ Einstellungen → 🎈 Fun-Packs**:
+**Winter & Christmas** (new): 11 decorations in the furniture library under **Fun pack: Winter & Christmas** – a Christmas tree with fairy lights (for the plug), a small Christmas tree, an **Advent wreath** that lights its candles by date (one on the first Sunday of Advent, all four on the fourth), a glowing window star, a candle arch, a light-up reindeer for the garden, a snowman, a pile of presents, warm white and colourful string lights and a poinsettia. What glows glows with a linked light or plug. With **Only show while …** (see [4.8](#48-furniture)) the decorations come back every December by themselves, e.g. while a calendar or a "Christmas time" helper is on. Under **⚙ Settings → 🎈 Fun packs**:
 
-- **Lichterkette an der Dachkante:** Lämpchen entlang der Traufe. **Leuchtet mit** verknüpft sie mit deiner echten Außenbeleuchtung; ohne Auswahl leuchtet sie **automatisch abends ab dem 1. Advent bis 6. Januar**. **Bunt statt warmweiß** und **Auch an Giebeln und First** (das ganze Dach in Licht) wählst du dazu.
-- **Schnee:** Meldet die Wetter-Entität Schnee, liegt Schnee auf Dach und Rasen. Bei Frost bleibt er liegen, bei Plusgraden taut er in einigen Stunden weg.
-- **Feuerwerk:** An Silvester steigt um Mitternacht (23:59 bis 0:10 Uhr) ein Neon-Feuerwerk über dem Haus auf.
+- **Fairy lights along the eaves:** bulbs along the roof's edge. **Shine with** links them to your real outdoor lights; without a choice they shine **automatically in the evening from the first Sunday of Advent to 6 January**. Pick **Colourful instead of warm white** and **Gables and ridge too** (the whole roof in light) as you like.
+- **Snow:** when the weather entity reports snow, snow lies on the roof and the lawn. It stays while it freezes and melts within a few hours above zero.
+- **Firework:** on New Year's Eve a neon firework rises over the house at midnight (23:59 to 0:10).
 
-Alles läuft auch auf alten Wandtablets: Lichterkette und Schnee kosten kaum etwas, das Feuerwerk wird nur in den elf Minuten gezeichnet.
+All of it runs on old wall tablets too: the fairy lights and the snow cost next to nothing, the firework is only drawn during those eleven minutes.
 
 ---
 
-### 7.5 Module
+### 7.5 Modules
 
-Ein **Modul** ist ein lokales Pack, das Code mitbringt: NeonPlan lädt ihn und kann ihn im Haus laufen lassen. Module werden als JSON-Packs eingespielt; eine Signatur ist nicht nötig. Der Code läuft erst, wenn ein Administrator ihn gesehen und freigegeben hat.
+A **module** is a local pack that carries code: NeonPlan loads it and can run it in the house. Modules are imported as JSON packs; no signature is needed. Their code runs only after an administrator has reviewed and approved it.
 
-**So funktioniert ein Modul – Schritt für Schritt:**
+**How a module works – step by step:**
 
-1. **Holen:** lokale `.json`-Modul-Datei bereitstellen.
-2. **Installieren:** unter **⚙ Einstellungen → 🧩 Module → Modul einspielen …** oder im Abschnitt **Module** der Erweiterungen einspielen.
-3. **Freigeben:** Ein Modul läuft erst, wenn ein Administrator seinen Code gesehen und freigegeben hat. **Code ansehen & freigeben** zeigt Anbieter, Version, Größe, Fingerabdruck und den ganzen Code; **Freigeben** startet genau diesen Code, ohne Neustart.
-4. **Sehen:** Das Modul steht in beiden Listen mit Name und Version. Die Sätze eines Sprach-Moduls erscheinen unter **🎙 Sprachsteuerung → Das versteht NeonPlan**, Warnungen in der Warnleiste, Karten über dem Haus.
-5. **Updates:** neue Pack-Datei einspielen. **Neuer Code läuft nie von allein:** Das Update wartet neben der laufenden Fassung („Update auf v4 wartet auf deine Freigabe“), bis du es mit **Update ansehen & freigeben** bestätigst.
-6. **Entfernen:** In der Liste **Entfernen**, wie bei einem Pack. Dein Plan bleibt unberührt.
+1. **Get it:** obtain the local `.json` module pack.
+2. **Install it:** import it under **⚙ Settings → 🧩 Modules → Import a module …** or in the **Modules** section on the Extensions page.
+3. **Approve it:** a module runs only once an administrator has seen and approved its code. **View code & approve** shows the publisher, version, size, fingerprint and the whole code; **Approve** starts exactly this code, without a restart.
+4. **See it:** the module appears in both lists with its name and version. Voice-module sentences show under **🎙 Voice control → What NeonPlan understands**, warnings in the warning bar, its cards over the house.
+5. **Updates:** import the new pack file. **New code never runs by itself:** the update waits beside the running release ("Update to v4 waits for your approval") until you confirm it with **View update & approve**. Until then the old release keeps running.
+6. **Remove:** **Remove** in the list, like a pack. Your plan stays untouched.
 
-Sicherheit: Modul-Code wird ohne Administrator-Freigabe nie ausgeführt, und das gesamte Projekt steht unter der MIT-Lizenz. Du kannst den Code in der Datei lesen.
+Security: module code is never executed before administrator approval, and the whole project is MIT licensed. You can read the code in the file.
 
-**Warum Module?** Module halten den Kern klein und schnell – ein Wandtablet lädt nur, was es nutzt. Jedes Modul wird lokal geladen und bleibt unter deiner Kontrolle.
+**Why modules?** Modules keep the core small and fast – a wall tablet only loads what it uses. Every module is loaded locally and stays under your control.
 
-> **Das Haus antwortet** ist enthalten. Öffne **⚙ Einstellungen → 🎙 Sprachsteuerung**: Unter „Das versteht NeonPlan“ stehen alle Fragen. Probier „Was ist offen?“, „Guten Morgen“, „Gute Nacht“, „Wie ist das Wetter?“ – am Mikrofon oder im Assist-Dialog. Für das Vorlesen braucht die Assist-Pipeline eine Sprachausgabe (Einstellungen → Sprachassistenten → Text-zu-Sprache).
+> **The house answers** is included. Open **⚙ Settings → 🎙 Voice control**: under "What NeonPlan understands" every question is listed. Try "What is open?", "Good morning", "Good night", "What is the weather like?" – at the microphone or in the Assist dialog. Speaking needs text-to-speech in the Assist pipeline (Settings → Voice assistants → Text-to-speech).
 
-## 8. Die Dashboard-Karte
+## 8. The dashboard card
 
-![Karte im Dashboard](images/card-og-dim.jpg)
+![The card in a dashboard](images/card-og-dim.jpg)
 
-Die Karte `custom:homeplan3d-card` bringt die 3D-Ansicht in jedes Dashboard. Sie wird automatisch geladen.
+The card `custom:homeplan3d-card` brings the 3D view into any dashboard. It loads automatically.
 
-**Anlegen:** Dashboard bearbeiten, **Karte hinzufügen**, nach „NeonPlan“ suchen. Alle Optionen stellst du im visuellen Editor der Karte ein:
+**Adding it:** Edit the dashboard, **Add card**, search for "NeonPlan". Set every option in the card's visual editor:
 
-| Abschnitt | Optionen |
+| Section | Options |
 |---|---|
-| **Ansicht** | Grundriss (auch das Grundstück), Etage oder ganzes Haus, Start-Raum, nur diese Räume, Größe fest oder bildschirmfüllend, Höhe, Look, Wände, Qualität, Etagen darunter |
-| **Anzeigen** | Symbole, Heatmap (auch „Werte“), Nur Grundriss (ohne Möbel), Schalter in der Karte, 3D-Sperre, Ansicht halten, Rundgang, Bedienleiste links oder rechts, Etagen-Miniaturen, Raumnamen, Raumfenster, Vollbild-Knopf, Uhr (Ecke wählbar, `clock: tl/tr/bl/br`), Etagen auseinander, Leistungsanzeige |
-| **Funktionen** | Warnungen, Sprung zur Warnung, Sprachsteuerung mit Bildschirmname und Raum für „hier“, Szenen-Knöpfe, Bewegungsspur, Kamera-Wand, Zeitreise mit Zeitraum und Tempo, Wetter mit Wetter-Entität |
-| **Wandtablet (Kiosk)** | Rückkehr zur Startansicht, Nachtdimmung, Kamerafahrt als Bildschirmschoner |
+| **View** | Floor plan (also the property), one floor or the whole house, start room, only these rooms, fixed size or full screen, height, look, walls, quality, floors below |
+| **Show** | Markers, heatmap (also "values"), floor plan only (no furniture), switches in the card, 3D lock, keep view, walk, controls left or right, floor pictures, room names, room panel, full-screen button, clock (corner of your choice, `clock: tl/tr/bl/br`), floors apart, performance display |
+| **Features** | Warnings, jump to a warning, voice control with screen name and room for "here", scene buttons, motion trail, camera wall, time travel with range and speed, weather with weather entity |
+| **Wall tablet (kiosk)** | Back to the start view, night dimming, camera turn as screensaver |
 
-**Glaskarten auf schmalen Karten** (seit 3.1.1): Ist die Karte schmaler als 600 px oder läuft die Tablet-Stufe, lassen Glaskarten wie die der Wärmepumpe ihre Nebenwerte weg (Starts, Laufzeit, Verlauf). Ein Tipp auf **mehr** unten auf der Glaskarte zeigt sie auf diesem Gerät, **weniger** blendet sie wieder aus.
+**Glass cards on narrow cards** (since 3.1.1): when the card is narrower than 600 px or runs at the tablet level, glass cards such as the heat pump's leave their minor values out (starts, run time, history). A tap on **more** at the bottom of the glass card shows them on this device, **less** hides them again.
 
-![Karte mit Szenen](images/card-scenes.jpg)
+![A card with scenes](images/card-scenes.jpg)
 
-### 8.1 Karten-Vorlagen
+### 8.1 Card templates
 
-Statt jede Karte auf jedem Tablet einzeln einzustellen, baust du sie einmal im Editor: **⚙ Einstellungen → Karten-Vorlagen**. Links stehen die Vorlagen, getrennt nach **Bildschirme** und **Handys**, jeweils mit **+ Neue Vorlage**. Gib der Vorlage einen Namen (etwa „Küche Fire-Tablet“) und stell sie in den Reitern **Allgemein**, **Ansicht**, **Anzeigen**, **Funktionen** und **Wandtablet (Kiosk)** ein – dieselben Optionen wie im Kartendialog von Home Assistant. **Duplizieren** macht eine Kopie als Ausgangspunkt für das nächste Gerät.
+Instead of setting up every card on every tablet, you build it once in the editor: **⚙ Settings → Card templates**. The templates stand on the left, by **Screens** and **Phones**, each with **+ New template**. Give the template a name (e.g. "Kitchen Fire tablet") and set it up in the tabs **General**, **View**, **Show**, **Features** and **Wall tablet (kiosk)** – the same options as in Home Assistant's card dialog. **Duplicate** makes a copy to start the next device from.
 
-Rechts steht die **Vorschau** auf dem gewählten Bildschirm (eine Handy-Vorlage auf einem Handy). Du kannst darin drehen, zoomen und Räume öffnen wie auf der Karte; geschaltet wird in der Vorschau nichts. Damit Formular und Vorschau Platz haben, klappen die Themen der Einstellungen hier weg – **Alle Einstellungen** oben holt sie zurück. Eine Vorlage **für ein Handy** hat die Optionen der Leiste, siehe [5.13](#513-am-handy-die-handy-ansicht-neu).
+On the right stands the **preview** on the chosen screen (a phone template on a phone). You can turn, zoom and open rooms in it as on the card; the preview switches nothing. So that the form and the preview have room, the settings' topics fold away here – **All settings** at the top brings them back. A template **for a phone** has the bar's options, see [5.13](#513-on-the-phone-the-phone-view-new).
 
-![Karten-Vorlagen](images/card-templates.jpg)
+![Card templates](images/card-templates.jpg)
 
-**Auf dem Tablet:** Karte hinzufügen, nach „NeonPlan“ suchen und ganz oben unter **Vorlage** die Vorlage wählen, fertig. Das Formular darunter fällt weg. Im YAML stehen nur zwei Zeilen:
+**On the tablet:** add a card, search for "NeonPlan" and pick the template under **Template** at the very top, done. The form below goes away. The YAML has two lines only:
 
 ```yaml
 type: custom:homeplan3d-card
-template: kueche_fire
+template: kitchen_fire
 ```
 
-- **Ändern:** Änderst du die Vorlage im Editor, übernimmt jedes Tablet mit dieser Vorlage das nach einem Moment von selbst, ohne Neuladen.
-- **Die Vorlage zählt, die Größe bleibt bei der Karte:** Eine Karte mit Vorlage zeigt die Vorlage. Nur ihre Größe (**Bildschirm füllen**, **Höhe**, **Vollbild-Knopf**) nimmt sie aus ihrem eigenen YAML, denn die gehört zum Dashboard. Alles andere, was von früher noch im YAML der Karte steht, gilt nicht mehr; der Kartendialog zeigt es an und räumt es mit **Aufräumen** weg. Soll ein Tablet anders aussehen, gib ihm eine eigene Vorlage (**Duplizieren**).
-- **Sofort oder mit Knopf:** Unter **Änderungen** wählst du pro Vorlage **Sofort auf die Tablets** (Standard) oder **Erst mit Knopf übertragen**. Dann zeigt nur die Vorschau deine Änderungen; die Tablets behalten den alten Stand, bis du **Auf Tablets übertragen** drückst. **Verwerfen** nimmt die Änderungen zurück.
-- **Wo hängt das Tablet?** Das Feld oben in der Vorlage legt den Raum für „hier“ fest („Mach hier das Licht an“), unabhängig davon, welche Etage oder welchen Start-Raum die Karte zeigt.
-- **Umbenennen:** Die ID im YAML folgt dem neuen Namen. Tablets, die noch mit der alten ID eingerichtet sind, finden die Vorlage weiter.
-- **Bildschirmname:** Der Name der Vorlage ist zugleich der Bildschirmname der Karte (für Durchsagen und „hier“ in der Sprachsteuerung), solange die Vorlage keinen eigenen hat.
-- **Neu laden:** **Bildschirme mit dieser Vorlage neu laden** und **Alle Bildschirme neu laden** lassen die offenen Tablets ihre Seite neu laden, etwa nach einem NeonPlan-Update (neuer Code kommt nur so an). In Automationen gibt es dafür die Aktion `homeplan3d.reload_screens` (ohne `templates` alle Bildschirme).
-- **Gelöscht:** Fehlt die Vorlage im Plan, zeigt die Karte einen Hinweis und läuft mit ihren eigenen Einstellungen weiter.
+- **Changing it:** when you change the template in the editor, every tablet with this template follows after a moment by itself, without a reload.
+- **The template counts, the size stays with the card:** a card with a template shows the template. Only its size (**Fill the screen**, **Height**, **Full-screen button**) comes from its own YAML, as it belongs to the dashboard. Whatever else is still in the card's YAML from before no longer applies; the card dialog lists it and **Tidy up** removes it. For a tablet that should look different, give it a template of its own (**Duplicate**).
+- **Straight away or with a button:** under **Changes** each template is either **Straight to the tablets** (the default) or **Send with a button**. Then only the preview shows your changes; the tablets keep the old state until you press **Send to the tablets**. **Discard** drops the changes.
+- **Where does the tablet hang?** The field at the top of the template sets the room for "here" ("Turn on the lights here"), whatever floor or start room the card shows.
+- **Renaming:** the id in the YAML follows the new name. Tablets still set up with the old id keep finding the template.
+- **Screen name:** the template's name is also the card's screen name (for announcements and "here" in voice control), as long as the template has none of its own.
+- **Reload:** **Reload screens with this template** and **Reload all screens** make the open tablets load their page again, e.g. after a NeonPlan update (new code only arrives that way). Automations have the action `homeplan3d.reload_screens` for it (without `templates`: every screen).
+- **Deleted:** when the template is missing from the plan, the card shows a note and carries on with its own settings.
 
-### 8.2 Alle Optionen in YAML
+### 8.2 All options in YAML
 
-In YAML sieht eine Karte so aus. Alle Zeilen außer der ersten sind optional:
+In YAML a card looks like this. Every line except the first is optional:
 
 ```yaml
 type: custom:homeplan3d-card
-template: kueche_fire   # eine Karten-Vorlage aus dem Editor (dann gilt nur sie, die übrigen Zeilen nicht)
-plan: pab12cd34ef      # ein anderer Grundriss (ID unter ⚙ → Grundrisse; weglassen = der erste); site = das Grundstück
-floor: floor_ab12cd34   # eine Etage zeigen (ID aus dem Editor)
-room: room_ab12cd34     # in diesem Raum starten (ID steht im Raumformular des Editors), z. B. ein Display fürs Kinderzimmer
-rooms: [room_ab12cd34] # nur diese Räume zeigen (siehe 8.3)
-rooms_lock: true       # false: andere Räume dürfen geöffnet werden
-height: 420             # Höhe in Pixeln
-fill: false             # den Bildschirm unter der Kopfzeile füllen
+template: kitchen_fire  # a card template from the editor (then only it counts, not the other lines)
+plan: pab12cd34ef      # another floor plan (id under ⚙ → Floor plans; left out = the first); site = the property
+floor: floor_ab12cd34   # show one floor (id from the editor)
+room: room_ab12cd34     # start in this room (the id is in the editor's room form), e.g. a display for the kids' room
+rooms: [room_ab12cd34] # show only these rooms (see 8.3)
+rooms_lock: true       # false: other rooms may be opened
+height: 420             # height in pixels
+fill: false             # fill the screen below the header
 walls: auto             # auto | cut
-controls_side: left     # left | right: Etagenbilder, Stern, Suche und Auge rechts
-keep_view: false        # true: Etagenwechsel ohne neuen Kameraflug
-angle_lock: false       # true: 3D-Sperre – der Blickwinkel bleibt fest, Ziehen verschiebt
-explode: true           # Etagen in der Hausansicht auseinanderziehen
-floor_stack: dim        # Etagen darunter: dim | stacked | single
+controls_side: left     # left | right: floor pictures, star, search and eye on the right
+keep_view: false        # true: floor switches keep the camera
+angle_lock: false       # true: 3D lock – the angle stays fixed, a drag moves the view
+explode: true           # pull floors apart in the house view
+floor_stack: dim        # floors below: dim | stacked | single
 quality: auto           # auto | low | high
-theme: neon             # neon | blueprint | day | focus | synth | cozy | evening | winter | model | pastel | warm | my_… (eigener Stil) | auto | house
-theme_evening: evening  # optional: Stil abends (nach dem Hausplan)
-theme_night: focus      # optional: Stil nachts
-style_entity: input_select.neonplan_stil  # optional: Helfer, dessen Zustand einen Stil nennt
-accent: "#ff8a00"       # eigene Akzentfarbe (Linien im Neon-Look, Knöpfe, Pins); weglassen = Cyan
+theme: neon             # neon | blueprint | day | focus | synth | cozy | evening | winter | model | pastel | warm | my_… (own style) | auto | house
+theme_evening: evening  # optional: style in the evening (by the house plan)
+theme_night: focus      # optional: style at night
+style_entity: input_select.neonplan_style  # optional: helper whose state names a style
+accent: "#ff8a00"       # an accent colour of your own (neon lines, buttons, pins); leave out for cyan
 markers: important      # none | room | important | all
 marker_size: normal     # small | normal | large
-marker_names: false     # true: Geräte mit eigenem Namen zeigen ihn unter dem Symbol
-central: true           # der Stern mit dem Zentral-Menü (alle Lichter, Rollläden, Favoriten)
-buttons:                # eigene Knöpfe nur für diese Karte (ersetzen die aus dem Editor)
-  - label: Rollos
+marker_names: false     # true: devices with an own name show it under their marker
+central: true           # the star with the central menu (all lights, blinds, favourites)
+buttons:                # own buttons for this card only (replace the ones from the editor)
+  - label: Blinds
     icon: window-shutter
     action: fire_dom_event   # navigate | more_info | service | fire_dom_event
-    data: { browser_mod: { service: browser_mod.popup, data: { title: Rollos, content: { type: "custom:meine-rollo-karte" } } } }
-heatmap: none           # none | temperature | humidity | co2 | values (Zahlen an den Raumnamen)
-room_panel: true        # Raum antippen öffnet das Raumfenster
+    data: { browser_mod: { service: browser_mod.popup, data: { title: Blinds, content: { type: "custom:my-blind-card" } } } }
+heatmap: none           # none | temperature | humidity | co2 | values (numbers at the room names)
+room_panel: true        # tapping a room opens the room panel
 room_names: true
-controls: true          # Schalter in der Karte, oder eine Liste: walls, floors, temperature, humidity, co2
-controls_hidden: false  # true: mit ausgeblendeten Bedienelementen starten (nur die 3D-Ansicht), ein Auge unten links holt sie zurück
-controls_hide_after: 0  # Sekunden ohne Berührung, nach denen die Bedienelemente verschwinden (0 = nie); eine Berührung zeigt sie wieder
+controls: true          # switches in the card, or a list: walls, floors, temperature, humidity, co2
+controls_hidden: false  # true: start with the controls hidden (only the 3D view); an eye at the bottom left brings them back
+controls_hide_after: 0  # seconds without a touch after which the controls disappear (0 = never); a touch shows them again
 floor_thumbs: true
 fullscreen_button: false
-dashboard: /lovelace/home   # Knopf oben rechts, der dieses Dashboard öffnet (weglassen = kein Knopf)
-dashboard_label: Start      # Beschriftung des Knopfs; ohne Beschriftung zeigt er ⌂
+dashboard: /lovelace/home   # a button at the top right that opens this dashboard (leave out = no button)
+dashboard_label: Home       # label of the button; without one it shows ⌂
 stats: false
 alerts: true
-alert_jump: false       # bei einer neuen Warnung in den Raum springen
+alert_jump: false       # jump into the room of a new warning
 scenes: true
-motion_trail: false     # Pro: Kamera-Cockpit
-weather: true           # Pro: Wetter draußen
+motion_trail: false     # Pro: camera cockpit
+weather: true           # Pro: weather outside
 weather_entity: weather.home
-holograms: true         # Pro: Hologramme immer an/aus; weglassen = Schalter in der Karte
-camera_wall: false      # Pro: Knopf „Kameras“ unten in der Karte öffnet die Kamera-Wand
-time_travel: false      # Pro: Knopf „Zeitreise“ unten in der Karte spielt die letzten 24 Stunden ab (nur ansehen)
-time_travel_speed: 360  # Tempo der Zeitreise: 60 | 360 | 900 | 3600 | 14400 (eine Stunde in 1 min, 10 s, 4 s, 1 s; ein Tag in 6 s, nur in der Woche)
-time_travel_range: 24h  # Start der Zeitreise: 24h oder 7d (die Woche; auch auf der Stufe Tablet, die sonst zwei Tage hält)
-roof: true              # false: Haus ganz ohne Dach zeigen
-roof_fade: true         # false: Dach bleibt beim Heranzoomen auf dem Haus
-plain: false            # true: nur Grundriss – Wände, Türen, Fenster und Treppen ohne Möbel
-start_view: { theta: 0.8, phi: 1.0, radius: 20 }   # eigene Startansicht dieser Karte; die Zeile steht im Editor unter Startansicht (weglassen = die des Plans)
-idle_return: 0          # Sekunden ohne Berührung bis zur Startansicht
+holograms: true         # Pro: holograms always on/off; leave out = a switch in the card
+camera_wall: false      # Pro: a "Cameras" button at the bottom of the card opens the camera wall
+time_travel: false      # Pro: a "Time travel" button at the bottom of the card replays the last 24 hours (view only)
+time_travel_speed: 360  # time travel speed: 60 | 360 | 900 | 3600 | 14400 (one hour in 1 min, 10 s, 4 s, 1 s; a day in 6 s, week only)
+time_travel_range: 24h  # time travel starts with: 24h or 7d (the week; also at the Tablet level, which else holds two days)
+roof: true              # false: show the house without its roof
+roof_fade: true         # false: the roof stays on the house while zooming in
+plain: false            # true: floor plan only – walls, doors, windows and stairs without furniture
+start_view: { theta: 0.8, phi: 1.0, radius: 20 }   # a start view of this card's own; the line is shown in the editor under Start view (leave out = the plan's)
+idle_return: 0          # seconds without a touch until the start view
 night: "off"            # off | sun | "22:00-06:00"
 idle_orbit: false
 ```
 
-### 8.3 Karten für einzelne Räume (neu in 3.0)
+### 8.3 Cards for single rooms (new in 3.0)
 
-![Eine Karte nur fürs Kinderzimmer](images/card-room-one.jpg)
+![A card for the kids' room only](images/card-room-one.jpg)
 
-Im Kartendialog unter **Nur diese Räume** tippst du Räume auf der kleinen Draufsicht an (oder kreuzt sie darunter an). Die Karte zeigt dann nur sie, mit ihren Möbeln, Geräten, Türen und Fenstern; die anderen Räume, Etagen und das Dach fallen weg. Das ist ideal fürs Tablet im Kinderzimmer, in der Einliegerwohnung oder im Gästezimmer. Auf alten Tablets läuft es sogar noch flüssiger, weil nur diese Räume gezeichnet werden.
+In the card dialog under **Only these rooms**, tap rooms on the small view from above (or tick them below). The card then shows only them, with their furniture, devices, doors and windows; the other rooms, floors and the roof are left out. That is ideal for the tablet in the kids' room, a granny flat or the guest room. On old tablets it runs even more smoothly, because only these rooms are drawn.
 
-- **Ein Raum** öffnet sich gleich mit seinen Geräten daneben. „Hier“ in der Sprachsteuerung meint dann diesen Raum.
-- **Das Tablet bleibt in diesen Räumen:** Tippen, Suchen und Sprünge führen nicht hinaus. **Andere Räume dürfen geöffnet werden** hebt das auf.
-- **Schnellweg im Editor:** Raum auswählen → **🖥 Karte für diesen Raum** legt eine Karten-Vorlage nur mit diesem Raum an und öffnet sie. Auf dem Tablet wählst du dann nur noch die Vorlage.
-- **Mehrere Grundrisse:** Oben im Kartendialog wählst du den **Grundriss** der Karte, auch **🏘 Grundstück** mit allen Gebäuden zusammen.
+- **One room** opens with its devices beside it right away. "Here" in voice control then means that room.
+- **The tablet stays in these rooms:** taps, search and jumps do not lead out. **Other rooms may be opened** lifts that.
+- **Shortcut in the editor:** select a room → **🖥 Card for this room** makes a card template with only this room and opens it. On the tablet you then just pick the template.
+- **Several floor plans:** at the top of the card dialog you choose the card's **Floor plan**, also **🏘 Property** with every building together.
 
-![Nur diese Räume im Kartendialog](images/card-editor-rooms.jpg)
+![Only these rooms in the card dialog](images/card-editor-rooms.jpg)
 
 ---
 
-## 9. HomePlan 3D auf dem Wandtablet
+## 9. HomePlan 3D on a wall tablet
 
 ![Tablet](images/tablet.jpg)
 
-HomePlan 3D ist für Wandtablets wie das Amazon Fire gebaut:
+HomePlan 3D is built for wall tablets such as the Amazon Fire:
 
-- **Kein Rechnen im Leerlauf.** Ändert sich nichts, zeichnet die Ansicht kein einziges Bild. Die FPS-Anzeige zeigt dann „Ruhe (0 B/s)“.
-- **Qualitätsstufe Tablet:** Auf Fire-Tablets wählt „Auto“ sie von selbst, ebenso auf jedem Gerät, das die Ansicht beim Drehen mit weniger als 20 Bildern pro Sekunde zeigt – das merkt sich der Browser dann. Muster, Schatten, Halos und Partikel fallen weg. Bewegte Deko (Energiefluss, Solarfelder, Klangringe, Poolwasser, Saugroboter, Farbeffekte, Haustiere) läuft mit etwa 5 Bildern pro Sekunde und bleibt 30 Sekunden nach der letzten Berührung stehen; Antippen oder etwas, das neu losläuft, weckt sie wieder. Reine Messwerte (Watt, Temperatur) erscheinen höchstens alle 2 Sekunden, Schalter, Türen und Alarme sofort.
-- **Kiosk-Optionen der Karte:** Nach einigen Minuten ohne Berührung kehrt die Karte zur Startansicht zurück. Nachts dimmt sie nach Sonnenstand oder Uhrzeit. Als Bildschirmschoner dreht sich das Haus langsam.
-- **Warnungen** springen auf Wunsch von selbst in den betroffenen Raum.
-- Hochkant erscheint das Raumfenster unten.
+- **No work while idle.** If nothing changes, the view draws not a single frame. The FPS display then reads "At rest (0 fps)".
+- **Tablet quality level:** "Auto" picks it by itself on Fire tablets, and on any device that turns the view at under 20 frames a second – the browser remembers that. Patterns, shadows, halos and particles are left out. Moving decorations (energy flow, solar fields, sound rings, pool water, robot vacuums, colour effects, pets) run at about 5 frames a second and stand still 30 seconds after the last touch; a tap, or something new that starts to move, wakes them. Measured values alone (watts, temperature) show at most every 2 seconds, switches, doors and alarms at once.
+- **Kiosk options of the card:** After a few minutes without a touch the card returns to the start view. At night it dims by the sun or by the clock. As a screensaver the house turns slowly.
+- **Warnings** can jump into the affected room by themselves.
+- In portrait the room panel appears at the bottom.
 
-![Tablet hochkant](images/tablet-portrait-room.jpg)
+![Portrait tablet](images/tablet-portrait-room.jpg)
 
-![Handy](images/phone-floor.jpg)
+![Phone](images/phone-floor.jpg)
 
-**Tipps für Fire-Tablets:** Fully Kiosk Browser mit Hardwarebeschleunigung nutzen, die Karte mit `fill: true` bildschirmfüllend zeigen und `quality: auto` lassen.
+**Tips for Fire tablets:** Use Fully Kiosk Browser with hardware acceleration, show the card full screen with `fill: true` and keep `quality: auto`.
 
-**Sprachsteuerung:** Auf dem Wandtablet sprichst du mit NeonPlan über einen Mikrofon-Knopf, z. B. „Zeig das Wohnzimmer“. Alles dazu steht in [5.10 Sprachsteuerung](#510-sprachsteuerung-neu).
-
----
-
-## 10. Sicherung und Umzug
-
-![Sicherung](images/editor-backup.jpg)
-
-Unter **Sicherung** im Editor:
-
-- **Wiederherstellungspunkte** entstehen beim Bearbeiten höchstens alle 10 Minuten, die letzten 20 bleiben – bei mehreren Grundrissen für jeden eigene. **Wiederherstellen** holt einen Stand zurück, der aktuelle bleibt dabei selbst als Punkt erhalten.
-- **Exportieren** speichert den Plan als Datei, **Importieren …** lädt eine solche Datei.
-- **Als Vorlage teilen** exportiert ohne Bereiche, Geräte, Sensoren und Bilder. Das ist gut, um einen Grundriss weiterzugeben.
-- **🖨 In 3D drucken** (seit 2.2): lädt den Plan wie **Exportieren** herunter für einen lokalen 3D-Druck-Workflow: Etagen zum Abheben, Dach als Deckel, Bodenplatte mit eurem Namen. Für alle enthalten, für deine eigenen Häuser.
-- **Komplett-Backup:** **Alles sichern (Plan, Bilder, Packs)** speichert eine Datei mit allen Grundrissen, allen Hintergrund- und Bildschirmbildern und den installierten Packs. **Komplett-Backup wiederherstellen …** spielt sie in dieselbe oder eine andere Installation zurück. Lokale JSON-Packs werden daraus wieder eingespielt.
-- **Zwei Geräte, ein Plan** (seit 3.1.1): Jede Speicherung weiß, auf welchem Stand des Plans sie gemacht wurde. Hat ein anderes Gerät inzwischen gespeichert – etwa der PC, während das Handy über Nacht im Hintergrund lag –, schreibt NeonPlan den alten Stand nicht darüber: Du siehst den neueren Plan, und deine Änderung wartet oben mit **Übernehmen und speichern** oder **Verwerfen**. Kommt die App aus dem Hintergrund zurück, lädt sie den Plan neu.
-
-Das normale Backup von Home Assistant sichert HomePlan 3D ebenfalls vollständig mit.
-
-**Aus anderen Programmen übernehmen:** Der Import des Editors macht aus Plänen anderer Programme eine NeonPlan-Datei: Sweet Home 3D (`.sh3d`), iPhone-/iPad-Scans mit LiDAR (RoomPlan-JSON), CAD-Zeichnungen (`.dxf`), 3D-Modelle aus Blender, SketchUp & Co. (`.glb`, `.gltf`, `.obj`, `.stl`), Floorplanner und Valetudo-Saugroboterkarten. Er zeigt eine Vorschau mit Räumen, Türen, Fenstern und Möbeln, lässt Räume umbenennen und je nach Format Einheit, Layer oder Etagenhöhen einstellen; die Datei bleibt dabei auf deinem Computer. Die Datei lädst du hier mit **Importieren …**. Wer sich den Plan lieber von einer KI schreiben lässt, findet die Vorlage dafür in [docs/ai-import.md](ai-import.md).
+**Voice control:** on the wall tablet you talk to NeonPlan with a microphone button, e.g. "Show the living room". Everything about it is in [5.10 Voice control](#510-voice-control-new).
 
 ---
 
-## 11. Daten und Datenschutz
+## 10. Backup and moving
 
-- Plan, Bilder und Packs liegen in Home Assistant unter `.storage`. Nichts davon verlässt deine Installation.
-- HomePlan 3D hat keinen Update-Dienst, den es kontaktieren muss. Es wird keine Installations-Kennung gesendet.
-- Kamerabilder, Verlaufsdaten und Zustände bleiben in Home Assistant und werden nur im Browser angezeigt.
-- Die Zeitreise liest den Verlauf aus dem Recorder von Home Assistant, nur für die Geräte des Plans. Personen und ihre Tracker liest sie nie.
-- Die **Ortung** wertet die Bluetooth-Signale nur in Home Assistant aus. Nichts darüber, wer wo ist, verlässt dein Haus.
-- **Lokale Diagnose (standardmäßig aus):** Unter **⚙ Einstellungen → Diagnose** kannst du als Admin anonyme Nutzungs- und Fehlerstatistiken einschalten. Es wird nichts versendet; die Daten bleiben in Home Assistant unter `.storage`.
-  - **Lokal gespeichert werden:** eine zufällige Kennung (nicht die von Home Assistant, sie entsteht beim Einschalten), die Versionen von HomePlan 3D, Home Assistant und Python, die Sprache, die installierten Packs und aktivierten Funktionen, Anzahlen aus dem Plan (Etagen, Räume, Möbel, verknüpfte Geräte, Kameras), Geräteart, Browser und System der Bildschirme mit Bildrate und Grafikklasse, wie oft welche Ansicht geöffnet wurde, und Fehlermeldungen ohne Namen und Adressen.
-  - **Nie enthalten sind:** Namen, Entitäten, Bereiche, die Form deines Grundrisses, IP-Adressen, die Kennung deiner Home-Assistant-Installation, Benutzernamen, Zugangsdaten – und nichts aus der Ortung.
-  - **„Bericht ansehen“** zeigt genau, was gespeichert ist. **„Daten löschen“** entfernt es und schaltet die Diagnose aus.
+![Backup](images/editor-backup.jpg)
+
+Under **Backup** in the editor:
+
+- **Restore points** are kept at most every 10 minutes while you edit, the last 20 stay – with several floor plans, each its own. **Restore** brings back a state, the current one is kept as a restore point itself.
+- **Export** saves the plan as a file, **Import …** loads such a file.
+- **Share as template** exports without areas, devices, sensors and pictures. Good for passing a floor plan on.
+- **🖨 Print in 3D** (since 2.2): downloads the plan like **Export** for a local 3D-print workflow: floors you lift off, the roof as a lid, a base plate with your name. Included for everyone, for your own homes.
+- **Full backup:** **Back up everything (plan, pictures, packs)** saves one file with every floor plan, every background and screen picture and the installed packs. **Restore a full backup …** brings it back into the same or another installation. Local JSON packs are imported again from the backup.
+- **Two devices, one plan** (since 3.1.1): every save knows which state of the plan it was made on. If another device saved meanwhile – the PC, say, while the phone slept in the background overnight – NeonPlan does not write the old state over it: you see the newer plan, and your change waits at the top with **Restore and save** or **Discard**. An app coming back from the background loads the plan again.
+
+Home Assistant's own backup includes HomePlan 3D completely as well.
+
+**From other programs:** the editor's import turns plans of other programs into a NeonPlan file: Sweet Home 3D (`.sh3d`), iPhone/iPad LiDAR scans (RoomPlan JSON), CAD drawings (`.dxf`), 3D models from Blender, SketchUp & co. (`.glb`, `.gltf`, `.obj`, `.stl`), Floorplanner and Valetudo robot vacuum maps. It shows a preview with rooms, doors, windows and furniture, lets you rename rooms and, depending on the format, set the unit, the layers or the floor levels; the file stays on your computer. Load the file here with **Import …**. If you would rather let an AI write the plan, the template is in [docs/ai-import.md](ai-import.md).
 
 ---
 
-## 12. Häufige Fragen und Fehlerbehebung
+## 11. Data and privacy
 
-**Hilfe und Rückmeldung:** Einen Fehler meldest du als Issue und eine Idee als Diskussion in diesem Repository. So geht nichts verloren, alle sehen den Stand, und du wirst in den Release-Notizen genannt, wenn es umgesetzt ist. Die beiden Knöpfe dafür stehen auch im Editor unten in der Seitenleiste und auf der Seite Erweiterungen.
+- The plan, pictures and packs are stored in Home Assistant under `.storage`. None of it leaves your installation.
+- HomePlan 3D has no update service to contact. No installation id is sent anywhere.
+- Camera pictures, history and states stay in Home Assistant and are only shown in the browser.
+- Time travel reads the history from Home Assistant's recorder, only for the devices of the plan. It never reads people or their trackers.
+- **Locating** evaluates the Bluetooth signals only in Home Assistant. Nothing about who is where leaves your house.
+- **Local diagnostics (off by default):** under **⚙ Settings → Diagnostics** an admin can switch on anonymous usage and error statistics. Nothing is sent anywhere; the data stays in Home Assistant under `.storage`.
+  - **Collected locally:** a random id (not Home Assistant's, made when you switch it on), the versions of HomePlan 3D, Home Assistant and Python, the language, the installed packs and enabled features, counts from the plan (floors, rooms, furniture, linked devices, cameras), device type, browser and system of the screens with frame rate and graphics class, how often each view was opened, and error messages without names and addresses.
+  - **Never included:** names, entities, areas, the shape of your floor plan, IP addresses, your Home Assistant installation's id, user names, credentials – and nothing from locating.
+  - **"View report"** shows exactly what is stored. **"Clear data"** deletes it and switches diagnostics off.
 
-**Wie bekomme ich das neueste Update?**
-Einstellungen → System → Updates. Der Marketplace sucht nur alle paar Stunden nach neuen Versionen, deshalb fehlt ein frisches Update dort manchmal noch; dann etwas später noch einmal nachsehen. Mit HACS (Home Assistant vor 2026.11) geht es sofort: HACS → HomePlan 3D → ⋮ → **Informationen aktualisieren** → **Herunterladen**. Danach Home Assistant neu starten und die Seite neu laden (Strg+F5, in der Companion-App: Einstellungen → Companion-App → Frontend-Cache zurücksetzen).
+---
 
-**Kann ich Helfer statt echter Sensoren nehmen?**
-Ja. Überall, wo NeonPlan einen Zahlenwert erwartet (Leistung, Ladestand, Reichweite, Position …), stehen auch `input_number`- und `number`-Helfer zur Wahl, und wo ein Ein/Aus erwartet wird (Kontakt, Anwesenheit …), auch `input_boolean`. Für Leistung braucht der Helfer die Einheit W oder kW.
+## 12. FAQ and troubleshooting
 
-**Die Lautstärke eines Echo ändert sich nicht.**
-Alexa Media Player setzt die Lautstärke bei manchen Echos nicht oder nur verzögert und meldet den neuen Wert spät zurück. Prüfe es unter Entwicklerwerkzeuge → Aktionen mit `media_player.volume_set`: Passiert dort nichts, liegt es an der Integration (siehe Kapitel 6.5).
+**Help and feedback:** report a bug as an issue and an idea as a discussion in this repository. Nothing gets lost, everyone sees the state, and you are credited in the release notes once it is built. The two buttons for it are also at the bottom of the editor's sidebar and on the Extensions page.
 
-**Auf iPhone oder iPad schließt sich NeonPlan, wenn ich mit zwei Fingern verschiebe oder zoome.**
-Das ist kein Absturz: Die Home-Assistant-App hat eigene Wischgesten. Liegt auf einem Wischen mit zwei Fingern eine Aktion (etwa zur Startseite), führt die App sie aus und verlässt die Seite. In der App unter **Einstellungen → Companion App → Gesten** die Zwei-Finger-Gesten auf **Keine** stellen. In Safari passiert das nicht.
+**How do I get the latest update?**
+Settings → System → Updates. The Marketplace only looks for new versions every few hours, so a fresh update may not show there yet; then look again a little later. With HACS (Home Assistant before 2026.11) it works right away: HACS → HomePlan 3D → ⋮ → **Update information** → **Download**. Then restart Home Assistant and reload the page (Ctrl+F5; in the Companion app: Settings → Companion app → reset frontend cache).
 
-**Oben steht „Neustart nötig“.**
-Nach einem Update läuft im Hintergrund noch die alte Version. Home Assistant neu starten.
+**Can I use helpers instead of real sensors?**
+Yes. Wherever NeonPlan expects a number (power, charge, range, position …), `input_number` and `number` helpers can be picked too, and wherever it expects on/off (contact, presence …), `input_boolean` as well. For power the helper needs the unit W or kW.
 
-**Ein Gerät fehlt in der Geräteliste eines Raums.**
-Der Raum braucht einen Bereich, und das Gerät muss diesem Bereich zugeordnet sein, entweder das Gerät oder die Entität selbst. Steckt die Entität unter einem Gerät mit mehreren Entitäten, steht sie hinter „+n mehr“. Das Suchfeld findet sie direkt. In Home Assistant ausgeblendete oder deaktivierte Entitäten nimmt NeonPlan nicht von selbst auf; war eine schon im Raum platziert, bleibt sie in der Liste, damit du sie entfernen oder mit 👁 ausblenden kannst.
+**An Echo's volume does not change.**
+Alexa Media Player does not set the volume on some Echos, or only with a delay, and reports the new value late. Check it in Developer tools → Actions with `media_player.volume_set`: if nothing happens there, it is the integration (see chapter 6.5).
 
-**Eine Kamera ist schwer zu treffen.**
-Tippe auf ihren Sichtkegel am Boden, er zählt wie die Kamera.
+**"Restart needed" appears at the top.**
+After an update the old version still runs in the background. Restart Home Assistant.
 
-**Möbel erscheinen als graue Kästen.**
-Das Pack, aus dem sie stammen, ist nicht installiert. Importiere die lokale JSON-Datei wieder.
+**On an iPhone or iPad NeonPlan closes when I move or zoom with two fingers.**
+That is no crash: the Home Assistant app has gestures of its own. If a two-finger swipe has an action there (e.g. to the start page), the app runs it and leaves the page. In the app, set the two-finger gestures under **Settings → Companion App → Gestures** to **None**. It never happens in Safari.
 
-**Beim Verschieben in 3D rutscht ein Möbel nicht durch die Wand.**
-Das ist Absicht: In der 3D-Ansicht bleiben Möbel und Geräte beim Ziehen in ihrem Raum und gleiten an der Wand entlang. In einen anderen Raum ziehst du sie im Grundriss, dort geht das frei.
+**A device is missing in a room's device list.**
+The room needs an area, and the device must belong to that area, either the device or the entity itself. If the entity sits under a device with several entities, it is behind "+n more". The search field finds it directly. Entities hidden or disabled in Home Assistant are never taken in by themselves; one that was placed in the room before stays in the list, so you can remove it or hide it with 👁.
 
-**Ein Tipp trifft das Gerät im Nachbarraum.**
-Wände fangen Tipps ab. In der Raumansicht zählen nur Dinge im Raum. Trifft es trotzdem das Falsche, hilft der Schalter **Schnitt**.
+**A camera is hard to hit.**
+Tap its wedge on the floor, it counts like the camera.
 
-**Die Ansicht ruckelt auf dem Tablet.**
-Qualität auf **Tablet** stellen und mit **FPS** prüfen, was zeichnet. Im Leerlauf sollte dort 0 B/s stehen. Läuft dauerhaft etwas, steht der Grund daneben, etwa ein Farbeffekt einer Lampe.
+**Furniture shows as grey boxes.**
+The pack it comes from is not installed. Import the local JSON pack again.
 
-**Die Zeitreise zeigt nichts, „unbekannt“ oder Lücken.**
-Die Zeitreise nimmt den Verlauf aus dem Recorder von Home Assistant. Steht dort „Ohne den Recorder … gibt es keinen Verlauf“, ist der Recorder abgeschaltet (`recorder:` in der `configuration.yaml`). Steht ein Gerät auf „unbekannt“, ist es vom Recorder ausgeschlossen (`exclude:` unter `recorder:`) oder erst seit Kurzem da. Graue Flächen am Anfang der Leiste: Der Recorder hat noch keine 24 Stunden gesammelt (frisch eingerichtet, oder `purge_keep_days` ist kleiner als 1). Schraffierte Flächen: Home Assistant war in dieser Zeit aus oder startete neu. Temperaturen und Leistungen kommen aus den Fünf-Minuten-Statistiken; ein Sensor ohne Zustandsklasse (`state_class: measurement`) wird stattdessen aus seinen Zuständen gezeigt. Meldet die Leiste „Bitte Home Assistant neu starten“, läuft im Hintergrund noch eine ältere Version.
+**Dragging in 3D, an item does not pass through the wall.**
+That is on purpose: in the 3D view furniture and devices stay in their room while dragged and slide along the wall. Move them into another room in the floor plan, where they move freely.
 
-**Die 3D-Ansicht bricht gleich nach dem Start ab (Grafik verloren, „Error creating WebGL context“).**
-Manche ältere Grafikchips scheitern an Sonnenbahn, Hausschatten oder dem Fensterschein bei Nacht (etwa ältere AMD-Chips in Chrome auf dem Mac). Geht der 3D-Ansicht in den ersten Sekunden die Grafik verloren, merkt sich der Browser das: Ab dem nächsten Laden startet er ohne diese Effekte, und ⚙ Einstellungen sagt es dazu. Jede neue NeonPlan-Version probiert sie einmal wieder. Hat Chrome die Grafik nach mehreren Abstürzen gesperrt, Chrome ganz beenden und neu öffnen.
+**A tap hits the device in the next room.**
+Walls catch taps. In the room view only things in the room count. If it still hits the wrong thing, the **Cut** switch helps.
 
-**Das Sonnenlicht fällt durch die falschen Fenster.**
-Unter Einstellungen die **Nordrichtung** prüfen: Grad im Uhrzeigersinn von „oben“ im Plan.
+**The view stutters on the tablet.**
+Set quality to **Tablet** and check with **FPS** what is drawing. At rest it should read 0 fps. If something keeps running, the reason is shown next to it, e.g. a lamp's colour effect.
 
-**Ein Pack-Import schlägt fehl.**
-Prüfe, dass die Datei ein gültiges lokales JSON-Pack ist, und importiere sie erneut.
+**Time travel shows nothing, "unknown" or gaps.**
+Time travel takes the history from Home Assistant's recorder. If the bar says "Without Home Assistant's recorder there is no history", the recorder is switched off (`recorder:` in `configuration.yaml`). A device reading "unknown" is excluded from the recorder (`exclude:` under `recorder:`) or new. Grey areas at the start of the bar: the recorder has not collected 24 hours yet (freshly set up, or `purge_keep_days` is below 1). Hatched areas: Home Assistant was off or restarting then. Temperatures and power come from the five-minute statistics; a sensor without a state class (`state_class: measurement`) is shown from its states instead. If the bar says "Please restart Home Assistant", an older version still runs in the background.
 
-**Die Meldung „Diese Seite zeigt noch HomePlan 3D x.y, Home Assistant hat schon …“ bleibt.**
-Browser oder Companion-App halten noch ein altes NeonPlan-Bundle. Auf **Neu laden** tippen; in der Companion-App unter Einstellungen → Companion-App → **Frontend-Cache zurücksetzen**, dann die App ganz schließen und neu öffnen. Ein Neustart von Home Assistant hilft hier nicht. Dasselbe gilt, wenn ein installiertes Pack „braucht eine neuere NeonPlan-Version“ meldet.
+**The 3D view breaks off right after it starts (graphics lost, "Error creating WebGL context").**
+Some older graphics chips fail on the sun's arc, the house shadow or the window glow at night (e.g. older AMD chips in Chrome on a Mac). If the 3D view loses its graphics within the first seconds, the browser remembers it: from the next load on, this browser starts without these effects, and ⚙ Settings says so. Every new NeonPlan version tries them again once. If Chrome has blocked the graphics after several crashes, quit Chrome completely and open it again.
 
-**Am Dach hängen zwei Hologramme (Energie Pro).**
-Das ist gewollt: Das große ist die **Hausbilanz** (Solar & Energie), das kleinere die **Anlagenkarte** des Wechselrichters, dessen Feld das ist – bei mehreren Anlagen hat jede ihre eigene. Zu viel? Im Abschnitt **Hologramm** die Hausbilanz **Frei im Plan** hängen (Griff ◈), oder im Wechselrichter-Formular den Haken **Anlagenkarte zeigen** rausnehmen. Eine kleine Karte, die scheinbar am Dach klebt, ist oft das Geräte-Hologramm eines Geräts im Raum darunter – Kamera etwas drehen.
+**Sunlight falls through the wrong windows.**
+Check **North** under Settings: degrees clockwise from "up" in the plan.
 
-**Eine Pack-Datei lässt sich nicht lesen.**
-Installierte Packs und Pro-Erweiterungen funktionieren weiter. Exportiere die Datei erneut oder nutze die aktuelle JSON-Datei.
+**A pack import fails.**
+Check that the file is a valid local JSON pack and import it again.
 
-**Wo melde ich Fehler?**
-Im Issue-Tracker auf GitHub: 
+**The notice "This page still shows HomePlan 3D x.y, Home Assistant already has …" stays.**
+The browser or the companion app still holds an old NeonPlan bundle. Tap **Reload**; in the companion app go to Settings → Companion app → **Reset frontend cache**, then close the app completely and open it again. Restarting Home Assistant does not help here. The same applies when an installed pack says "needs a newer NeonPlan version".
+
+**Two holograms hang on the roof (Energy Pro).**
+That is intended: the big one is the **house balance** (Solar & Energy), the smaller one the **plant card** of the inverter whose field that is – with several plants each has its own. Too much? In the **Hologram** section hang the house balance **Free in the plan** (handle ◈), or untick **Show the plant card** in the inverter form. A small card that seems to stick to the roof is often the device hologram of a device in the room below – turn the camera a little.
+
+**A pack file cannot be read.**
+Installed packs and Pro add-ons keep working. Export the pack again or use the current JSON file.
+
+**Where do I report bugs?**
+In the issue tracker on GitHub:

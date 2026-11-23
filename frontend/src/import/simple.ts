@@ -48,7 +48,7 @@ export function readSimple(data: unknown): RawPlan {
     });
     if (skipped) warnings.push({ code: "rooms_skipped", n: skipped });
     const floor: RawFloor = {
-      name: String(f.name ?? `Etage ${i + 1}`),
+      name: String(f.name ?? `Floor ${i + 1}`),
       elevation: f.elevation !== undefined ? n(f.elevation, 0) * unit : i * 2.8,
       height: f.height !== undefined ? n(f.height, 2.5 / unit) * unit : null,
       rooms,
@@ -100,7 +100,7 @@ export function repairPlan(input: Building): { building: Building; warnings: War
   b.floors = (Array.isArray(b.floors) ? b.floors : []).map((f, i) => {
     const floor = { ...f };
     floor.id = fresh(f.id, "floor");
-    floor.name = String(f.name ?? `Etage ${i + 1}`);
+    floor.name = String(f.name ?? `Floor ${i + 1}`);
     floor.elevation = n(f.elevation, 0);
     floor.height = Math.min(8, Math.max(1.8, n(f.height, 2.5)));
     floor.cut_height = n(f.cut_height, 1.15);

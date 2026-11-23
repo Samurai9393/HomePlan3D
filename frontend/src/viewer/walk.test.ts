@@ -8,7 +8,7 @@ function rect(id: string, x0: number, z0: number, x1: number, z1: number): Room 
   return { id, name: id, area_id: null, points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]], floor_material: "wood" };
 }
 
-const floor = { ...newFloor("f", "EG", 0), rooms: [rect("r", 0, 0, 8, 5)] };
+const floor = { ...newFloor("f", "Ground floor", 0), rooms: [rect("r", 0, 0, 8, 5)] };
 const building = { ...emptyBuilding(), floors: [floor] };
 // a sofa across the middle of the room
 const sofa: Obstacle = { c: [4, 2.5], u: [0, 1], hw: 1.2, hd: 0.45 };
@@ -48,7 +48,7 @@ test("a place on the furniture is reached with a last hop, and left with a first
 
 test("an outer door upstairs leads nowhere unless a balcony is drawn behind it; downstairs it leads into the garden (#766)", () => {
   const french = { id: "fd", room_id: "r", edge: 0, offset: 4, width: 1.2, type: "window" as const, sill: 0, height: 2.2, hinge: "left" as const, leaves: 2 as const, swing: "in" as const, cover: null, contact: null, contact2: null, tilt: null };
-  const up = { ...newFloor("og", "OG", 2.8), rooms: [rect("r", 0, 0, 8, 5)], openings: [french] };
+  const up = { ...newFloor("og", "Upper floor", 2.8), rooms: [rect("r", 0, 0, 8, 5)], openings: [french] };
   assert.equal(new FloorMap({ ...emptyBuilding(), floors: [up] }, up).doors.length, 0);
   // the room's edge 0 runs along z = 0: a balcony in front of it (z < 0)
   const withBalcony = { ...up, outdoor: [{ id: "b", type: "terrace", points: [[2, -2], [6, -2], [6, 0], [2, 0]] }] } as typeof up;
@@ -62,7 +62,7 @@ test("pets stay indoors: only doors between two rooms are ways, never round the 
   // two rooms side by side, each with a door to the outside (edge 0 runs along z = 0), the right one a garage door
   const rooms = [rect("a", 0, 0, 4, 5), rect("b", 4, 0, 8, 5)];
   const outside = [door("front", "a", 0, 2), door("gate", "b", 0, 2, "garage"), door("french", "b", 2, 2, "window")];
-  const apart = { ...newFloor("f", "EG", 0), rooms, openings: outside };
+  const apart = { ...newFloor("f", "Ground floor", 0), rooms, openings: outside };
   const plan = { ...emptyBuilding(), floors: [apart] };
   const from: Vec2 = [1, 3];
   const to: Vec2 = [7, 3];
@@ -81,7 +81,7 @@ test("pets stay indoors: only doors between two rooms are ways, never round the 
 test("upstairs, a door between rooms drawn a wall's width apart is a way, not a door into the air (#970)", () => {
   const door = { id: "d", room_id: "a", edge: 1, offset: 2.5, width: 0.8, type: "door" as const, sill: 0, height: 2.1, hinge: "left" as const, leaves: 1 as const, swing: "in" as const, cover: null, contact: null, contact2: null, tilt: null };
   // two rooms with a 12 cm gap between them: the wall there is room a's "outer" wall, room b has none on that side
-  const up = { ...newFloor("og", "OG", 2.75), rooms: [rect("a", 0, 0, 4, 5), { ...rect("b", 4.12, 0, 8, 5), wall_heights: [null, null, null, 0] }], openings: [door] };
+  const up = { ...newFloor("og", "Upper floor", 2.75), rooms: [rect("a", 0, 0, 4, 5), { ...rect("b", 4.12, 0, 8, 5), wall_heights: [null, null, null, 0] }], openings: [door] };
   const map = new FloorMap({ ...emptyBuilding(), floors: [up] }, up);
   assert.equal(map.doors.length, 1);
   assert.ok(map.path([1, 2.5], [7, 2.5]), "from room to room");

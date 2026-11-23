@@ -1,17 +1,17 @@
-// Tutorial episode 2, part 3 – "Fenster, Sensoren und Rollläden": the windows of the traced house (episode 2,
+// Tutorial episode 2, part 3 – "Windows, sensors and covers": the windows of the traced house (episode 2,
 // parts 1 and 2) – two-leaf window, window with bars, a high bathroom window, a two-leaf terrace door, a glass wall –
 // sill, styles, the automatic and the hand-picked contacts per leaf, the sensor kinds (contact, handle sensor,
 // contact + tilt sensor, tilt angle sensor), blinds with a live position sensor, and everything live in 3D.
 // The handle sensor, the tilt angle sensor, the blind level sensor and the bathroom door contact are added to the
 // demo's mock Home Assistant at runtime (invented, like the rest of the demo).
-// Usage (from frontend/): node tutorials/ep02c-fenster-sensoren.mjs <out-dir> [<de voice-dir> <en voice-dir>] (each with durations.json)
+// Usage (from frontend/): node tutorials/ep02c-fenster-sensoren.mjs <out-dir> [<voice-dir>] (with durations.json)
 // Then: python ../tools/make-tutorial.py <out-dir> <out.mp4>
 
 import { narration, startRecorder } from "./recorder.mjs";
 import { VERSION, fastMode, helpers, tap, traceHouse } from "./ep02-common.mjs";
 
 const out = process.argv[2] ?? "tutorial-ep02c";
-const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "de" });
+const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "en" });
 fastMode(R);
 const N = narration(R, process.argv.slice(3));
 const { say, sayOver, chapter, catchUp } = N;
@@ -19,10 +19,10 @@ const H = helpers(R);
 const { fill, tapPlan, pointPlan, scrollSide, pickEntity, pickerMove, view3d, glide3d, setState } = H;
 
 const ENTITIES = [
-  ["binary_sensor.bad_tuer", "bad", "off", { friendly_name: "Bad Tür", device_class: "door" }],
-  ["sensor.schlafzimmer_fenstergriff", "schlafzimmer", "closed", { friendly_name: "Schlafzimmer Fenstergriff" }],
-  ["sensor.schlafzimmer_kippwinkel", "schlafzimmer", "0", { friendly_name: "Schlafzimmer Kippwinkel", unit_of_measurement: "°" }],
-  ["sensor.wohnzimmer_rollladen_level", "wohnzimmer", "70", { friendly_name: "Wohnzimmer Rollladen Level", unit_of_measurement: "%" }],
+  ["binary_sensor.bad_tuer", "bad", "off", { friendly_name: "Bathroom door", device_class: "door" }],
+  ["sensor.schlafzalways_fenstergriff", "schlafzalways", "closed", { friendly_name: "Bedroom window handle" }],
+  ["sensor.schlafzalways_kippwinkel", "schlafzalways", "0", { friendly_name: "Bedroom tilt angle", unit_of_measurement: "°" }],
+  ["sensor.wohnzimmer_rollladen_level", "wohnzimmer", "70", { friendly_name: "Living room roller shutter level", unit_of_measurement: "%" }],
 ];
 /** Camera views of the 3D half (plan metres as target). */
 const V = {
@@ -40,7 +40,7 @@ const look = async (to, seconds = 1.2) => {
   await glide3d(cam, to, seconds);
   cam = to;
 };
-const tool = () => R.clickOn({ text: "Tür & Fenster", exact: true }, 0.5);
+const tool = () => R.clickOn({ text: "Door & Window", exact: true }, 0.5);
 /** Move a blind (cover, or the number of a level sensor) in steps, so 3D shows it travelling. */
 const travel = async (id, from, to, seconds, sensor = false) => {
   const n = Math.max(2, Math.round(seconds * 5));
@@ -64,17 +64,17 @@ const B = { theta: 0.5, phi: 0.9, radius: 20 };
 await setState("binary_sensor.kueche_fenster", "off");
 await R.view(A);
 await R.sleep(1200);
-await R.title("Bauplan als Vorlage – Teil 3", `HomePlan 3D · Folge 2 · Fenster, Sensoren und Rollläden${VERSION}`);
-await sayOver("Fenster, die live aufgehen und kippen, Rollläden, die mitfahren – heute kommen die Fenster dazu.");
+await R.title("Floor plan as template – part 3", `HomePlan 3D · Episode 2 · Windows, sensors and shutters${VERSION}`);
+await sayOver("Windows that open and tilt live, blinds that move along – today we add the windows.");
 await R.glide(A, { theta: 0.1, phi: 0.87, radius: 19.5 }, 2.5);
 await setState("binary_sensor.kueche_fenster", "on");
 await travel("cover.kueche", 40, 100, 1.5);
 await R.untitle();
-await sayOver("Mit jedem Fensterstil, jeder Sensor-Art und dem Rollladen-Positionssensor.");
+await sayOver("With every window style, every sensor type and the blind position sensor.");
 await R.glide({ theta: 0.1, phi: 0.87, radius: 19.5 }, B, 3.5);
 
 // ---------------------------------------------------------------- 1. Intro
-await chapter("Was wir heute machen");
+await chapter("Was wir today machen");
 await R.open("empty");
 await traceHouse(R, { walls: true, openings: "doors" });
 await H.addEntities(ENTITIES);
@@ -82,153 +82,153 @@ await H.addEntities(ENTITIES);
 await H.editorEval(
   `e.change((doc, f) => { const d = f.openings.find((o) => o.room_id === "flur" && o.edge === 2 && o.offset === 5.5); if (d) Object.assign(d, { contact: "binary_sensor.bad_tuer", mark: "closed" }); });`,
 );
-await tap(R, { text: "3D daneben", exact: true });
+await tap(R, { text: "3D beside", exact: true });
 await R.sleep(1500);
 await H.view2d(58, 25, 330);
-await tap(R, { text: "Wände hoch", exact: true });
+await tap(R, { text: "Tall walls", exact: true });
 await view3d(V.over);
 await R.sleep(1200);
 await R.hideCursor(false);
 await R.move(700, 560, 0.01);
-await sayOver("Teil 3: Die Türen sind drin – jetzt kommen die Fenster, mit Kontakten, Griff- und Kippsensoren und Rollläden.");
+await sayOver("Part 3: the doors are in – now come the windows, with contacts, handle and tilt sensors, and blinds.");
 await R.hold(0.8);
 await pointPlan(5.5, 0, 0.6);
-await sayOver("Rechts läuft wieder „3D daneben“ mit, und wie in Teil 2 kommen Kontakte und Rollläden aus dem Bereich des Raums.");
+await sayOver("On the right, “3D beside” – runs along again, and like in part 2, contacts and blinds come from the room's area.");
 await R.move(1240, 520, 0.6);
 
 // ---------------------------------------------------------------- 2. Windows
-await chapter("Fenster einsetzen");
-await sayOver("„Tür & Fenster“ und auf die Außenwand vom Wohnzimmer. Zuerst wird daraus eine Haustür – also oben „Fenster 2-flügelig“.");
+await chapter("Window einsetzen");
+await sayOver("“Doors & windows”, and tap the outer wall of the living room. At first it becomes a front door – so pick “Double window” at the top.");
 await tool();
 await tapPlan(5.5, 0, 0.7);
 await H.sideTop();
 await R.hold(0.4);
-await R.clickOn({ text: "Fenster 2-flügelig", exact: true }, 0.5);
+await R.clickOn({ text: "Double window", exact: true }, 0.5);
 await look(V.wtop, 1.3);
-await sayOver("Fenster haben zusätzlich die „Brüstung“: die Höhe der Unterkante über dem Boden. Dazu „Breite“, „Mitte ab Ecke“ und „Höhe“ wie bei den Türen.");
-await R.moveTo({ label: "Brüstung" }, 0.5);
+await sayOver("Windows also have the “Sill height”: the height of the lower edge above the floor. Plus “Width”, “Centre from corner” and “Height”, just like the doors.");
+await R.moveTo({ label: "Sill height" }, 0.5);
 await R.hold(0.8);
-await R.moveTo({ label: "Breite" }, 0.5);
-await R.moveTo({ label: "Höhe" }, 0.5);
-await sayOver("Unter „Stil“: Standard, mit Sprossen oder eine feststehende Glaswand.");
-await R.pickOption("Stil", "Standard", 0.5);
-await sayOver("Der „Rollladen“ ist schon gefunden: „Automatisch (Wohnzimmer Rollladen)“. Bei zwei Flügeln hat jeder Flügel eigene Sensoren – Hauptflügel und zweiter Flügel.");
-await scrollSide(() => H.pickerBox("Rollladen"), 380, 0.6);
-await pickerMove("Rollladen", 0.5);
+await R.moveTo({ label: "Width" }, 0.5);
+await R.moveTo({ label: "Height" }, 0.5);
+await sayOver("Under “Style”: standard, with glazing bars, or a fixed glass wall.");
+await R.pickOption("Style", "Default", 0.5);
+await sayOver("The “Blind”, has already been found: “Automatic (Living room Blind)”. With two leaves, each leaf has its own sensors – main leaf and second leaf.");
+await scrollSide(() => H.pickerBox("Blind"), 380, 0.6);
+await pickerMove("Blind", 0.5);
 await R.hold(0.6);
-await pickerMove("Kontakt", 0.5, 0);
+await pickerMove("Contact", 0.5, 0);
 await R.hold(0.4);
-await pickerMove("Kontakt", 0.5, 1);
-await sayOver("Beim Kontakt steht „Automatisch (Terrassentür)“ – der erste Kontakt aus dem Wohnzimmer. Dieses Fenster hat aber keinen: „Keiner“.");
-await pickerMove("Kontakt", 0.5, 0);
+await pickerMove("Contact", 0.5, 1);
+await sayOver("The contact says “Automatic (Patio door)” – the first contact in the living room. But this window doesn't have one: “None”.");
+await pickerMove("Contact", 0.5, 0);
 await R.hold(1.2);
-await pickEntity("Kontakt", "", "Keiner", 0.4, 0);
-await sayOver("Die Küche bekommt ein Fenster mit Sprossen: auf die Wand, oben „Fenster“, Stil „Mit Sprossen“. Die Sprossen teilen das Glas in kleine Felder.");
+await pickEntity("Contact", "", "None", 0.4, 0);
+await sayOver("The kitchen gets a window with glazing bars: tap the wall, “Window” at the top, style “With glazing bars”. The bars divide the glass into small panes.");
 await tool();
 await tapPlan(12, 0, 0.7);
 await H.sideTop();
-await R.clickOn({ text: "Fenster", exact: true }, 0.5);
+await R.clickOn({ text: "Window", exact: true }, 0.5);
 await look(V.kueche, 1.2);
-await R.pickOption("Stil", "Mit Sprossen", 0.5);
-await sayOver("Kontakt und Rollladen findet NeonPlan im Bereich Küche von selbst. Das Fenster ist in der Demo offen – es steht in 3D auf und leuchtet warm.");
-await scrollSide(() => H.pickerBox("Rollladen"), 380, 0.5);
-await pickerMove("Rollladen", 0.5);
+await R.pickOption("Style", "With glazing bars", 0.5);
+await sayOver("NeonPlan finds the contact and the blind in the kitchen area by itself. In the demo the window is open – it stands open in 3D and glows warm.");
+await scrollSide(() => H.pickerBox("Blind"), 380, 0.5);
+await pickerMove("Blind", 0.5);
 await R.hold(0.5);
-await pickerMove("Kontakt", 0.5);
+await pickerMove("Contact", 0.5);
 await R.hold(0.6);
-await sayOver("Im Bad sitzt das Fenster höher: 80 Zentimeter breit, Brüstung 1,3 Meter, Höhe 0,8. So schaut von draußen niemand hinein.");
+await sayOver("In the bathroom the window sits higher: 80 centimetres wide, sill at 1.3 metres, height 0.8. That way nobody can look in from outside.");
 await tool();
 await tapPlan(9, 8.5, 0.7);
 await H.sideTop();
 await look(V.badwin, 1.2);
-await fill("Breite", "0,8");
-await fill("Brüstung", "1,3");
-await fill("Höhe", "0,8");
-await sayOver("Zur Terrasse kommt eine zweiflügelige Terrassentür – im Grunde ein Fenster mit Brüstung null.");
+await fill("Width", "0,8");
+await fill("Sill height", "1,3");
+await fill("Height", "0,8");
+await sayOver("Towards the terrace there's a two-leaf terrace door – “French doors” – which is basically a window with a sill height of zero.");
 await tool();
 await tapPlan(5.5, 8.5, 0.7);
 await H.sideTop();
-await R.clickOn({ text: "Terrassentür 2-flügelig", exact: true }, 0.5);
+await R.clickOn({ text: "French doors", exact: true }, 0.5);
 await look(V.terr, 1.2);
-await R.moveTo({ label: "Brüstung" }, 0.5);
-await sayOver("Ihre Kontakte wähle ich von Hand: Der Hauptflügel bekommt „Terrassentür“, der zweite Flügel den „Standflügel“.");
-await scrollSide(() => H.pickerBox("Rollladen"), 330, 0.5);
-await pickEntity("Kontakt", "Terrasse", "Terrassentür ·", 0.5, 0);
-await pickEntity("Kontakt", "Stand", "Terrassentür Standflügel", 0.5, 1);
-await sayOver("Jetzt geht in 3D der Hauptflügel auf – und mit dem zweiten Kontakt auch der Standflügel.");
+await R.moveTo({ label: "Sill height" }, 0.5);
+await sayOver("I pick its contacts by hand: the main leaf gets “Patio door”, the second leaf the “Fixed leaf”.");
+await scrollSide(() => H.pickerBox("Blind"), 330, 0.5);
+await pickEntity("Contact", "Terrace", "Terrace door ·", 0.5, 0);
+await pickEntity("Contact", "fixed", "Terrace door fixed panel", 0.5, 1);
+await sayOver("Now the main leaf opens in 3D – and with the second contact, the fixed leaf too.");
 await R.hold(1);
 await setState("binary_sensor.wohnzimmer_terrasse_2", "on");
 await R.hold(1.6);
 await setState("binary_sensor.wohnzimmer_terrasse_2", "off");
-await sayOver("Und links die Glaswand: auf die Wand, oben „Glaswand“. Feststehend, raumhoch, ohne Flügel – Breite und Höhe stellst du frei ein.");
+await sayOver("And on the left, the glass wall: tap the wall, “Glass wall” at the top, “Glass wall”. Fixed, floor to ceiling, no leaves – you set width and height freely.");
 await tool();
 await tapPlan(3.5, 7.25, 0.7);
 await H.sideTop();
-await R.clickOn({ text: "Glaswand", exact: true }, 0.5);
+await R.clickOn({ text: "Glass wall", exact: true }, 0.5);
 await look(V.glas, 1.2);
-await R.moveTo({ label: "Breite" }, 0.5);
-await R.moveTo({ label: "Höhe" }, 0.5);
+await R.moveTo({ label: "Width" }, 0.5);
+await R.moveTo({ label: "Height" }, 0.5);
 
 // ---------------------------------------------------------------- 3. Sensor kinds
-await chapter("Sensor-Art: Kontakt, Griff, Kipp");
-await sayOver("Jetzt das Schlafzimmer. Das Werkzeug hat sich die Glaswand gemerkt – also oben „Fenster“, Breite 1,40.");
+await chapter("Sensor type: contact, handle, tilt");
+await sayOver("Now the bedroom. The tool remembered the glass wall – so “Window” at the top, width 1.40.");
 await tool();
 await tapPlan(12.25, 8.5, 0.7);
 await H.sideTop();
-await R.clickOn({ text: "Fenster", exact: true }, 0.5);
+await R.clickOn({ text: "Window", exact: true }, 0.5);
 await look(V.schlaf, 1.2);
-await fill("Breite", "1,4");
-await sayOver("Wichtig ist die „Sensor-Art“. Ein Fensterkontakt meldet nur offen oder zu – das ist der Standard.");
-await scrollSide({ label: "Sensor-Art" }, 420, 0.6);
-await R.moveTo({ label: "Sensor-Art" }, 0.5);
-await sayOver("Ein „Griff-Sensor“ meldet offen, gekippt und zu – das ist ein Fenstergriff mit drei Stellungen. Ich wähle „Schlafzimmer Fenstergriff“.");
-await R.pickOption("Sensor-Art", "Griff-Sensor (offen/gekippt/zu)", 0.5);
-await pickEntity("Griff-Sensor", "Griff", "Schlafzimmer Fenstergriff", 0.5);
-await sayOver("Gekippt kippt der Flügel in 3D, offen geht er auf – und zu ist zu.");
-await setState("sensor.schlafzimmer_fenstergriff", "tilted");
+await fill("Width", "1,4");
+await sayOver("The important part is the “Sensor type”. A window contact only reports open or closed – that's the default.");
+await scrollSide({ label: "Sensor type" }, 420, 0.6);
+await R.moveTo({ label: "Sensor type" }, 0.5);
+await sayOver("A “Handle sensor” reports open, tilted and closed – that's a window handle with three positions. I choose “Bedroom window handle”.");
+await R.pickOption("Sensor type", "Handle sensor (open/tilted/closed)", 0.5);
+await pickEntity("Handle sensor", "handle", "Bedroom window handle", 0.5);
+await sayOver("Tilted tilts the leaf in 3D, open opens it – and closed is closed.");
+await setState("sensor.schlafzalways_fenstergriff", "tilted");
 await R.hold(1.6);
-await setState("sensor.schlafzimmer_fenstergriff", "open");
+await setState("sensor.schlafzalways_fenstergriff", "open");
 await R.hold(1.6);
-await setState("sensor.schlafzimmer_fenstergriff", "closed");
-await sayOver("Die dritte Art: „Kontakt + Kipp-Sensor“ – ein normaler Kontakt und ein zweiter Sensor, der nur „gekippt“ meldet.");
-await R.pickOption("Sensor-Art", "Kontakt + Kipp-Sensor", 0.5);
-await pickEntity("Kipp-Sensor", "gekippt", "Schlafzimmer Fenster gekippt", 0.5);
+await setState("sensor.schlafzalways_fenstergriff", "closed");
+await sayOver("The third type: “Contact + tilt sensor” – a normal contact plus a second sensor that only reports “tilted”.");
+await R.pickOption("Sensor type", "Contact + tilt sensor", 0.5);
+await pickEntity("Tilt sensor", "tilted", "Bedroom window tilted", 0.5);
 await R.hold(0.6);
-await sayOver("Optional liefert ein „Kippwinkel-Sensor“ den Winkel in Grad. Dann kippt der Flügel genau so weit – mit Feldern für den Winkel „ganz gekippt“, einen Offset und die Zählrichtung.");
-await pickEntity("Kippwinkel-Sensor", "Kippwinkel", "Schlafzimmer Kippwinkel", 0.5);
-await scrollSide({ label: "Winkel für" }, 640, 0.5);
-await setState("sensor.schlafzimmer_kippwinkel", "6");
-await R.moveTo({ label: "Winkel für" }, 0.5);
+await sayOver("Optionally, a “Tilt angle sensor” provides the angle in degrees. Then the leaf tilts exactly that far – with fields for the “fully tilted” angle, an offset and the counting direction.");
+await pickEntity("Tilt angle sensor", "tilt angle", "Bedroom tilt angle", 0.5);
+await scrollSide({ label: "Angle for" }, 640, 0.5);
+await setState("sensor.schlafzalways_kippwinkel", "6");
+await R.moveTo({ label: "Angle for" }, 0.5);
 await R.moveTo({ label: "Offset" }, 0.5);
-await R.moveTo({ label: "Winkel zählt andersherum" }, 0.5);
-await sayOver("Gekippt zählt übrigens auch für die Warnung „Fenster offen bei Regen“. Mit der Erweiterung „Wetter draußen“ siehst du den Regen dann auch am Haus.");
-await setState("sensor.schlafzimmer_kippwinkel", "15");
+await R.moveTo({ label: "Angle counts the other way round" }, 0.5);
+await sayOver("By the way, tilted also counts for the “Window open in the rain” warning. With the “Weather outside” extension you'll even see the rain at the house.");
+await setState("sensor.schlafzalways_kippwinkel", "15");
 await R.hold(1.2);
 
 // ---------------------------------------------------------------- 4. Blinds
-await chapter("Rollläden");
-await sayOver("Zurück zum Wohnzimmerfenster: Der Rollladen fährt in 3D mit der Position aus Home Assistant.");
+await chapter("Covers");
+await sayOver("Back to the living room window: the blind moves in 3D with its position from Home Assistant.");
 await tapPlan(5.5, 0, 0.7);
 await look(V.wtop, 1.2);
 await travel("cover.wohnzimmer", 70, 15, 2);
-await sayOver("Meldet dein Rollladen die Position über einen eigenen Sensor in Prozent, wählst du ihn unter „Positions-Sensor“. Dann fährt er auch während der Fahrt live.");
-await scrollSide(() => H.pickerBox("Rollladen"), 380, 0.5);
-await pickEntity("Positions-Sensor", "Level", "Wohnzimmer Rollladen Level", 0.5);
+await sayOver("If your blind reports its position through a separate sensor in percent, pick it under “Position sensor”. Then it moves live while it's travelling.");
+await scrollSide(() => H.pickerBox("Blind"), 380, 0.5);
+await pickEntity("Position sensor", "level", "Living room roller shutter level", 0.5);
 await travel("sensor.wohnzimmer_rollladen_level", 70, 25, 1.6, true);
 await travel("sensor.wohnzimmer_rollladen_level", 25, 85, 1.6, true);
-await sayOver("Zählt der Sensor andersherum, hilft „Sensor zählt umgekehrt“. Und „Vor dem Schalten nachfragen“ kennst du schon vom Garagentor.");
-await R.moveTo({ label: "Sensor zählt umgekehrt" }, 0.5);
+await sayOver("If the sensor counts the other way round, “Sensor counts the other way round” fixes that. And you already know “Ask before switching” from the garage door.");
+await R.moveTo({ label: "Sensor counts in reverse" }, 0.5);
 await R.hold(0.8);
-await R.moveTo({ label: "Vor dem Schalten nachfragen" }, 0.5);
-await sayOver("Auch vor Türen fährt ein Rollladen: Bei der Terrassentür heißt das Feld „Rollladen“, bei Haustür und Schiebetür „Antrieb“.");
+await R.moveTo({ label: "Ask before switching" }, 0.5);
+await sayOver("Blinds work in front of doors too: on the terrace door the field is called “Blind”, on the front door and the sliding door “Drive”.");
 await tapPlan(14, 4.75, 0.7);
-await scrollSide(() => H.pickerBox("Antrieb"), 500, 0.5);
-await pickerMove("Antrieb", 0.5);
+await scrollSide(() => H.pickerBox("Drive"), 500, 0.5);
+await pickerMove("Drive", 0.5);
 await R.hold(0.8);
 
 // ---------------------------------------------------------------- 5. Live in 3D
-await chapter("Alles live in 3D");
-await sayOver("Und jetzt das ganze Haus: oben auf „3D“.");
+await chapter("All live in 3D");
+await sayOver("And now the whole house: click “3D” at the top.");
 await R.clickOn({ text: "3D", exact: true }, 0.6);
 await R.sleep(1500);
 await catchUp();
@@ -238,18 +238,18 @@ const M = { theta: 0.5, phi: 0.8, radius: 24 };
 const E = { theta: 0.8, phi: 0.75, radius: 24 };
 await R.view(D);
 await R.sleep(1000);
-await sayOver("Offene Fenster und Türen leuchten warm, gekippte kippen, Rollläden und Garagentor fahren mit – alles live aus Home Assistant.");
+await sayOver("Open windows and doors glow warm, tilted ones tilt, blinds and the garage door move along – all live from Home Assistant.");
 await R.glide(D, M, 3);
 await setState("binary_sensor.haustuer", "on");
 await travel("cover.garagentor", 60, 100, 1.5);
-await sayOver("Und die Badtür leuchtet, solange sie zu ist – genau wie in Teil 2 eingestellt.");
+await sayOver("And the bathroom door glows as long as it's shut – exactly as we set it in part 2.");
 await R.glide(M, E, 4);
 
 // ---------------------------------------------------------------- 6. Outro
 await chapter("Wie geht es weiter");
-await R.title("Nächste Folge: Etagen, Treppen und Keller", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
-await say("Das war Folge 2: Bauplan unterlegen, nachzeichnen, Wände, Türen und Fenster. In Folge 3 geht es um Etagen, Treppen und den Keller.");
-await say("Links zur Online-Demo und zur Anleitung findest du in der Beschreibung. Und NeonPlan läuft auch auf alten Wandtablets. Bis zum nächsten Mal!");
+await R.title("Next episode: Floors, stairs and cellar", `HomePlan 3D – also runs on old wall tablets${VERSION}`);
+await say("That was episode 2: putting the plan underneath, tracing, walls, doors and windows. Episode 3 is about floors, stairs and the cellar.");
+await say("Left to the online demo and the manual are in the description. And NeonPlan also runs on old wall tablets. See you next time!");
 await R.hold(0.6);
 
 N.report();

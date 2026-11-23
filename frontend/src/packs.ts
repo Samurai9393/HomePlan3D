@@ -14,7 +14,7 @@ export function isCooktopZone(p: Pick<PackPart, "shape" | "y" | "h" | "axis">): 
 /** A pack item with a cooktop (a hob unit, a cooker, an island with a hob): its zones glow while it cooks. */
 export function isPackCooktop(type: string): boolean {
   const item = packItem(type);
-  return !!item && /(hob|cooker|stove|herd)/.test(type) && item.parts.filter(isCooktopZone).length >= 2;
+  return !!item && /(hob|cooker|stove)/.test(type) && item.parts.filter(isCooktopZone).length >= 2;
 }
 
 export interface PackPart {
@@ -285,14 +285,13 @@ export function isElectric(type: string): boolean {
   return ELECTRIC_FURNITURE.has(type) || !!packItem(type)?.electric || !!packItem(type)?.light;
 }
 
-/** Name of a pack item in a language (English, then the first name as fallback). */
-export function packItemName(item: PackItem, language: string): string {
-  const lang = language.split("-")[0];
-  return item.name[lang] ?? item.name.en ?? Object.values(item.name)[0] ?? item.id;
+/** Name of a pack item (English, then the first name as fallback). */
+export function packItemName(item: PackItem, _language: string): string {
+  return item.name.en ?? Object.values(item.name)[0] ?? item.id;
 }
 
 
-// English names of our own packs: a pack file carries one (German) name, the furniture inside both (#224)
+// English names of our own packs: a pack file may carry another name, the furniture inside ours (#224)
 const PACK_NAMES_EN: Record<string, string> = {
   architecture: "Architecture & Fit-out",
   balcony: "Balcony & Small Spaces",
@@ -336,15 +335,14 @@ const PACK_NAMES_EN: Record<string, string> = {
   window_watch: "Module: Window watch",
 };
 
-/** A pack's name in the user's language: our own packs in English outside German, others as they come. */
-export function packName(pack: { id: string; name: string }, language: string): string {
-  if (language.split("-")[0] === "de") return pack.name;
+/** A pack's name: our own packs in English, others as they come. */
+export function packName(pack: { id: string; name: string }, _language: string): string {
   const key = pack.id.replace(/^mastershort\./, "");
   const sample = key.endsWith("_sample");
   const en = PACK_NAMES_EN[sample ? key.slice(0, -"_sample".length) : key];
   if (en) return sample ? `${en} – Sampler` : en;
-  // one of ours newer than this table: at least its kind in English (#825)
-  return pack.name.replace(/^Modul:/, "Module:").replace(/^Fun-Pack:/, "Fun Pack:");
+  // one of ours newer than this table keeps the name its file carries (#825)
+  return pack.name;
 }
 
 const CEILING_GAP = 0.005;

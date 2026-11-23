@@ -70,7 +70,7 @@ export class Fp3dPhoneNav extends LitElement {
   declare active: string | null;
   /** 0 green, 1 yellow, 2 red: the dot of "Now". */
   declare level: number;
-  /** One line above the bar while something needs a look ("2 Fenster offen"); empty: none. */
+  /** One line above the bar while something needs a look ("2 windows open"); empty: none. */
   declare attention: string;
   declare roomId: string | null;
 

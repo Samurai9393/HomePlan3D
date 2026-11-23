@@ -21,13 +21,13 @@ const door = (id: string, room_id: string, edge: number, offset: number): Openin
 
 /** Two rooms side by side (kids at 0–4, hall at 4–7), a door between them filed under the hall, a second floor. */
 function house(): Building {
-  const ground = newFloor("eg", "EG", 0);
+  const ground = newFloor("eg", "Ground floor", 0);
   ground.rooms = [room("kids", 0, 4), room("hall", 4, 7)];
   // the hall's edge 3 runs from (4,3) to (4,0): the shared wall; the door 1 m along it
   ground.openings = [door("d1", "hall", 3, 1), door("w1", "kids", 0, 2)];
   ground.furniture = [{ id: "bed", type: "bed", x: 1, z: 1 } as never, { id: "shoe", type: "cabinet", x: 5, z: 1 } as never];
   ground.placements = [{ entity_id: "light.kids", x: 2, z: 1.5 } as never, { entity_id: "light.hall", x: 6, z: 1.5 } as never];
-  const top = newFloor("og", "OG", 2.75);
+  const top = newFloor("og", "Upper floor", 2.75);
   top.rooms = [room("attic", 0, 7)];
   return { ...emptyBuilding(), floors: [ground, top] };
 }
@@ -99,7 +99,7 @@ test("a card with some rooms of the top floor keeps the whole house's roof footp
 test("a roof of sections keeps the sections over the floors a card shows: the attic slopes of a middle floor (#997)", () => {
   const b = house();
   // a third floor over part of the house; the upper floor's other part has an attic roof of its own
-  const dg = newFloor("dg", "DG", 5.5);
+  const dg = newFloor("dg", "Attic floor", 5.5);
   dg.rooms = [room("loft", 0, 4)];
   b.floors[1].rooms = [room("attic", 0, 4), room("studio", 4, 7)];
   const sec = (id: string, x0: number, x1: number, base: number, extra: object = {}) =>

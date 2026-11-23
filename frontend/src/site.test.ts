@@ -4,14 +4,14 @@ import { emptyBuilding, newFloor, type Building } from "./model.ts";
 import { composeSite, placePoint, siteOwner } from "./site.ts";
 
 function house(): Building {
-  const eg = newFloor("eg", "EG", 0);
+  const eg = newFloor("eg", "Ground floor", 0);
   eg.rooms = [{ id: "wohnen", name: "Wohnen", area_id: null, points: [[0, 0], [6, 0], [6, 4], [0, 4]], floor_material: "wood" }];
-  return { ...emptyBuilding(), floors: [eg, newFloor("og", "OG", 2.75)] };
+  return { ...emptyBuilding(), floors: [eg, newFloor("og", "Upper floor", 2.75)] };
 }
 
 function garden(): Building {
-  const gh = newFloor("gh", "Gartenhaus", 0);
-  gh.rooms = [{ id: "werk", name: "Werkstatt", area_id: "garten", points: [[0, 0], [4, 0], [4, 3], [0, 3]], floor_material: "wood" }];
+  const gh = newFloor("gh", "Garden shed", 0);
+  gh.rooms = [{ id: "werk", name: "Workshop", area_id: "garten", points: [[0, 0], [4, 0], [4, 3], [0, 3]], floor_material: "wood" }];
   gh.openings = [{ id: "tuer", room_id: "werk", edge: 0, offset: 1, width: 0.9, type: "door" } as never];
   gh.furniture = [{ id: "bank", type: "workbench", x: 1, z: 1, rotation: 0 } as never];
   gh.placements = [{ entity_id: "light.werk", x: 2, z: 1.5, rotation: 0 } as never];

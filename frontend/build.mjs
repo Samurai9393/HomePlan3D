@@ -21,14 +21,7 @@ const common = {
 
 const viewerConfig = { ...common, entryPoints: ["src/viewer/viewer3d.ts"], outfile: `${out}/homeplan3d-3d.js` };
 // the card's visual editor only loads in the dashboard's card dialog
-// the language files (lang/*.json) are fetched with a hash of their content, so a new text is never stale
-const LANGS = ["fr", "es", "nl", "it", "hu", "da", "sv", "nb", "nn", "fi", "cs", "pl", "ro", "sl", "sk", "zh", "pt", "tr"];
-const langHash = createHash("sha256")
-  // line endings normalised: a file written with CRLF on Windows must give the same hash as the LF copy CI checks out
-  .update(LANGS.map((l) => (existsSync(`lang/${l}.json`) ? readFileSync(`lang/${l}.json`, "utf8").replace(/\r\n/g, "\n") : "")).join("\n"))
-  .digest("hex")
-  .slice(0, 12);
-const cardEditorConfig = { ...common, entryPoints: ["src/card-editor.ts"], outfile: `${out}/homeplan3d-card-editor.js`, define: { __FP3D_LANG_HASH__: JSON.stringify(langHash) } };
+const cardEditorConfig = { ...common, entryPoints: ["src/card-editor.ts"], outfile: `${out}/homeplan3d-card-editor.js` };
 const version = JSON.parse(readFileSync("../custom_components/homeplan3d/manifest.json", "utf8")).version;
 // the editor is only needed by admins who open it, so it is a bundle of its own as well
 // (it draws furniture previews with the 3D bundle, so it knows that bundle's hash too; card templates use the card editor)
@@ -38,7 +31,6 @@ const editorConfig = (viewerHash, locateHash, cardEditorHash, osmHash) => ({
   outfile: `${out}/homeplan3d-editor.js`,
   define: {
     __FP3D_VIEWER_HASH__: JSON.stringify(viewerHash),
-    __FP3D_LANG_HASH__: JSON.stringify(langHash),
     __FP3D_LOCATE_HASH__: JSON.stringify(locateHash),
     __FP3D_CARD_EDITOR_HASH__: JSON.stringify(cardEditorHash),
     __FP3D_OSM_HASH__: JSON.stringify(osmHash),
@@ -74,7 +66,6 @@ const mainConfig = (viewerHash, editorHash, cardEditorHash, timeTravelHash, funH
     __FP3D_VOICE_HASH__: JSON.stringify(voiceHash),
     __FP3D_LOCATE_HASH__: JSON.stringify(locateHash),
     __FP3D_VERSION__: JSON.stringify(version),
-    __FP3D_LANG_HASH__: JSON.stringify(langHash),
   },
 });
 const hashOf = (file) => createHash("sha256").update(readFileSync(file)).digest("hex").slice(0, 12);
@@ -89,9 +80,6 @@ function copyFonts() {
   // pictures shown in the app (the solar preview is now an ordinary free feature)
   mkdirSync(`${out}/images`, { recursive: true });
   copyFileSync("assets/solar-pro.jpg", `${out}/images/solar-pro.jpg`);
-  // further languages, fetched by the bundles only when Home Assistant runs in them
-  mkdirSync(`${out}/lang`, { recursive: true });
-  for (const l of LANGS) if (existsSync(`lang/${l}.json`)) copyFileSync(`lang/${l}.json`, `${out}/lang/${l}.json`);
   for (const [pkg, file, name] of FONTS) {
     const dir = `node_modules/@fontsource-variable/${pkg}`;
     copyFileSync(`${dir}/files/${file}`, `${out}/fonts/${name}`);
@@ -115,30 +103,30 @@ function copyFonts() {
 // main 640 KB on 2026-10-19 for the access point and the water heater (D582) and their texts
 // main 648 KB on 2026-10-19 for the settings menu and the module loader texts
 // editor 872 KB on 2026-10-19 for the settings menu, the side bar grip and the extra value
-// main 620 KB and card editor 250 KB on 2026-10-17 for the live director (Kamera-Cockpit) and its texts; the microphone probe has its own bundle
+// main 620 KB and card editor 250 KB on 2026-10-17 for the live director (camera cockpit) and its texts; the microphone probe has its own bundle
 // raised 2026-10-06 for the 1.12 round (outdoor round, hip-end solar, marker names): still small enough for old wall tablets;
-// main raised to 440 KB on 2026-10-08 for the time travel's switch, texts and read-only guards (its own code loads lazily), to 450 KB the same day for room to fix things;; card editor 180 KB the same day (it carries the German and English texts)
+// main raised to 440 KB on 2026-10-08 for the time travel's switch, texts and read-only guards (its own code loads lazily), to 450 KB the same day for room to fix things;; card editor 180 KB the same day (it carries the UI texts)
 // the time travel bundle raised to 120 KB on 2026-10-08 for phases 2/3 (the week, live edge, events sheet, summaries – loaded only when travelling)
-// main 480 KB, editor 570 KB, card editor 185 KB on 2026-10-09 for Pool Pro (pool state, glass card, alerts and its texts in German and English);
+// main 480 KB, editor 570 KB, card editor 185 KB on 2026-10-09 for Pool Pro (pool state, glass card, alerts and their texts);
 // main 495 KB, editor 600 KB, card editor 190 KB the same day for the pool tool, its pipes, devices and texts
 // editor 620 KB on 2026-10-10 for the wall view (furniture on a wall from the front; later pipes and cables on walls)
 // editor 640 KB on 2026-10-10: the wall view grew (3D in the room, lift, turn, lock, tap into a room); the next wall update (doors, windows, runs) needs room too
 // main 510 KB, 3D 760 KB, editor 680 KB, card editor 196 KB on 2026-10-10 for pipes on walls (Pool Pro: runs with a height per point,
 // T-pieces, ball valves, real tubes in 3D) and their texts – the doors and windows of the wall view come next
 // editor 730 KB, card editor 205 KB on 2026-10-10 for the parts' cards (connections, drawings, joining) and their texts
-// editor 760 KB, card editor 210 KB on 2026-10-12 for furniture blocks, the wall view side bar and "Technik zeichnen"
+// editor 760 KB, card editor 210 KB on 2026-10-12 for furniture blocks, the wall view side bar and "draw technical details"
 // main 530 KB on 2026-10-11 for the walk through the house (its controls and texts; the walking itself lives in the 3D bundle)
 // editor 770 KB on 2026-10-12 for the fun packs on the extensions page (the pets: kinds, breeds, furs, floors)
-// card editor 215 KB on 2026-10-12 (it carries the German and English texts, now with the pets)
+// card editor 215 KB on 2026-10-12 (it carries the UI texts, now with the pets)
 // main 540 KB on 2026-10-12 for the fun packs' switch (pets: the loader, settings and texts; the animals live in their own bundle)
 // main 550 KB and editor 780 KB on 2026-10-13 for the customer wishes (air conditioner, cooktop states, one-colour lamps, watt threshold) and roof windows in the room card
-// card editor 220 KB on 2026-10-13 for the cellar and ground texts (the card editor shares the language table)
+// card editor 220 KB on 2026-10-13 for the cellar and ground texts (the card editor shares the editor text table)
 // card editor 225 KB on 2026-10-13 for the floor menu texts
 // main 560 KB on 2026-10-13 for the Halloween gift notice, the extension badge and the cellar texts
 // editor 790 KB on 2026-10-13 for the tidied toolbar (tool and view menus)
 // editor 800 KB on 2026-10-14 for the awning (form, sensors) and the 1.18.2 fixes
 // main 570 KB, 3D 770 KB and card editor 230 KB on 2026-10-14 for the awnings (five kinds) and their texts
-// main 590 KB, editor 820 KB, card editor 235 KB on 2026-10-15 for the household (bins, mailboxes, Haushalt Pro) and its texts
+// main 590 KB, editor 820 KB, card editor 235 KB on 2026-10-15 for the household (bins, mailboxes, Household Pro) and its texts
 // editor 930 KB on 2026-10-23 for the locating section and the people setting in ⚙ House
 // main 692 KB on 2026-10-24 (was 688): the panel microphone asks locating first and flies into the rooms of the answer; presence zones place people at furniture and doors
 // locate 160 KB on 2026-10-24 (was 140): the locating setup carries its texts in 18 languages, the key helper, the Android transmitter hints and the fly switch (it only loads when an admin opens it)

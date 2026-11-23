@@ -8,8 +8,8 @@ import { watchedEntities } from "./watched.ts";
 function setup() {
   const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
   const hass = {
-    language: "de",
-    areas: { kueche: { area_id: "kueche", name: "Küche" } },
+    language: "en",
+    areas: { kueche: { area_id: "kueche", name: "Kitchen" } },
     entities: {
       "light.kueche": { entity_id: "light.kueche", area_id: "kueche" },
       "sensor.kueche_temp": { entity_id: "sensor.kueche_temp", area_id: "kueche" },
@@ -26,8 +26,8 @@ function setup() {
     },
   } as unknown as HomeAssistant;
   const b = emptyBuilding();
-  const floor = newFloor("eg", "EG", 0);
-  floor.rooms = [{ id: "k", name: "Küche", area_id: "kueche", points: [[0, 0], [4, 0], [4, 3], [0, 3]], floor_material: "tiles" }];
+  const floor = newFloor("eg", "Ground floor", 0);
+  floor.rooms = [{ id: "k", name: "Kitchen", area_id: "kueche", points: [[0, 0], [4, 0], [4, 3], [0, 3]], floor_material: "tiles" }];
   floor.placements = [{ entity_id: "light.placed", x: 1, z: 1, y: null }];
   b.floors = [floor];
   const openings = new Map<string, OpeningEntities>([["w", { cover: null, contact: "binary_sensor.fenster", tilt: null }]]);

@@ -10,11 +10,11 @@ const NOW = 1_700_000_000_000;
 function hassWith(): HomeAssistant {
   const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
   return {
-    language: "de",
+    language: "en",
     connection: {} as HomeAssistant["connection"],
     callWS: async () => undefined as never,
     callService: async () => undefined,
-    areas: { flur: { area_id: "flur", name: "Flur" } },
+    areas: { flur: { area_id: "flur", name: "Hallway" } },
     devices: { cam: { id: "cam" } },
     entities: {
       "binary_sensor.flur_bewegung": { entity_id: "binary_sensor.flur_bewegung", area_id: "flur" },
@@ -34,10 +34,10 @@ function hassWith(): HomeAssistant {
 }
 
 function building(): Building {
-  const floor = newFloor("eg", "EG", 0);
+  const floor = newFloor("eg", "Ground floor", 0);
   floor.rooms.push({
     id: "flur",
-    name: "Flur",
+    name: "Hallway",
     area_id: "flur",
     points: [
       [0, 0],

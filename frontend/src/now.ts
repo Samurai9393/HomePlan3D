@@ -10,7 +10,7 @@ export interface NowTarget {
   roomId?: string | null;
   /** A window or door of the plan (its id): the house shows it from inside its room. */
   opening?: string;
-  /** What the place is called in the list of a line with several places ("Bad", "Haustür"). */
+  /** What the place is called in the list of a line with several places ("Bathroom", "Front door"). */
   label?: string;
 }
 
@@ -21,7 +21,7 @@ export interface NowAction {
 }
 
 export interface NowInput {
-  /** The house's warnings, in their own words ("Küche · Rauch"). */
+  /** The house's warnings, in their own words ("Kitchen · Smoke"). */
   alerts: (NowTarget & { text: string })[];
   /** Windows and doors with a contact: where they are and whether they stand open or are tilted. */
   openings: (NowTarget & { id: string; kind: "door" | "window" | "garage" | "roof_window"; name?: string; room: string; open: boolean; tilted: boolean })[];
@@ -157,7 +157,7 @@ export function nowItems(i: NowInput, w: NowWords): NowItem[] {
 }
 
 /**
- * The one line under the house: the first warning, else what needs a look and the lights ("2 Fenster offen · 4 Lichter
+ * The one line under the house: the first warning, else what needs a look and the lights ("2 windows open · 4 Lichter
  * an"), else that all is well. `level` colours it.
  */
 export function nowSummary(items: NowItem[]): { text: string; level: 0 | 1 | 2 } {

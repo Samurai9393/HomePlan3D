@@ -6,7 +6,7 @@ import { bestFace, clampField, proposeWindow, roofWindowsOver, faceAt, faceCompa
 /** A 10 × 8 m house of one floor (walls 2.5 m high) with the given roof. */
 function house(roof: Building["settings"]["roof"]): Building {
   const b = emptyBuilding();
-  b.floors = [{ ...newFloor("eg", "EG", 0), height: 2.5, rooms: [{ id: "r", name: "R", area_id: null, points: [[0, 0], [10, 0], [10, 8], [0, 8]], floor_material: "wood" }] }];
+  b.floors = [{ ...newFloor("eg", "Ground floor", 0), height: 2.5, rooms: [{ id: "r", name: "R", area_id: null, points: [[0, 0], [10, 0], [10, 8], [0, 8]], floor_material: "wood" }] }];
   b.settings = { ...b.settings, wall_exterior: 0.24, roof };
   return b;
 }

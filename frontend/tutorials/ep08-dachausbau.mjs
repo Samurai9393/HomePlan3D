@@ -1,15 +1,15 @@
-// Tutorial episode 8 – "Dächer Teil 2: Gauben, Dachfenster, Dachschrägen, Carport" (manual 4.19, second half, and
-// „Dachfenster“), in two parts (the checklist does not fit into 8 minutes):
-//   a) Dachschrägen, Gauben und Zwerchgiebel: the knee wall („Wandoberkante“ under the ceiling, eaves on it), the
-//      headroom lines in the attic plan, the attic in 3D (the roof lifts while zooming in), „+ Gaube oben/unten“
-//      (the proposal, moving, width, heights, Sattel and Pult), the dormer window with „Tür & Fenster“, the cross
+// Tutorial episode 8 – "Roofs part 2: dormers, roof windows, sloping ceilings, carport" (manual 4.19, second half, and
+// “Roof windows”), in two parts (the checklist does not fit into 8 minutes):
+//   a) sloping ceilings, dormers and cross gables: the knee wall (“Top of walls” under the ceiling, eaves on it), the
+//      headroom lines in the attic plan, the attic in 3D (the roof lifts while zooming in), “+ Dormer top/bottom”
+//      (the proposal, moving, width, heights, Gable and Pent), the dormer window with “Door & Window”, the cross
 //      gable (a wide dormer with its eaves on the wall top), the attic in 3D.
-//   b) Dachfenster, Flachdach und Carport: „+ Dachfenster“ (moving, onto another roof face, size, position),
-//      „Rollladen“, „Kontakt“, „Kippkontakt“, „Fenstermotor“ live in 3D, „Name“; the flat roof as a free outline
-//      („Umriss des Geschosses übernehmen“, corners, „Zurück zum Rechteck“) on a bungalow, the terrace roof and the
-//      carport („Überdachung“), „Dach bleibt“ in the 3D view.
-// The house is the invented L-shaped house of episode 7; its upper floor is an attic („Dachgeschoss“) here.
-// Usage (from frontend/): node tutorials/ep08-dachausbau.mjs <out-dir> a|b [<voice-dir de> [<voice-dir en>]]
+//   b) Roof windows, flat roof and carport: “+ Roof windows” (moving, onto another roof face, size, position),
+//      “Blind”, “Contact”, “Tilt contact”, “Window motor” live in 3D, “Name”; the flat roof as a free outline
+//      (“Take the floor's outline”, corners, “Back to the rectangle”) on a bungalow, the terrace roof and the
+//      carport (“Canopy”), “Roof stays” in the 3D view.
+// The house is the invented L-shaped house of episode 7; its upper floor is an attic (“Attic”) here.
+// Usage (from frontend/): node tutorials/ep08-dachausbau.mjs <out-dir> a|b [<voice-dir>]
 //   (voice dirs: private/tutorial-audio/ep08a/de and …/en, resp. ep08b)
 // EP08_FAST=1: a quick dry run for checking the steps (the timing is not usable).
 // Then: python ../tools/make-tutorial.py <out-dir> <out.mp4> --en tutorials/ep08a-narration-en.json
@@ -20,7 +20,7 @@ import { helpers, tap } from "./ep02-common.mjs";
 const out = process.argv[2] ?? "tutorial-ep08";
 const PART = process.argv[3] === "b" ? "b" : "a";
 const FAST = !!process.env.EP08_FAST;
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D ${appVersion()}</span>`;
+const VERSION = `<br><span style="font-size:20px;opacity:.7">recorded with HomePlan 3D ${appVersion()}</span>`;
 
 // ---------------------------------------------------------------- the invented house (episode 7, with an attic)
 const rect = (id, name, area_id, x0, z0, x1, z1, floor_material = "wood") => ({ id, name, area_id, points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]], floor_material });
@@ -45,17 +45,17 @@ const hole = (id, type, room_id, edge, offset, width, extra = {}) => ({
 const floorOf = (id, name, elevation, ha_floor, rooms, openings) => ({ id, name, elevation, height: 2.5, cut_height: 1.15, rooms, openings, furniture: [], placements: [], background: null, outdoor: [], walls: [], ha_floor });
 const GROUND = floorOf(
   "eg",
-  "Erdgeschoss",
+  "Ground floor",
   0,
   "erdgeschoss",
   [
-    rect("r_wohnen", "Wohnzimmer", "wohnzimmer", 0, 0, 6, 4.5),
-    rect("r_kueche", "Küche", "kueche", 6, 0, 9.5, 4.5, "tiles"),
-    rect("r_flur", "Flur", "flur", 0, 4.5, 4, 7.5, "tiles"),
-    rect("r_bad", "Bad", "bad", 4, 4.5, 6.5, 7.5, "tiles"),
-    rect("r_schlafen", "Schlafzimmer", "schlafzimmer", 6.5, 4.5, 9.5, 7.5, "carpet"),
-    rect("r_essen", "Esszimmer", null, 0, 7.5, 4, 12),
-    rect("r_hwr", "Hauswirtschaft", null, 4, 7.5, 7, 10, "tiles"),
+    rect("r_wohnen", "Living room", "wohnzimmer", 0, 0, 6, 4.5),
+    rect("r_kueche", "Kitchen", "kueche", 6, 0, 9.5, 4.5, "tiles"),
+    rect("r_flur", "Hall", "flur", 0, 4.5, 4, 7.5, "tiles"),
+    rect("r_bad", "Bathroom", "bad", 4, 4.5, 6.5, 7.5, "tiles"),
+    rect("r_schlafen", "Bedroom", "schlafzalways", 6.5, 4.5, 9.5, 7.5, "carpet"),
+    rect("r_essen", "Dining room", null, 0, 7.5, 4, 12),
+    rect("r_hwr", "Utility", null, 4, 7.5, 7, 10, "tiles"),
     rect("r_garage", "Garage", "garage", 9.5, 0, 13, 6, "concrete"),
   ],
   [
@@ -71,14 +71,14 @@ const GROUND = floorOf(
 // the attic: windows only in the gables (the eave sides get a dormer, a cross gable and a roof window)
 const ATTIC = floorOf(
   "dg",
-  "Dachgeschoss",
+  "Attic",
   2.75,
   "dachgeschoss",
   [
-    rect("r_kind", "Kinderzimmer", "kinderzimmer", 0, 0, 4.5, 4.5),
-    rect("r_arbeit", "Arbeitszimmer", "arbeitszimmer", 4.5, 0, 9.5, 4.5),
-    rect("r_flur_og", "Flur oben", null, 0, 4.5, 9.5, 7.5),
-    rect("r_eltern", "Elternzimmer", null, 0, 7.5, 4, 12, "carpet"),
+    rect("r_kind", "Kids' room", "kinderzalways", 0, 0, 4.5, 4.5),
+    rect("r_arbeit", "Study", "arbeitszalways", 4.5, 0, 9.5, 4.5),
+    rect("r_flur_og", "Upper hallway", null, 0, 4.5, 9.5, 7.5),
+    rect("r_eltern", "Elternzalways", null, 0, 7.5, 4, 12, "carpet"),
   ],
   [hole("p1", "window", "r_kind", 3, 2.25, 1.2), hole("p2", "window", "r_arbeit", 1, 2.25, 1.2), hole("p4", "window", "r_eltern", 2, 2, 1.2)],
 );
@@ -96,10 +96,10 @@ const RWIN = {
   motor: "cover.dachfenster_motor",
 };
 const ENTITIES = [
-  [RWIN.cover, "kinderzimmer", "open", { friendly_name: "Dachfenster Rollladen", device_class: "shutter", current_position: 100, supported_features: 15 }],
-  [RWIN.contact, "kinderzimmer", "off", { friendly_name: "Dachfenster Kontakt", device_class: "window" }],
-  [RWIN.tilt, "kinderzimmer", "off", { friendly_name: "Dachfenster gekippt", device_class: "window" }],
-  [RWIN.motor, "kinderzimmer", "closed", { friendly_name: "Dachfenster Motor", device_class: "window", current_position: 0, supported_features: 15 }],
+  [RWIN.cover, "kinderzalways", "open", { friendly_name: "Roof window blind", device_class: "shutter", current_position: 100, supported_features: 15 }],
+  [RWIN.contact, "kinderzalways", "off", { friendly_name: "Roof window contact", device_class: "window" }],
+  [RWIN.tilt, "kinderzalways", "off", { friendly_name: "Roof window tilted", device_class: "window" }],
+  [RWIN.motor, "kinderzalways", "closed", { friendly_name: "Roof window motor", device_class: "window", current_position: 0, supported_features: 15 }],
 ];
 // plan points
 const MAIN = [6.5, 3.2];
@@ -115,7 +115,7 @@ const T_RWIN = { x: 4.75, y: 5.5, z: 5.5 };
 const T_CAN = { x: 9, y: 1.5, z: 1 };
 
 // ---------------------------------------------------------------- recorder
-const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "de" });
+const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "en" });
 const N = narration(R, process.argv.slice(4));
 const { say, sayOver, chapter, catchUp } = N;
 const h = helpers(R);
@@ -148,9 +148,9 @@ const { fill, typeOver, tapPlan, pointPlan, scrollSide, view3d } = h;
 const T = (o) => JSON.stringify(o);
 /** The roof tool with 3D beside, invisibly. */
 const roofTool = async () => {
-  await tap(R, { text: "Dach", exact: true });
+  await tap(R, { text: "roof", exact: true });
   await R.sleep(2500);
-  await tap(R, { text: "Alles zeigen", exact: true });
+  await tap(R, { text: "Whole plan", exact: true });
 };
 /** Change the building in the 3D tab (teaser only): roof sections patched by a test. */
 const patch3d = (fn) =>
@@ -204,14 +204,14 @@ const press = async (label, key) => {
   await R.page.keyboard.press(key);
   await R.frame(0.35, 150);
 };
-/** The app's confirm() as a visible box with OK and „Abbrechen“ (native dialogs are not in headless screenshots). */
+/** The app's confirm() as a visible box with OK and “Cancel” (native dialogs are not in headless screenshots). */
 const fakeConfirm = (text) =>
   R.page.evaluate((t) => {
     const d = document.createElement("div");
     d.id = "tut-dialog";
     d.style.cssText =
       "position:fixed;left:50%;top:22%;transform:translateX(-50%);z-index:2147483644;max-width:620px;padding:22px 26px;border-radius:12px;background:#f4f6fa;color:#111;font:18px/1.4 system-ui,'Segoe UI',sans-serif;box-shadow:0 12px 50px rgba(0,0,0,.6)";
-    d.innerHTML = `<div style="font-size:14px;color:#555;margin-bottom:8px">127.0.0.1 meldet</div>${t}<div style="text-align:right;margin-top:18px"><span id="tut-ok" style="display:inline-block;padding:7px 22px;border-radius:6px;background:#1a73e8;color:#fff;margin-right:10px">OK</span><span id="tut-cancel" style="display:inline-block;padding:7px 18px;border-radius:6px;border:1px solid #1a73e8;color:#1a73e8">Abbrechen</span></div>`;
+    d.innerHTML = `<div style="font-size:14px;color:#555;margin-bottom:8px">127.0.0.1 says</div>${t}<div style="text-align:right;margin-top:18px"><span id="tut-ok" style="display:inline-block;padding:7px 22px;border-radius:6px;background:#1a73e8;color:#fff;margin-right:10px">OK</span><span id="tut-cancel" style="display:inline-block;padding:7px 18px;border-radius:6px;border:1px solid #1a73e8;color:#1a73e8">Cancel</span></div>`;
     document.body.appendChild(d);
   }, text);
 const noDialog = () => R.page.evaluate(() => document.getElementById("tut-dialog")?.remove());
@@ -454,7 +454,7 @@ const roofState = async (stage) => {
   }
   if (stage >= 3) {
     await R.editor(`e._roofId = null; e.addRoofWindow();
-      e.updateRoofWindow({ w: 0.94, h: 1.4, cover: ${T(RWIN.cover)}, contact: ${T(RWIN.contact)}, tilt: ${T(RWIN.tilt)}, window: ${T(RWIN.motor)}, name: "Dachfenster Flur" });
+      e.updateRoofWindow({ w: 0.94, h: 1.4, cover: ${T(RWIN.cover)}, contact: ${T(RWIN.contact)}, tilt: ${T(RWIN.tilt)}, window: ${T(RWIN.motor)}, name: "Roof window hall" });
       e._roofWinId = null;`);
   }
   if (stage >= 4) {
@@ -472,7 +472,7 @@ const start = async (floors = HOUSE) => {
   await loadHouse(floors);
   await tap(R, { text: "3D", exact: true, nth: 0 });
   await R.sleep(1500);
-  if (floors.length > 1) await tap(R, { text: "Gestapelt", exact: true });
+  if (floors.length > 1) await tap(R, { text: "Stacked", exact: true });
   await R.sleep(300);
   await tap(R, { text: "Editor", exact: true });
   await R.sleep(900);
@@ -519,16 +519,16 @@ const park = () => R.page.mouse.move(700, 40);
 /** A plan label of the headroom lines ("1,5 m", "2 m"): its centre. */
 const headroomLabel = (text) =>
   R.editor(`const el = [...e.renderRoot.querySelectorAll(".fp3d-headroom-label")].find((t) => t.textContent.trim() === ${T(text)}); if (!el) return null; const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 };`);
-/** Tap the front wall of the attic at plan x with the tool „Tür & Fenster“ (an opening is placed). */
+/** Tap the front wall of the attic at plan x with the tool “Door & Window” (an opening is placed). */
 const placeWindow = async (x) => {
-  await R.clickOn({ text: "Tür & Fenster", exact: true }, 0.5);
+  await R.clickOn({ text: "Door & Window", exact: true }, 0.5);
   await R.frame(0.3, 500);
   await tapPlan(x, 0, 0.6);
   await R.frame(0.3, 400);
 };
-/** The type chip „Fenster“ of the opening just placed. */
+/** The type chip “Window” of the opening just placed. */
 const chipWindow = async () => {
-  await R.clickOn({ text: "Fenster", exact: true }, 0.5);
+  await R.clickOn({ text: "Window", exact: true }, 0.5);
   await R.frame(0.3, 400);
 };
 /** The id of the newest section (a dormer just added). */
@@ -567,7 +567,7 @@ const optionWith = (label, part) =>
     part,
   );
 
-// ================================================================ PART 1: Dachschrägen, Gauben und Zwerchgiebel
+// ================================================================ PART 1: sloping ceilings, dormers and cross gables
 if (PART === "a") {
   // ---------------------------------------------------------------- teaser: the finished attic roof
   await chapter("Teaser");
@@ -584,16 +584,16 @@ if (PART === "a") {
     const C = { theta: -2.9, phi: 0.85, radius: 13, target: { x: 0, y: 3, z: 0 } };
     await setMain(fit(A));
     await R.sleep(1500);
-    await R.title("Dächer Teil 2: Gauben, Dachfenster, Dachschrägen, Carport", `HomePlan 3D · Folge 8 · Teil 1${VERSION}`);
-    await sayOver("Eine Gaube, ein Zwerchgiebel, ein Dachfenster und ein Carport – und darunter ein Dachgeschoss mit echten Schrägen.");
+    await R.title("Roofs part 2: dormers, roof windows, sloping ceilings, carport", `HomePlan 3D · episode 8 · part 1${VERSION}`);
+    await sayOver("A dormer, a cross gable, a roof window and a carport – and below them an attic with real sloped ceilings.");
     await glideMainT(A, B, 6);
     await R.untitle();
-    await sayOver("In diesem Teil baust du das Dachgeschoss aus: mit Kniestock, Gaube und Zwerchgiebel.");
+    await sayOver("In this part you convert the attic: with a knee wall, a dormer and a cross gable.");
     await glideMainT(B, C, 4.5);
   }
 
   // ---------------------------------------------------------------- intro
-  await chapter("Was wir heute machen");
+  await chapter("Was wir today machen");
   await start();
   await roofState(0);
   await roofTool();
@@ -601,50 +601,50 @@ if (PART === "a") {
   await R.sleep(800);
   PLANVIEW = await R.editor(`return { ...e._view };`);
   await R.hideCursor(false);
-  await sayOver("Wir machen mit dem Haus aus Folge 7 weiter. Oben liegt diesmal ein ausgebautes Dachgeschoss.");
-  await R.clickOn({ text: "Dachgeschoss", exact: true }, 0.6);
+  await sayOver("We carry on with the house from episode 7. This time the top floor is a converted attic.");
+  await R.clickOn({ text: "Attic", exact: true }, 0.6);
   await pointPlan(2.25, 2.6, 0.5);
   await R.hold(0.4);
   await pointPlan(7, 2.6, 0.5);
   await R.hold(0.4);
   await pointPlan(2, 10, 0.5);
-  await sayOver("Noch sitzt das Dach auf vollen Wänden, wie über einem Obergeschoss. In vielen Häusern beginnt die Schräge aber viel tiefer.");
+  await sayOver("The roof still sits on full-height walls, as if over an upper floor. But in many houses the slope starts much lower.");
   await glide3d(cam(-2.6, 0.95, 32, T_HOUSE), cam(-2.9, 0.98, 30, T_HOUSE), 5);
 
   // ---------------------------------------------------------------- knee wall
-  await chapter("Dachschrägen mit Kniestock");
-  await sayOver("Ich tippe das Haupthaus an. Entscheidend ist die „Wandoberkante“: die Höhe, auf der die Wände unter dem Dach enden.");
+  await chapter("Sloping ceilings with knee walls");
+  await sayOver("I tap the main house. What matters is the “Top of walls”: the height where the walls end under the roof.");
   await tapSection(MAIN, 0.6);
   await setCam(cam(-2.9, 1.0, 27, T_MAIN));
-  await R.moveTo({ label: "Wandoberkante" }, 0.5);
+  await R.moveTo({ label: "Top of walls" }, 0.5);
   await R.hold(0.4);
-  await sayOver("Typisch ist ein Kniestock von etwa 90 Zentimetern. Der Boden des Dachgeschosses liegt auf 2,75 Metern, also trage ich 3,65 ein.");
+  await sayOver("A knee wall of about 90 centimetres is typical. The attic floor is at 2.75 metres, so I enter 3.65.");
   await R.hold(2.2);
-  await fill("Wandoberkante (m)", "3,65");
-  await sayOver("Damit das Dach dort auch aufliegt, setze ich beide Traufen auf denselben Wert.");
-  await fill("Traufe (m) oben", "3,65");
-  await fill("Traufe (m) unten", "3,65");
-  await sayOver("Und weil ein Dachgeschoss Kopfhöhe braucht, wird das Dach steiler: 45 Grad auf beiden Seiten.");
-  await fill("Neigung (°) oben", "45");
-  await fill("Neigung (°) unten", "45");
-  await sayOver("Jetzt enden die Wände unter dem Dach: ein niedriger Kniestock an der Traufe, die Giebelwände reichen bis zum First.");
+  await fill("Top of walls (m)", "3,65");
+  await sayOver("So that the roof actually rests there, I set both eaves to the same value.");
+  await fill("Eave (m) top", "3,65");
+  await fill("Eave (m) bottom", "3,65");
+  await sayOver("And because an attic needs headroom, the roof gets steeper: 45 degrees on both sides.");
+  await fill("Pitch (°) top", "45");
+  await fill("Pitch (°) bottom", "45");
+  await sayOver("Now the walls end under the roof: a low knee wall at the eaves, and the gable walls reach up to the ridge.");
   await glide3d(cam(-2.9, 1.0, 27, T_MAIN), cam(-2.3, 1.05, 24, T_MAIN), 5);
-  await sayOver("So steht es auch im Hinweis unter dem Feld: Liegt die Wandoberkante unter der Deckenhöhe, enden die Wände an der Dachunterseite – auch die Innenwände an der Schräge.");
-  await moveToText("Liegt sie unter der Deckenhöhe", 0.6);
+  await sayOver("The hint under the field says the same: if the top of the walls is below the ceiling height, the walls end at the underside of the roof – the inner walls at the slope too.");
+  await moveToText("Below the ceiling height", 0.6);
   await R.hold(1.5);
-  await sayOver("Den Seitenflügel stelle ich genauso ein: Wandoberkante und Traufen auf 3,65, beide Neigungen auf 45 Grad.");
+  await sayOver("I set up the side wing the same way: top of walls and eaves to 3.65, both pitches to 45 degrees.");
   await tapSection(WING, 0.5);
   await setCam(cam(-0.75, 1.0, 26, T_WING));
-  for (const [label, value] of [["Wandoberkante (m)", "3,65"], ["Traufe (m) links", "3,65"], ["Traufe (m) rechts", "3,65"], ["Neigung (°) links", "45"], ["Neigung (°) rechts", "45"]]) {
+  for (const [label, value] of [["Top of walls (m)", "3,65"], ["Eave (m) left", "3,65"], ["Eave (m) right", "3,65"], ["Pitch (°) left", "45"], ["Pitch (°) right", "45"]]) {
     await R.clickOn({ label }, 0.35);
     await h.typeOver(value, 0.04);
   }
   await glide3d(cam(-0.75, 1.0, 26, T_WING), cam(-1.2, 1.0, 26, T_WING), 1.5);
 
   // ---------------------------------------------------------------- headroom and the attic in 3D
-  await chapter("Dachschrägen im Plan und in 3D");
-  await R.clickOn({ text: "‹ Dachflächen" }, 0.5);
-  await sayOver("Im Plan des Dachgeschosses zeigen gestrichelte Linien, wo unter der Schräge noch 1,5 Meter und 2 Meter Kopfhöhe bleiben.");
+  await chapter("Sloping ceilings in the plan and in 3D");
+  await R.clickOn({ text: "‹ Roof sections" }, 0.5);
+  await sayOver("In the attic plan, dashed lines show where 1.5 metres and 2 metres of headroom remain under the slope.");
   {
     const a = await headroomLabel("1,5 m");
     const b = await headroomLabel("2 m");
@@ -653,10 +653,10 @@ if (PART === "a") {
     if (b) await R.move(b.x, b.y, 0.5);
     await R.hold(0.8);
   }
-  await sayOver("Praktisch beim Einrichten: Unter 1,5 Metern passt nur noch eine niedrige Kommode, ein Bett lieber dort, wo du aufrecht stehen kannst.");
+  await sayOver("Phone when you furnish the room: under 1.5 metres only a low chest of drawers fits, so put the bed where you can stand upright.");
   await pointPlan(2.25, 5, 0.6);
   await R.hold(1.5);
-  await sayOver("Und so sieht es in der 3D-Ansicht aus. Zoome ich heran, hebt sich das Dach ab und blendet aus – du schaust ins Dachgeschoss.");
+  await sayOver("And this is how it looks in the 3D view. When I zoom in, the roof lifts off and fades out – and you look into the attic.");
   await R.clickOn({ text: "3D", exact: true, nth: 0 }, 0.6);
   await R.sleep(2000);
   await R.hideCursor();
@@ -669,10 +669,10 @@ if (PART === "a") {
     await setMain(fit(A));
     await R.frame(0.3, 400);
     await glideMainT(A, B, 4.5);
-    await sayOver("Da ist der Kniestock an der Traufe, die Giebel reichen bis zum First, und die Innenwände folgen der Schräge.");
+    await sayOver("There's the knee wall at the eaves, the gables reach up to the ridge, and the inner walls follow the slope.");
     await glideMainT(B, C, 5);
     {
-      const line = "Fenster passen dann nur, wo die Wand hoch genug ist – hier in den Giebeln. Für die Traufseite gibt es Gauben und Dachfenster.";
+      const line = "Windows then only fit where the wall is high enough – here in the gables. For the eave side there are dormers and roof windows.";
       await sayOver(line);
       await glideMainT(C, { ...C, theta: -1.7 }, N.length(line) - 0.2);
     }
@@ -682,72 +682,72 @@ if (PART === "a") {
   await R.sleep(1500);
 
   // ---------------------------------------------------------------- a dormer
-  await chapter("Eine Gaube einsetzen");
+  await chapter("Eine Dormer einsetzen");
   await setCam(cam(-2.9, 1.0, 24, T_MAIN));
-  await sayOver("Zurück im Editor nehme ich wieder das Werkzeug „Dach“ und oben „Dachgeschoss“. Dann tippe ich das Haupthaus an: Unten im Formular stehen „+ Gaube oben“ und „+ Gaube unten“, eine für jede Dachseite.");
-  await R.clickOn({ text: "Dach", exact: true }, 0.6);
+  await sayOver("Back in the editor I pick the “Roof” tool – “Roof” – again, and “Attic” at the top. Then I tap the main house: at the bottom of the form you'll find “+ Dormer top” and “+ Dormer bottom” and “+ Dormer bottom” – one for each side of the roof.");
+  await R.clickOn({ text: "roof", exact: true }, 0.6);
   await R.sleep(1500);
   // the plan as it was before the 3D view (coming back, the editor fits it to the narrower pane only later)
   await R.editor(`e._view = ${T(PLANVIEW)};`);
   await setCam(cam(-2.9, 1.0, 24, T_MAIN));
   await R.frame(0.2, 300);
-  await R.clickOn({ text: "Dachgeschoss", exact: true }, 0.5);
+  await R.clickOn({ text: "Attic", exact: true }, 0.5);
   await R.editor(`e._view = ${T(PLANVIEW)};`);
   await R.frame(0.2, 300);
   await tapSection(MAIN, 0.6);
-  await R.moveTo({ text: "+ Gaube oben" }, 0.5);
+  await R.moveTo({ text: "+ Dormer top" }, 0.5);
   await R.hold(0.5);
-  await R.moveTo({ text: "+ Gaube unten" }, 0.4);
-  await sayOver("Ich nehme „+ Gaube oben“, die Seite zur Straße.");
-  await R.clickOn({ text: "+ Gaube oben" }, 0.5);
+  await R.moveTo({ text: "+ Dormer bottom" }, 0.4);
+  await sayOver("I take “+ Dormer top”, the side facing the street.");
+  await R.clickOn({ text: "+ Dormer top" }, 0.5);
   await setCam(cam(-2.9, 1.05, 18, T_FRONT));
   await R.hold(0.4);
-  await sayOver("Die Gaube kommt in die Mitte: zwei Meter breit, die Front auf der Außenwand, mit Satteldach. Ihre Traufe liegt 1,4 Meter über der Dachtraufe, hier 5,05 Meter.");
+  await sayOver("The dormer appears in the middle: two metres wide, its front on the outer wall, with a gable roof. Its eaves are 1.4 metres above the roof's eaves, here 5.05 metres.");
   await glide3d(cam(-2.9, 1.05, 18, T_FRONT), cam(-2.6, 1.05, 17, T_FRONT), 3.5);
-  await R.moveTo({ label: "Traufe (m) links" }, 0.5);
+  await R.moveTo({ label: "Eave (m) left" }, 0.5);
   await R.hold(1.2);
-  await sayOver("Sie ist genau so tief, dass ihr First auf die Schräge trifft. Darunter öffnet sich das Hauptdach, und die Seiten der Gaube schließen sie ab.");
+  await sayOver("It's exactly as deep as it needs to be for its ridge to meet the slope. The main roof opens up underneath, and the sides of the dormer close it off.");
   await glide3d(cam(-2.6, 1.05, 17, T_FRONT), cam(-3.3, 1.0, 17, T_FRONT), 6);
-  await sayOver("Eine Gaube ist eine eigene kleine Dachfläche: Im Formular heißt sie „Gaube 5“, und auch Liste und Plan zeigen „Gaube“.");
-  await moveToText("Gaube 5", 0.5);
+  await sayOver("A dormer is a small roof section of its own: in the form it's called “Dormer 5”, and the list and the plan say “Dormer” too.");
+  await moveToText("Dormer 5", 0.5);
   await R.hold(0.8);
   {
     const s = await selected();
     await pointPlan((s.x0 + s.x1) / 2, 0.75, 0.5);
   }
-  await sayOver("Ziehen verschiebt sie. Ich setze sie über das Kinderzimmer.");
+  await sayOver("Dragging moves it. I put it over the children's room.");
   {
     const s = await selected();
     await moveSel(DORMER.x0 - s.x0, 0, 1.2);
   }
   await R.hold(0.3);
-  await sayOver("An den Ecken änderst du die Breite. Ich mache sie etwas breiter, 2,5 Meter.");
+  await sayOver("The corners change its width. I make it a little wider, 2.5 metres.");
   {
     const s = await selected();
     await dragCorner(1, 1, DORMER.x1, s.z1, 1.1);
     console.log("dormer:", JSON.stringify(await selected()));
   }
   await glide3d(cam(-3.3, 1.0, 17, T_FRONT), cam(-2.9, 1.05, 16, { ...T_FRONT, x: 2.5 }), 2);
-  await sayOver("Bei „Form“ wählst du „Sattel“ oder „Pult“. Für eine Schleppgaube nehme ich „Pult“ und die Firstrichtung quer: Dann fällt die Fläche nach vorn.");
-  await pick("Form", "Pult", 0.5);
-  await R.clickOn({ text: "First ↔", exact: true }, 0.5);
-  await sayOver("Eine Schleppgaube ist flacher als das Dach, hier 15 Grad. So trifft sie weiter oben auf die Schräge.");
-  await fill("Neigung (°)", "15");
+  await sayOver("Under “Shape” – you choose “Gable”, a gable, or “Pent”, a pent roof. For a shed dormer I take “Pent” and the ridge running across: then the roof slopes down to the front.");
+  await pick("Shape", "Pent", 0.5);
+  await R.clickOn({ text: "Ridge ↔", exact: true }, 0.5);
+  await sayOver("A shed dormer is flatter than the roof, here 15 degrees. That way it meets the slope higher up.");
+  await fill("Pitch (°)", "15");
   await glide3d(cam(-2.9, 1.05, 16, { ...T_FRONT, x: 2.5 }), cam(-2.4, 1.05, 16, { ...T_FRONT, x: 2.5 }), 3);
   console.log("pent dormer:", JSON.stringify(await selected()));
-  await sayOver("Für unser Haus bleibe ich bei der Satteldachgaube, also dreimal „Rückgängig“.");
-  for (let i = 0; i < 3; i++) await R.clickOn({ text: "Rückgängig", exact: true }, i ? 0.25 : 0.6);
+  await sayOver("For our house I'll stay with the gable dormer, so three times “Undo”.");
+  for (let i = 0; i < 3; i++) await R.clickOn({ text: "Undo", exact: true }, i ? 0.25 : 0.6);
   await R.hold(0.6);
   console.log("dormer back:", JSON.stringify(await selected()));
 
   // ---------------------------------------------------------------- the dormer window
-  await chapter("Das Gaubenfenster");
-  await sayOver("Unter der Gaube steigt die Wand des Dachgeschosses bis zu ihrer Traufe. Dort setzt du das Fenster mit „Tür & Fenster“: Werkzeug wählen und auf die Wand tippen.");
+  await chapter("Das Dormernfenster");
+  await sayOver("Under the dormer the attic wall rises up to its eaves. That's where you put the window, with “Doors & windows”: pick the tool and tap the wall.");
   await placeWindow(2.5);
-  await sayOver("Rechts stelle ich die Art auf „Fenster“ – fertig ist das Gaubenfenster.");
+  await sayOver("On the right I set the type to “Window” – and the dormer window is done.");
   await chipWindow();
   await R.hold(0.8);
-  await R.clickOn({ text: "Dach", exact: true }, 0.6);
+  await R.clickOn({ text: "roof", exact: true }, 0.6);
   await R.sleep(1500);
   await setCam(cam(-2.95, 1.12, 13, { x: 2.5, y: 4, z: 0 }));
   await R.frame(0.2, 400);
@@ -755,45 +755,45 @@ if (PART === "a") {
 
   // ---------------------------------------------------------------- the cross gable
   await chapter("Der Zwerchgiebel");
-  await sayOver("Ein Zwerchgiebel ist ein Giebel, der aus der Traufseite vortritt – typisch beim Drei-Giebel-Haus. In NeonPlan ist das eine breite Gaube, deren Traufe auf der Wandoberkante liegt.");
-  await R.clickOn({ text: "‹ Dachflächen" }, 0.5).catch(() => {});
+  await sayOver("A cross gable is a gable that projects from the eave side – typical of a three-gable house. In NeonPlan it's a wide dormer whose eaves sit on the top of the walls.");
+  await R.clickOn({ text: "‹ Roof sections" }, 0.5).catch(() => {});
   await pointPlan(7, 0.6, 0.6);
   await R.hold(1.5);
-  await sayOver("Also: Haupthaus antippen, „+ Gaube oben“ und die neue Gaube über das Arbeitszimmer ziehen.");
+  await sayOver("So: tap the main house, “+ Dormer top”, and drag the new dormer over the study.");
   await tapSection(MAIN, 0.5);
-  await R.clickOn({ text: "+ Gaube oben" }, 0.5);
+  await R.clickOn({ text: "+ Dormer top" }, 0.5);
   await R.hold(0.3);
   {
     const s = await selected();
     await moveSel(CROSS.x0 - s.x0, 0, 1.1);
   }
-  await sayOver("An der Ecke ziehe ich sie auf etwa 3,4 Meter Breite.");
+  await sayOver("At the corner I pull it out to about 3.4 metres wide.");
   {
     const s = await selected();
     await dragCorner(1, 1, CROSS.x1, s.z1, 1.1);
   }
   await setCam(cam(-2.95, 1.05, 17, { x: 7, y: 4, z: 1 }));
-  await sayOver("Jetzt beide Traufen auf die Wandoberkante, 3,65 Meter, und 45 Grad Neigung wie beim Hauptdach.");
-  for (const [label, value] of [["Traufe (m) links", "3,65"], ["Traufe (m) rechts", "3,65"], ["Neigung (°) links", "45"], ["Neigung (°) rechts", "45"]]) {
+  await sayOver("Now both eaves on the top of the walls, 3.65 metres, and a 45-degree pitch like the main roof.");
+  for (const [label, value] of [["Eave (m) left", "3,65"], ["Eave (m) right", "3,65"], ["Pitch (°) left", "45"], ["Pitch (°) right", "45"]]) {
     await R.clickOn({ label }, 0.35);
     await h.typeOver(value, 0.04);
   }
   console.log("cross gable:", JSON.stringify(await selected()));
-  await sayOver("Die Tiefe passt sich von selbst an: Der Giebel reicht genau so weit, bis sein First auf die Schräge trifft. Das Hauptdach öffnet sich nur unter dem Giebeldach, so entstehen die Kehlen.");
+  await sayOver("The depth adjusts by itself: the gable reaches exactly as far as its ridge needs to meet the slope. The main roof only opens under the gable roof, which creates the valleys.");
   await glide3d(cam(-2.95, 1.05, 17, { x: 7, y: 4, z: 1 }), cam(-2.35, 0.9, 17, { x: 7, y: 4, z: 1 }), 8);
-  await sayOver("Auch hier steigt die Wand darunter bis in den Giebel. Das Fenster setze ich wieder mit „Tür & Fenster“.");
+  await sayOver("Here too the wall underneath rises up into the gable. I put the window in with “Doors & windows” again.");
   await placeWindow(7);
   await chipWindow();
   await R.hold(0.3);
-  await R.clickOn({ text: "Dach", exact: true }, 0.6);
+  await R.clickOn({ text: "roof", exact: true }, 0.6);
   await R.sleep(1500);
   await setCam(cam(-2.9, 1.1, 18, { x: 5, y: 4, z: 0 }));
   await R.frame(0.2, 400);
   await glide3d(cam(-2.9, 1.1, 18, { x: 5, y: 4, z: 0 }), cam(-2.5, 1.05, 19, { x: 5, y: 4, z: 0 }), 2);
 
   // ---------------------------------------------------------------- the attic in 3D
-  await chapter("Das Dachgeschoss in 3D");
-  await sayOver("In der 3D-Ansicht hast du jetzt ein Haus mit Gaube und Zwerchgiebel.");
+  await chapter("Das Attic in 3D");
+  await sayOver("In the 3D view you now have a house with a dormer and a cross gable.");
   await R.clickOn({ text: "3D", exact: true, nth: 0 }, 0.6);
   await R.sleep(2000);
   await R.hideCursor();
@@ -806,7 +806,7 @@ if (PART === "a") {
     await setMain(fit(A));
     await R.frame(0.2, 400);
     await glideMainT(A, B, 4);
-    const line = "Und von innen: Die Wand steigt unter der Gaube und im Zwerchgiebel hoch, mit den beiden neuen Fenstern.";
+    const line = "And from the inside: the wall rises under the dormer and in the cross gable, with the two new windows.";
     await sayOver(line);
     const len = N.length(line);
     await glideMainT(B, C, Math.min(4, len * 0.55));
@@ -815,13 +815,13 @@ if (PART === "a") {
 
   // ---------------------------------------------------------------- outro
   await chapter("Wie geht es weiter");
-  await R.title("Teil 2: Dachfenster, Flachdach, Terrassendach und Carport", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
-  await say("Das war Teil eins: Kniestock und Dachschrägen, die Kopfhöhe im Plan, die Gaube als Sattel oder Pult mit ihrem Fenster und der Zwerchgiebel.");
-  await say("In Teil zwei kommen Dachfenster mit Rollladen und Kontakt, ein Flachdach als freie Form, Terrassendach und Carport – und der Schalter „Dach bleibt“.");
-  await say("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. NeonPlan läuft übrigens auch auf alten Wandtablets. Bis gleich in Teil zwei!");
+  await R.title("Part 2: roof windows, flat roof, terrace roof and carport", `HomePlan 3D – also runs on old wall tablets${VERSION}`);
+  await say("That was part one: the knee wall and sloped ceilings, the headroom in the plan, the dormer as a gable or shed dormer with its window, and the cross gable.");
+  await say("Part two covers roof windows with blinds and contacts, a flat roof as a free shape, a terrace roof and a carport – and the “Roof stays” switch.");
+  await say("Left to the online demo and the manual are in the description. NeonPlan also runs on old wall tablets, by the way. See you in part two!");
   await R.hold(0.6);
 } else {
-  // ================================================================ PART 2: Dachfenster, Flachdach und Carport
+  // ================================================================ PART 2: Roof windows, flat roof and carport
   // ---------------------------------------------------------------- teaser
   await chapter("Teaser");
   await start();
@@ -837,18 +837,18 @@ if (PART === "a") {
     const C = { theta: -1.4, phi: 0.95, radius: 30, target: home.target };
     await setMain(fit(A));
     await R.sleep(1500);
-    await R.title("Dachfenster, Flachdach, Terrassendach und Carport", `HomePlan 3D · Folge 8 · Teil 2${VERSION}`);
-    await sayOver("Ein Dachfenster, das live aufgeht, ein Terrassendach und ein Carport auf Pfosten.");
+    await R.title("Roof windows, flat roof, terrace roof and carport", `HomePlan 3D · episode 8 · part 2${VERSION}`);
+    await sayOver("A roof window that opens live, a terrace roof and a carport on posts.");
     await glideMainT(A, B, 2.5);
     await h.setState(RWIN.motor, "open", { current_position: 100 });
     await glideMainT(B, { ...B, theta: 0.05 }, 2.5);
     await R.untitle();
-    await sayOver("In diesem Teil zeige ich dir Dachfenster mit Rollladen, Kontakt und Motor, ein Flachdach als freie Form, die Überdachung und „Dach bleibt“.");
+    await sayOver("In this part I show you roof windows with a blind, contacts and a motor, a flat roof as a free shape, the canopy and “Roof stays”.");
     await glideMainT({ ...B, theta: 0.05 }, C, 8);
   }
 
   // ---------------------------------------------------------------- intro
-  await chapter("Was wir heute machen");
+  await chapter("Was wir today machen");
   await start();
   await roofState(2);
   await roofTool();
@@ -856,24 +856,24 @@ if (PART === "a") {
   await setCam(cam(-2.6, 0.95, 32, T_HOUSE));
   await R.sleep(800);
   await R.hideCursor(false);
-  await sayOver("Wir machen mit dem Dachgeschoss aus Teil eins weiter: Kniestock, Gaube und Zwerchgiebel sind fertig. Jetzt kommt Licht von der anderen Seite.");
+  await sayOver("We carry on with the attic from part one: the knee wall, the dormer and the cross gable are done. Now light comes in from the other side.");
   await glide3d(cam(-2.6, 0.95, 32, T_HOUSE), cam(0.35, 0.95, 32, T_HOUSE), 4);
 
   // ---------------------------------------------------------------- roof window: add, move, size
-  await chapter("Ein Dachfenster einsetzen");
-  await sayOver("Unter der Liste der Dachflächen steht der Abschnitt „Dachfenster“. „+ Dachfenster“ legt ein Fenster in eine Dachfläche.");
-  await moveToText("Dachfenster liegen in der Dachfläche", 0.6);
+  await chapter("Install a roof window");
+  await sayOver("Below the list of roof sections there's the “Roof windows” section – “Roof windows”. “+ Roof window” – puts a window into a roof section.");
+  await moveToText("Roof windows sit in the roof section", 0.6);
   await R.hold(0.8);
-  await R.clickOn({ text: "+ Dachfenster" }, 0.5);
+  await R.clickOn({ text: "+ Roof windows" }, 0.5);
   await setCam(cam(0.35, 0.95, 24, T_RWIN));
-  await sayOver("Es landet auf der Südseite des Hauptdachs, 78 mal 118 Zentimeter, ein übliches Maß. Im Plan ist es das kleine Rechteck.");
+  await sayOver("It lands on the south side of the main roof, 78 by 118 centimetres, a common size. In the plan it's the small rectangle.");
   await glide3d(cam(0.35, 0.95, 24, T_RWIN), cam(0.15, 0.95, 24, T_RWIN), 3);
   {
     const b = await roofWinBox();
     await R.move(b.x, b.y, 0.5);
   }
   await R.hold(0.6);
-  await sayOver("Im Plan ziehst du es an die richtige Stelle. Ich schiebe es etwas nach rechts, über den Flur.");
+  await sayOver("In the plan you drag it to the right spot. I move it a little to the right, over the hallway.");
   {
     const b = await roofWinBox();
     const p0 = await R.planPoint(0, 0);
@@ -882,7 +882,7 @@ if (PART === "a") {
     await R.drag(b.x + 1.8 * (p1.x - p0.x), b.y, 1.1);
   }
   await R.hold(0.4);
-  await sayOver("Ziehst du es weiter, wechselt es auf eine andere Dachfläche – hier auf den Seitenflügel über dem Elternzimmer.");
+  await sayOver("Drag it further and it changes to another roof section – here onto the side wing above the master bedroom.");
   {
     const b = await roofWinBox();
     const to = await R.planPoint(3.1, 10);
@@ -892,85 +892,85 @@ if (PART === "a") {
   await setCam(cam(-0.6, 1.0, 22, T_WING));
   await R.hold(0.6);
   console.log("roof window on the wing:", JSON.stringify(await R.editor(`return e._doc.settings.roof.windows;`)));
-  await sayOver("Oben im Formular steht, auf welcher Dachfläche es liegt. Dort kannst du sie auch wählen. Ich nehme wieder das Hauptdach, Südseite.");
-  await R.moveTo({ label: "Dachfläche" }, 0.5);
+  await sayOver("At the top of the form you can see which roof section it's on. You can also pick it there. I go back to the main roof, south side.");
+  await R.moveTo({ label: "Roof section" }, 0.5);
   await R.hold(0.8);
   {
-    const opt = await optionWith("Dachfläche", "Abschnitt 1 · Süd");
-    await pick("Dachfläche", opt ?? "Abschnitt 1 · Süd · 45°", 0.4);
+    const opt = await optionWith("Roof section", "Section 1 · south");
+    await pick("Roof section", opt ?? "Section 1 · south · 45°", 0.4);
   }
   await setCam(cam(0.35, 0.95, 24, T_RWIN));
-  await sayOver("„Breite“ und „Höhe“ ändern die Größe. Ich nehme 94 mal 140 Zentimeter.");
-  await fill("Breite", "0,94");
-  await fill("Höhe (m)", "1,4");
-  await sayOver("„Abstand vom Rand“ und „Abstand von der Traufe“ legen die Lage auf den Zentimeter genau fest.");
-  await R.moveTo({ label: "Abstand vom Rand" }, 0.5);
+  await sayOver("“Width” and “Height” change the size. I take 94 by 140 centimetres.");
+  await fill("Width", "0,94");
+  await fill("Height (m)", "1,4");
+  await sayOver("“Distance from the edge” and “Distance from the eaves” and “Distance from the eave” – fix the position to the centimetre.");
+  await R.moveTo({ label: "Distance from the edge" }, 0.5);
   await R.hold(0.8);
-  await R.moveTo({ label: "Abstand von der Traufe" }, 0.5);
+  await R.moveTo({ label: "Distance from the eave" }, 0.5);
   await R.hold(0.6);
 
   // ---------------------------------------------------------------- blind, contacts, motor live
-  await chapter("Rollladen, Kontakt und Fenstermotor");
-  await sayOver("Wie ein normales Fenster hat das Dachfenster einen „Rollladen“, einen „Kontakt“ und einen „Kippkontakt“.");
-  await h.pickEntity("Rollladen", "dachfenster", "Dachfenster Rollladen", 0.5);
-  await h.pickEntity("Kontakt", "dachfenster", "Dachfenster Kontakt", 0.45);
-  await h.pickEntity("Kippkontakt", "dachfenster", "Dachfenster gekippt", 0.45);
+  await chapter("Blind, contact and window motor");
+  await sayOver("Just like a normal window, the roof window has a “Blind” – a “Contact” – and a “Tilt contact”.");
+  await h.pickEntity("Blind", "roof window", "Roof window blind", 0.5);
+  await h.pickEntity("Contact", "roof window", "Roof window contact", 0.45);
+  await h.pickEntity("Tilt contact", "roof window", "Roof window tilted", 0.45);
   await setCam(cam(0.4, 0.95, 15, T_RWIN));
-  await sayOver("Meldet der Kontakt offen, klappt der Flügel in 3D nach außen, oben angeschlagen, und der Rahmen leuchtet warm.");
+  await sayOver("When the contact reports open, the sash swings outwards in 3D, hinged at the top, and the frame glows warm.");
   await h.setState(RWIN.contact, "on");
   await glide3d(cam(0.4, 0.95, 15, T_RWIN), cam(0.75, 1.0, 15, T_RWIN), 5);
-  await sayOver("Gekippt öffnet er nur ein Stück.");
+  await sayOver("Tilted, it only opens a little.");
   await h.setState(RWIN.contact, "off");
   await h.setState(RWIN.tilt, "on");
   await live(2.4);
-  await sayOver("Und fährt der Rollladen herunter, schiebt er sich von oben über die Scheibe.");
+  await sayOver("And when the blind comes down, it slides over the glass from the top.");
   await h.setState(RWIN.tilt, "off");
   await live(0.6);
   await h.setState(RWIN.cover, "open", { current_position: 40 });
   await live(1.6);
   await h.setState(RWIN.cover, "closed", { current_position: 0 });
   await live(1.4);
-  await sayOver("Hat dein Dachfenster einen Motor, wählst du ihn bei „Fenstermotor“. Er meldet seine Stellung als Cover, und der Flügel öffnet in 3D genau so weit.");
+  await sayOver("If your roof window has a motor, you pick it under “Window motor”. It reports its position as a cover, and the sash in 3D opens exactly that far.");
   await h.setState(RWIN.cover, "open", { current_position: 100 });
-  await h.pickEntity("Fenstermotor", "motor", "Dachfenster Motor", 0.5);
+  await h.pickEntity("Window motor", "motor", "Roof window motor", 0.5);
   await h.setState(RWIN.motor, "open", { current_position: 50 });
   await glide3d(cam(0.75, 1.0, 15, T_RWIN), cam(0.45, 0.95, 15, T_RWIN), 3);
-  await sayOver("Kontakt und Kippkontakt gehen aber auch ohne Motor. Der „Name“ ist optional, praktisch bei mehreren Dachfenstern.");
-  await fill("Name (optional)", "Dachfenster Flur");
-  await sayOver("Weil das Fenster ein Loch in die Schräge schneidet, schaust du in 3D aus dem Dachgeschoss hinaus.");
+  await sayOver("Contact and tilt contact work without a motor too. The “Name” – is optional, handy when you have several roof windows.");
+  await fill("Name (optional)", "Roof window hall");
+  await sayOver("Because the window cuts a hole into the slope, in 3D you can look out of the attic.");
   await glide3d(cam(0.45, 0.95, 15, T_RWIN), cam(0.2, 0.8, 11, T_RWIN), 4);
-  await sayOver("„Fixieren“, „Löschen“ und oben „Dachflächen“ zurück zur Liste gibt es wie bei jeder Dachfläche.");
+  await sayOver("“Fix”, “Delete” and “Roof sections” at the top, back to the list, work like for any roof section.");
   await sideTop(0.3);
-  await R.moveTo({ text: "Fixieren" }, 0.5);
+  await R.moveTo({ text: "Fix" }, 0.5);
   await R.hold(0.4);
-  await R.moveTo({ text: "Löschen", exact: true }, 0.5);
+  await R.moveTo({ text: "Delete", exact: true }, 0.5);
   await R.hold(0.4);
-  await R.clickOn({ text: "‹ Dachflächen" }, 0.5);
+  await R.clickOn({ text: "‹ Roof sections" }, 0.5);
   await h.setState(RWIN.motor, "closed", { current_position: 0 });
   await R.hold(0.4);
 
   // ---------------------------------------------------------------- flat roof as a free outline (a bungalow)
-  await chapter("Flachdach als freie Form");
+  await chapter("Flat roof als freie Shape");
   await start([GROUND]);
   await R.editor(`const d = structuredClone(e._doc); d.settings.roof = { type: "custom", pitch: 35, overhang: 0.4, sections: [{ id: "roof_bungalow", x0: -0.25, z0: -0.25, x1: 13.25, z1: 12.25, shape: "flat", axis: "x", eave_a: 2.5, eave_b: 2.5, pitch_a: 35, pitch_b: 35, base: 2.5, overhang: 0.3 }] };
     e.setDoc(d, null); e.past = []; e._canUndo = false;`);
   await roofTool();
   await setCam(cam(-2.5, 0.95, 28, { x: 6.5, y: 1.5, z: 6 }));
   await R.sleep(800);
-  await sayOver("Ein Flachdach muss kein Rechteck sein. Ein Beispiel: unser Erdgeschoss allein, als Bungalow mit Flachdach.");
+  await sayOver("A flat roof doesn't have to be a rectangle. An example: our ground floor on its own, as a bungalow with a flat roof.");
   await glide3d(cam(-2.5, 0.95, 28, { x: 6.5, y: 1.5, z: 6 }), cam(-2.2, 0.95, 28, { x: 6.5, y: 1.5, z: 6 }), 3);
-  await sayOver("Ich habe eine Dachfläche darübergezogen und „Flach“ gewählt. Das Rechteck deckt aber auch die Ecken ab, in denen gar kein Haus steht.");
+  await sayOver("I've drawn a roof section over it and chosen “Flat”. But the rectangle also covers the corners where there's no house at all.");
   await tapSection([6.5, 5], 0.5);
   await pointPlan(11, 9.5, 0.6);
   await glide3d(cam(-2.2, 0.95, 28, { x: 6.5, y: 1.5, z: 6 }), cam(-0.9, 0.95, 28, { x: 6.5, y: 1.5, z: 6 }), 3);
-  await sayOver("Bei „Flach“ und „Attika“ gibt es dafür „Umriss des Geschosses übernehmen“.");
-  await R.clickOn({ text: "Umriss des Geschosses übernehmen" }, 0.6);
+  await sayOver("For “Flat” and “Parapet” there's “Take the floor's outline”.");
+  await R.clickOn({ text: "Take the floor's outline" }, 0.6);
   await R.hold(0.4);
-  await sayOver("Die Fläche bekommt den Umriss aller Räume des angezeigten Geschosses – auch in L- oder Z-Form, als eine Fläche ohne Kanten.");
+  await sayOver("The section takes the outline of all rooms of the floor shown – L- or Z-shaped too – as one surface without seams.");
   await glide3d(cam(-0.9, 0.95, 28, { x: 6.5, y: 1.5, z: 6 }), cam(-2.4, 0.95, 28, { x: 6.5, y: 1.5, z: 6 }), 5);
   console.log("outline:", JSON.stringify(await selected()));
-  await sayOver("Die Ecken ziehst du danach im Plan, so steht es auch im Hinweis. Hier ziehe ich das Dach über den Eingang der Garage.");
-  await moveToText("Freie Form: Ziehe", 0.5);
+  await sayOver("Afterwards you drag the corners in the plan, as the hint says. Here I pull the roof out over the garage entrance.");
+  await moveToText("Cleare Shape: Ziehe", 0.5);
   await R.hold(0.6);
   {
     // the outline corner nearest to the garage's front right corner
@@ -984,51 +984,51 @@ if (PART === "a") {
     }
   }
   await R.hold(0.5);
-  await sayOver("„Zurück zum Rechteck“ löscht die freie Form wieder.");
-  await R.clickOn({ text: "Zurück zum Rechteck" }, 0.6);
+  await sayOver("“Back to the rectangle” – removes the free shape again.");
+  await R.clickOn({ text: "Back to the rectangle" }, 0.6);
   await R.hold(0.6);
-  await sayOver("Hat dein Haus mehrere Etagen, wählst du oben mit den Etagen-Knöpfen, welches Geschoss den Umriss liefert.");
+  await sayOver("If your house has several floors, you choose with the floor buttons at the top which floor provides the outline.");
   await glide3d(cam(-2.4, 0.95, 28, { x: 6.5, y: 1.5, z: 6 }), cam(-2.0, 0.95, 28, { x: 6.5, y: 1.5, z: 6 }), 4);
 
   // ---------------------------------------------------------------- terrace roof
-  await chapter("Terrassendach");
+  await chapter("Terracendach");
   await start();
   await roofState(3);
   await roofTool();
   await R.editor(`e._floorId = "eg"; e._view = { scale: 45, ox: 50, oy: 255 };`);
   await setCam(cam(-2.75, 1.0, 26, T_CAN));
   await R.sleep(800);
-  await sayOver("Zurück zu unserem Haus. Vor das Wohnzimmer kommt ein Terrassendach. Du ziehst einfach eine Dachfläche dort auf, wo kein Raum ist.");
+  await sayOver("Back to our house. A terrace roof goes in front of the living room. You simply draw a roof section where there's no room.");
   await pointPlan(3, -1.8, 0.6);
   await R.hold(0.6);
   await dragPlan(TERRACE.x0, TERRACE.z0, TERRACE.x1, TERRACE.z1, 1.5);
   console.log("terrace:", JSON.stringify(await selected()));
-  await sayOver("NeonPlan macht daraus von selbst eine Überdachung: ein flaches Pultdach auf 2,4 Metern, getragen von Pfosten und Balken, mit durchsichtiger Dachfläche.");
+  await sayOver("NeonPlan turns it into a canopy by itself: a flat pent roof at 2.4 metres, carried by posts and beams, with a see-through roof.");
   await glide3d(cam(-2.75, 1.0, 26, T_CAN), cam(-3.2, 1.05, 20, { x: 3, y: 1.5, z: -1 }), 7);
-  await sayOver("An der Hauswand liegt es auf. Im Formular ist dafür „Überdachung“ angehakt, und Liste und Plan zeigen „Überdachung“.");
-  await R.moveTo({ text: "Überdachung (Pfosten" }, 0.5);
+  await sayOver("At the house wall it rests on the wall. In the form, “Canopy” is ticked for this, and the list and the plan say “Canopy”.");
+  await R.moveTo({ text: "Canopy (Pfosten" }, 0.5);
   await R.hold(1.2);
   await pointPlan(3, -1.9, 0.6);
   await R.hold(0.6);
 
   // ---------------------------------------------------------------- carport
   await chapter("Carport");
-  await sayOver("Genauso entsteht der Carport neben der Garage: Fläche aufziehen, fertig.");
+  await sayOver("The carport next to the garage works the same way: draw the section, done.");
   await dragPlan(CARPORT.x0, CARPORT.z0, CARPORT.x1, CARPORT.z1, 1.4);
   console.log("carport:", JSON.stringify(await selected()));
   await glide3d(cam(-3.2, 1.05, 20, { x: 3, y: 1.5, z: -1 }), cam(-3.98, 1.0, 19, { x: 14.5, y: 1.5, z: 3 }), 3);
-  await sayOver("Den Schalter „Überdachung“ hat jede Dachfläche. Ohne Haken wird daraus ein normales Dach ohne Pfosten – mit Haken wieder ein Carport.");
-  await R.clickOn({ text: "Überdachung (Pfosten" }, 0.5);
+  await sayOver("Every roof section has the “Canopy” switch. Without the tick it becomes a normal roof without posts – with the tick, a carport again.");
+  await R.clickOn({ text: "Canopy (Pfosten" }, 0.5);
   await live(1.8);
-  await R.clickOn({ text: "Überdachung (Pfosten" }, 0.5);
+  await R.clickOn({ text: "Canopy (Pfosten" }, 0.5);
   await glide3d(cam(-3.98, 1.0, 19, { x: 14.5, y: 1.5, z: 3 }), cam(-4.28, 0.95, 19, { x: 14.5, y: 1.5, z: 3 }), 2.5);
 
   // ---------------------------------------------------------------- roof stays (3D view)
-  await chapter("Dach bleibt");
-  await sayOver("Zum Schluss die 3D-Ansicht. Zoomst du nah heran, hebt sich das Dach ab, damit du ins Haus schauen kannst.");
+  await chapter("Roof stays");
+  await sayOver("Finally the 3D view. When you zoom in close, the roof lifts off so you can look into the house.");
   await R.clickOn({ text: "3D", exact: true, nth: 0 }, 0.6);
   await R.sleep(2000);
-  const kb = await R.locate({ text: "Dach bleibt", exact: true });
+  const kb = await R.locate({ text: "Roof stays", exact: true });
   await R.move(kb.x + 150, kb.y - 60, 0.4);
   {
     const home = await readHR();
@@ -1037,13 +1037,13 @@ if (PART === "a") {
     await setMain(fit(A));
     await R.frame(0.2, 400);
     await glideMainT(A, B, 4.5);
-    await sayOver("Willst du das Dach auch aus der Nähe sehen, etwa die Gaube oder das Dachfenster, schalte unten „Dach bleibt“ ein.");
-    await R.clickOn({ text: "Dach bleibt", exact: true }, 0.6);
+    await sayOver("If you want to see the roof up close, say the dormer or the roof window, switch on “Roof stays” – at the bottom.");
+    await R.clickOn({ text: "Roof stays", exact: true }, 0.6);
     await live(1.2);
-    await sayOver("Jetzt bleibt es auf dem Haus, auch ganz nah. Den Schalter gibt es in der Hausansicht, sobald dein Haus ein Dach hat.");
+    await sayOver("Now it stays on the house, even very close up. The switch is there in the house view as soon as your house has a roof.");
     await glideMainT(B, { ...B, theta: -2.3, phi: 0.85 }, 5);
-    await sayOver("Ein zweiter Klick schaltet ihn wieder aus.");
-    await R.clickOn({ text: "Dach bleibt", exact: true }, 0.5);
+    await sayOver("A second click switches it off again.");
+    await R.clickOn({ text: "Roof stays", exact: true }, 0.5);
     await live(1.2);
 
     // ---------------------------------------------------------------- result
@@ -1053,7 +1053,7 @@ if (PART === "a") {
     const C = { theta: -2.3, phi: 0.95, radius: 32, target: home.target };
     const D = { theta: 0.5, phi: 0.92, radius: 30, target: home.target };
     await h.setState(RWIN.motor, "open", { current_position: 100 });
-    const line = "Gaube, Zwerchgiebel, Dachfenster, Terrassendach und Carport – alles aus Dachflächen.";
+    const line = "Dormer, cross gable, roof window, terrace roof and carport – all made of roof sections.";
     await sayOver(line);
     const len = N.length(line);
     await glideMainT({ ...B, theta: -2.3, phi: 0.85 }, C, len * 0.35);
@@ -1062,10 +1062,10 @@ if (PART === "a") {
 
   // ---------------------------------------------------------------- outro
   await chapter("Wie geht es weiter");
-  await R.title("Nächste Folge: Außenbereich und Garten", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
-  await say("Das war Teil zwei: Dachfenster mit Rollladen, Kontakt und Motor, das Flachdach als freie Form, Terrassendach und Carport und der Schalter „Dach bleibt“.");
-  await say("In der nächsten Folge geht es nach draußen: Außenbereich und Garten mit Wegen, Zäunen, Bäumen und Licht.");
-  await say("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und NeonPlan läuft auch auf alten Wandtablets. Bis zum nächsten Mal!");
+  await R.title("Next episode: outdoor area and garden", `HomePlan 3D – also runs on old wall tablets${VERSION}`);
+  await say("That was part two: roof windows with a blind, contacts and a motor, the flat roof as a free shape, the terrace roof, the carport and the “Roof stays” switch.");
+  await say("In the next episode we go outside: outdoor areas and the garden, with paths, fences, trees and lights.");
+  await say("Left to the online demo and the manual are in the description. And NeonPlan also runs on old wall tablets. See you next time!");
   await R.hold(0.6);
 }
 

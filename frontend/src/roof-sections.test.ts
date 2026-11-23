@@ -63,8 +63,8 @@ test("sections proposed from an L-shaped house and a single-storey part", () => 
   b.settings.wall_exterior = 0.25;
   // ground floor: an L (barn 16 × 10, living wing 8 × 10 at a right angle); upper floor over the wing only
   b.floors = [
-    { ...newFloor("eg", "EG", 0), rooms: [rect("barn", 0, 0, 16, 10), rect("wing", 0, 10, 8, 20)] },
-    { ...newFloor("og", "OG", 2.75), rooms: [rect("up", 0, 10, 8, 20)] },
+    { ...newFloor("eg", "Ground floor", 0), rooms: [rect("barn", 0, 0, 16, 10), rect("wing", 0, 10, 8, 20)] },
+    { ...newFloor("og", "Upper floor", 2.75), rooms: [rect("up", 0, 10, 8, 20)] },
   ];
   const s = roofSectionsFromRooms(b);
   assert.equal(s.length, 2);
@@ -83,7 +83,7 @@ test("sections proposed from an L-shaped house and a single-storey part", () => 
 
 test("every shape builds geometry", () => {
   const b = emptyBuilding();
-  b.floors = [{ ...newFloor("eg", "EG", 0), rooms: [rect("a", 0, 0, 12, 8)] }];
+  b.floors = [{ ...newFloor("eg", "Ground floor", 0), rooms: [rect("a", 0, 0, 12, 8)] }];
   for (const shape of ROOF_SHAPES) {
     b.settings.roof = { type: "custom", pitch: 40, overhang: 0.4, sections: [section({ shape, base: 2.5, eave_a: 2.5, eave_b: 2.5 })] };
     const [part] = buildRoof(b);
@@ -101,8 +101,8 @@ test("a lean-to has no overhang where it meets the taller house, and sits on the
   const b = emptyBuilding();
   // a two-storey house (0..10) and a single-storey garage beside it (10..14)
   b.floors = [
-    { ...newFloor("eg", "EG", 0), rooms: [rect("house", 0, 0, 10, 8), rect("garage", 10, 0, 14, 6)] },
-    { ...newFloor("og", "OG", 2.75), rooms: [rect("up", 0, 0, 10, 8)] },
+    { ...newFloor("eg", "Ground floor", 0), rooms: [rect("house", 0, 0, 10, 8), rect("garage", 10, 0, 14, 6)] },
+    { ...newFloor("og", "Upper floor", 2.75), rooms: [rect("up", 0, 0, 10, 8)] },
   ];
   near(wallTopUnder(b, 10, 0, 14, 6)!, 2.5);
   near(wallTopUnder(b, 0, 0, 10, 8)!, 2.75 + 2.5);
@@ -115,7 +115,7 @@ test("a lean-to has no overhang where it meets the taller house, and sits on the
 
 test("a canopy over a terrace draws see-through panels and posts instead of walls", () => {
   const b = emptyBuilding();
-  b.floors = [{ ...newFloor("eg", "EG", 0), rooms: [rect("house", 0, 0, 10, 8)] }];
+  b.floors = [{ ...newFloor("eg", "Ground floor", 0), rooms: [rect("house", 0, 0, 10, 8)] }];
   // a terrace roof in front of the house, rising to the house wall (side b at z = 8 … flipped: a = z 11)
   const canopy = section({ x0: 2, z0: 8, x1: 8, z1: 11, shape: "pent", axis: "x", flip: true, eave_a: 2.4, eave_b: 2.4, pitch_a: 6, pitch_b: 6, base: 2.4, open: true });
   b.settings.roof = { type: "custom", pitch: 35, overhang: 0.4, sections: [canopy] };
@@ -133,8 +133,8 @@ function terraceCase(ext: number) {
   const b = emptyBuilding();
   b.settings.wall_exterior = ext;
   b.floors = [
-    { ...newFloor("eg", "EG", 0), height: 2.6, rooms: [rect("house", 0, 0, 10, 8)] },
-    { ...newFloor("dg", "DG", 2.8), height: 2.5, rooms: [rect("up", 0, 0, 10, 8)] },
+    { ...newFloor("eg", "Ground floor", 0), height: 2.6, rooms: [rect("house", 0, 0, 10, 8)] },
+    { ...newFloor("dg", "Attic floor", 2.8), height: 2.5, rooms: [rect("up", 0, 0, 10, 8)] },
   ];
   const canopy = (z0: number, patch: Partial<RoofSection> = {}) =>
     section({ x0: 2, z0, x1: 8, z1: z0 + 3, shape: "pent", axis: "x", flip: true, eave_a: 2.4, eave_b: 2.4, pitch_a: 6, pitch_b: 6, base: 2.4, open: true, ...patch });
@@ -328,8 +328,8 @@ test("a roof drawn over an upper floor with a hole in its middle sits on the upp
   const room = (id: string, x0: number, z0: number, x1: number, z1: number) => ({ id, name: id, area_id: null, points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]] as [number, number][], floor_material: "wood" as const });
   // ground floor 10 × 8; the upper floor has two rooms left and right, a stairwell gap in the middle
   b.floors = [
-    { ...newFloor("eg", "EG", 0), height: 2.5, rooms: [room("a", 0, 0, 10, 8)] },
-    { ...newFloor("og", "OG", 2.75), height: 2.5, rooms: [room("l", 0, 0, 4, 8), room("r", 6, 0, 10, 8)] },
+    { ...newFloor("eg", "Ground floor", 0), height: 2.5, rooms: [room("a", 0, 0, 10, 8)] },
+    { ...newFloor("og", "Upper floor", 2.75), height: 2.5, rooms: [room("l", 0, 0, 4, 8), room("r", 6, 0, 10, 8)] },
   ];
   const top = wallTopUnder(b, 0, 0, 10, 8);
   assert.equal(top, 5.25);
@@ -344,9 +344,9 @@ test("in a split-level house each roof sits on the floor under it, not on the hi
   // two halves on a slope, half a storey apart: west 0–6 (granny flat, ground floor), east 6–12 (basement, upper floor)
   b.floors = [
     { ...newFloor("flat", "Flat", -2.6), height: 2.58, rooms: [room("w1", 0, 0, 6, 8)] },
-    { ...newFloor("ug", "UG", -1.387), height: 2.58, rooms: [room("e1", 6, 0, 12, 8)] },
-    { ...newFloor("eg", "EG", 0), height: 2.6, rooms: [room("w2", 0, 0, 6, 8)] },
-    { ...newFloor("og", "OG", 1.213), height: 2.81, rooms: [room("e2", 6, 0, 12, 8)] },
+    { ...newFloor("ug", "Basement", -1.387), height: 2.58, rooms: [room("e1", 6, 0, 12, 8)] },
+    { ...newFloor("eg", "Ground floor", 0), height: 2.6, rooms: [room("w2", 0, 0, 6, 8)] },
+    { ...newFloor("og", "Upper floor", 1.213), height: 2.81, rooms: [room("e2", 6, 0, 12, 8)] },
   ];
   const west = { base: 2.6, x0: -0.24, z0: -0.24, x1: 6, z1: 8.24 };
   const east = { base: 4.02, x0: 6, z0: -0.24, x1: 12.24, z1: 8.24 };
@@ -359,11 +359,11 @@ test("in a split-level house each roof sits on the floor under it, not on the hi
 test("pulled apart, a roof rides with the loft under its slopes, a garage roof with its own floor (#202, D207)", () => {
   const b = emptyBuilding();
   b.floors = [
-    { ...newFloor("eg", "EG", 0), height: 2.5, rooms: [rect("a", 0, 0, 12, 8), rect("g", 13, 0, 17, 6)] },
-    { ...newFloor("og", "OG", 2.5), height: 2.5, rooms: [rect("b", 0, 0, 12, 8)] },
+    { ...newFloor("eg", "Ground floor", 0), height: 2.5, rooms: [rect("a", 0, 0, 12, 8), rect("g", 13, 0, 17, 6)] },
+    { ...newFloor("og", "Upper floor", 2.5), height: 2.5, rooms: [rect("b", 0, 0, 12, 8)] },
     { ...newFloor("sb", "Spitzboden", 5.3), height: 2, rooms: [rect("c", 3, 2, 9, 6)] },
   ];
-  // the main roof stands on the OG (ridge 9 m), the loft lies under it; a dormer sits in its slope
+  // the main roof stands on the upper floor (ridge 9 m), the loft lies under it; a dormer sits in its slope
   const main = section({ id: "main", base: 5, eave_a: 5, eave_b: 5 });
   const dormer = section({ id: "d", x0: 4, z0: 0, x1: 6, z1: 2, axis: "z", base: 5.5, eave_a: 6.5, eave_b: 6.5, pitch_a: 30, pitch_b: 30, dormer: true });
   const garage = section({ id: "gar", x0: 13, z0: 0, x1: 17, z1: 6, base: 2.5, eave_a: 2.5, eave_b: 2.5, pitch_a: 20, pitch_b: 20 });
@@ -444,7 +444,7 @@ test("a wing running into the slope of a higher roof reaches on to its ridge lin
 
 test("overlapping sections keep only what shows above the other; a single section is drawn as before (#466)", () => {
   const b = emptyBuilding();
-  b.floors = [{ ...newFloor("eg", "EG", 0), height: 2.75, rooms: [rect("a", 0, 0, 12, 8), rect("b", 6, 8, 11, 14)] }];
+  b.floors = [{ ...newFloor("eg", "Ground floor", 0), height: 2.75, rooms: [rect("a", 0, 0, 12, 8), rect("b", 6, 8, 11, 14)] }];
   // one section alone: the same triangles as drawn by itself
   b.settings.roof = { type: "custom", pitch: 40, overhang: 0.4, sections: [main] };
   const alone = buildRoof(b)[0].solid.count;
@@ -583,7 +583,7 @@ test("a cross gable as high as a roof with a hipped end meets it like a wing, no
   // the main roof runs along z with a hip at its z0 end; the cross gable runs along x into it, as wide and as high,
   // flush with the hipped end: its slope on that side lies in the hip's plane
   const b = emptyBuilding();
-  b.floors = [{ ...newFloor("eg", "EG", 0), height: 2.75, rooms: [rect("main", 4, -2, 13, 12), rect("wing", 2, -2, 4, 7.3)] }];
+  b.floors = [{ ...newFloor("eg", "Ground floor", 0), height: 2.75, rooms: [rect("main", 4, -2, 13, 12), rect("wing", 2, -2, 4, 7.3)] }];
   const main = section({ id: "main", x0: 4, z0: -2, x1: 13, z1: 12, axis: "z", eave_a: 2.75, eave_b: 2.75, pitch_a: 40, pitch_b: 40, base: 2.75, end_u0: "hip", end_u1: "gable" });
   const wing = section({ id: "wing", x0: 2, z0: -2, x1: 8.5, z1: 7, axis: "x", eave_a: 2.75, eave_b: 2.75, pitch_a: 40, pitch_b: 40, base: 2.75, overhang: 0, dormer: true });
   const sections = [main, wing];
@@ -622,7 +622,7 @@ test("a cross gable as high as a roof with a hipped end meets it like a wing, no
 
 test("a flat roof opens under its roof windows: the glass looks into the room below, not onto the slab (#1078)", () => {
   const b = emptyBuilding();
-  b.floors = [{ ...newFloor("eg", "EG", 0), rooms: [rect("a", 0, 0, 12, 8)] }];
+  b.floors = [{ ...newFloor("eg", "Ground floor", 0), rooms: [rect("a", 0, 0, 12, 8)] }];
   const flat = section({ id: "f", shape: "flat", base: 2.5, eave_a: 2.5, eave_b: 2.5, pitch_a: 0, pitch_b: 0, overhang: 0 });
   // the slab's faces crossing the vertical line through a plan point (x, z)
   const hits = (x: number, z: number) => {
@@ -658,7 +658,7 @@ test("a flat roof opens under its roof windows: the glass looks into the room be
 
 test("the single flat roof opens under its roof windows too (#1078)", () => {
   const b = emptyBuilding();
-  b.floors = [{ ...newFloor("eg", "EG", 0), rooms: [rect("a", 0, 0, 12, 8)] }];
+  b.floors = [{ ...newFloor("eg", "Ground floor", 0), rooms: [rect("a", 0, 0, 12, 8)] }];
   b.settings.roof = { type: "flat", pitch: 0, overhang: 0.3 };
   const face = roofFaces(b).find((f) => f.flat)!;
   const solid = () => buildRoof(b)[0].solid.p.length;
@@ -674,8 +674,8 @@ test("a roof that begins at a floor's own level sits on that floor: its rooms ar
   const b = emptyBuilding();
   const room = (id: string, x0: number, z0: number, x1: number, z1: number) => ({ id, name: id, area_id: null, points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]] as [number, number][], floor_material: "wood" as const });
   b.floors = [
-    { ...newFloor("eg", "EG", 0), height: 2.4, rooms: [room("a", 0, 0, 13, 9), room("g", 13, 0, 20, 6)] },
-    { ...newFloor("og", "OG", 2.6), height: 2.4, rooms: [room("b", 0, 0, 13, 9)] },
+    { ...newFloor("eg", "Ground floor", 0), height: 2.4, rooms: [room("a", 0, 0, 13, 9), room("g", 13, 0, 20, 6)] },
+    { ...newFloor("og", "Upper floor", 2.6), height: 2.4, rooms: [room("b", 0, 0, 13, 9)] },
   ];
   assert.equal(sectionFloor(b, { base: 2.6, x0: -0.5, z0: -0.5, x1: 13.5, z1: 9.5 })?.id, "og");
   // the garage roof beside it at the same height has no room of the upper floor under it

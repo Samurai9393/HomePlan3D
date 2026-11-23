@@ -47,7 +47,7 @@ export function setVoiceHere(on: boolean): void {
   }
 }
 
-/** This device's screen name for Assist and the service `homeplan3d.ask` ("Küche"); empty: reacts to every sentence. */
+/** This device's screen name for Assist and the service `homeplan3d.ask` ("Kitchen"); empty: reacts to every sentence. */
 export function screenName(): string {
   try {
     return localStorage.getItem("homeplan3d.screen") ?? "";
@@ -83,7 +83,7 @@ export function setVoicePipeline(id: string | null): void {
   }
 }
 
-/** The Home Assistant area this device hangs in, for sentences without a room ("Licht an"); null: none (as before). */
+/** The Home Assistant area this device hangs in, for sentences without a room ("Lights on"); null: none (as before). */
 export function voiceArea(): string | null {
   try {
     return localStorage.getItem("homeplan3d.voiceArea");

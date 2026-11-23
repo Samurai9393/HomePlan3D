@@ -77,7 +77,7 @@ export function roomEntities(hass: HomeAssistant, building: Building, spec: Pick
         temps: (() => {
           const own = (room as { climate?: { temperature?: string | null } | null }).climate?.temperature;
           if (own && hass.states[own]) return [own];
-          const index = /dew|frost|humidex|heat_?index|simmer|wind_?chill|apparent|feels|taupunkt|gef(ü|ue)hlt|perceived|comfort/i;
+          const index = /dew|frost|humidex|heat_?index|simmer|wind_?chill|apparent|feels|perceived|comfort/i;
           const name = (id: string) => `${id} ${String(hass.states[id]?.attributes.friendly_name ?? "")}`;
           return all.filter((id) => domainOf(id) === "sensor" && cls(id) === "temperature" && !index.test(name(id)));
         })(),

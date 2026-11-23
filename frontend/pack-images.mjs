@@ -58,7 +58,7 @@ for (const source of sources) {
       await document.fonts.load("700 20px 'Bricolage Grotesque'");
       await document.fonts.load("500 20px Figtree");
       const mod = await import(bundle);
-      const name = (it) => it.name.de ?? it.name.en ?? Object.values(it.name)[0];
+      const name = (it) => it.name.en ?? Object.values(it.name)[0];
       const items = pack.items.map((it) => ({
         id: it.id,
         name: name(it),
@@ -92,13 +92,13 @@ for (const source of sources) {
         for (let y = 0; y <= H; y += 40) g.strokeRect(0, y, W, 0);
         g.fillStyle = "#37e0ff";
         g.font = "600 22px Figtree";
-        g.fillText("HomePlan 3D · MÖBEL-PACK", 70, 86);
+        g.fillText("HomePlan 3D · FURNITURE PACK", 70, 86);
         g.fillStyle = "#f2f5ff";
         g.font = "800 64px 'Bricolage Grotesque'";
         g.fillText(pack.name, 68, 150);
         g.fillStyle = "#8d9bc2";
         g.font = "500 24px Figtree";
-        g.fillText(`${pack.items.length} Möbel · für Home Assistant${pack.publisher ? ` · von ${pack.publisher}` : ""}${pages > 1 ? ` · Seite ${pageNo} von ${pages}` : ""}`, 70, 192);
+        g.fillText(`${pack.items.length} items · for Home Assistant${pack.publisher ? ` · by ${pack.publisher}` : ""}${pages > 1 ? ` · page ${pageNo} of ${pages}` : ""}`, 70, 192);
         const n = page.length;
         const cols = n <= 4 ? n : n <= 6 ? 3 : n <= 8 ? 4 : n <= 12 ? 4 : 5;
         const rows = Math.ceil(n / cols);

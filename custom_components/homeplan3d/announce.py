@@ -389,7 +389,7 @@ RELOAD_SCHEMA = vol.Schema(
 
 STYLE_SCHEMA = vol.Schema(
     {
-        # a style id or name ("cozy", "Wohnlich Abend"); "reset" or empty: the screens go back to their own setting
+        # a style id or name ("cozy", "Cozy evening"); "reset" or empty: the screens go back to their own setting
         vol.Required("style"): vol.All(cv.string, vol.Length(max=60)),
         vol.Optional("screens", default=[]): vol.All(cv.ensure_list, [vol.All(cv.string, vol.Length(max=60))]),
         vol.Optional("minutes"): vol.Any(None, vol.All(vol.Coerce(int), vol.Range(min=1, max=10080))),

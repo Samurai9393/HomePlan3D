@@ -5,7 +5,7 @@ import { limitEffects, weatherActive, weatherEntity, weatherState } from "./weat
 
 function hassWith(state: string, attributes: Record<string, unknown> = {}): HomeAssistant {
   return {
-    language: "de",
+    language: "en",
     connection: {} as HomeAssistant["connection"],
     callWS: async () => undefined as never,
     callService: async () => undefined,

@@ -429,7 +429,7 @@ async def test_outdoor_roof_and_north_get_defaults(hass: HomeAssistant, hass_ws_
                 {
                     "id": "h1",
                     "kind": "wall",
-                    "name": "Loch Einläufe",
+                    "name": "Inlets hole",
                     "x": 1,
                     "z": 0,
                     "y": 0.4,
@@ -448,7 +448,7 @@ async def test_outdoor_roof_and_north_get_defaults(hass: HomeAssistant, hass_ws_
     assert got_pool["pipes"][1]["heights"] == [-0.3, 0.8, None]
     assert got_pool["pipes"][1]["fittings"][0]["open"] is False
     assert got_pool["joints"][0]["y"] == 0.8
-    assert got_pool["joints"][1]["name"] == "Loch Einläufe"
+    assert got_pool["joints"][1]["name"] == "Inlets hole"
     assert got_pool["ports"][0]["kind"] == "skimmer"
 
     bad = copy.deepcopy(building)

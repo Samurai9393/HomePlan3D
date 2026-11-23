@@ -16,7 +16,7 @@ from custom_components.homeplan3d.schema import (
     START_VIEW_SCHEMA,
 )
 
-ROOM = {"id": "r1", "name": "Bad", "area_id": None, "points": [[0, 0], [2, 0], [2, 2]], "floor_material": "tiles"}
+ROOM = {"id": "r1", "name": "Bathroom", "area_id": None, "points": [[0, 0], [2, 0], [2, 2]], "floor_material": "tiles"}
 
 
 def test_start_view_keeps_its_target() -> None:
@@ -188,8 +188,8 @@ def test_household_tag_settings_are_optional() -> None:
 def test_outdoor_area_keeps_its_name_and_area() -> None:
     """An outdoor area acting as a room (#100) keeps its name and Home Assistant area; without them both are None."""
     base = {"id": "g1", "type": "lawn", "points": [[0, 0], [4, 0], [4, 3]]}
-    out = OUTDOOR_SCHEMA({**base, "name": "Garten", "area_id": "garden"})
-    assert out["name"] == "Garten" and out["area_id"] == "garden"
+    out = OUTDOOR_SCHEMA({**base, "name": "Garden", "area_id": "garden"})
+    assert out["name"] == "Garden" and out["area_id"] == "garden"
     plain = OUTDOOR_SCHEMA(base)
     assert plain["name"] is None and plain["area_id"] is None
 
@@ -402,7 +402,7 @@ def test_card_templates_keep_the_card_options() -> None:
 
     b = empty_building()
     config = {"floor": "eg", "room_bar": True}
-    b["card_templates"] = [{"id": "kueche_fire", "name": "Küche Fire-Tablet", "config": config}]
+    b["card_templates"] = [{"id": "kueche_fire", "name": "Kitchen Fire tablet", "config": config}]
     assert BUILDING_SCHEMA(b)["card_templates"][0]["config"] == config
     assert "card_templates" not in BUILDING_SCHEMA(empty_building())
     with pytest.raises(vol.Invalid):

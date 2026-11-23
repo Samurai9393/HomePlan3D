@@ -42,7 +42,7 @@ const scan = {
 
 test("a RoomPlan scan of two rooms: rooms found, joined, door and window placed, objects mapped", () => {
   assert.ok(isRoomPlan(scan));
-  const raw = readRoomPlan(scan, "de");
+  const raw = readRoomPlan(scan);
   assert.equal(raw.floors.length, 1);
   assert.equal(raw.floors[0].elevation, 0);
   const { building: b, stats } = buildPlan(raw);
@@ -64,9 +64,8 @@ test("RoomPlan floor outlines and labels name the rooms", () => {
     ...scan,
     floors: [{ category: { floor: {} }, dimensions: [4, 3, 0], transform: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, FLOOR, 0, 1], polygonCorners: [[0, 0, 0], [3.98, 0, 0], [3.98, 0, 3], [0, 0, 3]] }],
   };
-  const raw = readRoomPlan(withFloors, "de");
-  assert.equal(raw.floors[0].rooms[0].name, "Wohnzimmer");
-  assert.equal(readRoomPlan(withFloors, "en").floors[0].rooms[0].name, "Living room");
+  const raw = readRoomPlan(withFloors);
+  assert.equal(raw.floors[0].rooms[0].name, "Living room");
 });
 
 test("RoomPlan as Swift's Codable writes it: transforms as four columns, a whole home as a structure of rooms", () => {
@@ -76,7 +75,7 @@ test("RoomPlan as Swift's Codable writes it: transforms as four columns, a whole
   // a CapturedStructure: only per-room lists, nothing at the top
   const structure = { rooms: [room(scan.walls.slice(0, 4)), room(scan.walls.slice(4))], walls: [], doors: [], windows: [], openings: [], objects: [], floors: [], sections: [] };
   assert.ok(isRoomPlan(structure));
-  const { building: b } = buildPlan(readRoomPlan(structure, "en"));
+  const { building: b } = buildPlan(readRoomPlan(structure));
   assert.equal(b.floors.length, 1);
   assert.equal(b.floors[0].rooms.length, 2);
   assert.equal(b.floors[0].name, "Ground floor");

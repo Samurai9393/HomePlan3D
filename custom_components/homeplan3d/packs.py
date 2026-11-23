@@ -115,7 +115,7 @@ SYMBOL_SCHEMA = vol.Any(
 ITEM_SCHEMA = vol.Schema(
     {
         vol.Required("id"): _ID,
-        # names by language ("de", "en", …); "en" or the first one is the fallback
+        # names by language; "en" or the first one is the fallback
         vol.Required("name"): vol.All({vol.All(str, vol.Length(min=2, max=5)): _TEXT}, vol.Length(min=1, max=10)),
         vol.Required("size"): vol.All([_METRES], vol.Length(min=3, max=3)),
         vol.Optional("electric", default=False): bool,

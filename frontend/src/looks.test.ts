@@ -53,14 +53,14 @@ test("a card's own evening and night styles", () => {
 });
 
 test("a helper entity and an override win; names match loosely", () => {
-  assert.equal(styleFromText("Wohnlich Abend"), "evening");
-  assert.equal(styleFromText("  architekturmodell "), "model");
-  assert.equal(styleFromText("Gemütlich"), "cozy");
+  assert.equal(styleFromText("Cozy evening"), "evening");
+  assert.equal(styleFromText("  architect "), "model");
+  assert.equal(styleFromText("cozy"), "cozy");
   assert.equal(styleFromText("nothing"), null);
-  assert.equal(resolveStyle({ choice: "neon", entityState: "Pastell", now: at(12), sunUp: true }), "pastel");
+  assert.equal(resolveStyle({ choice: "neon", entityState: "Pastel", now: at(12), sunUp: true }), "pastel");
   assert.equal(resolveStyle({ choice: "neon", entityState: "unknown", now: at(12), sunUp: true }), "neon");
-  assert.equal(resolveStyle({ choice: "neon", entityState: "Pastell", override: "synth", now: at(12), sunUp: true }), "synth");
-  assert.equal(resolveStyle({ choice: "neon", names: { cozy: ["Kuschelig"] }, entityState: "kuschelig", now: at(12), sunUp: true }), "cozy");
+  assert.equal(resolveStyle({ choice: "neon", entityState: "Pastel", override: "synth", now: at(12), sunUp: true }), "synth");
+  assert.equal(resolveStyle({ choice: "neon", names: { cozy: ["Snug Nook"] }, entityState: "snug-nook", now: at(12), sunUp: true }), "cozy");
 });
 
 test("own styles: listed, resolved, named by voice; gone again when the plan has none", async () => {

@@ -16,7 +16,7 @@ const until = async (ok: () => boolean) => {
 function start(opts: { states?: Record<string, unknown>; entities?: string[]; range?: "24h" | "7d"; quality?: "auto" | "low" | "high" } = {}) {
   const asked: [number, number][] = [];
   const hass = {
-    language: "de",
+    language: "en",
     entities: {},
     areas: {},
     devices: {},

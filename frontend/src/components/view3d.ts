@@ -71,7 +71,7 @@ function waterText(hass: HomeAssistant, v: number, unit: string): string {
 interface HoloCard {
   kind: "main" | "plant" | "device" | "media" | "car" | "module" | "bin";
   /**
-   * Haushalt Pro: the tag of a waste bin that goes out – its colour and when ("Tomorrow") – or of bins standing
+   * Household Pro: the tag of a waste bin that goes out – its colour and when ("Tomorrow") – or of bins standing
    * together (one line each, in pickup order), a mailbox with post or a thirsty plant (a round symbol from afar).
    */
   bin?: { lines: { color: string; when: string; name: string; soon: boolean; out: boolean }[]; soon: boolean; icon: "mail" | "plant" | null };
@@ -82,7 +82,7 @@ interface HoloCard {
   name: string;
   /** Auto Pro: the car in its parking spot (charge, range, charging, lock, climate). */
   car?: { spot: string; soc: number | null; range: number | null; rangeUnit: string; chargingW: number | null; charging: boolean; locked: boolean | null; climateOn: boolean | null; lock: string | null; climate: string | null; charge: string | null };
-  /** Klang & Kino: what the player plays right now. */
+  /** Sound & Cinema: what the player plays right now. */
   media?: { id: string; title: string; artist: string; picture: string | null; volume: number; playing: boolean };
   /** The plant's power now (W); null on the main card (it shows the house). */
   w: number | null;
@@ -467,7 +467,7 @@ export class Fp3dView3d extends LitElement {
   declare showEnergy: boolean;
   /** Power flow lines fixed on or off (cards); null: the viewer's own toggle decides. */
   declare flows: boolean | null;
-  /** Energie Pro holograms always on or off (card option); null = the bar's own switch. */
+  /** Energy Pro holograms always on or off (card option); null = the bar's own switch. */
   declare holograms: boolean | null;
   private declare _holoShow: boolean;
   /** Furnishing: furniture and lamps are dragged in 3D (admins, panel only). */
@@ -509,7 +509,7 @@ export class Fp3dView3d extends LitElement {
   private declare _stats: ViewerStats | null;
   private declare _error: string | null;
   private declare _energy: EnergySummary | null;
-  /** Energie Pro: today's solar statistics for the hologram (kWh, peak and the day curve). */
+  /** Energy Pro: today's solar statistics for the hologram (kWh, peak and the day curve). */
   /** The hologram cards (main plant first) and today's statistics rows of their sensors. */
   private declare _holos: HoloCard[];
   /** The quick menu has just opened and takes no touch yet. */
@@ -533,7 +533,7 @@ export class Fp3dView3d extends LitElement {
   /** A module card just opened from its marker (it lights up for a moment). */
   private cardPing: string | null = null;
   private cardPingTimer: ReturnType<typeof setTimeout> | undefined;
-  /** Klang & Kino: the last card of each player and until when it may stand in for a short dropout. */
+  /** Sound & Cinema: the last card of each player and until when it may stand in for a short dropout. */
   private mediaGrace = new Map<string, { until: number; card: HoloCard; source: SoundSource; anchor: Parameters<FloorplanViewer["setAnchors"]>[0][number] }>();
   private mediaGraceTimer: ReturnType<typeof setTimeout> | undefined;
   /** The volume being dragged (shown at once; the player answers later, a cloud speaker slowly). */
@@ -606,7 +606,7 @@ export class Fp3dView3d extends LitElement {
   declare director: boolean;
   /** The roof left out altogether (card option `roof: false`). */
   declare hideRoof: boolean;
-  /** Voice control: a microphone button – "Zeig das Wohnzimmer" shows it, other sentences go to Assist (default off). */
+  /** Voice control: a microphone button – "Show the living room" shows it, other sentences go to Assist (default off). */
   declare voice: boolean;
   /** This view's screen name: a sentence from Assist that names a screen is only for the view with that name. */
   declare screen: string | null;
@@ -624,15 +624,15 @@ export class Fp3dView3d extends LitElement {
   private declare _announce: string | null;
   private announceTimer: ReturnType<typeof setTimeout> | undefined;
   private declare _alerts: Alert[];
-  /** Haushalt Pro: what is due in the household now (the glass card "Today in the household"). */
+  /** Household Pro: what is due in the household now (the glass card "Today in the household"). */
   private declare _household: HouseholdItem[];
   private declare _hhFolded: boolean;
-  /** Haushalt Pro: the bin tapped – its next pickups in a small pop-up. */
+  /** Household Pro: the bin tapped – its next pickups in a small pop-up. */
   private declare _binInfo: { furnitureId: string; x: number; y: number } | null;
   /** A wall switch or socket with several gangs: its small menu (one button per gang). */
   private declare _gangMenu: { furnitureId: string; x: number; y: number } | null;
   private binInfoTimer: ReturnType<typeof setTimeout> | undefined;
-  /** The glass card "Today in the household" (Haushalt Pro; the dashboard card can switch it off). */
+  /** The glass card "Today in the household" (Household Pro; the dashboard card can switch it off). */
   declare householdCard: boolean;
   private alertSrc: AlertSources | null = null;
   private alertTimer: ReturnType<typeof setInterval> | undefined;
@@ -725,15 +725,15 @@ export class Fp3dView3d extends LitElement {
   private linkedRegistry: HomeAssistant["entities"] | undefined;
   /** Entities of electric furniture (TV, fridge, …). */
   private furnitureLinks = new Map<string, FurnitureLinks>();
-  /** Haushalt Pro: the pickups of the waste calendars (fetched every 10 minutes while bins read one). */
+  /** Household Pro: the pickups of the waste calendars (fetched every 10 minutes while bins read one). */
   private pickups = new Map<string, Pickup[]>();
-  /** Haushalt Pro: today's entries of the calendars chosen for the glass card. */
+  /** Household Pro: today's entries of the calendars chosen for the glass card. */
   private dayEvents: DayEvent[] = [];
   private pickupKey = "";
   private householdTimer: ReturnType<typeof setInterval> | undefined;
-  /** Haushalt Pro: small holograms – bins that go out today or tomorrow, post, a thirsty plant (set by the furniture pass). */
+  /** Household Pro: small holograms – bins that go out today or tomorrow, post, a thirsty plant (set by the furniture pass). */
   private binHolos: HouseholdTag[] = [];
-  /** Haushalt Pro: appliances that ended their program while the page is open ("finished" until the door opens). */
+  /** Household Pro: appliances that ended their program while the page is open ("finished" until the door opens). */
   private finished = new FinishedMemory();
   /** Washers, dryers and dishwashers as last read: whether they run (the live director notices a program ending). */
   private appliances = new Map<string, { floorId: string; x: number; z: number; entity: string; running: boolean }>();
@@ -751,7 +751,7 @@ export class Fp3dView3d extends LitElement {
   } | null = null;
   /** Where the view was before the director took it: it goes back there. */
   private directorBack: { floorId: string | null; roomId: string | null; view: ReturnType<FloorplanViewer["getView"]> } | null = null;
-  /** Haushalt Pro: looks again when an open fridge door reaches its limit. */
+  /** Household Pro: looks again when an open fridge door reaches its limit. */
   private fridgeTimer: ReturnType<typeof setTimeout> | undefined;
   /** Tablet level: measured values alone are shown at most every SENSOR_SYNC_MS (the pending sync, the last one). */
   private sensorTimer: ReturnType<typeof setTimeout> | undefined;
@@ -1183,7 +1183,7 @@ export class Fp3dView3d extends LitElement {
       if (this.hass) void syncModules(this.hass, getPacks()).then(() => this.syncDevices(true));
       // vehicles in parking spots come from packs too: look them up again now that the packs are here
       if (this.hass && this.building) v.setParked(parkedVehicles(this.hass, this.building));
-      // a feature pack may have arrived with them (Energie Pro): the cables and modules follow
+      // a feature pack may have arrived with them (Energy Pro): the cables and modules follow
       this.syncDevices(true);
     }
     // a plan that changed only in its card templates (edited for the wall tablets) is the same house: nothing is built again
@@ -1387,13 +1387,13 @@ export class Fp3dView3d extends LitElement {
         const marker = { ...m, power, powerText: power === null ? undefined : formatPower(hass, power), effect: this.dimmed ? false : m.effect };
         // the own name under the pin: per device, or for every named device (card option marker_names)
         const caption = m.ownName && (m.showName || this.markerNames) ? m.ownName : "";
-        // Klang & Kino: while a card floats over the speaker, its pin steps aside (it comes back when the music stops)
+        // Sound & Cinema: while a card floats over the speaker, its pin steps aside (it comes back when the music stops)
         // (only while the cards show at all: else the pin stays – it vanished with no card in its place)
         const carded = this.cardsOn() && ((hasFeature("sound") && this.mediaCardUp(hass, m.id)) || (hasFeature("auto_pro") && !!m.furnitureId && carSpots.has(m.furnitureId)));
         // a lock at its door asks for its text itself (full): the symbol mode does not take that away
         return { ...marker, pin: this.showPin(marker) && !carded, full: m.show === "always" || m.full === true, caption };
       }),
-      // Energie Pro: the street end of the grid cable carries a pin with what comes in or goes out
+      // Energy Pro: the street end of the grid cable carries a pin with what comes in or goes out
       ...(pro && (this.flows ?? this._flows) && !this.dimmed && summary.grid !== null ? [this.gridPin(hass, b, summary.grid)] : []).filter((m): m is NonNullable<typeof m> => !!m),
       // Kamera-Cockpit: what a camera detects right now stands in front of it as a pin
       ...detections,
@@ -1436,7 +1436,7 @@ export class Fp3dView3d extends LitElement {
     const own = this.alertSrc ? findAlerts(hass, b, this.alertSrc, this.openingLinks!) : [];
     const fromModules = this.alerts && anyModule() ? moduleAlerts(this.sceneHost(hass, b)).map((a) => ({ kind: a.kind, entity: a.entity, roomId: a.roomId, floorId: a.floorId, text: a.text, color: a.color, quiet: !a.roomId })) : [];
     this.setAlerts([...own, ...fromModules]);
-    // Haushalt Pro: an open fridge door warns once it stood open too long – look again at that moment
+    // Household Pro: an open fridge door warns once it stood open too long – look again at that moment
     clearTimeout(this.fridgeTimer);
     const fridgeWait = hasFeature("household") && !this.replay ? nextFridgeCheck(b.floors.flatMap((f) => f.furniture), hass) : null;
     if (fridgeWait !== null) this.fridgeTimer = setTimeout(() => this.syncDevices(true), fridgeWait + 500);
@@ -1602,7 +1602,7 @@ export class Fp3dView3d extends LitElement {
         }
       }
     }
-    // Klang & Kino: a now-playing card over every speaker or media furniture that plays, rings around it,
+    // Sound & Cinema: a now-playing card over every speaker or media furniture that plays, rings around it,
     // and lines between the members of a multiroom group
     const sound: SoundSource[] = [];
     if (hasFeature("sound")) {
@@ -1736,7 +1736,7 @@ export class Fp3dView3d extends LitElement {
         anchors.push({ p, n: [0, 1, 0], floorId: floor.id, size: holoSize * 0.7, roof: false, views: "all" });
         cards.push({ kind: "module", name: card.title, w: null, dayIds: [], battery: null, module: card });
       }
-      // a module's small labels (a value at a point) look like Haushalt Pro's tags
+      // a module's small labels (a value at a point) look like Household Pro's tags
       for (const tag of this.scene) {
         if (tag.kind !== "tag") continue;
         const floor = b.floors.find((f) => f.id === tag.floorId);
@@ -1745,7 +1745,7 @@ export class Fp3dView3d extends LitElement {
         cards.push({ kind: "bin", name: tag.sub ?? "", w: null, dayIds: [], battery: null, bin: { lines: [{ color: tag.color ?? "#37e0ff", when: tag.text, name: tag.sub ?? "", soon: true, out: false }], soon: true, icon: null }, tag: true });
       }
     }
-    // Haushalt Pro: a small tag on every bin that goes out today or tomorrow (and on a mailbox with post, a thirsty plant)
+    // Household Pro: a small tag on every bin that goes out today or tomorrow (and on a mailbox with post, a thirsty plant)
     if (hasFeature("household")) {
       const holoSize = (b.settings.roof.hologram ?? DEFAULT_HOLOGRAM).size;
       // bins standing together share one tag, their lines in pickup order (their own tags covered each other)
@@ -1768,7 +1768,7 @@ export class Fp3dView3d extends LitElement {
     if (JSON.stringify(shownCards) !== JSON.stringify(this._holos)) this._holos = shownCards;
     // the modules live with their production (at night, and without Pro, they rest)
     v.setSolarLevels(powers && !this.dimmed ? fieldLevels(b, powers) : new Map());
-    // the energy cables (Energie Pro) and the pool's pipes share the viewer's flow layer
+    // the energy cables (Energy Pro) and the pool's pipes share the viewer's flow layer
     const energyFlows =
       !pro || !(this.flows ?? this._flows) || this.dimmed
         ? []
@@ -1843,7 +1843,7 @@ export class Fp3dView3d extends LitElement {
     if (wallboxW !== this._wallboxW) this._wallboxW = wallboxW;
     // the holograms' day curves: the sensors' statistics, fetched now and then while the sun is watched
     this.watchSolarDay([...new Set(cards.flatMap((c) => c.dayIds))]);
-    // Energie Pro: today's gas and water use on the house card
+    // Energy Pro: today's gas and water use on the house card
     const energyPro = hasFeature("energy_pro");
     this.watchMeters(energyPro ? (b.energy.gas ?? null) : null, energyPro ? (b.energy.water ?? null) : null);
     if (began) this.syncMs = this.syncMs * 0.8 + (performance.now() - began) * 0.2;
@@ -2111,7 +2111,7 @@ export class Fp3dView3d extends LitElement {
     };
   }
 
-  /** Energie Pro: today's gas and water use (meter unit), fetched every five minutes. */
+  /** Energy Pro: today's gas and water use (meter unit), fetched every five minutes. */
   private declare _meters: { gas: number | null; water: number | null } | null;
   private meterKey = "";
   private meterTimer?: ReturnType<typeof setInterval>;
@@ -2363,20 +2363,20 @@ export class Fp3dView3d extends LitElement {
   }
 
   /**
-   * Energie Pro: the glass holograms – the house's balance on the main field and one card per further
+   * Energy Pro: the glass holograms – the house's balance on the main field and one card per further
    * plant (house view), and the device cards (house and floor view). The viewer hides every card whose
    * anchor is not in view, so every card renders, in the anchors' order.
    */
   private renderHologram() {
     const e = this._energy;
-    // Haushalt Pro's tags (bins, post, a thirsty plant) are no energy holograms: they show on their own
+    // Household Pro's tags (bins, post, a thirsty plant) are no energy holograms: they show on their own
     const tagsOnly = () => this._holos.map((card, i) => (card.kind === "bin" ? this.renderBinCard(card, i) : nothing));
     // a module with a card or a label of its own needs no Pro add-on for them
     const fromModule = this._holos.some((c) => c.kind === "module" || c.tag);
     // the editor keeps the energy bar off but asks for the holograms in its energy tool
     if (!(fromModule || hasFeature("energy_pro") || hasFeature("sound") || hasFeature("auto_pro") || hasFeature("pool") || hasFeature("household")) || !this.cardsOn()) return hasFeature("household") || fromModule ? tagsOnly() : nothing;
-    // in an opened room the energy cards come only when switched on (Energie Pro); the music cards of the room always
-    // (#911 – a Klang & Kino owner without Energie Pro could not switch them on at all)
+    // in an opened room the energy cards come only when switched on (Energy Pro); the music cards of the room always
+    // (#911 – a Sound & Cinema owner without Energy Pro could not switch them on at all)
     if (this.roomId && !(this.building?.settings.roof.hologram ?? DEFAULT_HOLOGRAM).device_room) {
       return this._holos.map((card, i) => (card.kind === "media" ? this.renderMediaCard(card, i) : card.kind === "bin" ? this.renderBinCard(card, i) : nothing));
     }
@@ -2386,7 +2386,7 @@ export class Fp3dView3d extends LitElement {
     return this._holos.map((card, i) => (card.kind === "module" ? this.renderModuleCard(card, i) : card.kind === "bin" ? this.renderBinCard(card, i) : card.kind === "car" ? this.renderCarCard(card, i) : card.kind === "media" ? this.renderMediaCard(card, i) : card.kind === "device" ? this.renderDeviceCard(card, i) : plants ? this.renderHoloCard(card, i, e!) : nothing));
   }
 
-  /** Haushalt Pro: a waste bin's small hologram – when it goes out, in the bin's colour. */
+  /** Household Pro: a waste bin's small hologram – when it goes out, in the bin's colour. */
   private renderBinCard(card: HoloCard, index: number) {
     const b = card.bin!;
     // light text on a dark plate, the colour only as its edge (blue text on glass was hard to read)
@@ -2547,7 +2547,7 @@ export class Fp3dView3d extends LitElement {
     this.dispatchEvent(new CustomEvent("hass-notification", { detail: { message: `${service}: ${why}` }, bubbles: true, composed: true }));
   }
 
-  /** Klang & Kino: what a speaker plays – cover, title, artist, volume, with play/pause, previous and next. */
+  /** Sound & Cinema: what a speaker plays – cover, title, artist, volume, with play/pause, previous and next. */
   private renderMediaCard(card: HoloCard, index: number) {
     const hass = this.hass;
     const t = (k: Parameters<typeof translate>[1]) => translate(hass, k);
@@ -3033,7 +3033,7 @@ export class Fp3dView3d extends LitElement {
     const targets = new Map<string, string>();
     // devices placed on their own keep their pin; two pieces of furniture on one entity (a copy) each get theirs, like lamps (#688)
     const placed = new Set(taken);
-    // Haushalt Pro: what is due now, for the glass card
+    // Household Pro: what is due now, for the glass card
     const household = hasFeature("household");
     const today: HouseholdItem[] = [];
     this.binHolos = [];
@@ -3098,7 +3098,7 @@ export class Fp3dView3d extends LitElement {
         // a parking spot with Auto Pro data gets one even without a presence sensor
         const glow = glows.get(f.id);
         if (glow) screens.set(f.id, { color: glow.color, level: glow.level });
-        // Haushalt Pro: a bin glows the evening before its pickup, a mailbox while post lies in it, a plant while it
+        // Household Pro: a bin glows the evening before its pickup, a mailbox while post lies in it, a plant while it
         // is thirsty
         const plant = (f.type === "plant" || isPackPlant(f.type)) && !!f.moisture && f.moisture !== "none";
         if (f.type === "waste_bin" || f.type === "mailbox" || plant) {
@@ -3128,7 +3128,7 @@ export class Fp3dView3d extends LitElement {
         }
         const autoPro = f.type === "parking" && hasFeature("auto_pro") && !!f.car;
         const car = autoPro ? carState(hass, f) : null;
-        // Haushalt Pro: a washer with only its time left still gets its pin
+        // Household Pro: a washer with only its time left still gets its pin
         const applianceKind = applianceOf(f.type);
         const appliance = !!applianceKind;
         const extraRef = f.type === "home_battery" ? f.soc : f.type === "wallbox" ? f.status : f.type === "parking" && car ? (f.car?.device ?? car.entities.soc) : household && appliance ? (f.remaining ?? null) : null;
@@ -3164,7 +3164,7 @@ export class Fp3dView3d extends LitElement {
         const running = (power ?? 0) > runW || (!metered && (st?.state === "on" || st?.state === "running" || (isStatusSensor(st) && isActive(st))));
         // the live director notices a program ending (a washer done) from the same reading
         if (appliance) this.appliances.set(f.id, { floorId: floor.id, x: f.x, z: f.z, entity: link.entity ?? link.power ?? f.id, running });
-        // Haushalt Pro: a washer, dryer or dishwasher tells the time left while it runs and "finished" afterwards –
+        // Household Pro: a washer, dryer or dishwasher tells the time left while it runs and "finished" afterwards –
         // until its door opens (or it runs again); from its own state, or remembered from the moment it stopped
         let hhText: string | null = null;
         if (household && appliance) {
@@ -3231,7 +3231,7 @@ export class Fp3dView3d extends LitElement {
         const packed = packItem(f.type);
         const ringed = !!packed && !packed.light && packed.parts.some((p) => p.glow);
         if (st && ringed && hasFeature("sound") && kindOf(st.entity_id) === "media" && st.state === "playing" && !hasScreen(f.type)) {
-          // Klang & Kino: a speaker without a screen lights its ring in the app's colour while it plays
+          // Sound & Cinema: a speaker without a screen lights its ring in the app's colour while it plays
           const vol = typeof st.attributes.volume_level === "number" ? st.attributes.volume_level : 0.5;
           screens.set(f.id, { color: appColor(st) ?? [0.22, 0.88, 1], level: 0.5 + 0.5 * vol, ring: true, plain: true });
         }
@@ -3378,7 +3378,7 @@ export class Fp3dView3d extends LitElement {
   }
 
   /**
-   * Haushalt Pro: fetch the waste calendars' pickups now and every 10 minutes while bins read a calendar; the
+   * Household Pro: fetch the waste calendars' pickups now and every 10 minutes while bins read a calendar; the
    * timer also lets the bins start and stop glowing at their hours (14:00 the day before, noon on the day).
    */
   private watchHousehold(hass: HomeAssistant, b: Building): void {
@@ -3606,7 +3606,7 @@ export class Fp3dView3d extends LitElement {
       </div>`;
   }
 
-  /** Haushalt Pro: how a bin or a mailbox shows now – its glow and its pin (with the days to the pickup, "post"). */
+  /** Household Pro: how a bin or a mailbox shows now – its glow and its pin (with the days to the pickup, "post"). */
   private householdState(hass: HomeAssistant, floor: Floor, f: Furniture): { screen?: ScreenState; marker?: DeviceMarker & { fromFurniture: boolean }; item?: HouseholdItem } | null {
     const rgb = (hex: string): [number, number, number] => {
       const n = parseInt(hex.slice(1), 16);
@@ -3840,7 +3840,7 @@ export class Fp3dView3d extends LitElement {
     return parts.join(" · ");
   }
 
-  /** Wallbox: "lädt · 11 kW", "angesteckt" or its power, from a status sensor (on/off or a state such as charging). */
+  /** Wallbox: "charging · 11 kW", "plugged in" or its power, from a status sensor (on/off or a state such as charging). */
   /** The meter: what the house draws from the grid, or feeds into it. */
   private meterText(hass: HomeAssistant, power: number | null): string {
     if (power === null) return "";
@@ -4219,7 +4219,7 @@ export class Fp3dView3d extends LitElement {
     setTimeout(() => this.viewer?.focus(item.floorId, item.x, item.z, item.y, item.entity), 120);
   }
 
-  /** Haushalt Pro: the bin tapped – its kind and its next pickups ("Tomorrow", "Thu 23.10."). */
+  /** Household Pro: the bin tapped – its kind and its next pickups ("Tomorrow", "Thu 23.10."). */
   private renderBinInfo() {
     const i = this._binInfo;
     const hass = this.hass;
@@ -4254,7 +4254,7 @@ export class Fp3dView3d extends LitElement {
     </div>`;
   }
 
-  /** Haushalt Pro: the glass card "Today in the household" – what is due, tapped it opens the entity. */
+  /** Household Pro: the glass card "Today in the household" – what is due, tapped it opens the entity. */
   private renderHousehold() {
     if (!this._household.length || !this.householdCard || !hasFeature("household") || this.panelOpen) return nothing;
     const fold = () => {
@@ -4701,7 +4701,7 @@ export class Fp3dView3d extends LitElement {
   }
 
   /**
-   * "Anflug aus dem All" (setting, off by default): once per page load, the main view opens with a globe that turns
+   * "Fly-in from space" (setting, off by default): once per page load, the main view opens with a globe that turns
    * to the home and dives in while the camera comes down onto the house. Never in the editor, on the tablet level, in
    * time travel or with reduced motion.
    */
@@ -4913,7 +4913,7 @@ export class Fp3dView3d extends LitElement {
     return translate(hass, "voice_off_done", { room: name, n: callCount(calls) });
   }
 
-  /** One spoken sentence: a place to show ("Zeig das Wohnzimmer") is shown, anything else goes to Assist. */
+  /** One spoken sentence: a place to show ("Show the living room") is shown, anything else goes to Assist. */
   private async onMic(): Promise<void> {
     const hass = this.hass;
     const b = this.building;
@@ -4941,7 +4941,7 @@ export class Fp3dView3d extends LitElement {
       }
       if ((await this.handleSentence(hass, b, v, text, true)) !== null) return;
       say("wait", `“${text}” …`);
-      // "there" is the room open in the view ("Mach da das Licht aus" after tapping into the living room); "here" and
+      // "there" is the room open in the view ("Turn off the light there" after tapping into the living room); "here" and
       // a sentence without a room are the tablet's
       let area = this.voiceArea ?? voiceArea();
       let said = text;
@@ -4980,7 +4980,7 @@ export class Fp3dView3d extends LitElement {
       return styled;
     }
     const { devices, items } = this.spokenDevices(hass, b, v.SYNONYMS);
-    // "Saug die Küche", "Saug hier", "Mach da alles aus": the robot vacuum or everything off for a room
+    // "Vacuum the kitchen", "Vacuum here", "Turn everything off there": the robot vacuum or everything off for a room
     const intent = this.replay ? null : v.roomIntent(text, b, hass.language, (r) => (r.area_id ? hass.areas?.[r.area_id]?.name : null));
     if (intent) {
       const answer = await this.roomAction(hass, b, intent);
@@ -5786,7 +5786,7 @@ export class Fp3dView3d extends LitElement {
         ><input type="checkbox" .checked=${on} ?disabled=${!admin} @change=${(e: Event) => this.setPlanSettings(patch((e.target as HTMLInputElement).checked))} /> ${t(key)}</label
       >`;
     const host = this.sceneHost(hass, b);
-    // every module's section starts with a heading: its own, else the pack's name (Wärme Pro brings none)
+    // every module's section starts with a heading: its own, else the pack's name (Heat Pro brings none)
     const packs = getPacks();
     const modules = modulesWithSettings()
       .map((id): ModuleField[] => {
@@ -5839,7 +5839,7 @@ export class Fp3dView3d extends LitElement {
 
   /**
    * How large the glass cards are (energy, heat pump, car, devices …): the hologram's size, which the editor shows
-   * with Energie Pro only – here for everyone with a glass card.
+   * with Energy Pro only – here for everyone with a glass card.
    */
   private renderGlassSize(t: (k: I18nKey) => string, admin: boolean, st: Building["settings"]) {
     const h = st.roof.hologram ?? DEFAULT_HOLOGRAM;
@@ -6261,7 +6261,7 @@ export class Fp3dView3d extends LitElement {
       }
       return;
     }
-    // Haushalt Pro: a bin shows its next pickups; a mailbox's or a plant's pin opens its sensor
+    // Household Pro: a bin shows its next pickups; a mailbox's or a plant's pin opens its sensor
     if (entityId.startsWith("hh:")) {
       const [id, furnitureId] = entityId.slice(3).split("#");
       const bin = this.building?.floors.flatMap((f) => f.furniture).find((f) => f.id === furnitureId && f.type === "waste_bin");
@@ -6389,23 +6389,23 @@ export class Fp3dView3d extends LitElement {
     this.setStyleOverride(st.style, st.minutes ?? null);
   }
 
-  /** "Stil Wohnlich", "NeonPlan auf Pastell", "style homely": switches this view's style (null: no style sentence). */
+  /** "Style homely", "NeonPlan pastel", "style homely": switches this view's style (null: no style sentence). */
   private styleSentence(text: string): string | null {
     const hass = this.hass;
     const words = text.toLowerCase().trim();
-    const keyword = /\b(stil|style|look|design|farbstil|ansicht|optik)\b/.test(words);
+    const keyword = /\b(style|look|design)\b/.test(words);
     const rest = words
-      .replace(/\b(neon ?plan|haus|house|bitte|please|stelle?|schalte?|mach|setze?|set|switch|change|to|auf|zu|um|in|den|die|das|the|an|on|ein|als|modus|mode|stil|style|look|design|farbstil|ansicht|optik)\b/g, " ")
+      .replace(/\b(neon ?plan|house|please|set|switch|change|to|in|the|on|mode|style|look|design)\b/g, " ")
       .replace(/\s+/g, " ")
       .trim();
-    if (keyword && /^(zurück|zurueck|normal|reset|back|standard|automatisch|auto)$/.test(rest)) {
+    if (keyword && /^(normal|reset|back|default|auto)$/.test(rest)) {
       this.setStyleOverride("reset", null);
       return translate(hass, "style_reset");
     }
     setCustomStyles(this.building?.settings.styles_custom);
     const names: Record<string, string[]> = {};
     for (const st of allStyles()) names[st.id] = [st.name ?? translate(hass, `style_${st.id}` as I18nKey)];
-    // the words left must name a style as a whole ("Wohnlich Abend", "auf Synthwave"), so "Licht an" stays a light
+    // the words left must name a style as a whole ("Cozy evening", "on synthwave"), so "light on" stays a light
     const id = styleFromText(rest, names);
     if (!id) return null;
     this.setStyleOverride(id, null);
@@ -8449,7 +8449,7 @@ export class Fp3dView3d extends LitElement {
       .fp3d-legend-none {
         color: var(--fp3d-warm);
       }
-      /* Energie Pro: the glass hologram beside the house */
+      /* Energy Pro: the glass hologram beside the house */
       .fp3d-holo {
         position: absolute;
         left: 0;

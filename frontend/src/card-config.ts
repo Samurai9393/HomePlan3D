@@ -148,7 +148,7 @@ export interface CardConfig {
   weather?: boolean;
   /** The weather entity to use (default: the first one). */
   weather_entity?: string;
-  /** Haushalt Pro: the glass card "Today in the household" (bins, post, appliances, plants …; default on). */
+  /** Household Pro: the glass card "Today in the household" (bins, post, appliances, plants …; default on). */
   household_card?: boolean;
   /** Pro: a "Time travel" button replays the last 24 hours in the card (read-only). */
   time_travel?: boolean;
@@ -238,20 +238,16 @@ export function setLive(tpl: CardTemplate, live: boolean): void {
   } else tpl.live = false;
 }
 
-/** An id for a new template from its name: lower case, umlauts spelled out, words joined by "_", unique in the plan. */
+/** An id for a new template from its name: lower case, no accents, words joined by "_", unique in the plan. */
 export function templateId(name: string, taken: readonly string[]): string {
   const base =
     name
       .toLowerCase()
-      .replace(/ä/g, "ae")
-      .replace(/ö/g, "oe")
-      .replace(/ü/g, "ue")
-      .replace(/ß/g, "ss")
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "_")
       .replace(/^_+|_+$/g, "")
-      .slice(0, 40) || "vorlage";
+      .slice(0, 40) || "template";
   let id = base;
   for (let n = 2; taken.includes(id); n++) id = `${base}_${n}`;
   return id;

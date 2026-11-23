@@ -40,13 +40,13 @@ export interface SpokenDevice {
   /** Its power sensor, when it has one. */
   power: string | null;
   type: string;
-  /** Haushalt Pro: minutes left of its program (a washer, dryer, dishwasher with a time sensor), null without. */
+  /** Household Pro: minutes left of its program (a washer, dryer, dishwasher with a time sensor), null without. */
   remaining?: number | null;
   /** A plant with a moisture sensor: whether it is thirsty (null: not a plant, or no sensor). */
   thirsty?: boolean | null;
 }
 
-/** Haushalt Pro: a line of "Today in the household" ("Restmüll: morgen", "Waschmaschine: 23 min"). */
+/** Household Pro: a line of "Today in the household" ("General waste: tomorrow", "Washing machine: 23 min"). */
 export interface SpokenHousehold {
   text: string;
   entity: string | null;
@@ -104,7 +104,7 @@ export interface SpokenOpening {
   id: string;
   entity: string;
   kind: "door" | "window" | "garage" | "roof_window";
-  /** The kind's word in the user's language ("Fenster"), or the roof window's own name. */
+  /** The kind's word in the user's language ("Window"), or the roof window's own name. */
   name: string;
   room: string;
   floorId: string;
@@ -121,11 +121,11 @@ export interface ModuleHost {
   stage?: number;
   hass(): HomeAssistant;
   building(): Building | null;
-  /** The language of the user ("de", "en-GB" …). */
+  /** The language of the user ("en", "en-GB" …). */
   language(): string;
   /** The devices and furniture of the plan, each with its room. */
   devices(): SpokenDevice[];
-  /** The one a sentence names ("die Waschmaschine", "der Fernseher im Wohnzimmer"), by the host's own matching. */
+  /** The one a sentence names ("the washing machine", "the TV in the living room"), by the host's own matching. */
   findDevice(sentence: string): SpokenDevice | null;
   /** The doors and windows of the plan with their rooms, one entry per linked entity (the plan names them better than Home Assistant's contact sensors do). */
   openings(): SpokenOpening[];
@@ -133,7 +133,7 @@ export interface ModuleHost {
   energy(): { consumption: number | null; solar: number | null; grid: number | null; battery: number | null; soc: number | null } | null;
   /** Consumers drawing power right now (from the plan's sensors), highest first. */
   consumers(): { id: string; entity: string | null; name: string; watts: number }[];
-  /** Haushalt Pro: today's household lines (empty without the Pro, or when nothing is due). */
+  /** Household Pro: today's household lines (empty without the Pro, or when nothing is due). */
   household?(): SpokenHousehold[];
   /** The warnings shown right now. */
   alerts?(): SpokenAlert[];
@@ -166,7 +166,7 @@ export interface ModuleHost {
   // --- talking to the people in the house (the 3D view's host has them) ---
   /** Listens once with the host's microphone and Assist's speech-to-text; the words, or null (no microphone, nothing said). */
   listen?(onListening?: () => void): Promise<string | null>;
-  /** A short note at the bottom of the view ("Durchsage an Kinderzimmer gesendet"). */
+  /** A short note at the bottom of the view ("Announcement sent to the kids' room"). */
   notify?(text: string): void;
   /** Flies the view to each stop in turn, like a voice answer's tour (a tap ends it); `say` is spoken when `speak` is set. */
   tour?(stops: NonNullable<VoiceAnswer["tour"]>, speak?: boolean): void;
@@ -446,7 +446,7 @@ export interface ModuleCard {
   anchor: { floorId: string; areaId?: string; furnitureId?: string };
   icon: string;
   title: string;
-  /** What is live now ("heizt", "Pumpe läuft"); shown in the head. */
+  /** What is live now ("heating", "pump running"); shown in the head. */
   live?: string;
   /** The live text's colour (a state in plain words: heating orange, a fault red). */
   liveColor?: string;

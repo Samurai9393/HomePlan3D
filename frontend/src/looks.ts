@@ -48,7 +48,7 @@ export interface StyleDef {
   group: "neon" | "homely" | "designed" | "custom";
   /** An own style's name (the built-in ones are named by their texts). */
   name?: string;
-  /** Words that name it (a helper entity, voice); the id and the German and English names always count. */
+  /** Words that name it (a helper entity, voice); the id and the English names always count. */
   aliases: string[];
 }
 
@@ -56,8 +56,8 @@ const NATURAL = { natural: true, signal: true, shadows: true, floors: 1, cutDark
 
 export const STYLES: StyleDef[] = [
   { id: "neon", base: "neon", group: "neon", aliases: ["neon", "standard"] },
-  { id: "blueprint", base: "blueprint", group: "neon", aliases: ["blueprint", "bauplan", "blaupause"] },
-  { id: "day", base: "day", group: "neon", aliases: ["tag", "day", "hell", "light"] },
+  { id: "blueprint", base: "blueprint", group: "neon", aliases: ["blueprint"] },
+  { id: "day", base: "day", group: "neon", aliases: ["day", "light"] },
   {
     id: "focus",
     base: "neon",
@@ -66,7 +66,7 @@ export const STYLES: StyleDef[] = [
     signal: true,
     sun: 0.2,
     bg: ["#030407", "#0b0e14"],
-    aliases: ["fokus", "focus", "nacht", "night", "dunkel", "dark"],
+    aliases: ["focus", "night", "dark"],
   },
   {
     id: "synth",
@@ -78,9 +78,9 @@ export const STYLES: StyleDef[] = [
     bg: ["#08010f", "#2a0838"],
     aliases: ["synthwave", "synth", "retro", "party"],
   },
-  { id: "cozy", base: "day", group: "homely", ...NATURAL, palette: null, bg: ["#f1efeb", "#d9d5ce"], aliases: ["wohnlich", "gemütlich", "cozy", "homely", "echt", "real"] },
-  { id: "evening", base: "neon", group: "homely", ...NATURAL, sun: 0.4, dim: 0.75, bg: ["#14161c", "#272630"], aliases: ["wohnlich abend", "abend", "abendstimmung", "evening", "cozy evening"] },
-  { id: "winter", base: "neon", group: "homely", ...NATURAL, sun: 0.4, dim: 0.8, bg: ["#0b1322", "#1d2a40"], aliases: ["winterabend", "winter", "advent", "weihnachten", "christmas"] },
+  { id: "cozy", base: "day", group: "homely", ...NATURAL, palette: null, bg: ["#f1efeb", "#d9d5ce"], aliases: ["cozy", "homely", "real"] },
+  { id: "evening", base: "neon", group: "homely", ...NATURAL, sun: 0.4, dim: 0.75, bg: ["#14161c", "#272630"], aliases: ["evening", "cozy evening"] },
+  { id: "winter", base: "neon", group: "homely", ...NATURAL, sun: 0.4, dim: 0.8, bg: ["#0b1322", "#1d2a40"], aliases: ["winter", "christmas"] },
   {
     id: "model",
     base: "day",
@@ -91,7 +91,7 @@ export const STYLES: StyleDef[] = [
     ao: 0.3,
     shadows: true,
     bg: ["#eeece8", "#d6d2cb"],
-    aliases: ["architekturmodell", "modell", "model", "architect", "weiß", "white"],
+    aliases: ["model", "architect", "white"],
   },
   {
     id: "pastel",
@@ -103,7 +103,7 @@ export const STYLES: StyleDef[] = [
     ao: 0.2,
     shadows: true,
     bg: ["#f4efe8", "#e3e7f2"],
-    aliases: ["pastell", "pastel", "bunt", "kids"],
+    aliases: ["pastel", "kids"],
   },
   {
     id: "warm",
@@ -115,7 +115,7 @@ export const STYLES: StyleDef[] = [
     ao: 0.3,
     shadows: true,
     bg: ["#f0e7d7", "#d9cbb3"],
-    aliases: ["warm", "holz", "papier", "holz und papier", "wood", "paper"],
+    aliases: ["warm", "wood", "paper"],
   },
 ];
 
@@ -193,14 +193,12 @@ export function phaseOf(plan: StylePlan | null | undefined, now: Date, sunUp: bo
   return t >= evening ? "evening" : "day";
 }
 
-/** Normalises a name for matching: lower case, umlauts folded, only letters and digits. */
+/** Normalises a name for matching: lower case, no accents, only letters and digits. */
 function norm(s: string): string {
   return s
     .toLowerCase()
-    .replace(/ä/g, "ae")
-    .replace(/ö/g, "oe")
-    .replace(/ü/g, "ue")
-    .replace(/ß/g, "ss")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9]+/g, "");
 }
 

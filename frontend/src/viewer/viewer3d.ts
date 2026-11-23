@@ -244,7 +244,7 @@ export interface PatchPiece {
 }
 
 /** A lit TV or monitor screen: colour of the running app and brightness (0..1). */
-/** Klang & Kino: a speaker or media player in the house – rings pulse around it while it plays, group members are joined by a line. */
+/** Sound & Cinema: a speaker or media player in the house – rings pulse around it while it plays, group members are joined by a line. */
 export interface SoundSource {
   id: string;
   floorId: string;
@@ -425,7 +425,7 @@ interface FloorMaterials {
   patch: MeshBasicMaterial;
   /** A module's surfaces that add light (a heated floor glowing warm). */
   patchGlow: MeshBasicMaterial;
-  /** Energie Pro: the living overlay of the solar fields on this floor (garden, walls). */
+  /** Energy Pro: the living overlay of the solar fields on this floor (garden, walls). */
   solarLive: MeshBasicMaterial;
   lamps: MeshBasicMaterial;
   halos: PointsMaterial;
@@ -498,7 +498,7 @@ interface FloorView {
   wallMesh: Mesh;
   screenMesh: Mesh;
   screenSig: string;
-  /** Klang & Kino: rings around playing speakers and lines between grouped ones (made when first needed). */
+  /** Sound & Cinema: rings around playing speakers and lines between grouped ones (made when first needed). */
   soundGroup?: Group;
   /** Pool Pro: the living water and covers of the pools on this floor. */
   poolGroup?: Group;
@@ -602,7 +602,7 @@ export class FloorplanViewer {
   private readonly flowTime = { value: 0 };
   private readonly flowStart = performance.now();
   private flowActive = false;
-  /** Klang & Kino: the sound sources and whether any plays (then the rings animate). */
+  /** Sound & Cinema: the sound sources and whether any plays (then the rings animate). */
   private sound: SoundSource[] = [];
   private pools: PoolPiece[] = [];
   /** A filter pump runs: the water moves (frames keep coming like for the energy flow). */
@@ -680,7 +680,7 @@ export class FloorplanViewer {
   private anchors: { p: [number, number, number]; n: [number, number, number]; floorId: string; size: number; roof: boolean; views: "house" | "all" | "floor"; room?: string | null; near?: number }[] = [];
   /** Told where the anchor lies on screen after every frame, how large the hologram should be and whether its front faces the camera. */
   private anchorCb: ((index: number, x: number, y: number, visible: boolean, scale: number, facing: boolean) => void) | null = null;
-  /** Energie Pro: production level (0..1) per solar field; the overlays animate while any is above zero. */
+  /** Energy Pro: production level (0..1) per solar field; the overlays animate while any is above zero. */
   private solarLevels = new Map<string, number>();
   private solarActive = false;
   private roofO = 0;
@@ -1167,7 +1167,7 @@ export class FloorplanViewer {
     this.invalidate();
   }
 
-  /** Energie Pro: how much every solar field produces (0..1 of its peak); the modules glow and sweep with it. */
+  /** Energy Pro: how much every solar field produces (0..1 of its peak); the modules glow and sweep with it. */
   setSolarLevels(levels: Map<string, number>): void {
     this.solarLevels = levels;
     let alive = false;
@@ -1201,7 +1201,7 @@ export class FloorplanViewer {
     fv.group.add(fv.poolGroup);
   }
 
-  /** Klang & Kino: rings around playing speakers, lines between grouped players; an empty list clears them. */
+  /** Sound & Cinema: rings around playing speakers, lines between grouped players; an empty list clears them. */
   setSound(list: SoundSource[]): void {
     const sig = (l: SoundSource[]) => l.map((s) => `${s.id}:${s.floorId}:${s.x},${s.z}:${s.level.toFixed(2)}:${s.playing ? 1 : 0}:${s.members.join("+")}`).join(";");
     if (sig(list) === sig(this.sound)) return;
@@ -6034,7 +6034,7 @@ export class FloorplanViewer {
     this.controls.flyTo(view, duration);
   }
 
-  /** "Anflug aus dem All": the camera waits high above the house (hidden behind the globe) … */
+  /** "Fly-in from space": the camera waits high above the house (hidden behind the globe) … */
   flyInStart(): void {
     const v = this.getView();
     this.flyInTo = v;
@@ -6471,7 +6471,7 @@ export class FloorplanViewer {
       if (!pin) continue;
       const fv = this.floorMap.get(d.floorId);
       // device markers belong to the floor and room views; the house view only shows floor labels –
-      // except what a camera detects right now and (Haushalt Pro) a bin that goes out or post in the box: those
+      // except what a camera detects right now and (Household Pro) a bin that goes out or post in the box: those
       // are worth a pin on the whole house too
       const alert = d.id.startsWith("detect:") || (d.id.startsWith("hh:") && d.active);
       if (!fv || (house && !alert) || fv.to < 0.99 || fv.o < 0.9 || d.pin === false || this.otherFloor(fv)) {

@@ -126,7 +126,7 @@ export class Session implements TimeTravelSession {
     this.startStates = opts.live.states;
     this.quality = opts.quality;
     this.low = opts.spec.low;
-    this.t = withTexts(opts.t, () => this.live.language);
+    this.t = withTexts(opts.t);
     setZone(zoneOf(opts.live));
     this.end = Date.now();
     this.range = opts.range === "7d" ? "7d" : "24h";
@@ -190,7 +190,7 @@ export class Session implements TimeTravelSession {
     return typeof c?.latitude === "number" && typeof c?.longitude === "number" ? { lat: c.latitude, lon: c.longitude } : null;
   }
 
-  /** Energie Pro's sensors are part of the summaries and events. */
+  /** Energy Pro's sensors are part of the summaries and events. */
   get energy(): boolean {
     return !!this.opts.spec.energy && this.energyIds.length > 0;
   }

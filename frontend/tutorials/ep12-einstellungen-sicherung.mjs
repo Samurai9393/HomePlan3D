@@ -1,18 +1,18 @@
-// Tutorial episode 12 – "Einstellungen, Sicherung und Umzug", the last episode of the series, in two parts:
-//   a) Alle Einstellungen: where the sections are, „Außenwand“ / „Innenwand“ / „Raster“, „Nordrichtung“ and
-//      „Sonnenlicht durch die Fenster“, the simple „Dach“ (pointing to episodes 7 and 8), „Wetter-Entität“, the
-//      weather effects (Wetter draußen in one sentence) and the rain warning, „Startansicht“, „Favoriten“, „Eigene
-//      Knöpfe“ with every action, „Sender und Playlists“ (Klang & Kino in one sentence), „🔒 Grundriss“, and pointers
-//      to „Vorlage (Grundriss-Bild)“, the energy tool and the language.
-//   b) Sicherung, Umzug und Datenschutz: undo / redo, restore points, „Exportieren“ / „Als Vorlage teilen“ /
-//      „Importieren …“ (and what happens to areas and devices on another Home Assistant), „Komplett-Backup“, moving to
+// Tutorial episode 12 – "Settings, backup and moving", the last episode of the series, in two parts:
+//   a) All Settings: where the sections are, “exterior wall” / “Interior wall” / “Grid”, “North” and
+//      “Sunlight through the windows”, the simple “Roof” (pointing to episodes 7 and 8), “Weather entity”, the
+//      weather effects (Weather outside in one sentence) and the rain warning, “Start view”, “Favourites”, “Eigene
+//      buttons” with every action, “Broadcasters and playlists” (Sound & Cinema in one sentence), “🔒 Floor plan”, and pointers
+//      to “Template (floor plan image)”, the energy tool and the language.
+//   b) backup, moving and data protection: undo / redo, restore points, “Export” / “Als Template teilen” /
+//      “Import …” (and what happens to areas and devices on another Home Assistant), “Full backup”, moving to
 //      a new Home Assistant step by step, local JSON pack files, what NeonPlan stores locally (manual chapter 11),
-//      help links, and the end of the series.
+//      help left, and the end of the series.
 // The full demo house (invented data, mock Home Assistant). Setup steps before a scene are invisible. The preview
 // has no full-backup commands: this script answers them in the page (export: the plan and the installed local packs;
 // import: the plan and those pack files back). Packs are plain JSON files: no signature, no binding to an installation.
 // Downloads go into the recording folder, never into the user's Downloads.
-// Usage (from frontend/): node tutorials/ep12-einstellungen-sicherung.mjs <out-dir> a|b [<voice-dir de> [<voice-dir en>]]
+// Usage (from frontend/): node tutorials/ep12-einstellungen-sicherung.mjs <out-dir> a|b [<voice-dir>]
 //   (voice dirs: private/tutorial-audio/ep12a/de and …/en, resp. ep12b)
 // EP12_FAST=1: a quick dry run for checking the steps (the timing is not usable).
 // Then: python ../tools/make-tutorial.py <out-dir> <out.mp4> --en tutorials/ep12a-narration-en.json
@@ -24,11 +24,11 @@ import { appVersion, FPS, narration, startRecorder } from "./recorder.mjs";
 const out = resolve(process.argv[2] ?? "tutorial-ep12");
 const PART = process.argv[3] === "b" ? "b" : "a";
 const FAST = !!process.env.EP12_FAST;
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D ${appVersion()}</span>`;
+const VERSION = `<br><span style="font-size:20px;opacity:.7">recorded with HomePlan 3D ${appVersion()}</span>`;
 const DL = join(out, "downloads");
 mkdirSync(DL, { recursive: true });
 
-const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "de" });
+const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "en" });
 const N = narration(R, process.argv.slice(4));
 const { sayOver, chapter, catchUp } = N;
 if (FAST) {
@@ -83,8 +83,8 @@ const quiet = async (target, wait = 400) => {
   await R.page.mouse.click(b.x, b.y);
   await R.sleep(wait);
 };
-const EYE = 'button[aria-label="Bedienelemente ausblenden – nur die 3D-Ansicht bleibt"]';
-const STAR = 'button[aria-label="Zentral: alle Lichter, Rollläden und Favoriten"]';
+const EYE = 'button[aria-label="Hide the controls – only the 3D view remains"]';
+const STAR = 'button[aria-label="Central: all lights, blinds and favourites"]';
 /** The main 3D view's viewer object. */
 const VIEWER = `const v = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-view3d"); const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);`;
 /** The editor's 3D pane. */
@@ -270,7 +270,7 @@ const fakeDialog = (text) =>
     d.id = "tut-dialog";
     d.style.cssText =
       "position:fixed;left:50%;top:22%;transform:translateX(-50%);z-index:2147483644;max-width:640px;padding:22px 26px;border-radius:12px;background:#f4f6fa;color:#111;font:18px/1.4 system-ui,'Segoe UI',sans-serif;box-shadow:0 12px 50px rgba(0,0,0,.6)";
-    d.innerHTML = `<div style="font-size:14px;color:#555;margin-bottom:8px">127.0.0.1 meldet</div>${t}<div style="text-align:right;margin-top:18px"><span style="display:inline-block;padding:7px 22px;border-radius:6px;background:#1a73e8;color:#fff">OK</span></div>`;
+    d.innerHTML = `<div style="font-size:14px;color:#555;margin-bottom:8px">127.0.0.1 says</div>${t}<div style="text-align:right;margin-top:18px"><span style="display:inline-block;padding:7px 22px;border-radius:6px;background:#1a73e8;color:#fff">OK</span></div>`;
     document.body.appendChild(d);
   }, text);
 const noDialog = () => R.page.evaluate(() => document.getElementById("tut-dialog")?.remove());
@@ -356,7 +356,7 @@ const fresh = async (query = "") => {
 /** Open the editor (with the 3D pane) and wait. */
 const toEditor = async (split = true) => {
   await quiet({ text: "Editor", exact: true }, 1500);
-  if (split) await quiet({ text: "3D daneben", exact: true }, 2000);
+  if (split) await quiet({ text: "3D beside", exact: true }, 2000);
 };
 /** Open a side-panel section (a <summary>) if it is closed. */
 const openSection = async (name, seconds = 0.5, retry = false) => {
@@ -419,9 +419,9 @@ if (PART === "a") {
     const b = { theta: d.theta + 0.35, phi: d.phi - 0.04, radius: d.radius * 0.92 };
     await camOf("main", null, 0, 0, a);
     await R.sleep(1200);
-    await R.title("Einstellungen, Sicherung und Umzug", `HomePlan 3D · Folge 12 · Teil 1${VERSION}`);
-    const l1 = "Wandstärke, Nordrichtung, Wetter, Favoriten und eigene Knöpfe: Mit den Einstellungen passt du HomePlan 3D an dein Zuhause an.";
-    const l2 = "In dieser Folge gehe ich jede Einstellung mit dir durch.";
+    await R.title("Settings, backup and moving", `HomePlan 3D · Episode 12 · part 1${VERSION}`);
+    const l1 = "Wall thickness, north, weather, favourites and your own buttons: with the settings you fit HomePlan 3D to your home.";
+    const l2 = "In this episode I go through every setting with you.";
     const total = N.length(l1) + N.length(l2);
     const t0 = R.time;
     const step = async (end) => {
@@ -439,42 +439,42 @@ if (PART === "a") {
   }
 
   // ---------------------------------------------------------------- 2. Intro
-  await chapter("Worum es heute geht");
+  await chapter("Worum es today geht");
   await fresh();
   await R.move(960, 560, 0.01);
-  await sayOver("Folge 12 ist die letzte Folge der Reihe und hat zwei Teile. In Teil 1 geht es um alle Einstellungen im Editor.");
+  await sayOver("Episode 12 is the last episode of the series and has two parts. Part 1 is about all the settings in the editor.");
   await R.move(1300, 420, 1.4);
   await R.move(900, 640, 1.4);
-  await sayOver("Teil 2 zeigt Sicherung, Umzug auf ein neues Home Assistant und welche Daten NeonPlan speichert. Ich nehme wieder das Demo-Haus aus der Online-Demo.");
+  await sayOver("Part 2 shows backups, moving to a new Home Assistant, and which data NeonPlan stores. Once again I use the demo house from the online demo.");
   await R.move(1200, 500, 1.6);
 
   // ---------------------------------------------------------------- 3. Where
-  await chapter("Wo die Einstellungen liegen");
-  await sayOver("Alles findest du im Reiter „Editor“. Oben schalte ich „3D daneben“ ein – dann siehst du jede Änderung sofort in 3D.");
+  await chapter("Where the settings are");
+  await sayOver("You find everything in the Editor tab. At the top I switch on “3D beside” – so you see every change in 3D right away.");
   await R.clickOn({ text: "Editor", exact: true }, 0.6);
   await R.sleep(1200);
   await R.hold(0.4);
-  await R.clickOn({ text: "3D daneben", exact: true }, 0.6);
+  await R.clickOn({ text: "3D beside", exact: true }, 0.6);
   await live(R.time + 1.6);
-  await sayOver("Rechts in der Seitenleiste stehen ganz unten Abschnitte zum Aufklappen: „Startansicht“, „Favoriten“, die „Vorlage“, „Einstellungen“ und „Sicherung“.");
-  await toSection("Startansicht", 300, 1.0);
-  for (const name of ["Startansicht", "Favoriten", "Vorlage", "Einstellungen", "Sicherung"]) {
+  await sayOver("At the very bottom of the sidebar on the right there are sections that fold open: Start view, Favourites, the Template, Settings – “Settings” – and Backup – “Backup”.");
+  await toSection("Start view", 300, 1.0);
+  for (const name of ["Start view", "Favourites", "Template", "Settings", "Backup"]) {
     await pointAt(name, 0.45, { exact: false, tags: "SUMMARY" });
     await R.hold(0.25);
   }
-  await sayOver("Alles hier gilt für den ganzen Plan – also auch für die Dashboard-Karte, den Kiosk und jedes Wandtablet.");
+  await sayOver("Everything here applies to the whole plan – so also to the dashboard card, the kiosk and every wall tablet.");
   await R.move(1500, 520, 1.0);
   await R.hold(0.8);
 
   // ---------------------------------------------------------------- 4. Walls and grid
-  await chapter("Wandstärken und Raster");
-  await sayOver("Ich klappe „Einstellungen“ auf. Ganz oben stehen die Wandstärken für alle Wände: „Außenwand“ und „Innenwand“, in Metern.");
-  await openSection("Einstellungen", 0.5);
-  await toSection("Einstellungen", 120, 0.8);
-  await R.moveTo({ label: "Außenwand (m)" }, 0.5);
+  await chapter("Wall thicknesses and grid");
+  await sayOver("I open Settings. At the top are the thicknesses for all walls: “Exterior wall” and “Interior wall”, in metres.");
+  await openSection("Settings", 0.5);
+  await toSection("Settings", 120, 0.8);
+  await R.moveTo({ label: "exterior wall (m)" }, 0.5);
   await R.hold(0.3);
-  await R.moveTo({ label: "Innenwand (m)" }, 0.4);
-  await sayOver("Das Demo-Haus hat außen 24 Zentimeter. Ich mache daraus 36 – rechts werden alle Außenwände sofort dicker.");
+  await R.moveTo({ label: "Interior wall (m)" }, 0.4);
+  await sayOver("The demo house has 24 centimetres outside. I make it 36 – on the right, every exterior wall gets thicker at once.");
   const paneHome = await camFull("pane");
   {
     // close to the living room's outer corner, so the thickness is easy to see
@@ -482,61 +482,61 @@ if (PART === "a") {
     await R.move(1150, 600, 0.5);
     await flyTo("pane", { theta: paneHome.theta, phi: 0.5, radius: 9, t }, 1.4);
   }
-  await setField("Außenwand (m)", "0.36", 0.5);
+  await setField("exterior wall (m)", "0.36", 0.5);
   await live(R.time + 1.2);
-  await sayOver("Eine einzelne Wand stellst du dagegen am Raum ein, im Kasten „Wandhöhen“ mit „Dicke“ – das kam in Folge 2. Ich gehe wieder auf 24 zurück.");
+  await sayOver("A single wall, on the other hand, you set at its room, in the wall heights box with its thickness – that was in episode 2. I go back to 24.");
   await R.hold(1.2);
-  await setField("Außenwand (m)", "0.24", 0.5);
+  await setField("exterior wall (m)", "0.24", 0.5);
   await live(R.time + 0.6);
   await R.move(1150, 600, 0.4);
   await flyTo("pane", paneHome, 1.2);
-  await sayOver("„Raster“ ist die Schrittweite beim Zeichnen: Ecken springen auf dieses Raster, im Demo-Haus alle 5 Zentimeter.");
-  await R.moveTo({ label: "Raster (m)" }, 0.5);
+  await sayOver("Grid – “Grid” – is the step size for drawing: corners snap to this grid, in the demo house every 5 centimetres.");
+  await R.moveTo({ label: "Grid (m)" }, 0.5);
   await R.hold(0.6);
-  await sayOver("Auch die Pfeiltasten schieben das Ausgewählte um einen Rasterschritt – mit Umschalt um 10 und mit Alt um einen Zentimeter.");
+  await sayOver("The arrow keys also move the selection by one grid step – with Shift by 10 and with Alt by one centimetre.");
   await R.move(700, 560, 0.8);
   await R.hold(0.4);
-  await R.moveTo({ label: "Raster (m)" }, 0.6);
-  await sayOver("Mein Tipp: Lass das Raster fein. Mit einem halben Meter triffst du beim Nachzeichnen kaum ein echtes Maß.");
+  await R.moveTo({ label: "Grid (m)" }, 0.6);
+  await sayOver("My tip: keep the grid fine. With half a metre you will hardly hit a real measurement when you trace a plan.");
   await R.hold(0.6);
 
   // ---------------------------------------------------------------- 5. North and sun
-  await chapter("Nordrichtung und Sonnenlicht");
-  await sayOver("Darunter die „Nordrichtung“: Wie viele Grad im Uhrzeigersinn von oben im Plan liegt Norden?");
-  await R.moveTo({ label: "Nordrichtung" }, 0.5);
+  await chapter("North and sunlight");
+  await sayOver("Below that is North – “North”: how many degrees clockwise from the top of the plan is north?");
+  await R.moveTo({ label: "North" }, 0.5);
   await R.hold(0.4);
-  await sayOver("Die braucht NeonPlan für die Sonne: Aus dem Sonnenstand in Home Assistant fällt Licht durch die Fenster, die zur Sonne zeigen.");
+  await sayOver("NeonPlan needs it for the sun: from the sun's position in Home Assistant, light falls through the windows that face the sun.");
   await R.move(620, 520, 1.0);
   await R.hold(0.6);
-  await sayOver("Zeigt bei dir oben im Plan nach Westen, trägst du 90 ein – eine Karten-App hilft beim Ausrichten.");
-  await setField("Nordrichtung", "90", 0.6);
-  await sayOver("Fällt die Sonne durch die falschen Fenster, stimmt fast immer diese Zahl nicht. Ich stelle wieder 0 ein.");
+  await sayOver("If the top of your plan points west, you enter 90 – a map app helps you find the direction.");
+  await setField("North", "90", 0.6);
+  await sayOver("If the sun comes through the wrong windows, this number is almost always wrong. I set it back to 0.");
   await R.hold(0.6);
-  await setField("Nordrichtung", "0", 0.4);
-  await sayOver("Ganz unten im Abschnitt steht „Sonnenlicht durch die Fenster“. Ohne Haken bleibt der Boden ohne Sonnenflecken.");
-  await scrollSide("Sonnenlicht durch die Fenster", 700, 0.8);
-  await R.moveTo({ text: "Sonnenlicht durch die Fenster" }, 0.5);
+  await setField("North", "0", 0.4);
+  await sayOver("At the bottom of the section is “Sunlight through the windows”. Without the tick the floor stays free of sun patches.");
+  await scrollSide("Sunlight through the windows", 700, 0.8);
+  await R.moveTo({ text: "Sunlight through the windows" }, 0.5);
   await R.hold(0.6);
-  await sayOver("Heruntergelassene Rollläden machen die Flecken übrigens kleiner, ganz wie in echt.");
+  await sayOver("By the way, closed blinds make the patches smaller, just like in real life.");
   await R.hold(0.6);
 
   // ---------------------------------------------------------------- 6. Roof
-  await chapter("Das einfache Dach");
-  await sayOver("Dann das „Dach“. Hier steht das einfache Dach für das ganze Haus: „Kein Dach“, „Flachdach“, „Satteldach“ – oder „Dachflächen (frei)“.");
-  await toSection("Einstellungen", 120, 0.7);
-  await R.pickOption("Dach", "Satteldach", 0.5);
-  await sayOver("Beim Satteldach legt „First“ fest, ob der First entlang der langen oder der kurzen Seite läuft – die kurze ist typisch fürs Reihenhaus.");
-  await R.moveTo({ label: "First" }, 0.5);
+  await chapter("Das einfache Roof");
+  await sayOver("Then the “Roof”. Here is the simple roof for the whole house: no roof, flat roof, gable roof – or “Roof sections (custom)”.");
+  await toSection("Settings", 120, 0.7);
+  await R.pickOption("roof", "Gable roof", 0.5);
+  await sayOver("For a gable roof, Ridge – “Ridge” – sets whether the ridge runs along the long or the short side – the short one is typical for a terraced house.");
+  await R.moveTo({ label: "Ridge" }, 0.5);
   await R.hold(0.6);
-  await sayOver("Dazu kommen „Dachneigung“ in Grad und „Dachüberstand“ in Metern. Ich stelle 50 Grad ein und schaue im Reiter „3D“ nach.");
-  await R.moveTo({ label: "Dachneigung" }, 0.5);
+  await sayOver("Then roof pitch in degrees and roof overhang in metres. I set 50 degrees and take a look in the 3D tab.");
+  await R.moveTo({ label: "Roof pitch" }, 0.5);
   await R.hold(0.3);
-  await R.moveTo({ label: "Dachüberstand" }, 0.4);
-  await setField("Dachneigung", "50", 0.5);
+  await R.moveTo({ label: "Roof overhang" }, 0.4);
+  await setField("Roof pitch", "50", 0.5);
   await R.clickOn({ text: "3D", exact: true, nth: 0 }, 0.6);
   await R.sleep(1200);
   await live(R.time + 0.6);
-  await sayOver("Das Dach ist jetzt deutlich steiler. Zurück im Editor stelle ich wieder 35 Grad ein.");
+  await sayOver("The roof is much steeper now. Back in the editor I set it to 35 degrees again.");
   {
     const a = await camNow();
     await R.move(1000, 640, 0.4);
@@ -545,65 +545,65 @@ if (PART === "a") {
   await R.clickOn({ text: "Editor", exact: true }, 0.6);
   await R.sleep(1000);
   await R.frame(0.1, 200);
-  await sayOver("„Dachflächen (frei)“ baut das Dach aus mehreren Teilen, mit Walm, Gauben und Dachfenstern – das zeigen die Folgen 7 und 8.");
-  await openSection("Einstellungen", 0.4);
-  await toSection("Einstellungen", 120, 0.6);
-  await setField("Dachneigung", "35", 0.5);
-  await R.moveTo({ label: "First" }, 0.5);
-  await R.move(1700, (await R.locate({ label: "First" })).y - 63, 0.4);
+  await sayOver("Custom roof sections build the roof from several parts, with hips, dormers and roof windows – episodes 7 and 8 show that.");
+  await openSection("Settings", 0.4);
+  await toSection("Settings", 120, 0.6);
+  await setField("Roof pitch", "35", 0.5);
+  await R.moveTo({ label: "Ridge" }, 0.5);
+  await R.move(1700, (await R.locate({ label: "Ridge" })).y - 63, 0.4);
   await R.hold(0.8);
 
   // ---------------------------------------------------------------- 7. Weather
-  await chapter("Wetter und Regenwarnung");
-  await sayOver("Weiter mit dem Wetter. Unter „Wetter-Entität“ wählst du, woher es kommt. „Automatisch“ nimmt die erste Wetter-Entität in Home Assistant.");
-  await scrollSide("Warnung: Fenster offen bei Regen", 860, 0.7);
-  await peekPicker("Wetter-Entität", 0.5, 1.6);
-  await sayOver("Darunter die „Wetter-Effekte in 3D“: Regen, Schnee, Nebel, Wolken, Blitze, Sonne und Mond. Jeden Effekt schaltest du einzeln ab.");
-  for (const name of ["Regen", "Schnee", "Nebel (graut die Szene ein)", "Wolken dunkeln Himmel und Sonne ab", "Blitze bei Gewitter", "Sonne und Mond am Himmel"]) {
+  await chapter("Weather and rain warning");
+  await sayOver("On to the weather. Under “Weather entity” you choose where it comes from. “Automatic” takes the first weather entity in Home Assistant.");
+  await scrollSide("Warning: window open while it rains", 860, 0.7);
+  await peekPicker("Weather entity", 0.5, 1.6);
+  await sayOver("Below are the weather effects in 3D: rain, snow, fog, clouds, lightning, sun and moon. You can switch off each effect on its own.");
+  for (const name of ["Rain", "Snow", "Fog (greys the scene)", "Clouds dim the sky and the sun", "Lightning in storms", "Sun and moon in the sky"]) {
     await R.moveTo({ text: name, exact: true }, 0.35);
     await R.hold(0.15);
   }
-  await sayOver("Nebel ist anfangs aus, weil er die ganze Szene eingraut. Auf der Qualitätsstufe Tablet bleibt nur die Abdunkelung durch die Wolken.");
-  await R.moveTo({ text: "Nebel (graut die Szene ein)", exact: true }, 0.5);
+  await sayOver("Fog is off at first, because it greys the whole scene. On the Tablet quality level only the dimming by clouds remains.");
+  await R.moveTo({ text: "Fog (greys the scene)", exact: true }, 0.5);
   await R.hold(0.6);
-  await sayOver("Das Wetter rund ums Haus bringt die Pro-Erweiterung „Wetter draußen“. Kostenlos ist die Warnung darunter.");
-  await R.moveTo({ text: "Sonne und Mond am Himmel", exact: true }, 0.5);
+  await sayOver("The weather around the house comes with the Pro add-on Weather outside. The warning below it is free.");
+  await R.moveTo({ text: "Sun and moon in the sky", exact: true }, 0.5);
   await R.hold(0.4);
-  await sayOver("„Warnung: Fenster offen bei Regen“: Meldet die Wetter-Entität Regen und ein Fenster ist offen, pulsiert der Raum rot. Brauchst du das nicht, nimmst du hier den Haken raus.");
-  await R.moveTo({ text: "Warnung: Fenster offen bei Regen" }, 0.5);
+  await sayOver("“Warning: window open while it rains”: if the weather entity reports rain and a window is open, the room pulses red. If you don't need it, untick it here.");
+  await R.moveTo({ text: "Warning: window open while it rains" }, 0.5);
   await R.hold(0.8);
 
   // ---------------------------------------------------------------- 8. Start view
-  await chapter("Startansicht");
-  await closeSection("Einstellungen");
-  await sayOver("Weiter oben die „Startansicht“: Du drehst das Haus rechts so, wie es sich öffnen soll, und drückst „Aktuelle 3D-Ansicht als Start merken“.");
-  await toSection("Startansicht", 300, 0.8);
-  await openSection("Startansicht", 0.4);
-  await R.moveTo({ text: "Aktuelle 3D-Ansicht als Start merken", exact: true }, 0.5);
+  await chapter("Start view");
+  await closeSection("Settings");
+  await sayOver("Further up is the start view: you turn the house on the right the way it should open, and press “Remember the current 3D view as the start”.");
+  await toSection("Start view", 300, 0.8);
+  await openSection("Start view", 0.4);
+  await R.moveTo({ text: "Remember the current 3D view as the start", exact: true }, 0.5);
   await R.hold(0.5);
-  await sayOver("Das gilt für die 3D-Ansicht, die Karte und den Kiosk, „Standard“ nimmt es zurück. Startansichten für Etagen und Räume zeigt Folge 10.");
+  await sayOver("That applies to the 3D view, the card and the kiosk; Default – “Default” – takes it back. Episode 10 shows start views for floors and rooms.");
   await R.move(1500, 520, 1.0);
   await R.hold(0.6);
-  await closeSection("Startansicht");
+  await closeSection("Start view");
 
   // ---------------------------------------------------------------- 9. Favourites
-  await chapter("Favoriten");
-  await sayOver("Unter „Favoriten“ legst du fest, was im Stern der 3D-Ansicht steht: Szenen, Skripte, Automationen, Tasten und Schalter.");
-  await toSection("Favoriten", 160, 0.6);
-  await openSection("Favoriten", 0.4);
+  await chapter("Favourites");
+  await sayOver("Under Favourites – “Favourites” – you set what is in the star of the 3D view: scenes, scripts, automations, buttons and switches.");
+  await toSection("Favourites", 160, 0.6);
+  await openSection("Favourites", 0.4);
   await R.hold(0.6);
-  await sayOver("Typisch sind Party, Anwesenheitssimulation, Verschattung oder die Bewässerung im Garten.");
+  await sayOver("Typical ones are party mode, presence simulation, shading or watering the garden.");
   await pointAt("Szenen, Skripte, Automationen", 0.8, { exact: false, tags: "P" });
   await R.hold(0.4);
-  await sayOver("In „Favorit hinzufügen“ tippst du einfach los und wählst den Treffer. Ich nehme das Skript „Wohnzimmer Alles aus“.");
-  await pickEntity("Favorit hinzufügen", "alles", "Wohnzimmer Alles aus", 0.5);
-  await sayOver("Die Pfeile ändern die Reihenfolge, das Kreuz entfernt einen Favoriten wieder.");
+  await sayOver("In “Add a favourite” you just start typing and pick the match. I take the script “Living room all off”.");
+  await pickEntity("Add a favourite", "all", "Living room everything off", 0.5);
+  await sayOver("The arrows change the order, the cross removes a favourite again.");
   {
     // the buttons of the newest favourite row
     const favBtn = (txt) =>
       R.page.evaluate((txt) => {
         const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
-        const sm = [...e.renderRoot.querySelectorAll("summary")].find((x) => x.textContent.trim().startsWith("Favoriten"));
+        const sm = [...e.renderRoot.querySelectorAll("summary")].find((x) => x.textContent.trim().startsWith("Favourites"));
         const rows = [...sm.parentElement.querySelectorAll(":scope > .fp3d-dev-row")];
         const el = [...rows[rows.length - 1].querySelectorAll("button")].find((b) => b.textContent.trim() === txt);
         const r = el.getBoundingClientRect();
@@ -619,13 +619,13 @@ if (PART === "a") {
   }
 
   // ---------------------------------------------------------------- 10. Own buttons
-  await chapter("Eigene Knöpfe");
-  await sayOver("Darunter stehen die „Eigenen Knöpfe“ – im Stern erscheinen sie unter den Favoriten. „+ Eigener Knopf“ legt einen neuen an.");
-  await scrollSide("+ Eigener Knopf", 760, 0.8);
-  await R.clickOn({ text: "+ Eigener Knopf" }, 0.5);
+  await chapter("Own buttons");
+  await sayOver("Below are your “Own buttons” – in the star they appear below the favourites. “+ Own button” adds a new one.");
+  await scrollSide("+ Own button", 760, 0.8);
+  await R.clickOn({ text: "+ Own button" }, 0.5);
   await R.hold(0.3);
-  await scrollSide("+ Eigener Knopf", 860, 0.6);
-  await sayOver("Er bekommt eine „Beschriftung“ und eine „Aktion“. „Seite öffnen“ springt zu einem Dashboard, etwa zu deiner Gartenseite.");
+  await scrollSide("+ Own button", 860, 0.6);
+  await sayOver("It gets a label and an action. “Open a path” – jumps to a dashboard, for example your garden page.");
   {
     // the new button's form is the last one
     const lbl = await R.page.evaluate(() => {
@@ -640,32 +640,32 @@ if (PART === "a") {
     await R.page.keyboard.down("Control");
     await R.page.keyboard.press("a");
     await R.page.keyboard.up("Control");
-    await R.type("Garten", 0.08);
+    await R.type("Garden", 0.08);
     await R.key("Tab");
   }
-  await R.pickOption("Aktion", "Seite öffnen", 0.5);
-  await R.clickOn({ label: "Pfad" }, 0.5);
-  await R.type("/lovelace/garten", 0.05);
+  await R.pickOption("Action", "Open a path", 0.5);
+  await R.clickOn({ label: "Path" }, 0.5);
+  await R.type("/lovelace/garden", 0.05);
   await R.key("Tab");
-  await sayOver("„Details einer Entität“ öffnet das Fenster eines Geräts aus Home Assistant, etwa den Rollladen im Wohnzimmer.");
-  await R.pickOption("Aktion", "Details einer Entität", 0.5);
-  await retype("Entität", "cover.wohnzimmer");
-  await sayOver("„Dienst aufrufen“ startet einen Dienst. Darunter stehen seine Daten im JSON-Format, zum Beispiel welches Skript laufen soll.");
-  await R.pickOption("Aktion", "Dienst aufrufen", 0.5);
-  await retype("Dienst (domain.service)", "script.turn_on");
-  await retype("Daten (JSON)", '{"entity_id": "script.gute_nacht"}', 0.035);
-  await sayOver("Und „fire-dom-event“ öffnet zusammen mit browser_mod ein Popup mit deiner eigenen Karte – zum Beispiel alle Rollläden auf einen Blick.");
-  await retype("Daten (JSON)", "", 0.03);
-  await R.pickOption("Aktion", "fire-dom-event (browser_mod)", 0.5);
-  await R.moveTo({ label: "Daten (JSON)" }, 0.5);
+  await sayOver("“Entity details” opens a device's dialog from Home Assistant, for example the living room blind.");
+  await R.pickOption("Action", "Entity details", 0.5);
+  await retype("Entity", "cover.wohnzimmer");
+  await sayOver("“Call a service” runs a service. Below go its data in JSON format, for example which script should run.");
+  await R.pickOption("Action", "Call a service", 0.5);
+  await retype("Service (domain.service)", "script.turn_on");
+  await retype("Data (JSON)", '{"entity_id": "script.gute_nacht"}', 0.035);
+  await sayOver("And fire-dom-event, together with browser_mod, opens a popup with your own card – for example all blinds at a glance.");
+  await retype("Data (JSON)", "", 0.03);
+  await R.pickOption("Action", "fire-dom-event (browser_mod)", 0.5);
+  await R.moveTo({ label: "Data (JSON)" }, 0.5);
   await R.hold(0.6);
-  await sayOver("Für meinen Gartenknopf bleibe ich bei „Seite öffnen“. Das Symbol ist ein Material-Design-Icon, hier eine Blume.");
-  await R.pickOption("Aktion", "Seite öffnen", 0.5);
-  await R.clickOn({ label: "Pfad" }, 0.4);
+  await sayOver("For my garden button I stay with “Open a path”. The icon is a Material Design icon, here a flower.");
+  await R.pickOption("Action", "Open a path", 0.5);
+  await R.clickOn({ label: "Path" }, 0.4);
   await R.page.keyboard.down("Control");
   await R.page.keyboard.press("a");
   await R.page.keyboard.up("Control");
-  await R.type("/lovelace/garten", 0.04);
+  await R.type("/lovelace/garden", 0.04);
   await R.key("Tab");
   {
     const icons = await R.page.evaluate(() => {
@@ -680,8 +680,8 @@ if (PART === "a") {
     await R.type("flower", 0.08);
     await R.key("Tab");
   }
-  await sayOver("Mit dem Pfeil wandert ein Knopf nach oben, „Löschen“ entfernt ihn.");
-  await scrollSide("+ Eigener Knopf", 860, 0.5);
+  await sayOver("The arrow moves a button up, “Delete” removes it.");
+  await scrollSide("+ Own button", 860, 0.5);
   {
     const btn = async (txt) => {
       const b = await R.page.evaluate((txt) => {
@@ -696,30 +696,30 @@ if (PART === "a") {
     };
     await btn("↑");
     await R.hold(0.4);
-    await btn("Löschen");
+    await btn("Delete");
     await R.hold(0.6);
   }
-  await sayOver("In der 3D-Ansicht öffnet der Stern jetzt die Favoriten und darunter die eigenen Knöpfe – mit meinem neuen Gartenknopf.");
+  await sayOver("In the 3D view the star now opens the favourites and below them your own buttons – with my new garden button.");
   await R.clickOn({ text: "3D", exact: true, nth: 0 }, 0.6);
   await R.sleep(1200);
   await R.clickOn(STAR, 0.7);
   await live(R.time + 1.6);
-  await sayOver("Ganz unten bei den Favoriten stehen noch „Sender und Playlists“. Die gehören zur Pro-Erweiterung Klang & Kino.");
+  await sayOver("At the very bottom of the favourites there are also stations and playlists. They belong to the Pro add-on Sound & Cinema.");
   await R.clickOn({ text: "Editor", exact: true }, 0.6);
   await R.sleep(1000);
   await R.frame(0.1, 200);
-  await openSection("Favoriten", 0.4);
-  await scrollSide("Sender und Playlists (Klang & Kino)", 500, 0.8);
-  await pointAt("Sender und Playlists (Klang & Kino)", 0.5, { tags: "H4" });
+  await openSection("Favourites", 0.4);
+  await scrollSide("Broadcasters and playlists (Sound & Cinema)", 500, 0.8);
+  await pointAt("Broadcasters and playlists (Sound & Cinema)", 0.5, { tags: "H4" });
   await R.hold(0.6);
-  await closeSection("Favoriten");
+  await closeSection("Favourites");
 
   // ---------------------------------------------------------------- 11. Plan lock
-  await chapter("Grundriss sperren");
-  await sayOver("Ist der Grundriss fertig, sperrst du ihn: oben in der Werkzeugleiste „Grundriss“ mit dem Schloss.");
-  await R.clickOn({ text: "🔒 Grundriss", exact: true }, 0.7);
+  await chapter("Lock the floor plan");
+  await sayOver("Once the floor plan is done, you lock it: at the top of the toolbar, “Floor plan” with the lock.");
+  await R.clickOn({ text: "🔒 Floor plan", exact: true }, 0.7);
   await R.hold(0.5);
-  await sayOver("Dann lassen sich Räume, Wände, Türen, Fenster und Außenflächen nicht mehr versehentlich verschieben – auch neu gezeichnete nicht.");
+  await sayOver("Then rooms, walls, doors, windows and outdoor areas can no longer be moved by accident – not even newly drawn ones.");
   {
     const p = await R.planPoint(3.5, 5.2);
     await R.move(p.x, p.y, 0.6);
@@ -727,11 +727,11 @@ if (PART === "a") {
     await R.hold(0.4);
     await R.drag(p.x + 140, p.y + 60, 1.2);
   }
-  await sayOver("Ziehen auf einem Raum bewegt jetzt nur die Ansicht. Auswählen und im Formular ändern geht weiterhin.");
+  await sayOver("Dragging on a room now only moves the view. Selecting and changing things in the form still works.");
   await R.hold(0.6);
-  await sayOver("Der Raum zeigt „Grundriss gesperrt“ – ein Klick darauf entsperrt wieder. Per Rechtsklick auf einen Raum geht es auch.");
+  await sayOver("The room shows “Floor plan locked” – one click on it unlocks again. A right-click on a room does it too.");
   await sideTop(0.5);
-  await R.moveTo({ text: "Grundriss gesperrt" }, 0.5);
+  await R.moveTo({ text: "Floor plan locked" }, 0.5);
   await R.hold(0.6);
   {
     const p = await R.planPoint(3.5, 5.2);
@@ -750,21 +750,21 @@ if (PART === "a") {
     await R.hold(0.8);
     await R.key("Escape");
   }
-  await sayOver("Möbel und Geräte bleiben frei. Die fixierst du einzeln mit dem Schloss im Formular oder mit der Taste L – wie in Folge 4.");
-  await R.clickOn({ text: "🔒 Grundriss", exact: true }, 0.6);
+  await sayOver("Furniture and devices stay free. You fix them one by one with the lock in the form or with the L key – like in episode 4.");
+  await R.clickOn({ text: "🔒 Floor plan", exact: true }, 0.6);
   await R.hold(0.8);
 
   // ---------------------------------------------------------------- 12. Elsewhere
   await chapter("Was woanders steht");
-  await sayOver("Zwei Dinge stehen woanders: Das Grundriss-Bild unter „Vorlage“ kennst du aus Folge 2.");
-  await R.clickOn({ text: "Zurück zur Etage" }, 0.5).catch(() => {});
-  await toSection("Vorlage", 400, 0.7);
-  await pointAt("Vorlage", 0.5, { exact: false, tags: "SUMMARY" });
+  await sayOver("Two things live elsewhere: the floor plan picture under Template – “Template” – you know from episode 2.");
+  await R.clickOn({ text: "Back zur Floor" }, 0.5).catch(() => {});
+  await toSection("Template", 400, 0.7);
+  await pointAt("Template", 0.5, { exact: false, tags: "SUMMARY" });
   await R.hold(0.6);
-  await sayOver("Und die Sensoren für Netz, Solar und Akku trägst du im Werkzeug „Energie“ ein – dazu gibt es eine eigene Folge.");
-  await R.moveTo({ text: "Energie", exact: true, nth: 0 }, 0.7);
+  await sayOver("And the sensors for grid, solar and battery go into the Energy tool – “Energy” – there is an episode of its own for that.");
+  await R.moveTo({ text: "Energy", exact: true, nth: 0 }, 0.7);
   await R.hold(0.8);
-  await sayOver("Die Sprache stellst du nicht hier ein: NeonPlan folgt deinem Profil in Home Assistant.");
+  await sayOver("You don't set the language here: NeonPlan follows your profile in Home Assistant.");
   await R.move(1100, 560, 1.0);
   await R.hold(0.6);
 
@@ -780,14 +780,14 @@ if (PART === "a") {
     const b = { theta: d.theta + 0.4, phi: d.phi - 0.05, radius: d.radius * 0.95 };
     await camOf("main", null, 0, 0, a);
     await R.sleep(700);
-    const end = await line("Kurz zusammengefasst: Wände, Raster, Nordrichtung, Dach, Wetter, Startansicht, Favoriten und eigene Knöpfe – alles unten in der Seitenleiste des Editors.");
+    const end = await line("In short: walls, grid, north, roof, weather, start view, favourites and your own buttons – all at the bottom of the editor's sidebar.");
     await glide("main", null, 0, 0, a, b, end - R.time);
   }
-  await R.title("Teil 2: Sicherung, Umzug und Datenschutz", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+  await R.title("part 2: backup, moving and data protection", `HomePlan 3D – also runs on old wall tablets${VERSION}`);
   {
-    let end = await line("In Teil 2 sicherst du deinen Plan und ziehst damit auf ein neues Home Assistant um.");
+    let end = await line("In part 2 you back up your plan and move it to a new Home Assistant.");
     await live(end);
-    end = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und HomePlan 3D läuft auch auf alten Wandtablets. Bis gleich in Teil 2!");
+    end = await line("Left to the online demo and the manual are in the description. And HomePlan 3D also runs on old wall tablets. See you in part 2!");
     await live(end + 0.6);
   }
 }
@@ -847,9 +847,9 @@ if (PART === "b") {
     const b = { theta: d.theta - 0.4, phi: d.phi - 0.03, radius: d.radius * 0.9 };
     await camOf("main", null, 0, 0, a);
     await R.sleep(1200);
-    await R.title("Einstellungen, Sicherung und Umzug", `HomePlan 3D · Folge 12 · Teil 2${VERSION}`);
-    const l1 = "Ein Klick zu viel, ein neues Home Assistant oder neue Hardware – dein Plan geht nicht verloren.";
-    const l2 = "In Teil 2 zeige ich dir Sicherung, Import und Umzug.";
+    await R.title("Settings, backup and moving", `HomePlan 3D · Episode 12 · part 2${VERSION}`);
+    const l1 = "One click too many, a new Home Assistant or new hardware – your plan won't get lost.";
+    const l2 = "In part 2 I show you backups, importing and moving.";
     const total = N.length(l1) + N.length(l2);
     const t0 = R.time;
     const step = async (end) => {
@@ -867,104 +867,104 @@ if (PART === "b") {
   }
 
   // ---------------------------------------------------------------- 2. Intro
-  await chapter("Worum es heute geht");
+  await chapter("Worum es today geht");
   await fresh();
   await mockBackup();
   await toEditor(false);
   await R.move(960, 560, 0.01);
-  await sayOver("Teil 1 hat alle Einstellungen gezeigt. Jetzt geht es um Rückgängig, Wiederherstellungspunkte, die drei Arten von Dateien, den Umzug und den Datenschutz.");
+  await sayOver("Part 1 showed all the settings. Now it's about undo, restore points, the three kinds of files, moving and privacy.");
   await R.move(700, 120, 1.4);
   await R.move(1700, 700, 1.6);
-  await sayOver("Und zum Schluss ein paar Worte zum Ende dieser Reihe.");
+  await sayOver("And at the end a few words to close this series.");
   await R.move(900, 560, 1.2);
 
   // ---------------------------------------------------------------- 3. Undo
-  await chapter("Rückgängig und Wiederholen");
-  await sayOver("Das Wichtigste zuerst: Verschiebst du aus Versehen einen Raum …");
+  await chapter("Undo and redo");
+  await sayOver("Ridge things first: if you move a room by accident …");
   {
     const p = await R.planPoint(3.5, 5.2);
     await R.move(p.x, p.y, 0.6);
     await R.click();
     await R.drag(p.x + 120, p.y + 90, 1.2);
   }
-  await sayOver("… holt „Rückgängig“ oben in der Werkzeugleiste ihn zurück. „Wiederholen“ macht es wieder.");
-  await R.clickOn({ text: "Rückgängig", exact: true }, 0.6);
+  await sayOver("… “Undo” at the top of the toolbar brings it back. “Redo” does it again.");
+  await R.clickOn({ text: "Undo", exact: true }, 0.6);
   await R.hold(0.6);
-  await R.clickOn({ text: "Wiederholen", exact: true }, 0.5);
+  await R.clickOn({ text: "Redo", exact: true }, 0.5);
   await R.hold(0.5);
-  await sayOver("Schneller geht es mit Strg+Z – und mit gedrückter Umschalttaste dazu wiederholst du.");
+  await sayOver("It's quicker with Ctrl+Z – and holding Shift as well, you redo.");
   await R.move(700, 560, 0.6);
   await R.page.keyboard.down("Control");
   await R.page.keyboard.press("z");
   await R.page.keyboard.up("Control");
   await R.frame(0.1, 200);
   await R.hold(0.8);
-  await sayOver("Das gilt für alles, was du gerade bearbeitest. Für ältere Stände gibt es die Wiederherstellungspunkte.");
+  await sayOver("That works for everything you are editing right now. For older states there are the restore points.");
   await R.move(1400, 300, 0.8);
   await R.hold(0.4);
 
   // ---------------------------------------------------------------- 4. Restore points
-  await chapter("Wiederherstellungspunkte");
-  await sayOver("Die stehen ganz unten in der Seitenleiste im Abschnitt „Sicherung“.");
-  await R.clickOn({ text: "Zurück zur Etage" }, 0.5).catch(() => {});
-  await toSection("Sicherung", 200, 0.9);
-  await openSection("Sicherung", 0.4);
+  await chapter("Restore points");
+  await sayOver("They are at the very bottom of the sidebar, in the Backup section – “Backup”.");
+  await R.clickOn({ text: "Back zur Floor" }, 0.5).catch(() => {});
+  await toSection("Backup", 200, 0.9);
+  await openSection("Backup", 0.4);
   await R.hold(0.4);
-  await sayOver("Beim Bearbeiten entsteht höchstens alle 10 Minuten ein Wiederherstellungspunkt, die letzten 20 bleiben. Jede Zeile zeigt die Zeit, die Räume und die Möbel.");
-  await pointAt("Wiederherstellungspunkte", 0.5, { tags: "H4" });
+  await sayOver("While you edit, a restore point – “Wiederherstellungspunkt” – is kept at most every 10 minutes, and the last 20 stay. Each row shows the time, the rooms and the furniture.");
+  await pointAt("Restore points", 0.5, { tags: "H4" });
   await R.hold(0.6);
-  await pointAt("Räume,", 0.5, { exact: false, tags: "SPAN" });
+  await pointAt("Rooms,", 0.5, { exact: false, tags: "SPAN" });
   await R.hold(0.6);
-  await sayOver("„Wiederherstellen“ holt einen Stand zurück – nach einer Rückfrage. Der jetzige Stand bleibt selbst als Punkt erhalten, du verlierst also nichts.");
-  await R.moveTo({ text: "Wiederherstellen", exact: true }, 0.5);
+  await sayOver("Restore – “Restore” – brings a state back, after asking you first. The current state is kept as a point itself, so you lose nothing.");
+  await R.moveTo({ text: "Restore", exact: true }, 0.5);
   await R.hold(1.0);
 
   // ---------------------------------------------------------------- 5. Export
-  await chapter("Exportieren und als Vorlage teilen");
-  await sayOver("Darunter „Datei“. „Exportieren“ speichert den Plan mit allen Verknüpfungen: Räume, Möbel, Geräte und Sensoren.");
-  await pointAt("Datei", 0.5, { tags: "H4" });
-  await R.clickOn({ text: "Exportieren", exact: true }, 0.5);
+  await chapter("Export and share as template");
+  await sayOver("Below that is File. Export – “Export” – saves the plan with all its left: rooms, furniture, devices and sensors.");
+  await pointAt("File", 0.5, { tags: "H4" });
+  await R.clickOn({ text: "Export", exact: true }, 0.5);
   await R.sleep(500);
-  await downloadChip(basename(await downloaded("homeplan3d-sicherung")));
+  await downloadChip(basename(await downloaded("homeplan3d-backup")));
   await R.hold(1.0);
-  await sayOver("Bilder sind nicht drin, das steht auch darunter. Für die Bilder gibt es gleich das Komplett-Backup.");
+  await sayOver("Pictures are not included, it says so below. For the pictures there is the full backup in a moment.");
   await noChip();
-  await pointAt("Hintergrundbilder sind nicht in der Datei enthalten.", 0.5, { tags: "P" });
+  await pointAt("Background images are not part of the file.", 0.5, { tags: "P" });
   await R.hold(0.6);
-  await sayOver("„Als Vorlage teilen“ lässt alles weg, was zu deinem Home Assistant gehört: Bereiche, Geräte, Sensoren und Bilder.");
-  await R.clickOn({ text: "Als Vorlage teilen", exact: true }, 0.5);
+  await sayOver("“Share as template” – leaves out everything that belongs to your Home Assistant: areas, devices, sensors and pictures.");
+  await R.clickOn({ text: "Als Template teilen", exact: true }, 0.5);
   await R.sleep(500);
-  const template = await downloaded("homeplan3d-vorlage");
+  const template = await downloaded("homeplan3d-template");
   await downloadChip(basename(template));
   await R.hold(0.8);
-  await sayOver("Das ist die Datei für einen Freund, fürs Forum oder für einen Fehlerbericht – ohne deine Geräte.");
+  await sayOver("That's the file for a friend, for a forum or for a bug report – without your devices.");
   await R.hold(0.6);
   await noChip();
 
   // ---------------------------------------------------------------- 6. Import
-  await chapter("Importieren – und was mit Bereichen passiert");
-  await sayOver("„Importieren …“ lädt so eine Datei. Ich nehme die Vorlage von eben.");
+  await chapter("Import – and what happens to areas");
+  await sayOver("Import – “Import” – loads such a file. I take the template from just now.");
   {
-    const box = await R.locate({ text: "Importieren …", exact: true });
+    const box = await R.locate({ text: "Import …", exact: true });
     await R.move(box.x, box.y, 0.5);
     // the confirm is shown as a box first; the app's own confirm is answered "yes" by the dialog handler
     await ringHere();
   }
-  await sayOver("Vorher fragt NeonPlan nach: Der ganze Grundriss wird ersetzt, der jetzige Stand bleibt als Wiederherstellungspunkt.");
-  await dialogOk("Den ganzen Grundriss durch die Datei ersetzen? Der jetzige Stand bleibt als Wiederherstellungspunkt erhalten.", 1.6);
+  await sayOver("NeonPlan asks first: the whole floor plan is replaced, and the current state stays as a restore point.");
+  await dialogOk("Replace the whole floor plan with the file? The current state is kept as a restore point.", 1.6);
   {
     const [chooser] = await Promise.all([
       R.page.waitForFileChooser(),
       R.page.evaluate(() => {
         const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
-        const label = [...e.renderRoot.querySelectorAll("label.fp3d-upload")].find((l) => l.textContent.trim().startsWith("Importieren"));
+        const label = [...e.renderRoot.querySelectorAll("label.fp3d-upload")].find((l) => l.textContent.trim().startsWith("Import"));
         label.querySelector("input").click();
       }),
     ]);
     await chooser.accept([template]);
     await R.frame(0.3, 900);
   }
-  await sayOver("So sieht eine Vorlage aus: Räume, Wände, Türen und Möbel sind da – aber keine Geräte und keine Verknüpfungen.");
+  await sayOver("This is what a template looks like: rooms, walls, doors and furniture are there – but no devices and no left.");
   {
     const c = await R.page.evaluate(() => {
       const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
@@ -974,35 +974,35 @@ if (PART === "b") {
     await R.move(c.x, c.y, 0.8);
     await R.hold(0.6);
   }
-  await sayOver("Genau das passiert auch auf einem anderen Home Assistant: Verknüpft wird über die Bereiche und Entitäten. Heißen sie dort gleich, ist sofort alles verbunden.");
+  await sayOver("The same happens on another Home Assistant: left go through the areas and entities. If they have the same names there, everything is connected right away.");
   await R.hold(0.6);
-  await sayOver("Sonst wählst du je Raum den „Bereich“ neu – und schon stehen seine Geräte wieder in der Liste.");
+  await sayOver("Otherwise you pick the area – “Area” – again for each room, and its devices are back in the list.");
   {
-    await scrollSide("Räume", 400, 0.5).catch(() => {});
-    await R.clickOn({ text: "Wohnzimmer" }, 0.6);
+    await scrollSide("Rooms", 400, 0.5).catch(() => {});
+    await R.clickOn({ text: "Living room" }, 0.6);
     await R.frame(0.2, 300);
-    await R.pickOption("Bereich", "Wohnzimmer", 0.5);
+    await R.pickOption("Area", "Living room", 0.5);
     await R.hold(0.4);
-    await scrollSide("Geräte", 260, 0.8).catch(() => console.log("no Geräte heading"));
+    await scrollSide("Devices", 260, 0.8).catch(() => console.log("no Devices heading"));
     await R.hold(0.6);
   }
-  await sayOver("Zurück zum alten Stand? Unter „Wiederherstellungspunkte“ steht jetzt der Punkt von vor dem Import.");
+  await sayOver("Back to the old state? Under restore points there is now the point from just before the import.");
   await sideTop(0.5);
-  await R.clickOn({ text: "Zurück zur Etage" }, 0.5);
-  await toSection("Sicherung", 200, 0.8);
-  await openSection("Sicherung", 0.3);
+  await R.clickOn({ text: "Back zur Floor" }, 0.5);
+  await toSection("Backup", 200, 0.8);
+  await openSection("Backup", 0.3);
   await R.hold(0.3);
-  const restoreBox = await R.moveTo({ text: "Wiederherstellen", exact: true, nth: 0 }, 0.5);
-  await sayOver("„Wiederherstellen“ – und das Demo-Haus ist wieder komplett, mit allen Geräten.");
+  const restoreBox = await R.moveTo({ text: "Restore", exact: true, nth: 0 }, 0.5);
+  await sayOver("Restore – and the demo house is complete again, with all its devices.");
   await ringHere();
   {
     // the newest point is the one taken right before the import; its time as the row shows it
     const time = await R.page.evaluate(() => {
       const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
-      const row = [...e.renderRoot.querySelectorAll(".fp3d-dev-row")].find((r) => r.textContent.includes("Wiederherstellen"));
+      const row = [...e.renderRoot.querySelectorAll(".fp3d-dev-row")].find((r) => r.textContent.includes("Restore"));
       return row ? row.querySelector("span").textContent.split("·")[0].trim() : "";
     });
-    await dialogOk(`Den Stand vom ${time} wiederherstellen? Der jetzige Stand bleibt als Wiederherstellungspunkt erhalten.`, 0.8);
+    await dialogOk(`Restore the state from ${time}? The current state is kept as a restore point.`, 0.8);
   }
   // the real click after the shown dialog (its own confirm is answered "yes")
   await R.page.mouse.click(restoreBox.x, restoreBox.y);
@@ -1010,55 +1010,55 @@ if (PART === "b") {
   await live(R.time + 1.0);
 
   // ---------------------------------------------------------------- 7. Full backup
-  await chapter("Komplett-Backup");
-  await sayOver("Für alles auf einmal gibt es das „Komplett-Backup“. „Alles sichern“ speichert den Plan, alle Hintergrund- und Bildschirmbilder und die installierten Packs.");
-  await toSection("Sicherung", 200, 0.6);
-  await openSection("Sicherung", 0.3);
-  await pointAt("Komplett-Backup", 0.5, { tags: "H4" });
-  await R.clickOn({ text: "Alles sichern (Plan, Bilder, Packs)", exact: true }, 0.5);
-  const full = await downloaded("homeplan3d-komplett");
+  await chapter("Full backup");
+  await sayOver("For everything at once there is the full backup – “Full backup”. “Back up everything” – saves the plan, every background and screen picture and the installed packs.");
+  await toSection("Backup", 200, 0.6);
+  await openSection("Backup", 0.3);
+  await pointAt("Full backup", 0.5, { tags: "H4" });
+  await R.clickOn({ text: "Back up everything (plan, pictures, packs)", exact: true }, 0.5);
+  const full = await downloaded("homeplan3d-full");
   await downloadChip(basename(full));
   await R.hold(0.8);
-  await sayOver("Die Datei bleibt lokal und enthält nur deinen Plan, die Bilder und die installierten Packs.");
-  await pointAt("Eine Datei mit dem Plan", 0.5, { exact: false, tags: "P" });
+  await sayOver("The file stays local and contains only your plan, the pictures and the installed packs.");
+  await pointAt("A file with the plan", 0.5, { exact: false, tags: "P" });
   await noChip();
   await R.hold(0.4);
-  await sayOver("„Komplett-Backup wiederherstellen …“ spielt sie zurück, in dieselbe oder eine andere Installation. Auch hier fragt NeonPlan vorher nach.");
-  await R.moveTo({ text: "Komplett-Backup wiederherstellen …", exact: true }, 0.5);
+  await sayOver("“Restore a full backup” – plays it back, into the same or another installation. Here too NeonPlan asks first.");
+  await R.moveTo({ text: "Restore a full backup …", exact: true }, 0.5);
   await R.hold(0.6);
-  await sayOver("Die Packs sind lokale JSON-Dateien. Sie kommen unverändert zurück – ohne Signatur und ohne Bindung an ein Gerät.");
+  await sayOver("The packs are local JSON files. They come back unchanged – no signature and no binding to a device.");
   await R.hold(0.8);
-  await sayOver("Übrigens: Das normale Backup von Home Assistant sichert HomePlan 3D ebenfalls vollständig mit.");
+  await sayOver("By the way: the normal Home Assistant backup also saves HomePlan 3D completely.");
   await R.hold(0.6);
 
   // ---------------------------------------------------------------- 8. Moving
-  await chapter("Umzug auf ein neues Home Assistant");
+  await chapter("Moving to a new Home Assistant");
   const STEPS = [
-    "Altes System: „Alles sichern“",
-    "Neues System: HomePlan 3D über HACS installieren, Integration hinzufügen, Bereiche anlegen",
-    "Editor › Sicherung › „Komplett-Backup wiederherstellen …“",
+    "Altes System: “Back up everything”",
+    "New system: install HomePlan 3D through HACS, add the integration, create areas",
+    "Editor › Backup › “Restore a full backup …”",
   ];
-  await sayOver("Jetzt der Umzug, zum Beispiel auf einen neuen Mini-PC. Am einfachsten spielst du das Backup von Home Assistant auf der neuen Hardware ein – dann ist NeonPlan mit allem da.");
-  await card("Weg 1: das Backup von Home Assistant", ["Auf der neuen Hardware einspielen – HomePlan 3D ist mit Plan, Bildern und Packs da"], 0);
+  await sayOver("Now moving, for example to a new mini PC. The easiest way is to restore your Home Assistant backup on the new hardware – then NeonPlan is there with everything.");
+  await card("Path 1: the Home Assistant backup", ["Restore it on the new hardware – HomePlan 3D comes with the plan, images and packs"], 0);
   await R.move(1100, 560, 1.2);
   await R.hold(0.6);
-  await sayOver("Fängst du neu an, geht es in drei Schritten. Erstens: auf dem alten System „Alles sichern“.");
-  await card("Weg 2: neu anfangen", STEPS, 0);
-  await R.moveTo({ text: "Alles sichern (Plan, Bilder, Packs)", exact: true }, 0.6);
+  await sayOver("If you start fresh, it takes three steps. One: on the old system, “Back up everything”.");
+  await card("Path 2: neu anfangen", STEPS, 0);
+  await R.moveTo({ text: "Back up everything (plan, pictures, packs)", exact: true }, 0.6);
   await R.hold(0.6);
-  await sayOver("Zweitens: Auf dem neuen System installierst du HomePlan 3D über HACS, fügst die Integration hinzu und legst deine Bereiche an.");
-  await card("Weg 2: neu anfangen", STEPS, 1);
+  await sayOver("Two: on the new system you install HomePlan 3D through HACS, add the integration and create your areas.");
+  await card("Path 2: neu anfangen", STEPS, 1);
   await R.hold(0.8);
-  await sayOver("Drittens: Im Editor unter „Sicherung“ das Komplett-Backup wiederherstellen.");
-  await card("Weg 2: neu anfangen", STEPS, 2);
+  await sayOver("Three: in the editor, under Backup, restore the full backup.");
+  await card("Path 2: neu anfangen", STEPS, 2);
   {
-    const [chooser] = await Promise.all([R.page.waitForFileChooser(), R.clickOn({ text: "Komplett-Backup wiederherstellen …", exact: true }, 0.5)]);
+    const [chooser] = await Promise.all([R.page.waitForFileChooser(), R.clickOn({ text: "Restore a full backup …", exact: true }, 0.5)]);
     await noCard();
-    await dialogOk("Plan, Bilder und Packs durch das Backup ersetzen? Der aktuelle Stand bleibt als Wiederherstellungspunkt erhalten.", 0.8);
+    await dialogOk("Replace the plan, the pictures and the packs with the backup? The current state stays as a restore point.", 0.8);
     await chooser.accept([full]);
     await R.frame(0.3, 1500);
   }
-  await sayOver("Die Meldung oben sagt, was zurückkam – der Plan, die Bilder und alle lokalen Packs sind wieder da.");
+  await sayOver("The message at the top tells you what came back – the plan, the pictures and all the local packs are there again.");
   {
     await sideTop(0.6);
     const n = await noticeBox();
@@ -1066,14 +1066,14 @@ if (PART === "b") {
     else console.log("no notice after the full backup");
     await R.hold(1.0);
   }
-  await sayOver("Eigene Module sind genauso lokale Dateien. Ein Admin gibt ihren Code auf der Seite „Erweiterungen“ frei, bevor er läuft.");
-  await card("Lokale Dateien", ["Pack-Dateien und Module bleiben auf deiner Installation", "Modulcode läuft erst nach der Freigabe durch einen Admin"], 0);
+  await sayOver("Your own modules are local files too. An admin approves their code on the Extensions page – “Extensions” – before it runs.");
+  await card("Local files", ["Pack files and modules stay on your installation", "Moduless code only runs after approval by an admin"], 0);
   await R.move(1100, 560, 1.2);
   await R.hold(0.8);
   await noCard();
 
   // ---------------------------------------------------------------- 9. Privacy
-  await chapter("Daten und Datenschutz");
+  await chapter("Data and data protection");
   await fresh();
   await quiet(EYE, 600);
   await R.hideCursor();
@@ -1083,10 +1083,10 @@ if (PART === "b") {
     const b = { theta: d.theta + 0.2, phi: d.phi - 0.03, radius: d.radius * 1.02 };
     await camOf("main", null, 0, 0, a);
     await R.sleep(600);
-    const PRIV = ["Plan, Bilder und Packs: in Home Assistant unter .storage", "Keine Meldung an einen externen Dienst: alles bleibt lokal", "Kamerabilder, Verläufe, Zustände: bleiben in Home Assistant"];
-    const l1 = "Und was speichert NeonPlan wo? Plan, Bilder und Packs liegen in Home Assistant, im Ordner „.storage“. Nichts davon verlässt deine Installation.";
-    const l2 = "Diagnoseberichte bleiben ebenfalls lokal: Du kannst sie im Editor ansehen und wieder löschen. Es geht nichts an einen externen Dienst.";
-    const l3 = "Kamerabilder, Verläufe und Zustände bleiben in Home Assistant und werden nur in deinem Browser angezeigt.";
+    const PRIV = ["Plan, images and packs: in Home Assistant under .storage", "No message to an external service: everything stays local", "Camera images, history, states: stay in Home Assistant"];
+    const l1 = "And what does NeonPlan store where? Plan, pictures and packs live in Home Assistant, in the .storage folder. None of it leaves your installation.";
+    const l2 = "Diagnostics reports stay local as well: you can view them in the editor and delete them again. Nothing goes to an external service.";
+    const l3 = "Camera pictures, history and states stay in Home Assistant and are only shown in your browser.";
     const total = N.length(l1) + N.length(l2) + N.length(l3);
     const t0 = R.time;
     const step = async (end) => {
@@ -1098,32 +1098,32 @@ if (PART === "b") {
         await R.frame(1 / FPS, 15);
       }
     };
-    await card("Daten und Datenschutz", PRIV, 0);
+    await card("Data and data protection", PRIV, 0);
     await step(await line(l1));
-    await card("Daten und Datenschutz", PRIV, 1);
+    await card("Data and data protection", PRIV, 1);
     await step(await line(l2));
-    await card("Daten und Datenschutz", PRIV, 2);
+    await card("Data and data protection", PRIV, 2);
     await step(await line(l3));
     await noCard();
   }
 
   // ---------------------------------------------------------------- 10. Help
-  await chapter("Hilfe und Rückmeldung");
+  await chapter("Help and feedback");
   await fresh();
   await R.hideCursor(false);
   await toEditor(false);
   await R.move(1500, 600, 0.01);
-  await sayOver("Hakt etwas, steht in der Seitenleiste „Hilfe und Rückmeldung“: „Problem melden“ öffnet ein Issue auf GitHub, „Idee vorschlagen“ eine Diskussion.");
-  await toSection("Vorlage", 700, 0.9);
-  await pointAt("Hilfe und Rückmeldung", 0.5, { tags: "H3" });
+  await sayOver("If something goes wrong, the sidebar has Help and feedback: “Report a problem” – opens an issue on GitHub, “Propose an idea” a discussion.");
+  await toSection("Template", 700, 0.9);
+  await pointAt("Help and feedback", 0.5, { tags: "H3" });
   await R.hold(0.3);
-  await R.moveTo({ text: "Problem melden" }, 0.5);
+  await R.moveTo({ text: "Report a problem" }, 0.5);
   await R.hold(0.4);
-  await R.moveTo({ text: "Idee vorschlagen" }, 0.5);
+  await R.moveTo({ text: "Propose an idea" }, 0.5);
   await R.hold(0.6);
 
   // ---------------------------------------------------------------- 11. End of the series
-  await chapter("Ende der Reihe");
+  await chapter("End of the series");
   await catchUp();
   await fresh();
   await R.hideCursor();
@@ -1134,10 +1134,10 @@ if (PART === "b") {
     const b = { theta: d.theta + 0.2, phi: d.phi - 0.03, radius: d.radius * 1.0 };
     await camOf("main", null, 0, 0, a);
     await R.sleep(700);
-    const l1 = "Das war die letzte Folge der Reihe. Vom ersten Raum bis zum Umzug kennst du jetzt jeden Knopf in HomePlan 3D.";
-    const l2 = "Danke, dass du dabei warst! Alle Folgen findest du in der Playlist „HomePlan 3D – Tutorials“.";
-    const l3 = "Links zur Online-Demo, zur Anleitung und zu GitHub für Fehlermeldungen stehen in der Beschreibung.";
-    const l4 = "Und denk dran: HomePlan 3D läuft auch auf alten Wandtablets. Bis bald!";
+    const l1 = "That was the last episode of the series. From the first room to moving house, you now know every button in HomePlan 3D.";
+    const l2 = "Thanks for watching along! You find every episode in the playlist “HomePlan 3D – Tutorials”.";
+    const l3 = "Left to the online demo, the manual and GitHub for bug reports are in the description.";
+    const l4 = "And remember: HomePlan 3D also runs on old wall tablets. See you soon!";
     const total = N.length(l1) + N.length(l2) + N.length(l3) + N.length(l4) + 0.6;
     const t0 = R.time;
     const step = async (end) => {
@@ -1150,11 +1150,11 @@ if (PART === "b") {
       }
     };
     await step(await line(l1));
-    await R.title("Danke fürs Zuschauen!", `Playlist „HomePlan 3D – Tutorials“`);
+    await R.title("Thanks for watching!", `Playlist “HomePlan 3D – Tutorials”`);
     await step(await line(l2));
-    await R.title("Demo · Anleitung · GitHub", `Links in der Beschreibung`);
+    await R.title("Demo · Manual · GitHub", `Left in the description`);
     await step(await line(l3));
-    await R.title("HomePlan 3D", `läuft auch auf alten Wandtablets${VERSION}`);
+    await R.title("HomePlan 3D", `also runs on old wall tablets${VERSION}`);
     await step((await line(l4)) + 0.6);
   }
 }

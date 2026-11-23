@@ -23,7 +23,7 @@ test("only show while: a piece without a condition always shows; the signature c
   const tree = { id: "tree", show_if: { entity: "sensor.temp", state: "<20" } } as Furniture;
   const sofa = { id: "sofa" } as Furniture;
   const b = emptyBuilding();
-  b.floors = [{ ...newFloor("eg", "EG", 0), furniture: [tree, sofa] }];
+  b.floors = [{ ...newFloor("eg", "Ground floor", 0), furniture: [tree, sofa] }];
   assert.equal(furnitureShown(hass({}), sofa), true);
   const a = showIfSignature(hass({ "sensor.temp": "18" }), b);
   assert.equal(a, showIfSignature(hass({ "sensor.temp": "19" }), b), "another number, same outcome: nothing to draw again");

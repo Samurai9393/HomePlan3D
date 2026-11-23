@@ -1,88 +1,82 @@
-# Folge 11 – Dashboard-Karte und Wandtablet: Coverage-Checkliste
+# Episode 11 – Dashboard card and wall tablet: coverage checklist
 
-Quellen: `docs/anleitung.md` Kapitel 8 (Dashboard-Karte, YAML-Block) und 9 (Wandtablet), die Karte in
-`frontend/src/card.ts`, ihr visueller Editor `frontend/src/card-editor.ts`, die Optionen in
-`frontend/src/card-config.ts`, Nachtdimmung `frontend/src/kiosk.ts`, Qualitätsstufe/Pixeldichte/`isLowEnd` in
-`frontend/src/viewer/viewer3d.ts`, Leistungsanzeige in `frontend/src/components/view3d.ts`, Labels aus
-`frontend/src/i18n.ts`. Die Vorschau `preview/index.html?card` zeigt den Karten-Editor links und die Karte rechts
-(wie der Karten-Dialog von Home Assistant). Das Anlegen in Home Assistant selbst wird nur gesagt.
-Zu viel für 8 Minuten in einem Stück → zwei Teile: **a** = Teil 1 „Die Karte anlegen und einstellen“,
-**b** = Teil 2 „YAML, Kiosk und alte Wandtablets“. Zeit = Stelle im fertigen Video (Zeilenbeginn, echte Stimme).
-`controls_side` und `keep_view` kommen mit 1.12.7 → Versionszeile 1.12.7.
+Sources: `docs/anleitung.md` chapter 8 (dashboard card, YAML block) and 9 (wall tablet), the card in `frontend/src/card.ts`, its visual editor `frontend/src/card-editor.ts`, the options in `frontend/src/card-config.ts`, night dimming `frontend/src/kiosk.ts`, quality level / pixel ratio / `isLowEnd` in `frontend/src/viewer/viewer3d.ts`, performance display in `frontend/src/components/view3d.ts`, labels from `frontend/src/i18n.ts`. The preview `preview/index.html?card` shows the card editor on the left and the card on the right (like Home Assistant's card dialog). Creating it in Home Assistant itself is only said.
+Too much for 8 minutes in one piece → two parts: **a** = part 1 "Create and configure the card", **b** = part 2 "YAML, kiosk and old wall tablets". Time = position in the finished video (line start, real voice).
+`controls_side` and `keep_view` arrive with 1.12.7 → version line 1.12.7.
 
-## Karte anlegen (Kapitel 8, nur gesagt)
-- [x] a 0:12 · Dashboard bearbeiten, „Karte hinzufügen“, nach „NeonPlan“ suchen (gesagt über dem Karten-Editor)
-- [x] a 0:19 · Karte wird mit der Integration automatisch geladen, keine Ressource nötig
-- [x] a 0:24 · Visueller Editor: links Optionen, rechts Live-Vorschau; kein YAML nötig
-- [x] a 0:32 · Optionen auf dem Standard fehlen im YAML
+## Creating the card (chapter 8, only said)
+- [x] a 0:12 · Edit the dashboard, "Add card", search for "NeonPlan" (said over the card editor)
+- [x] a 0:19 · The card is loaded automatically with the integration, no resource needed
+- [x] a 0:24 · Visual editor: options on the left, live preview on the right; no YAML needed
+- [x] a 0:32 · Options at their defaults are missing from the YAML
 
-## Ansicht
-- [x] a 0:38 · „Etage“: „Ganzes Haus (Etage antippen zum Öffnen)“ / jede Etage (Liste gezeigt)
-- [x] a 0:45 · Start-Etage „Erdgeschoss“
-- [x] a 0:49 · „Größe“: „Feste Höhe“ / „Bildschirm füllen“ + Hinweis Panel-Ansicht (fill)
-- [x] a 0:59 · „Höhe (Pixel)“ 420 → 760 (height)
-- [x] a 1:05 · „Look“: Neon / Blueprint / Tag (theme)
-- [x] a 1:10 · „Akzentfarbe“ (Orange) und „Zurück zu Cyan“ (accent)
-- [x] a 1:17 · „Wände“: „Wände hoch“ / „Schnitt“ (walls)
-- [x] a 1:23 · „Qualität“: Auto / Tablet / Hoch + Hinweis „Tablet ist die sparsamste Stufe“ (quality)
-- [x] a 1:32 · Hoch: Lichtkegel unter Spots
-- [x] a 1:38 · „Etagen darunter“: Abgedunkelt / Gestapelt / Ausgeblendet am Obergeschoss gezeigt (floor_stack)
+## View
+- [x] a 0:38 · "Floor": "Whole house (tap a floor to open it)" / every floor (list shown)
+- [x] a 0:45 · Start floor "Ground floor"
+- [x] a 0:49 · "Size": "Fixed height" / "Fill the screen" + panel view hint (fill)
+- [x] a 0:59 · "Height (pixels)" 420 → 760 (height)
+- [x] a 1:05 · "Look": Neon / Blueprint / Day (theme)
+- [x] a 1:10 · "Accent colour" (orange) and "Back to cyan" (accent)
+- [x] a 1:17 · "Walls": "Tall walls" / "Cut" (walls)
+- [x] a 1:23 · "Quality": Auto / Tablet / High + hint "“Tablet” is the lightest setting" (quality)
+- [x] a 1:32 · High: light cones under spots
+- [x] a 1:38 · "Floors below": Dimmed / Stacked / Hidden shown on the upper floor (floor_stack)
 
-## Anzeigen
-- [x] a 1:52 · „Symbole“: Keine / Wichtige / Alle (markers)
-- [x] a 1:59 · „Heatmap“: Temperatur, Werte am Raumnamen, Normal (Feuchte/CO₂ genannt) (heatmap)
-- [x] a 2:07 · „Stromfluss“ / „Hologramme“: Schalter in der Karte / Immer an / Immer aus (flows, holograms); Energie Pro genannt
-- [x] a 2:16 · „Schalter in der Karte“ + Auswahl Wände, Etagen, Temperatur, Feuchte, CO₂ (controls)
-- [x] a 2:26 · Leiste in der Karte bedient (Temp. / Normal)
-- [x] a 2:31 · „Stern mit Zentral-Menü“, Menü geöffnet (central)
-- [x] a 2:37 · „Eigene Namen an den Symbolen“ (marker_names)
-- [x] a 2:42 · „Mit ausgeblendeten Bedienelementen starten“ + Auge holt alles zurück (controls_hidden)
-- [x] a 2:48 · „Bedienelemente ausblenden nach“ 10 s, echte 10 Sekunden gewartet, Berührung zeigt alles (controls_hide_after)
-- [x] a 2:59 · „Etagen als Mini-Ansichten“ mit Start-Etage eingeschaltet (floor_thumbs)
-- [x] a 3:08 · „Raumnamen anzeigen“ (room_names), „Energiewerte oben anzeigen (Energie Pro)“ (energy)
-- [x] a 3:15 · „Raum-Details beim Antippen“: Raumfenster; ohne Haken Raum nur gewählt + „Zurück“ (room_panel)
-- [x] a 3:29 · „Vollbild-Taste“ ⛶ oben rechts (fullscreen_button)
-- [x] a 3:37 · „Etagen in der Hausansicht auseinanderziehen“ (explode), „Dach beim Heranzoomen ausblenden“ (roof_fade)
-- [x] a 3:37 / b 2:12 · „Leistungsanzeige (Bilder pro Sekunde)“ (stats)
+## Display
+- [x] a 1:52 · "Markers": None / Important / All (markers)
+- [x] a 1:59 · "Heatmap": Temperature, values at the room name, Normal (humidity/CO₂ mentioned) (heatmap)
+- [x] a 2:07 · "Power flow" / "Holograms": switches in the card / Always on / Always off (flows, holograms); Energy Pro named
+- [x] a 2:16 · "Switches in the card" + selection of walls, floors, temperature, humidity, CO₂ (controls)
+- [x] a 2:26 · Bar in the card operated (Temp. / Normal)
+- [x] a 2:31 · "Star with the central menu", menu open (central)
+- [x] a 2:37 · "Own names at the markers" (marker_names)
+- [x] a 2:42 · "Start with the controls hidden" + the eye brings everything back (controls_hidden)
+- [x] a 2:48 · "Hide the controls after" 10 s, a real 10 seconds waited, touch shows everything (controls_hide_after)
+- [x] a 2:59 · "Floors as miniatures" with the start floor switched on (floor_thumbs)
+- [x] a 3:08 · "Show room names" (room_names), "Show energy values at the top (Energy Pro)" (energy)
+- [x] a 3:15 · "Room details on tap": room panel; without the checkbox the room is only selected + "Back" (room_panel)
+- [x] a 3:29 · "Full screen button" ⛶ at the top right (fullscreen_button)
+- [x] a 3:37 · "Pull floors apart in the house view" (explode), "Fade the roof out while zooming in" (roof_fade)
+- [x] a 3:37 / b 2:12 · "Performance display (frames per second)" (stats)
 
-## Funktionen
-- [x] a 3:46 · „Warnungen anzeigen“ (alerts)
-- [x] a 3:56 · „Bei neuer Warnung zum Raum springen“: Rauchmelder Küche, Karte springt (alert_jump)
-- [x] a 4:03 · „Szenen-Knöpfe im Raum“ (gezeigt bei a 3:22: Film, Kino, Lesen, Alles aus) (scenes)
-- [x] a 4:11 · „Bewegungsspur“ mit Uhrzeiten (motion_trail)
-- [x] a 4:16 · Knopf „Kameras“ → Kamera-Wand (camera_wall)
-- [x] a 4:23 · „Wetter draußen“ + „Wetter-Entität“, Regen gezeigt (weather, weather_entity)
-- [x] a 4:30 · Hinweis Pro-Erweiterungen
+## Functions
+- [x] a 3:46 · "Show warnings" (alerts)
+- [x] a 3:56 · "Jump to the room of a new warning": smoke detector in the kitchen, the card jumps (alert_jump)
+- [x] a 4:03 · "Scene buttons in the room" (shown at a 3:22: Movie, Cinema, Reading, All off) (scenes)
+- [x] a 4:11 · "Motion trail" with times (motion_trail)
+- [x] a 4:16 · Button "Cameras" → camera wall (camera_wall)
+- [x] a 4:23 · "Weather outside" + "Weather entity", rain shown (weather, weather_entity)
+- [x] a 4:30 · Hint about Pro extensions
 
-## Wandtablet (Kiosk)
-- [x] b 0:13 · „Zurück zur Startansicht nach“: Nie / 1 / 2 / 5 / 10 min (idle_return)
-- [x] b 0:24 · Hinweis: Karte schließt den Raum und zeigt die Startansicht
-- [x] b 0:31 · „Kamerafahrt als Bildschirmschoner“ (idle_orbit)
-- [x] b 0:37 · Bad geöffnet, echte Minute gewartet, Rückkehr + Kamerafahrt, Tipp beendet sie
-- [x] b 0:48 · „Nachtdimmung“: Aus / Nach Sonnenstand (Sonne unter Horizont → gedimmt) / Zeitraum (night)
-- [x] b 0:55 · „Zeitraum (z. B. 22:00-06:00)“ eingetragen
-- [x] b 1:01 · „Knopf zu einem Dashboard (Pfad)“ /lovelace/home, ⌂ in der Karte (dashboard)
-- [x] b 1:08 · „Beschriftung des Knopfs“ „Start“ (dashboard_label)
+## Wall tablet (kiosk)
+- [x] b 0:13 · "Back to the start view after": Never / 1 / 2 / 5 / 10 min (idle_return)
+- [x] b 0:24 · Hint: the card closes the room and shows the start view
+- [x] b 0:31 · "Camera turn as screensaver" (idle_orbit)
+- [x] b 0:37 · Bathroom opened, a real minute waited, return + camera turn, a tap ends it
+- [x] b 0:48 · "Night dimming": Off / By sun position (sun below the horizon → dimmed) / Time range (night)
+- [x] b 0:55 · "Time range (e.g. 22:00-06:00)" entered
+- [x] b 1:01 · "Button to a dashboard (path)" /lovelace/home, ⌂ in the card (dashboard)
+- [x] b 1:08 · "Label of the button" "Start" (dashboard_label)
 
-## YAML (Code-Editor, als Code-Karte gezeigt)
-- [x] b 1:13 · Umschalten auf den Code-Editor in Home Assistant (gesagt)
-- [x] b 1:19 · Jede Editor-Option hat ihre Zeile (floor, height, idle_return, idle_orbit, dashboard markiert)
-- [x] b 1:23 · floor: og + room: kind → Karte startet im Kinderzimmer (room, floor)
-- [x] b 1:30 · start_view: { theta, phi, radius } – Zeile aus Editor → Einstellungen → Startansicht
-- [x] b 1:39 · controls_side: right (1.12.7)
-- [x] b 1:47 · keep_view: true, Etagenwechsel per Mini-Ansicht (1.12.7)
-- [x] b 1:52 · buttons: label / icon / action / target, Knopf „Garten“ im Stern; Aktionen genannt
-- [x] b 1:59 · idle_return / controls_hide_after mit freien Sekunden
-- [ ] nicht einzeln gezeigt (aber in der Anleitung): explode/roof_fade/fill usw. als YAML-Zeilen – sie stehen im Editor und erzeugen dieselben Zeilen
+## YAML (code editor, shown as a code card)
+- [x] b 1:13 · Switch to the code editor in Home Assistant (said)
+- [x] b 1:19 · Every editor option has its line (floor, height, idle_return, idle_orbit, dashboard marked)
+- [x] b 1:23 · `floor: og` + `room: kind` → the card starts in the kids' room (room, floor)
+- [x] b 1:30 · `start_view: { theta, phi, radius }` – line from the editor → Settings → Start view
+- [x] b 1:39 · `controls_side: right` (1.12.7)
+- [x] b 1:47 · `keep_view: true`, floor change via miniature view (1.12.7)
+- [x] b 1:52 · `buttons`: label / icon / action / target, button "Garden" in the star; actions named
+- [x] b 1:59 · `idle_return` / `controls_hide_after` with free seconds
+- [ ] Not shown individually (but in the manual): `explode` / `roof_fade` / `fill` etc. as YAML lines – they are in the editor and produce the same lines
 
-## Alte und schwache Wandtablets (Kapitel 9)
-- [x] b 2:06 · „läuft auch auf alten, schwachen Wandtablets“; „Kein Rechnen im Leerlauf“
-- [x] b 2:12 · Leistungsanzeige „Ruhe (0 B/s)“ (groß eingeblendet)
-- [x] b 2:22 · Grund für jedes Bild (Farbeffekt einer Lampe)
-- [x] b 2:29 · Stufe Tablet: keine Muster, Schatten, Halos, Partikel; Animationen halbe Rate
-- [x] b 2:36 · Pixeldichte 1 statt bis zu 2 (Render-Skalierung) – Anzeige „Stufe Tablet, Pixeldichte 1“
-- [x] b 2:43 · Auto wählt Tablet auf Fire-Tablets / wenig Speicher / ≤ 4 Kerne
-- [x] b 2:50 · Tipp: Fully Kiosk Browser mit Hardwarebeschleunigung, Panel-Ansicht + „Bildschirm füllen“, Qualität Auto
-- [x] b 3:00 · Empfehlungsseite (Link in der Beschreibung)
-- [x] b 3:05 · Karte am Wandtablet: bildschirmfüllend, ausgeblendete Bedienelemente, Stufe Tablet
-- [x] b 3:12 · Hochkant: Raumfenster unten
+## Old and weak wall tablets (chapter 9)
+- [x] b 2:06 · "runs on old, weak wall tablets"; "no work while idle"
+- [x] b 2:12 · Performance display "At rest (0 fps)" (shown large)
+- [x] b 2:22 · Reason for every frame (colour effect of a lamp)
+- [x] b 2:29 · Tablet level: no patterns, shadows, halos or particles; animations at half rate
+- [x] b 2:36 · Pixel ratio 1 instead of up to 2 (render scaling) – display "tablet level, pixel ratio 1"
+- [x] b 2:43 · Auto picks Tablet on Fire tablets / little memory / ≤ 4 cores
+- [x] b 2:50 · Tip: Fully Kiosk Browser with hardware acceleration, panel view + "Fill the screen", quality Auto
+- [x] b 3:00 · Recommendation page (link in the description)
+- [x] b 3:05 · Card on the wall tablet: full screen, controls hidden, Tablet level
+- [x] b 3:12 · Portrait: room panel at the bottom

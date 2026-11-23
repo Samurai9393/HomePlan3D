@@ -48,7 +48,7 @@ test("an overhang set by hand covers what stands under it: walls there end under
 });
 
 test("an attic floor's walls end under the slope: knee walls at the eaves, gables up to the ridge", () => {
-  const floor: Floor = { ...newFloor("og", "OG", 2.75), height: 2.5, rooms: [rect("a", 0, 0, 8, 6)] };
+  const floor: Floor = { ...newFloor("og", "Upper floor", 2.75), height: 2.5, rooms: [rect("a", 0, 0, 8, 6)] };
   const under = (x: number, z: number) => {
     const y = roofUnderAt(building, x, z);
     return y === null ? null : y - floor.elevation;
@@ -69,7 +69,7 @@ test("an attic floor's walls end under the slope: knee walls at the eaves, gable
 
 test("a window stays below the slope", () => {
   const floor: Floor = {
-    ...newFloor("og", "OG", 2.75),
+    ...newFloor("og", "Upper floor", 2.75),
     height: 2.5,
     rooms: [rect("a", 0, 0, 8, 6)],
     openings: [{ id: "w", room_id: "a", edge: 0, offset: 4, width: 1, type: "window", sill: 0.3, height: 1.4, hinge: "left", leaves: 1, swing: "in", cover: null, contact: null, contact2: null, tilt: null }],
@@ -190,7 +190,7 @@ test("the roof opens right at a dormer's edge, and a wall meeting it steps up th
   assert.ok(roofUnderAt(b, dormer.x0 + 0.01, 0.1)! > main + 1);
   assert.ok(Math.abs(roofUnderAt(b, dormer.x1 + 0.01, 0.1)! - main) < 1e-9);
   // the #1051 rule still holds for a roof that is not a dormer on the covering slope (see roof-sections.test.ts)
-  const floor: Floor = { ...newFloor("og", "OG", 2.75), height: 2.5, rooms: [rect("a", 0, 0, 8, 6)] };
+  const floor: Floor = { ...newFloor("og", "Upper floor", 2.75), height: 2.5, rooms: [rect("a", 0, 0, 8, 6)] };
   const under = (x: number, z: number) => {
     const y = roofUnderAt(b, x, z, floor.elevation);
     return y === null ? null : y - floor.elevation;
@@ -221,7 +221,7 @@ test("a wall under a dormer whose front starts above the floor's height rises to
   const b = { settings: { roof: { ...building.settings.roof, sections: [section, dormer] } } };
   const mid = (dormer.x0 + dormer.x1) / 2;
   const window: Opening = { id: "w", room_id: "a", edge: 0, offset: mid, width: 0.8, type: "window", sill: 1.6, height: 1, hinge: "left", leaves: 1, swing: "in", cover: null, contact: null, contact2: null, tilt: null };
-  const floor: Floor = { ...newFloor("og", "OG", 2.75), height: 2.5, rooms: [rect("a", 0, 0, 8, 6)], openings: [window] };
+  const floor: Floor = { ...newFloor("og", "Upper floor", 2.75), height: 2.5, rooms: [rect("a", 0, 0, 8, 6)], openings: [window] };
   const under = (x: number, z: number) => {
     const y = roofUnderAt(b, x, z, floor.elevation);
     return y === null ? null : y - floor.elevation;

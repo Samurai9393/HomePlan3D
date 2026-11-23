@@ -7,8 +7,8 @@ import { historyRequest, locationLike, personalDevices } from "./classify.ts";
 function hass(): HomeAssistant {
   const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
   return {
-    language: "de",
-    areas: { schlafzimmer: { area_id: "schlafzimmer", name: "Schlafzimmer" } },
+    language: "en",
+    areas: { schlafzimmer: { area_id: "schlafzimmer", name: "Bedroom" } },
     devices: {
       phone: { id: "phone", area_id: "schlafzimmer" },
       car: { id: "car", area_id: "schlafzimmer" },
@@ -42,7 +42,7 @@ test("privacy: places and the devices people carry are never fetched, they read 
   const h = hass();
   const building = emptyBuilding();
   const floor = newFloor("eg", "EG", 0);
-  floor.rooms.push({ id: "r1", name: "Schlafzimmer", area_id: "schlafzimmer", points: [[0, 0], [4, 0], [4, 4], [0, 4]] } as never);
+  floor.rooms.push({ id: "r1", name: "Bedroom", area_id: "schlafzimmer", points: [[0, 0], [4, 0], [4, 4], [0, 4]] } as never);
   building.floors = [floor];
   assert.equal(locationLike(h, "sensor.pixel_geocoded_location"), true);
   assert.equal(locationLike(h, "sensor.ev_position"), true);

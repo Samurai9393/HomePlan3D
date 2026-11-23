@@ -1,8 +1,8 @@
-// Records frames of the preview (invented demo data) for the Energie Pro video: the house with the
+// Records frames of the preview (invented demo data) for the Energy Pro video: the house with the
 // hologram over the solar field, a slow turn, the cables with their comets, the ground floor with a
 // device hologram, then back to the house and the hologram folds. Captions go into captions.json
 // (frame ranges) for tools/make-video.py, which writes the MP4.
-// Usage (from frontend/): node record-energy.mjs <frame-dir> [de|en]
+// Usage (from frontend/): node record-energy.mjs <frame-dir>
 
 import { createServer } from "node:http";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -11,7 +11,6 @@ import puppeteer from "puppeteer-core";
 
 const root = resolve(import.meta.dirname, "..");
 const outDir = resolve(process.argv[2] ?? "energy-frames");
-const lang = process.argv[3] ?? "de";
 mkdirSync(outDir, { recursive: true });
 
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".png": "image/png", ".json": "application/json" };
@@ -25,7 +24,7 @@ const server = createServer((req, res) => {
   res.writeHead(200, { "content-type": TYPES[extname(file)] ?? "application/octet-stream" }).end(readFileSync(file));
 });
 await new Promise((ok) => server.listen(0, "127.0.0.1", ok));
-const url = `http://127.0.0.1:${server.address().port}/preview/index.html?lang=${lang}&flows&pv=5400`;
+const url = `http://127.0.0.1:${server.address().port}/preview/index.html?lang=en&flows&pv=5400`;
 
 const executablePath = [process.env.CHROME_PATH, "C:/Program Files/Google/Chrome/Application/chrome.exe", "/usr/bin/google-chrome"].filter(Boolean).find((p) => existsSync(p));
 const browser = await puppeteer.launch({ executablePath, headless: true, args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"] });
@@ -35,10 +34,7 @@ await page.goto(url, { waitUntil: "networkidle0", timeout: 120000 });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 await sleep(2500);
 
-const T = {
-  de: ["Energie Pro – dein Strom, sichtbar", "Glas-Hologramm mit Live-Bilanz", "Leitungen zeigen, wohin der Strom fließt", "Module leben mit der Sonne", "Geräte-Hologramme – auch ohne Solaranlage", "Antippen klappt zusammen", "Läuft auch auf alten Wandtablets"],
-  en: ["Energy Pro – your power, made visible", "Glass hologram with the live balance", "Cables show where the power flows", "Modules live with the sun", "Device holograms – also without solar", "Tap to fold", "Runs on old wall tablets too"],
-}[lang];
+const T = ["Energy Pro – your power, made visible", "Glass hologram with the live balance", "Cables show where the power flows", "Modules live with the sun", "Device holograms – also without solar", "Tap to fold", "Runs on old wall tablets too"];
 const captions = [];
 let n = 0;
 const caption = (text) => {
@@ -94,14 +90,14 @@ const tapHolo = () =>
   });
 
 // the house centred like the screenshots: through the editor's fit, then the 3D house view, floors stacked
-await clickText(lang === "de" ? "Editor" : "Editor");
+await clickText("Editor");
 await sleep(1500);
 await inEditor("e.fit();");
 await sleep(800);
 await clickText("3D");
 await sleep(800);
-await clickText(lang === "de" ? "Alle Etagen" : "All floors");
-await clickText(lang === "de" ? "Gestapelt" : "Stacked");
+await clickText("All floors");
+await clickText("Stacked");
 await sleep(600);
 
 const A = { theta: 1.1, phi: 0.9, radius: 26 };
@@ -124,7 +120,7 @@ await glide(D, E, 30);
 await hold(22);
 await glide(E, A, 26);
 caption(T[4]);
-await clickText(lang === "de" ? "Erdgeschoss" : "Ground floor");
+await clickText("Ground floor");
 await sleep(900);
 const F = { theta: 0.25, phi: 1.2, radius: 11 };
 const G = { theta: 0.6, phi: 1.05, radius: 9 };
@@ -133,7 +129,7 @@ await hold(10);
 await glide(F, G, 36);
 await hold(20);
 caption(T[5]);
-await clickText(lang === "de" ? "Alle Etagen" : "All floors");
+await clickText("All floors");
 await sleep(900);
 await view(B);
 await hold(12);

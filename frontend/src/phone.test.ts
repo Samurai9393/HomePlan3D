@@ -7,16 +7,16 @@ const tile = (floorId: string, roomId: string, on = 0): RoomTile => ({ floorId, 
 
 test("the floors with rooms, the lowest first, with their lights on", () => {
   const floors = navFloors(
-    [{ id: "og", name: "OG", elevation: 2.75 }, { id: "eg", name: "EG", elevation: 0 }, { id: "roof", name: "Dach", elevation: 5.5 }],
+    [{ id: "og", name: "Upper floor", elevation: 2.75 }, { id: "eg", name: "Ground floor", elevation: 0 }, { id: "roof", name: "Roof", elevation: 5.5 }],
     [tile("og", "bed", 1), tile("eg", "living", 2), tile("eg", "kitchen", 1)],
   );
   assert.deepEqual(floors.map((f) => [f.id, f.rooms.length, f.lightsOn]), [["eg", 2, 3], ["og", 1, 1]]);
 });
 
 test("two floors get a place each, one or three share the place Rooms; no blinds, no place for them", () => {
-  const two = navFloors([{ id: "eg", name: "EG", elevation: 0 }, { id: "og", name: "OG", elevation: 3 }], [tile("eg", "a", 2), tile("og", "b")]);
+  const two = navFloors([{ id: "eg", name: "Ground floor", elevation: 0 }, { id: "og", name: "Upper floor", elevation: 3 }], [tile("eg", "a", 2), tile("og", "b")]);
   assert.deepEqual(navSlots(two, 1, 4, true).map((s) => [s.id, s.badge]), [["now", 1], ["floor:eg", 2], ["floor:og", 0], ["covers", 4], ["more", 0]]);
-  const one = navFloors([{ id: "eg", name: "EG", elevation: 0 }], [tile("eg", "a", 2)]);
+  const one = navFloors([{ id: "eg", name: "Ground floor", elevation: 0 }], [tile("eg", "a", 2)]);
   assert.deepEqual(navSlots(one, 0, 0, false).map((s) => s.id), ["now", "rooms", "more"]);
   const three = navFloors([{ id: "a", name: "A", elevation: 0 }, { id: "b", name: "B", elevation: 3 }, { id: "c", name: "C", elevation: 6 }], [tile("a", "x", 1), tile("b", "y", 1), tile("c", "z", 1)]);
   assert.deepEqual(navSlots(three, 0, 0, true).map((s) => [s.id, s.badge]), [["now", 0], ["rooms", 3], ["covers", 0], ["more", 0]]);

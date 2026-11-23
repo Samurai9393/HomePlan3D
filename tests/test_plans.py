@@ -53,7 +53,7 @@ async def test_create_copy_rename_order_and_save(hass: HomeAssistant, hass_ws_cl
     _main_stored(hass_storage)
     await _setup(hass)
     client = await hass_ws_client(hass)
-    empty = (await _ws(client, type="homeplan3d/plans/create", name="Gartenhaus", icon="🌳"))["result"]["plan"]
+    empty = (await _ws(client, type="homeplan3d/plans/create", name="Garden shed", icon="🌳"))["result"]["plan"]
     copied = (await _ws(client, type="homeplan3d/plans/create", name="Kopie", copy_of="main"))["result"]["plan"]
     assert empty != copied and empty.startswith("p")
 
@@ -78,11 +78,11 @@ async def test_create_copy_rename_order_and_save(hass: HomeAssistant, hass_ws_cl
     assert main["building"]["floors"][0]["name"] == "Ground floor"
     assert f"{STORAGE_KEY_BUILDING}.{copied}" in hass_storage
 
-    assert (await _ws(client, type="homeplan3d/plans/update", plan="main", name="Haus"))["success"]
+    assert (await _ws(client, type="homeplan3d/plans/update", plan="main", name="House"))["success"]
     assert (await _ws(client, type="homeplan3d/plans/order", plans=[empty, "main", copied]))["success"]
     listed = (await _ws(client, type="homeplan3d/plans/list"))["result"]
     assert [p["id"] for p in listed["plans"]] == [empty, "main", copied]
-    assert listed["plans"][1]["name"] == "Haus" and listed["plans"][0]["icon"] == "🌳"
+    assert listed["plans"][1]["name"] == "House" and listed["plans"][0]["icon"] == "🌳"
 
     # an unknown plan is refused
     missing = await _ws(client, type="homeplan3d/building/get", plan="nope")
@@ -114,7 +114,7 @@ async def test_the_bin_is_emptied_after_thirty_days(hass: HomeAssistant, hass_st
             "plans": [{"id": "main", "name": None}],
             "trash": [
                 {"id": "pold", "name": "Alt", "deleted_at": old},
-                {"id": "pnew", "name": "Neu", "deleted_at": time.time()},
+                {"id": "pnew", "name": "New", "deleted_at": time.time()},
             ],
         },
     }

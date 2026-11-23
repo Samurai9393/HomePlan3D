@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to HomePlan 3D. Full release notes in German and English are kept in the
+All notable changes to HomePlan 3D. Full release notes are kept in the
 historical archive under `docs/release-*.md`. Ideas and bugs are tracked in this repository.
 
 > **Current state:** HomePlan 3D is fully MIT open source. Every feature is free and enabled by
@@ -86,9 +86,9 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 - **Fly in from space (option):** when the view opens, a neon globe turns to your home, a beam marks it and the camera comes down onto the house. Off by default; a tap skips it.
 
 ### New in the Pro add-ons
-- **Kamera-Cockpit – People from cameras:** a person, car or animal a camera sees stands as a figure on the plot; with Frigate right where it is and moving along.
-- **Klang & Kino – Music follows you:** the music walks with you from room to room (Music Assistant); notes fly between the speakers.
-- **Haushalt Pro – Clean right here:** tap a spot in the 3D view and the robot vacuum cleans exactly there (Roborock, Dreame, Xiaomi).
+- **Camera Cockpit – People from cameras:** a person, car or animal a camera sees stands as a figure on the plot; with Frigate right where it is and moving along.
+- **Sound & Cinema – Music follows you:** the music walks with you from room to room (Music Assistant); notes fly between the speakers.
+- **Household Pro – Clean right here:** tap a spot in the 3D view and the robot vacuum cleans exactly there (Roborock, Dreame, Xiaomi).
 
 ### Fixed
 - **Dormers:** in the house view a dormer's walls lift and fade with the roof again – a box stood in the room below while the roof was lifted (#1167, thanks 1970lexi).
@@ -110,7 +110,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 ## 3.4.3
 
 ### Fixed
-- **Klang & Kino:** the now-playing glass card shows in an opened room too – before, a setting of Energy Pro hid every card there, and without Energy Pro it could not be switched on; a speaker's symbol steps aside for its card only while the card can show, so the symbol no longer vanishes with no card in its place (thanks to a report by e-mail, #911).
+- **Sound & Cinema:** the now-playing glass card shows in an opened room too – before, a setting of Energy Pro hid every card there, and without Energy Pro it could not be switched on; a speaker's symbol steps aside for its card only while the card can show, so the symbol no longer vanishes with no card in its place (thanks to a report by e-mail, #911).
 
 ## 3.4.2
 
@@ -321,8 +321,8 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 - **Duplicate floor** in the floor settings: rooms, walls, windows, doors and furniture once more on top of the house, without the links to Home Assistant (#443).
 - **Top-hung windows** that open outwards at the bottom, common in Scandinavia (#327).
 - **Lift-and-slide doors and sliding windows** (new presets, window style "Sliding"): one pane stands, the other slides in front of it as far as its contact says (#397, #361 and their many duplicates).
-- Kamera-Cockpit: a camera can **pop up its picture** for 20 seconds when it detects something new; a tap looks through it (#442).
-- Durchsagen and Das Haus antwortet are out of the beta.
+- Camera Cockpit: a camera can **pop up its picture** for 20 seconds when it detects something new; a tap looks through it (#442).
+- Announcements and The house answers are out of the beta.
 - **Walk from a room:** a room's panel has a 🚶 button that starts the walk right in that room – with the panel open, the walk button at the top right is hidden (#950, thanks PetrMa).
 
 ### Fixed
@@ -373,7 +373,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 - **Small items could not be moved (#908):** their corner handles left no room to grab them; the handles now sit outside small pieces. Thanks to @vincegre!
 - **Camera wedge (#901):** it turns red on motion alone, not only after a lamp on the floor changed. Thanks to @apalm8!
 - **Window light outside (#893):** the light falling out of a window lies on the ground under it instead of disappearing when zooming in. Thanks to @1970lexi!
-- **Modules may light an item's top plate (#917):** for Wärme Pro's status glow. Thanks to @grzegorz914!
+- **Modules may light an item's top plate (#917):** for Heat Pro's status glow. Thanks to @grzegorz914!
 
 ## 2.2.0
 
@@ -385,7 +385,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 - **Right click goes one step back** (⭐ → ⚙ Settings → Controls, off by default): a short right click in the 3D view closes the room or goes from the floor back to the house, like a double tap on empty space. Idea from ProvUK's fork.
 - **Sloping free-standing walls (#834):** a wall drawn with the wall tool can now fall in height from one end to the other, like a room wall – "◢ Sloping" in the wall's form, with a height at each end. Thanks to @daene85!
 - **Sun arc around the whole plot (#833):** the sun arc and compass ring can stand around everything drawn – rooms, outdoor areas, fences and free walls – instead of only the house (⭐ → ⚙ Settings → Look, or the editor's settings: "Sun arc around: the whole plot"); the house stays the default. Thanks to @grzegorz914!
-- **Energy cables: a cable hub of your own and the inverter cable to the grid point (#841):** with Energie Pro the cables can meet at a point of their own, set with a tap in the plan (the house board, while the meter stands at the grid connection), and the checklist counts it as done; an inverter's cable can end at the grid point instead of the meter. Plans without these settings stay as they were. Thanks to @grzegorz914!
+- **Energy cables: a cable hub of your own and the inverter cable to the grid point (#841):** with Energy Pro the cables can meet at a point of their own, set with a tap in the plan (the house board, while the meter stands at the grid connection), and the checklist counts it as done; an inverter's cable can end at the grid point instead of the meter. Plans without these settings stay as they were. Thanks to @grzegorz914!
 - **Overhang per side (#863):** a roof section's form can set the overhang of each side by hand ("Overhang per side"); off, it stays automatic.
 
 ### Fixed
@@ -402,7 +402,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 
 - **Voice control knows where the tablet hangs** (⚙ Settings → 🎙 Voice control → Room of this device, empty by default): on a tablet with a room, sentences without a room name apply to that room – "Lights on", "Turn off the lights here" or "Close the blinds". On a dashboard the card has the same choice (Features → Room for "here", YAML `voice_area: <area id>`). A room you name still wins. Home Assistant's Assist hears the sentence as said in that room's area, as from a voice satellite there.
 - **Slovenčina – Slovak (#870):** NeonPlan now speaks Slovak, the 19th language (fetched only when Home Assistant runs in Slovak). Thanks to @Havinko1991 for the setup texts!
-- **The size of the glass cards for everyone:** ⭐ → ⚙ Settings → Look → "Size of the glass cards" sets how large the energy, heat pump, car and device cards are – before, only the Energie Pro settings in the editor offered it.
+- **The size of the glass cards for everyone:** ⭐ → ⚙ Settings → Look → "Size of the glass cards" sets how large the energy, heat pump, car and device cards are – before, only the Energy Pro settings in the editor offered it.
 - **More of the card in its visual editor:** start room, 3D lock, keep view, walk on or off, controls left or right, and the time travel's range and speed – no YAML needed for them any more.
 
 ### Fixed
@@ -472,7 +472,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 - **Camera shown as furniture (#779):** the chosen model is the camera's look – one item that replaces the last one, moves and turns with the camera and goes with it; the built-in camera model hides, and "Built-in camera model" brings it back. Thanks to @EduK85!
 - **Editor error "Cannot convert undefined or null to object":** the selected room, door or item not on the floor shown made the editor throw (usage reports, ~20 installations).
 - **Room panel with a removed entity:** an entity placed in the plan but removed from Home Assistant no longer breaks the panel.
-- **Wärme Pro's lists on the PC (#815):** a module's form is made only when the plan or the devices change; the lists closed at once and the CPU load went up. Thanks to @frops83!
+- **Heat Pro's lists on the PC (#815):** a module's form is made only when the plan or the devices change; the lists closed at once and the CPU load went up. Thanks to @frops83!
 - **Paused players' cards (#815):** a paused card goes after ten minutes (Echos stay paused for hours). Thanks to @frops83!
 - **Smart Home pack sensors (#810):** the pack's sensor models link to any binary_sensor or sensor, also without a class (Local Tuya). Thanks to @vinimeca!
 - **Importing a too large full backup:** instead of "[object Object]" the message names the reason (a full backup with many packs can be larger than Home Assistant takes in one go – share plans with **Export plan**).
@@ -529,7 +529,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 
 ### Fixed
 
-- **Energie Pro: cables to the devices are back when rooms are drawn a little apart (#731).** The cables run from room to room through shared walls; rooms drawn with a small gap between them (a stairwell, a hallway) cut the way, and only the grid cable was left. Gaps up to about a metre are now bridged; a detached building further away is still not wired through the garden. Thanks to @netrunnercs!
+- **Energy Pro: cables to the devices are back when rooms are drawn a little apart (#731).** The cables run from room to room through shared walls; rooms drawn with a small gap between them (a stairwell, a hallway) cut the way, and only the grid cable was left. Gaps up to about a metre are now bridged; a detached building further away is still not wired through the garden. Thanks to @netrunnercs!
 - **Gas and water meters from the Utilities pack take their reading (#730):** the "Gas meter with pulse reader" and "Water meter with reader" asked for a power sensor in W; they now offer a meter reading in m³ or litres, shown at the symbol. Thanks to @PetrMa!
 - **Window watch and roof windows (#712):** a roof window opened by its window motor counted as shut for the window watch and the spoken answers (the 3D view showed it open). Thanks to @frops83!
 - **Front doors with glass show the pane from both sides (#712):** from outside the solid leaf hid it.
@@ -538,11 +538,11 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 - **Located people show without a tracker of their own (#744):** a Home Assistant person with no tracker (state "unknown") counted as away, so the figure of a person located at home stayed hidden. Thanks to @marcus2k9!
 - **Pets walk smoothly again on phones and tablets (#752):** on the tablet level they moved at 5 frames a second and stood still after half a minute; now about 15, and they keep walking while the view rests. Thanks to @Deninho91!
 - **A light's power is its own (#743):** where one device carries several lights (an actuator, PowerCalc), every light got the device's first power sensor – a bathroom light's power showed in the office. Now PowerCalc's sensor named after the light comes first, else one in the light's room. Thanks to @daene85!
-- **Wärme Pro (release 5): "heating since" tells the real time (#735)** – a card opened while the heat pump was already heating said "since 0 min"; a target of 0 °C (none reported) is no longer shown. Thanks to @tomv79! **Towel radiators** of the bath pack now get their heating pipes like other radiators (the electric one stays without, #751). Thanks to @holle021272!
+- **Heat Pro (release 5): "heating since" tells the real time (#735)** – a card opened while the heat pump was already heating said "since 0 min"; a target of 0 °C (none reported) is no longer shown. Thanks to @tomv79! **Towel radiators** of the bath pack now get their heating pipes like other radiators (the electric one stays without, #751). Thanks to @holle021272!
 
 ### Live Presence
 
-- **People stand where a presence zone says:** when a presence sensor of the room (such as an Aqara FP2 with zones) reports its "Sofa" or "Sessel" zone as occupied, the person's figure stands at that sofa or armchair instead of in the middle of the room. Zones are matched to furniture of the room by name – built-in and pack furniture, or the furniture's own name. A door zone ("Entrance hall", "Terrace door") places the figure just inside the room in front of the door to the room of that name, or of a door to the outside; "rest of the room" keeps the middle.
+- **People stand where a presence zone says:** when a presence sensor of the room (such as an Aqara FP2 with zones) reports its "Sofa" or "Armchair" zone as occupied, the person's figure stands at that sofa or armchair instead of in the middle of the room. Zones are matched to furniture of the room by name – built-in and pack furniture, or the furniture's own name. A door zone ("Entrance hall", "Terrace door") places the figure just inside the room in front of the door to the room of that name, or of a door to the outside; "rest of the room" keeps the middle.
 
 ## 2.0.2
 
@@ -612,7 +612,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 
 - **Awnings without a marker** (#688, thanks @fammastrodaiuto): a copied awning keeps its pin (two pieces of furniture on one entity each get one, like lamps), and a new awning over a terrace or garden area finds that area's awning cover by itself (never a roller blind).
 
-### Haushalt Pro
+### Household Pro
 
 - **Out of beta:** Household Pro is now included for everyone and enabled by default.
 
@@ -635,7 +635,7 @@ Polished with the wishes of the beta testers - thanks to MacGywer, Frops, Obaid,
 ### Fixed
 
 - **Door with a smart lock showed a roller shutter:** a blind's position sensor that stayed in the door's data after the drive was set to *None* (or after a window was turned into a door) lowered a shutter over it; the position sensor now only counts with a blind (#682, thanks @ciechompl).
-- **Voice: "Zeige mir Garage" showed the outdoor area:** between names of the same length a room's own name now wins over an outdoor area's, and own names over further names (the Home Assistant area's name, aliases), so the room "Garage" in the cellar is no longer lost to a driveway linked to the garage's area (#668, thanks @1970lexi).
+- **Voice: "Show me garage" showed the outdoor area:** between names of the same length a room's own name now wins over an outdoor area's, and own names over further names (the Home Assistant area's name, aliases), so the room "Garage" in the cellar is no longer lost to a driveway linked to the garage's area (#668, thanks @1970lexi).
 - **Wall lamps from furniture packs:** the halo and the light now sit in the lamp's glowing parts (the lantern's glass) instead of floating in front of it; pack lamps without glowing parts are unchanged (#680, thanks @LiveSide).
 
 ## 1.25.0
@@ -667,7 +667,7 @@ Polished with the wishes of the beta testers - thanks to MacGywer, Frops, Obaid,
 - The 3D lock keeps the saved start views of the house, floors and rooms: flying to one takes its own angle (#645, thanks @frops83).
 - Setting the first **State from** entity to *none* moves the second one up instead of leaving it active but hidden in the form (#645, thanks @frops83).
 - The workshop light and other flat ceiling lights from packs get the **Height above floor** field (#645, thanks @frops83).
-- The tags on bins, mailboxes and plants (Haushalt Pro) grow with the symbol size like the pins' labels (#645, thanks @frops83).
+- The tags on bins, mailboxes and plants (Household Pro) grow with the symbol size like the pins' labels (#645, thanks @frops83).
 - The heat pump's indoor unit, gas boiler, buffer tank and water heater from the packs take a `water_heater` entity; the pin shows its mode and water temperature (#645, thanks @frops83).
 - Entities hidden or disabled in Home Assistant are no longer picked automatically (e.g. a robot vacuum for its dock); one placed in a room before stays in the editor's device list so it can be removed or hidden (#645, thanks @frops83).
 - Two roofs meeting at a right angle form a proper valley: a wing running into the slope of a higher roof reaches on into it and ends at its surface instead of standing up with a gable (#605, thanks @holle021272).
@@ -704,7 +704,7 @@ Polished with the wishes of the beta testers - thanks to MacGywer, Frops, Obaid,
 ### Fixed
 
 - **Clock** (#642): the clock stood at the top left whatever corner was chosen – the corner styles were missing.
-- **Assist sentences** (#641): by default NeonPlan now registers only distinct sentences ("Zeig …", "Geh …", "Frag das Haus …", "NeonPlan, …", "Guten Morgen", "Gute Nacht"), so questions Home Assistant answers itself ("welche Fenster sind offen", "wo ist …") stay with Home Assistant. **⚙ Settings → Voice control → Sentences for Assist** switches to all questions or to none (the sentence file is removed). "Frag das Haus, welche Fenster offen sind" always reaches NeonPlan.
+- **Assist sentences** (#641): by default NeonPlan now registers only distinct sentences ("Show …", "Go …", "Ask the house …", "NeonPlan, …", "Good morning", "Good night"), so questions Home Assistant answers itself ("which windows are open", "where is …") stay with Home Assistant. **⚙ Settings → Voice control → Sentences for Assist** switches to all questions or to none (the sentence file is removed). "Ask the house which windows are open" always reaches NeonPlan.
 - **Smart locks** (#645): the lock's pin at the door shows its text (locked / open) again – the symbol mode took it away; a terrace door (a window down to the floor) takes a lock too.
 - **Look Auto / Day** (#645): the day look keeps more of the shading and the hue, so furniture and devices stand out instead of washing out.
 - **Roof windows** (#645): their glass is as see-through as the windows in the walls, no more.
@@ -714,30 +714,30 @@ Polished with the wishes of the beta testers - thanks to MacGywer, Frops, Obaid,
 ### New
 
 - **⚙ Settings menu in the editor:** everything that belongs to the whole plan – house (walls, grid, units, north), weather & warnings, live director, voice control, favourites, background, ground, backup and modules – sits in one menu in the toolbar; each topic opens as a dialog over the plan, also while something is selected. The side bar without a selection keeps the rooms, the floor-plan picture and help. The roof's shape, ridge, pitch and overhang moved to the roof tool; the start view is remembered in the 3D view's settings (📌).
-- **Modules:** NeonPlan can load code from local packs ("Modul von …" on the extensions page). The first module answers spoken questions ("Was ist offen?", "Wo ist es kalt?", "Läuft die Waschmaschine?", "Was zieht Strom?") in the house and out loud through the Assist pipeline's text-to-speech. Module code is reviewed and approved by an administrator before it runs.
-- **Ask through Assist:** everything voice control understands can be said to a voice satellite, the Assist dialog or the app – the sentences (`custom_sentences/de|en/homeplan3d.yaml`, written on start) hand "Zeig das Wohnzimmer" or "Was ist offen?" to every open NeonPlan view; the first answer goes back to Assist, which speaks it where it was asked. The service `homeplan3d.ask` (text, screen, speak) does the same from automations and returns the answer. Views can carry a **screen name** (voice settings, card option `screen`) so a sentence reaches one tablet only.
-- **Further names** for rooms, furniture and placed devices ("Smart TV Pro" also as "Wohnzimmerfernseher" or "Glotze"), for voice control and the search.
+- **Modules:** NeonPlan can load code from local packs ("Module from …" on the extensions page). The first module answers spoken questions ("What is open?", "Where is it cold?", "Is the washing machine running?", "What is drawing power?") in the house and out loud through the Assist pipeline's text-to-speech. Module code is reviewed and approved by an administrator before it runs.
+- **Ask through Assist:** everything voice control understands can be said to a voice satellite, the Assist dialog or the app – the sentences (`custom_sentences/de|en/homeplan3d.yaml`, written on start) hand "Show the living room" or "What is open?" to every open NeonPlan view; the first answer goes back to Assist, which speaks it where it was asked. The service `homeplan3d.ask` (text, screen, speak) does the same from automations and returns the answer. Views can carry a **screen name** (voice settings, card option `screen`) so a sentence reaches one tablet only.
+- **Further names** for rooms, furniture and placed devices ("Smart TV Pro" also as "living room TV" or "telly"), for voice control and the search.
 - Modules have their own home: **⚙ Settings → 🧩 Module** lists them and imports a module file; the extensions page gets a **Module** section of its own next to the furniture packs.
 - **Modules may draw:** a module adds water, pipe flows and device glows to the 3D stage, glass cards, warnings and fields in the editor's outdoor form, and lends the pipe tools their rules – the host draws, the module knows (`scene`, `cards`, `alerts`, `areaFields`, `pipes`, `watched`, `pools`; module kind `stage`).
 - **No restart for the frontend:** the bundles, languages and pictures are served with `Cache-Control: no-cache` – after an update of the files a reload of the page is enough (Home Assistant still restarts for its Python side); a 304 answers unchanged files.
-- **Window watch module:** warns when a window stands open in the cold for 20 minutes or the heating runs with a window open (10 minutes); the room pulses, the voice answers "Welche Fenster sind zu lange offen?". Manual 7.5 lists the modules.
-- Module **Das Haus antwortet**, release 2: around forty kinds of questions – open things (also how long), temperatures, humidity and CO₂, thermostats, appliances and their time left (Haushalt Pro), media, energy, lights, blinds, locks, people and motion, warnings, today's household lines, plants, cars (Auto Pro), weather, sun and time, the house's rooms and sizes, the morning report ("Guten Morgen") and the night check ("Gute Nacht"), plus a little small talk. Hosts tell modules more of the house (household, warnings, cars, pools, weather, time left, thirsty plants).
+- **Window watch module:** warns when a window stands open in the cold for 20 minutes or the heating runs with a window open (10 minutes); the room pulses, the voice answers "Which windows have been open too long?". Manual 7.5 lists the modules.
+- Module **The house answers**, release 2: around forty kinds of questions – open things (also how long), temperatures, humidity and CO₂, thermostats, appliances and their time left (Household Pro), media, energy, lights, blinds, locks, people and motion, warnings, today's household lines, plants, cars (Car Pro), weather, sun and time, the house's rooms and sizes, the morning report ("Good morning") and the night check ("Good night"), plus a little small talk. Hosts tell modules more of the house (household, warnings, cars, pools, weather, time left, thirsty plants).
 
 ### Improved
 
 - **Smart locks on doors** (D636): a door gets its lock entity; a pin at the door shows locked or open (red while unlocked), a tap locks or unlocks.
 - **Radiators with a heat sensor** (D637): Tuya valves and others that report heating as a separate "work state" sensor glow with it.
 - **Clock in the view** (D631): date and time in a corner of your choice, per device in the view settings and as card option `clock`.
-- **Editor start floor** (D418): ⚙ House → "Start-Etage im Editor".
-- **Pinboard in "Heute im Haushalt"** (D628): a text helper's lines stand at the top of the household card – automations write into it.
+- **Editor start floor** (D418): ⚙ House → "Start floor in the editor".
+- **Pinboard in "Today in the household"** (D628): a text helper's lines stand at the top of the household card – automations write into it.
 - **iPad / iPhone** (#635, #633): a finger on the house no longer swipes the dashboard to another view or back; the full-screen button spreads the card over the page where the browser has no full-screen mode (the Home Assistant app on iOS).
 - Look **Auto**: Day while the sun is up, Neon after sunset – in the view settings and as card option `theme: auto` (D623).
 - Editor: the side bar can be dragged wider or narrower at its left edge; the width is remembered (#620).
 - Electric furniture: an **extra value at the symbol** – a sensor (a gas boiler's water temperature) shown at the item's pin (D619).
 - Symbol mode **In the room**: an open room shows every symbol of that room, not only the important ones (D477, found by haddung).
-- Voice control: compounds are understood ("Auffahrtkamera" finds the camera "Auffahrt"); the voice settings list what NeonPlan understands, with the sentences of installed modules.
+- Voice control: compounds are understood ("driveway camera" said as one word finds the camera "Driveway"); the voice settings list what NeonPlan understands, with the sentences of installed modules.
 - Voice control: a bigger microphone button.
-- Voice control: furniture can be asked for by its kind ("Zeig den Trockner"), its own name and everyday words ("TV", "Glotze", "Heizung", "Auto"), with or without an entity; a sensor called "Waschmaschine Leistung" answers to "Waschmaschine"; with several of a kind the one in the room named wins.
+- Voice control: furniture can be asked for by its kind ("Show the dryer"), its own name and everyday words ("TV", "telly", "heating", "car"), with or without an entity; a sensor called "Washing machine power" answers to "washing machine"; with several of a kind the one in the room named wins.
 
 ### Fixed
 
@@ -797,7 +797,7 @@ Polished with the wishes of the beta testers - thanks to MacGywer, Frops, Obaid,
 
 - Old wall tablets (Fire 7 and other WebViews before Chrome 108): the NeonPlan page lost its height since 1.18.2 and showed an empty 3D view; the height for newer browsers now only applies where they know it. The editor's arrow keys no longer use a function those WebViews lack, and the build refuses such functions. Spotted in the CasaNeon fork (diegood).
 - Waste bins (Household Pro): a bin emptied every two or four weeks showed nothing when its next pickup was more than 10 days away – the calendar is now read six weeks ahead (#585).
-- Waste bins: a sensor whose text holds another number ("Restabfalltonne 2-wöchentlich in 4 Tagen") showed that number instead of the days (D576).
+- Waste bins: a sensor whose text holds another number ("Residual waste bin every 2 weeks in 4 days") showed that number instead of the days (D576).
 - Waste bins: across the change to winter time the pickup day shown on a tap was one day early (D576).
 - Extensions: a user whose beta add-on was not yet available saw a misleading notice; now the beta is shown as available, and a waiting beta pack says to install it (#583).
 
@@ -973,7 +973,7 @@ Polished with the wishes of the beta testers - thanks to MacGywer, Frops, Obaid,
 
 - **Walk through the house:** the 🚶 Walk button (top right) puts you at eye height into a room; drag to look, tap the floor to walk there (through doors), W A S D / arrows or a touch stick; walls stop you; `walk: false` hides it in the card.
 - **Thermostats as room temperature:** a room without its own temperature or humidity sensor takes its thermostat's `current_temperature` / `current_humidity` (room cards, heatmap, room panel); thermostats can be chosen as the room's sensor (#478).
-- **Energie Pro:** a side bar in the wall view puts the meter, inverter, home battery and wallbox straight onto the wall shown.
+- **Energy Pro:** a side bar in the wall view puts the meter, inverter, home battery and wallbox straight onto the wall shown.
 
 ### Fixed
 
@@ -1016,7 +1016,7 @@ Polished with the wishes of the beta testers - thanks to MacGywer, Frops, Obaid,
 
 - **Commands from glass cards** that Home Assistant refuses now show its error message at the bottom instead of failing silently (#400).
 - **A pool inside a lawn** was hidden by the lawn; every pool now cuts itself out of the area around it.
-- **Klang & Kino glass card:** ⏮, ▶/⏸ and ⏭ now act when the finger lifts – on some tablets the tap got lost while a speaker played (#400 by domodial).
+- **Sound & Cinema glass card:** ⏮, ▶/⏸ and ⏭ now act when the finger lifts – on some tablets the tap got lost while a speaker played (#400 by domodial).
 - **Full screen fills the whole screen** – an empty strip stayed at the bottom (#426 by rolandarends); **"Fill the screen"** reaches the bottom edge, also in kiosk mode without the header (#344 by djbassmind-sketch, cause found by sjess).
 - **Editor:** the lengths on upright room edges stand beside the "+" instead of under it (#431 by Maddin2020).
 - **The grid under lawns and paths** showed through when zoomed far out (#427 by 1970lexi).

@@ -14,9 +14,9 @@ function live() {
   const calls: unknown[] = [];
   const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}): HassEntity => ({ entity_id, state, attributes });
   const hass = {
-    language: "de",
+    language: "en",
     entities: { "light.a": { entity_id: "light.a", area_id: "k" } },
-    areas: { k: { area_id: "k", name: "Küche" } },
+    areas: { k: { area_id: "k", name: "Kitchen" } },
     devices: {},
     floors: {},
     config: { latitude: 52.52, longitude: 13.405 },
@@ -66,7 +66,7 @@ test("replay: the live registries stay, the states are the past ones with the st
   assert.equal(h.entities, hass.entities);
   assert.equal(h.areas, hass.areas);
   assert.equal(h.config, hass.config);
-  assert.equal(h.language, "de");
+  assert.equal(h.language, "en");
   const light = h.states["light.a"];
   assert.equal(light.state, "on");
   // the past brightness and colour, the name and the colour modes from the live entity
@@ -210,7 +210,7 @@ test("the request: the view's entities and the rooms' devices, measurements as s
   const { hass } = live();
   const b = emptyBuilding();
   const floor = newFloor("eg", "EG", 0);
-  floor.rooms = [{ id: "r", name: "Küche", area_id: "k", points: [[0, 0], [4, 0], [4, 3], [0, 3]], floor_material: "tiles" }];
+  floor.rooms = [{ id: "r", name: "Kitchen", area_id: "k", points: [[0, 0], [4, 0], [4, 3], [0, 3]], floor_material: "tiles" }];
   b.floors = [floor];
   b.presence = [{ person: "person.mia", sensor: "sensor.t" }];
   const spec: HistorySpec = { entities: ["cover.b", "person.mia", "device_tracker.phone", "camera.c", "sensor.t", "binary_sensor.gone"], openings: [], furniture: [], low: false };
@@ -231,8 +231,8 @@ test("roles: a front door, a room door, a garage door and windows from the openi
   const b = emptyBuilding();
   const floor = newFloor("eg", "EG", 0);
   floor.rooms = [
-    { id: "flur", name: "Flur", area_id: null, points: [[0, 0], [3, 0], [3, 3], [0, 3]], floor_material: "oak" },
-    { id: "kueche", name: "Küche", area_id: null, points: [[3, 0], [7, 0], [7, 3], [3, 3]], floor_material: "tiles" },
+    { id: "flur", name: "Hallway", area_id: null, points: [[0, 0], [3, 0], [3, 3], [0, 3]], floor_material: "oak" },
+    { id: "kueche", name: "Kitchen", area_id: null, points: [[3, 0], [7, 0], [7, 3], [3, 3]], floor_material: "tiles" },
   ];
   const o = (id: string, room_id: string, edge: number, type: Opening["type"], extra: Partial<Opening> = {}): Opening => ({ id, room_id, edge, offset: 1.5, width: 0.9, type, sill: 0, height: 2, hinge: "left", leaves: 1, swing: "in", cover: null, contact: null, tilt: null, contact2: null, ...extra }) as Opening;
   // the hall's bottom edge is outside, its right edge is the wall to the kitchen

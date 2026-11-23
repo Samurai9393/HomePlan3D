@@ -1,4 +1,4 @@
-// Helpers shared by both parts of tutorial episode 2 ("Bauplan als Vorlage"): the invented floor-plan picture
+// Helpers shared by both parts of tutorial episode 2 ("Floor plan as a template"): the invented floor-plan picture
 // (tutorials/assets/bauplan-l.png, made by make-plan.py, turned 2.5° like a crooked scan), the traced house as a
 // starting state, and small UI helpers (form rows, entity pickers, side-panel scrolling, live states of the mock).
 
@@ -11,7 +11,7 @@ export const PLAN = join(import.meta.dirname, "assets", "bauplan-l.png");
 export const PTS = JSON.parse(readFileSync(join(import.meta.dirname, "assets", "bauplan-l.json"), "utf-8"));
 /** The picture's true width in the plan (17.5 m at 100 px per metre) and its turn. */
 export const PLAN_WIDTH = 17.5;
-export const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D ${appVersion()}</span>`;
+export const VERSION = `<br><span style="font-size:20px;opacity:.7">recorded with HomePlan 3D ${appVersion()}</span>`;
 
 /** The traced rooms (plan metres; the house corner at 0/0). */
 export const ROOMS = {
@@ -141,11 +141,11 @@ export function helpers(R) {
       if (!box) throw new Error(`not found anywhere: ${JSON.stringify(target)}`);
       return box;
     },
-    /** Scroll the side panel back to the top of the selected item's form ("Zurück zu …"). */
+    /** Scroll the side panel back to the top of the selected item's form ("Back to …"). */
     async sideTop(seconds = 0.4) {
-      await h.scrollSide({ text: "Zurück zu" }, 150, seconds);
+      await h.scrollSide({ text: "Back to" }, 150, seconds);
     },
-    /** The centre of a control inside a row of the "Wandhöhen" box: "height", "thick", "split" or a button text. */
+    /** The centre of a control inside a row of the "Wall heights" box: "height", "thick", "split" or a button text. */
     async rowBox(title, what) {
       const box = await R.page.evaluate(
         (title, what) => {
@@ -187,7 +187,7 @@ export function helpers(R) {
     },
     /**
      * Pick an entity in a searchable picker (found by its label): click the field, type a search, click the hit.
-     * `option` is the visible text of the list entry (e.g. "Keiner" or a friendly name).
+     * `option` is the visible text of the list entry (e.g. "None" or a friendly name).
      */
     async pickEntity(label, search, option, seconds = 0.5, nth) {
       const b = await h.pickerBox(label, nth);
@@ -347,8 +347,8 @@ export async function traceHouse(R, { walls = true, openings = false } = {}) {
   const h = helpers(R);
   await tap(R, { text: "Editor", exact: true });
   await R.sleep(500);
-  await tap(R, { text: "Etage hinzufügen" });
-  await tap(R, { text: "Erdgeschoss", nth: 0 });
+  await tap(R, { text: "Add floor" });
+  await tap(R, { text: "Ground floor", nth: 0 });
   await R.sleep(500);
   const png = "data:image/png;base64," + readFileSync(PLAN).toString("base64");
   await R.page.evaluate((png) => window.fp3dPanel.hass.callWS({ type: "homeplan3d/image/set", image_id: "img_plan", data: png }), png);
@@ -360,8 +360,8 @@ export async function traceHouse(R, { walls = true, openings = false } = {}) {
      e.change((doc, f) => {
        doc.settings.wall_exterior = 0.3;
        f.background = { image_id: "img_plan", width: W, rotation: a, x: Math.round((-RL[0] - W / 2) * 1000) / 1000, z: Math.round((-RL[1] - H / 2) * 1000) / 1000, opacity: 0.6 };
-       f.rooms.push(room("garage", "Garage", "garage", "concrete"), room("wohnen", "Wohnzimmer", "wohnzimmer", "oak"), room("kueche", "Küche", "kueche", "tiles"),
-         room("flur", "Flur", "flur", "wood"), room("bad", "Bad", "bad", "tiles"), room("schlafen", "Schlafzimmer", "schlafzimmer", "carpet"));
+       f.rooms.push(room("garage", "Garage", "garage", "concrete"), room("wohnen", "Living room", "wohnzimmer", "oak"), room("kueche", "Kitchen", "kueche", "tiles"),
+         room("flur", "Hall", "flur", "wood"), room("bad", "Bathroom", "bad", "tiles"), room("schlafen", "Bedroom", "schlafzalways", "carpet"));
        if (walls) {
          Object.assign(f.rooms[1], { wall_splits: [null, [2], null, null, null, null], wall_heights: [null, [1.1, null], 0, null, null, null] });
          f.walls = [{ id: "teiler", a: [3.5, 5], b: [5.5, 5], thickness: 0.1, height: 1.2 }];
@@ -381,7 +381,7 @@ export async function traceHouse(R, { walls = true, openings = false } = {}) {
            o("wohnen", 5, 1.25, 2.0, "window", { sill: 0, height: 2.4, style: "glass_wall", contact: "none" }),
            o("kueche", 0, 2, 1.2, "window", { style: "bars" }),
            o("bad", 2, 1.5, 0.8, "window", { sill: 1.3, height: 0.8, contact: "none" }),
-           o("schlafen", 2, 1.75, 1.4, "window", { contact: "binary_sensor.schlafzimmer_fenster", sensor: "contact_tilt", tilt: "binary_sensor.schlafzimmer_kipp" }),
+           o("schlafen", 2, 1.75, 1.4, "window", { contact: "binary_sensor.schlafzalways_fenster", sensor: "contact_tilt", tilt: "binary_sensor.schlafzalways_kipp" }),
            o("garage", 2, 1.75, 2.5, "garage", { cover: "cover.garagentor" }),
          ].filter((x) => openings !== "doors" || x.type !== "window");
        }

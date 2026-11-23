@@ -1,4 +1,4 @@
-// The property (Grundstück): the main plan with the plans standing beside it (the garage, the garden house) as one
+// The property (lot): the main plan with the plans standing beside it (the garage, the garden house) as one
 // building for the 3D view – each moved and turned to its place, its ids prefixed with its plan so nothing collides.
 // Floors at the same height are drawn as one (the garden house's ground floor beside the house's). Read only: a tap
 // on a room maps back to its plan and room.

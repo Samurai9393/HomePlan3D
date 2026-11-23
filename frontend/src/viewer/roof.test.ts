@@ -11,8 +11,8 @@ const rect = (id: string, x1: number, z1: number): Room => ({ id, name: id, area
 function house(type: "none" | "flat" | "gable") {
   const b = emptyBuilding();
   b.floors = [
-    { ...newFloor("eg", "EG", 0), rooms: [rect("a", 10, 8)] },
-    { ...newFloor("og", "OG", 2.75), rooms: [rect("b", 10, 8)] },
+    { ...newFloor("eg", "Ground floor", 0), rooms: [rect("a", 10, 8)] },
+    { ...newFloor("og", "Upper floor", 2.75), rooms: [rect("b", 10, 8)] },
     { ...newFloor("dg", "Dachboden", 5.5) },
   ];
   b.settings.roof = { type, pitch: 45, overhang: 0.5 };
@@ -65,8 +65,8 @@ test("a floating roof window over a room of a lower floor belongs to that floor 
   const side = (id: string, x0: number, x1: number): Room => ({ id, name: id, area_id: null, points: [[x0, 0], [x1, 0], [x1, 8], [x0, 8]], floor_material: "wood" });
   const b = emptyBuilding();
   b.floors = [
-    { ...newFloor("eg", "EG", 0), rooms: [rect("a", 10, 8)] },
-    { ...newFloor("og", "OG", 2.75), rooms: [side("b1", 0, 4), side("b2", 6, 10)] },
+    { ...newFloor("eg", "Ground floor", 0), rooms: [rect("a", 10, 8)] },
+    { ...newFloor("og", "Upper floor", 2.75), rooms: [side("b1", 0, 4), side("b2", 6, 10)] },
   ];
   b.settings.roof = { type: "gable", pitch: 45, overhang: 0.5 };
   const face = roofFaces(b)[0].key;
@@ -109,7 +109,7 @@ test("two sections in one plane show no joint where they meet; a step between th
   const rise = 3 * Math.tan(20 * DEG);
   const roofOf = (back: RoofSection) => {
     const b = emptyBuilding();
-    b.floors = [{ ...newFloor("eg", "EG", 0), rooms: [rect("a", 8, 6)] }];
+    b.floors = [{ ...newFloor("eg", "Ground floor", 0), rooms: [rect("a", 8, 6)] }];
     b.settings.roof = { type: "custom", pitch: 20, overhang: 0.4, sections: [pent("front", 3, 6, 2.5, [null, 0, null, null]), back] };
     return buildRoof(b)[0];
   };
@@ -151,7 +151,7 @@ test("a dormer's front over a floor wall in its plane leaves that wall's height 
     const d = proposeDormer(section, "a", "d", 4);
     const b = emptyBuilding();
     b.settings.wall_exterior = 0.24;
-    b.floors = [{ ...newFloor("og", "OG", 2.75), height, rooms: [{ ...rect("a", 8, 6) }] }];
+    b.floors = [{ ...newFloor("og", "Upper floor", 2.75), height, rooms: [{ ...rect("a", 8, 6) }] }];
     b.settings.roof = { type: "custom", pitch: 40, overhang: 0.4, sections: [section, { ...d, z0: d.z0 + dz, z1: d.z1 + dz }] };
     const cheeks = buildRoof(b).find((p) => p.cheeks)?.cheeks;
     assert.ok(cheeks);

@@ -124,7 +124,7 @@ export class Extensions extends LitElement {
       ${(this._open.has("packs") ? packs : []).map(
         (p) => html`<div class="fp3d-pack">
           <div>
-            <b>${packName(p, this.hass?.language ?? "de")}</b>
+            <b>${packName(p, this.hass?.language ?? "en")}</b>
             <span class="fp3d-sub">${p.module ? this.t("pack_module", { publisher: p.publisher }) : p.features?.length ? this.t("pack_features", { publisher: p.publisher, n: p.features.length }) : this.t("pack_by", { publisher: p.publisher, n: p.items.length })}</span>
             ${p.release && p.release > 1 ? html`<span class="fp3d-sub">v${p.release}</span>` : nothing}
             ${(p.features ?? []).some((f) => !knownFeature(f)) ? html`<span class="fp3d-sub fp3d-pack-error">${this.t("pack_needs_update")}</span>` : nothing}
@@ -156,7 +156,7 @@ export class Extensions extends LitElement {
       ${waiting.length
         ? html`<p class="fp3d-sub fp3d-module-waits">
             ${this.t("modules_waiting", { n: waiting.length })}
-            ${waiting.map((p) => html`<button class="fp3d-btn fp3d-primary" @click=${() => void this.openReview(p)}>${packName(p, this.hass?.language ?? "de")}</button>`)}
+            ${waiting.map((p) => html`<button class="fp3d-btn fp3d-primary" @click=${() => void this.openReview(p)}>${packName(p, this.hass?.language ?? "en")}</button>`)}
           </p>`
         : nothing}
       ${!modules.length
@@ -166,7 +166,7 @@ export class Extensions extends LitElement {
           : modules.map(
             (p) => html`<div class="fp3d-pack">
               <div>
-                <b>${packName(p, this.hass?.language ?? "de")}</b>
+                <b>${packName(p, this.hass?.language ?? "en")}</b>
                 <span class="fp3d-sub">${p.module ? this.t("pack_module", { publisher: p.publisher }) : this.t((p.features ?? []).every((f) => f.startsWith("fun_")) ? "pack_fun_module" : "pack_pro_module", { publisher: p.publisher })}${p.release && p.release > 1 ? ` · v${p.release}` : ""}</span>
                 ${(p.features ?? []).some((f) => !knownFeature(f)) ? html`<span class="fp3d-sub fp3d-pack-error">${this.t("pack_needs_update")}</span>` : nothing}
                 ${p.module && p.module.approved !== true
@@ -242,7 +242,7 @@ export class Extensions extends LitElement {
     try {
       await approveModule(this.hass, review.pack.id, review.data.sha);
       this._review = null;
-      this._moduleMsg = { ok: true, text: this.t("module_approved", { name: packName(review.pack, this.hass.language ?? "de") }) };
+      this._moduleMsg = { ok: true, text: this.t("module_approved", { name: packName(review.pack, this.hass.language ?? "en") }) };
       this.dispatchEvent(new CustomEvent("packs-changed", { bubbles: true, composed: true }));
     } catch (err) {
       const { code, message } = (err ?? {}) as { code?: string; message?: string };
@@ -256,7 +256,7 @@ export class Extensions extends LitElement {
     if (!review) return nothing;
     const d = review.data;
     return html`<div class="fp3d-review" role="dialog" aria-modal="true">
-      <h4>${this.t("module_review_title", { name: packName(review.pack, this.hass?.language ?? "de") })}</h4>
+      <h4>${this.t("module_review_title", { name: packName(review.pack, this.hass?.language ?? "en") })}</h4>
       ${d
         ? html`<p class="fp3d-sub">${this.t("module_review_meta", { publisher: d.publisher, release: d.release, kb: Math.max(1, Math.round(d.code.length / 1024)), sha: d.sha })}</p>
             <p class="fp3d-sub">${this.t("module_review_note")}</p>
@@ -273,7 +273,7 @@ export class Extensions extends LitElement {
   }
 
   private async deletePack(pack: FurniturePack): Promise<void> {
-    if (!this.hass || !confirm(this.t("pack_remove_confirm", { name: packName(pack, this.hass?.language ?? "de") }))) return;
+    if (!this.hass || !confirm(this.t("pack_remove_confirm", { name: packName(pack, this.hass?.language ?? "en") }))) return;
     await removePack(this.hass, pack.id);
     this._packMsg = null;
     this.dispatchEvent(new CustomEvent("packs-changed", { bubbles: true, composed: true }));

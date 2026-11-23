@@ -17,7 +17,7 @@ function ll(e: number, n: number) {
 function house(rooms: [number, number, number, number][], north = 0): Building {
   const b = emptyBuilding();
   b.settings.north = north;
-  b.floors = [{ ...newFloor("eg", "EG", 0), rooms: rooms.map(([x0, z0, x1, z1], i) => ({ id: `r${i}`, name: `r${i}`, area_id: null, floor_material: "wood", points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]] as Vec2[] })) }];
+  b.floors = [{ ...newFloor("eg", "Ground floor", 0), rooms: rooms.map(([x0, z0, x1, z1], i) => ({ id: `r${i}`, name: `r${i}`, area_id: null, floor_material: "wood", points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]] as Vec2[] })) }];
   return b;
 }
 

@@ -1,19 +1,19 @@
-# Möbel- und Modul-Packs
+# Furniture and module packs
 
-Packs bringen zusätzliche Möbel oder Code in HomePlan 3D. Sie werden lokal als JSON-Datei
-importiert. Eine Signatur, ein Herausgeber-Schlüssel oder ein Server
-ist dafür nicht nötig: Alle Funktionen sind MIT-open-source und standardmäßig aktiviert.
+Packs bring additional furniture or code into HomePlan 3D. They are imported locally as a JSON
+file. A signature, a publisher key or a server
+is not needed: every feature is MIT open source and enabled by default.
 
 ## Import
 
-1. Pack-Quelle als JSON schreiben (Format unten).
-2. In Home Assistant importieren: Editor → **Möbel** → **Möbel-Pack importieren …**.
-   Für Module: **⚙ Einstellungen → 🧩 Module → Modul einspielen …** oder
-   **Erweiterungen → Module → Modul einspielen …**.
-3. Bei Modulen den Code als Administrator ansehen und freigeben. Erst danach läuft er.
+1. Write the pack source as JSON (format below).
+2. Import it in Home Assistant: Editor → **Furniture** → **Import furniture packs …**.
+   For modules: **⚙ Settings → 🧩 Modules → Import a module …** or
+   **Extensions → Modules → Import a module …**.
+3. For modules, view and approve the code as an administrator. Only then does it run.
 
-Mehrere Dateien können auf einmal ausgewählt werden. Entfernte Packs bleiben als einfache
-Kästen im Plan und erscheinen nach erneutem Import wieder mit allen Verknüpfungen.
+Several files can be selected at once. Removed packs stay as simple
+boxes in the plan and reappear with all their links after importing them again.
 
 ## Format
 
@@ -21,14 +21,14 @@ Kästen im Plan und erscheinen nach erneutem Import wieder mit allen Verknüpfun
 {
   "format": "fp3dpack",
   "version": 1,
-  "id": "example.kueche",
-  "name": "Küchen-Pack",
-  "publisher": "lokal",
+  "id": "example.kitchen",
+  "name": "Kitchen pack",
+  "publisher": "local",
   "description": "optional",
   "items": [
     {
       "id": "retro_fridge",
-      "name": { "de": "Retro-Kühlschrank", "en": "Retro fridge" },
+      "name": "Retro fridge",
       "size": [0.6, 0.65, 1.5],
       "electric": true,
       "parts": [{ "shape": "box", "x": 0, "z": 0, "w": 1, "d": 1, "y": 0, "h": 1, "color": "white", "edges": true }],
@@ -38,61 +38,60 @@ Kästen im Plan und erscheinen nach erneutem Import wieder mit allen Verknüpfun
 }
 ```
 
-- `size`: Standardgröße in Metern (Breite, Tiefe, Höhe). Im Plan lässt sich jedes Möbel danach frei
-  skalieren; alle Teile wachsen mit – außer denen mit `fix`.
-- `fix` an einem Teil: welche Maße das Teil beim Skalieren **behält** – `"w"`, `"d"`, `"h"`
-  oder mehrere (`"wdh"`). Beine, Armlehnen, Platten und Griffe behalten so ihre Größe, die Teile
-  dazwischen strecken sich.
-- `parts` (max. 60): `box`, `cyl` oder `loft`. Alle Maße sind **Anteile der Möbelgröße**: `x`/`z`
-  Mitte (−0,5 … 0,5, vorne ist +z), `w`/`d` Breite/Tiefe (0 … 1), `y` Unterkante und `h` Höhe (0 … 1
-  der Höhe). Ein Zylinder nimmt den kleineren Wert von `w` und `d` als Durchmesser; mit `axis: "x"`
-  oder `"z"` liegt er entlang der Achse. Ein `loft` ist ein Quader mit anderer Oberseite
-  (`tx`/`tz` Mitte, `tw`/`td` Größe) – für schräge Flächen.
-- `rot` (Grad) dreht ein Teil um seine eigene Mitte, etwa für Wendeltreppen oder diagonale Streben.
-- `color`: `#rrggbb` oder eine Rolle der eingebauten Palette (`body`, `fabric`, `cushion`, `wood`,
-  `white`, `metal`, `dark`, `glass`, `plant`, `pot`, `accent`). `top` setzt eine eigene Farbe für die
-  Oberseite, `edges` zeichnet leuchtende Kanten (`true`, `"glow"`, `"faint"`).
-- `symbol` (optional, max. 40): Draufsicht aus `rect` (`fill` für gefüllt), `circle` (`r` als Anteil
-  der kleineren Seite) und `line` (`x1`, `z1`, `x2`, `z2`). Ohne Symbol zeichnet der Plan die Teile
-  von oben.
-- `electric`: das Möbel lässt sich mit einem Schalter und Leistungssensor verknüpfen.
-- `mount`: `floor` (Standard), `surface` (auf dem Möbel darunter), `wall` (Unterkante bei
-  `wall_y` Metern) oder `ceiling` (hängt von der Decke).
-- `surface`: die Oberseite trägt andere Möbel (Tisch, Kücheninsel, Werkbank).
-- `hole`: eine Treppe, die in der Etage darüber die Treppenöffnung in den Boden schneidet.
-- `light`: das Möbel ist eine Leuchte; der Wert beschreibt die Ausleuchtung (`ceiling`, `pendant`,
-  `floor`, `table`, `wall`, `spot`, `garden` …). Teile mit `"glow": true` leuchten in Farbe und
-  Helligkeit des Lichts.
-- `screen`: ein Teil mit `"screen": true` ist ein Bildschirm, der mit einem Media Player
-  verknüpft werden kann.
-- **Bibliothek** (optional): `group` beschreibt die Art (`sofa`, `seating`, `table`, `storage`,
+- `size`: default size in metres (width, depth, height). In the plan every item can then be scaled
+  freely; all parts grow with it – except those with `fix`.
+- `fix` on a part: which dimensions the part **keeps** when scaling – `"w"`, `"d"`, `"h"`
+  or several (`"wdh"`). Legs, armrests, tops and handles thus keep their size, the parts
+  between them stretch.
+- `parts` (max. 60): `box`, `cyl` or `loft`. All dimensions are **fractions of the item size**: `x`/`z`
+  centre (−0.5 … 0.5, front is +z), `w`/`d` width/depth (0 … 1), `y` bottom edge and `h` height (0 … 1
+  of the height). A cylinder takes the smaller of `w` and `d` as its diameter; with `axis: "x"`
+  or `"z"` it lies along that axis. A `loft` is a box with a different top face
+  (`tx`/`tz` centre, `tw`/`td` size) – for sloping surfaces.
+- `rot` (degrees) turns a part about its own centre, e.g. for spiral staircases or diagonal struts.
+- `color`: `#rrggbb` or a role of the built-in palette (`body`, `fabric`, `cushion`, `wood`,
+  `white`, `metal`, `dark`, `glass`, `plant`, `pot`, `accent`). `top` sets a colour of its own for the
+  top face, `edges` draws glowing edges (`true`, `"glow"`, `"faint"`).
+- `symbol` (optional, max. 40): top view made of `rect` (`fill` for filled), `circle` (`r` as a fraction
+  of the smaller side) and `line` (`x1`, `z1`, `x2`, `z2`). Without a symbol the plan draws the parts
+  from above.
+- `electric`: the item can be linked to a switch and a power sensor.
+- `mount`: `floor` (default), `surface` (on the item below), `wall` (bottom edge at
+  `wall_y` metres) or `ceiling` (hangs from the ceiling).
+- `surface`: the top face carries other furniture (table, kitchen island, workbench).
+- `hole`: a staircase that cuts the stair opening into the floor above.
+- `light`: the item is a lamp; the value describes how it lights (`ceiling`, `pendant`,
+  `floor`, `table`, `wall`, `spot`, `garden` …). Parts with `"glow": true` light in the colour and
+  brightness of the light.
+- `screen`: a part with `"screen": true` is a screen that can be linked to a media player.
+- **Library** (optional): `group` describes the kind (`sofa`, `seating`, `table`, `storage`,
   `bed`, `kitchen`, `appliance`, `bath`, `lamp`, `media`, `office`, `tech`, `heating`, `energy`,
   `household`, `deco`, `plant`, `outdoor`, `kids`, `sport`, `pets`, `vehicle`, `stairs`,
-  `architecture`), `room` die passenden Räume (`living`, `dining`, `kitchen`, `bedroom`, `kids`,
-  `bath`, `office`, `hall`, `utility`, `garage`, `garden`, `hobby`; leer = überall), `tags`
-  weitere Suchwörter. `family` und `variant` fassen Größenvarianten zu einer Karte zusammen.
-  Ohne diese Felder ordnet NeonPlan das Möbel nach seinen Wörtern und dem Pack ein.
+  `architecture`), `room` the fitting rooms (`living`, `dining`, `kitchen`, `bedroom`, `kids`,
+  `bath`, `office`, `hall`, `utility`, `garage`, `garden`, `hobby`; empty = everywhere), `tags`
+  further search words. `family` and `variant` group size variants into one card.
+  Without these fields NeonPlan sorts the item by its words and the pack.
 
-## Funktions- und Modul-Packs
+## Feature and module packs
 
-Ein Pack kann statt Möbeln (oder zusätzlich) `features` tragen, zum Beispiel
-`"features": ["weather"]` mit `"items": []`. Die Pro-Funktionen sind bereits über
-`custom_components/homeplan3d/open-source-config.json` aktiviert; solche Packs ergänzen nur
-Möbel oder Szenen, sie schalten nichts frei.
+A pack can carry `features` instead of furniture (or in addition), for example
+`"features": ["weather"]` with `"items": []`. The Pro features are already enabled through
+`custom_components/homeplan3d/open-source-config.json`; such packs only add
+furniture or scenes, they unlock nothing.
 
-Ein Modul-Pack bringt Code mit. Es wird genauso lokal eingespielt wie ein Möbel-Pack. Der Code
-wird nicht ausgeführt, bevor ein Administrator ihn unter **Erweiterungen → Module → Code ansehen
-& freigeben** geprüft und freigegeben hat. Eine neue Fassung wartet ebenfalls auf Freigabe.
-Die Datei bleibt lesbar; das Projekt steht vollständig unter der MIT-Lizenz.
+A module pack brings code. It is imported locally just like a furniture pack. The code
+is not run until an administrator has reviewed and approved it under **Extensions → Modules → View code
+& approve**. A new version waits for approval too.
+The file stays readable; the project is fully under the MIT licence.
 
-## Pack-Bilder
+## Pack images
 
-`cd frontend && node pack-images.mjs <pack.json>... --out <ordner>` rendert mit der echten
-3D-Grafik (vorher `npm run build`) je Pack ein Übersichtsbild (`overview.png`, 3200 × 2400)
-und ein freigestelltes PNG pro Möbel (`items/<id>.png`).
+`cd frontend && node pack-images.mjs <pack.json>... --out <folder>` renders with the real
+3D graphics (run `npm run build` first) an overview image per pack (`overview.png`, 3200 × 2400)
+and a cut-out PNG per item (`items/<id>.png`).
 
 ## Updates
 
-Eine neuere Version derselben Pack-ID ersetzt die installierte Fassung, ohne etwas im Plan zu
-verlieren. Kurz gesagt: lokale JSON-Dateien, keine Signatur, kein Server – und bei
-Modulen immer menschliche Freigabe vor dem Ausführen.
+A newer version of the same pack ID replaces the installed version without losing anything in the
+plan. In short: local JSON files, no signature, no server – and for
+modules always human approval before running.

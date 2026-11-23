@@ -1,16 +1,16 @@
-// Tutorial episode 9 – "Außenbereich und Garten" (manual 4.17, with the outdoor parts of 4.8/4.11 and 4.14), in two
+// Tutorial episode 9 – "Outdoor area and garden" (manual 4.17, with the outdoor parts of 4.8/4.11 and 4.14), in two
 // parts (the checklist does not fit into 8 minutes):
-//   a) Flächen: the tool „Außen“, drawing, the form, moving, corners (a rectangle stays a rectangle), X/Y/Breite/Tiefe,
-//      arrow keys, „Duplizieren“, „Löschen“, a plot of several lawns with „Umrisslinie zeigen“ off, every area type
-//      (Rasen, Terrasse, Weg, Einfahrt, Pool, Beet, Wildfläche), holes („Aus Flächen darunter ausschneiden“: the pool
-//      and a wild patch in the lawn), „Höhenversatz“ (a raised terrace) and „Gefälle“ (the driveway down to the garage,
+//   a) Areas: the tool “Outdoor”, drawing, the form, moving, corners (a rectangle stays a rectangle), X/Y/Width/Depth,
+//      arrow keys, “Duplicate”, “Delete”, a plot of several lawns with “Show the outline” off, every area type
+//      (Lawn, Terrace, Path, Driveway, Pool, Flower bed, Wild patch), holes (“Cut out of the areas beneath”: the pool
+//      and a wild patch in the lawn), “Height offset” (a raised terrace) and “Slope” (the driveway down to the garage,
 //      the front garden on a slope).
-//   b) Hecken, Zaun, Pergola, Licht und Pflanzen: hedges with „Höhe“ (Thuja 2.5 m, low 0.5 m), a fence leaning
-//      against the house („Offen“), the pergola (height, offset, „X-Verstrebung“, slope), outdoor lights (Wegleuchte,
-//      Garten-Spot, Wandleuchte außen; light entity, duplicate, glow), the built-in plant, a parking spot in the
+//   b) Hedges, fence, pergola, lights and plants: hedges with “Height” (Thuja 2.5 m, low 0.5 m), a fence leaning
+//      against the house (“Open”), the pergola (height, offset, “X-bracing”, slope), outdoor lights (Path light,
+//      Garden spot, Wall light outside; light entity, duplicate, glow), the built-in plant, a parking spot in the
 //      driveway, the plan lock, the garden at night in 3D.
 // The house is invented (one ground floor with a garage, a gable roof); only built-in items are shown.
-// Usage (from frontend/): node tutorials/ep09-aussenbereich.mjs <out-dir> a|b [<voice-dir de> [<voice-dir en>]]
+// Usage (from frontend/): node tutorials/ep09-aussenbereich.mjs <out-dir> a|b [<voice-dir>]
 //   (voice dirs: private/tutorial-audio/ep09a/de and …/en, resp. ep09b)
 // EP09_FAST=1: a quick dry run for checking the steps (the timing is not usable).
 // Then: python ../tools/make-tutorial.py <out-dir> <out.mp4> --en tutorials/ep09a-narration-en.json
@@ -21,7 +21,7 @@ import { helpers, tap } from "./ep02-common.mjs";
 const out = process.argv[2] ?? "tutorial-ep09";
 const PART = process.argv[3] === "b" ? "b" : "a";
 const FAST = !!process.env.EP09_FAST;
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D ${appVersion()}</span>`;
+const VERSION = `<br><span style="font-size:20px;opacity:.7">recorded with HomePlan 3D ${appVersion()}</span>`;
 
 // ---------------------------------------------------------------- the invented house and garden
 const rect = (id, name, area_id, x0, z0, x1, z1, floor_material = "wood") => ({ id, name, area_id, points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]], floor_material });
@@ -45,7 +45,7 @@ const hole = (id, type, room_id, edge, offset, width, extra = {}) => ({
 });
 const GROUND = {
   id: "eg",
-  name: "Erdgeschoss",
+  name: "Ground floor",
   elevation: 0,
   height: 2.5,
   cut_height: 1.15,
@@ -56,13 +56,13 @@ const GROUND = {
   furniture: [],
   outdoor: [],
   rooms: [
-    rect("r_flur", "Flur", "flur", 0, 0, 3, 4, "tiles"),
-    rect("r_kueche", "Küche", "kueche", 3, 0, 7, 4, "tiles"),
-    rect("r_bad", "Bad", "bad", 7, 0, 10, 4, "tiles"),
-    rect("r_wohnen", "Wohnzimmer", "wohnzimmer", 0, 4, 6, 9),
-    rect("r_schlafen", "Schlafzimmer", "schlafzimmer", 6, 4, 10, 9, "carpet"),
+    rect("r_flur", "Hall", "flur", 0, 0, 3, 4, "tiles"),
+    rect("r_kueche", "Kitchen", "kueche", 3, 0, 7, 4, "tiles"),
+    rect("r_bad", "Bathroom", "bad", 7, 0, 10, 4, "tiles"),
+    rect("r_wohnen", "Living room", "wohnzimmer", 0, 4, 6, 9),
+    rect("r_schlafen", "Bedroom", "schlafzalways", 6, 4, 10, 9, "carpet"),
     rect("r_garage", "Garage", "garage", 10, 0, 13.5, 6, "concrete"),
-    rect("r_hwr", "Hauswirtschaft", null, 10, 6, 13.5, 9, "tiles"),
+    rect("r_hwr", "Utility", null, 10, 6, 13.5, 9, "tiles"),
   ],
   openings: [
     hole("o1", "door", "r_flur", 0, 1.7, 1.0, { style: "front_glass", height: 2.1 }),
@@ -130,7 +130,7 @@ const FURNITURE_B = [
   item("f_plant", "plant", ...PLANT, 0.45, 0.45, 1.5),
   item("f_park", "parking", ...PARK, 2.6, 5, 0.02, 0, { entity: "binary_sensor.einfahrt_auto" }),
 ];
-const ENTITIES = [["binary_sensor.einfahrt_auto", "garage", "on", { friendly_name: "Auto in der Einfahrt", device_class: "occupancy" }]];
+const ENTITIES = [["binary_sensor.einfahrt_auto", "garage", "on", { friendly_name: "Car in the driveway", device_class: "occupancy" }]];
 // plan views: the whole plot, the front garden, the back garden, the side yard
 const PLOT = [-5, -8.6, 17.6, 18];
 const FRONT = [-2.5, -9, 15.5, 1];
@@ -149,7 +149,7 @@ const C_SIDE = cam(1.35, 0.8, 18, 14.5, 5);
 const C_TERRACE = cam(0.6, 0.8, 14, 3, 11);
 
 // ---------------------------------------------------------------- recorder
-const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "de" });
+const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "en" });
 const N = narration(R, process.argv.slice(4));
 const { say, sayOver, chapter, catchUp } = N;
 const h = helpers(R);
@@ -376,9 +376,9 @@ const dragPlan = async (x0, z0, x1, z1, seconds = 1) => {
   await R.move(a.x, a.y, 0.45);
   await R.drag(b.x, b.y, seconds);
 };
-/** The tool „Außen“, then an area dragged open (plan rectangle). */
+/** The tool “Outdoor”, then an area dragged open (plan rectangle). */
 const drawArea = async ([x0, z0, x1, z1], seconds = 0.9) => {
-  await R.clickOn({ text: "Außen", exact: true }, 0.45);
+  await R.clickOn({ text: "Outdoor", exact: true }, 0.45);
   await R.frame(0.15, 250);
   await dragPlan(x0, z0, x1, z1, seconds);
   await R.frame(0.2, 350);
@@ -489,14 +489,14 @@ const loadHouse = async (outdoor = [], furniture = []) => {
     e.setDoc(d, null); e.past = []; e._canUndo = false; e._floorId = "eg"; e._roomId = null; e.fit();`);
   await R.sleep(900);
 };
-/** Open the preview with the house; the editor with „3D daneben“, the plan fitted to the plot. */
+/** Open the preview with the house; the editor with “3D beside”, the plan fitted to the plot. */
 const start = async (outdoor = [], furniture = []) => {
   await R.open("empty");
   await h.addEntities(ENTITIES);
   await tap(R, { text: "Editor", exact: true });
   await R.sleep(700);
   await loadHouse(outdoor, furniture);
-  await tap(R, { text: "3D daneben", exact: true });
+  await tap(R, { text: "3D beside", exact: true });
   await R.sleep(2200);
   await setPlan(PLOT);
   await setCam(C_HOUSE);
@@ -512,7 +512,7 @@ const show3d = async () => {
   await R.sleep(800);
 };
 
-// ================================================================ PART 1: Flächen
+// ================================================================ PART 1: Areas
 if (PART === "a") {
   // ---------------------------------------------------------------- teaser
   await chapter("Teaser");
@@ -524,62 +524,62 @@ if (PART === "a") {
     const C = cam(0.45, 0.85, 32, 6.5, 6);
     await setMain(A);
     await R.frame(0.2, 1200);
-    await R.title("Außenbereich und Garten", `HomePlan 3D · Folge 9 · Teil 1${VERSION}`);
-    const l1 = "Rasen, Terrasse, Pool, eine Einfahrt am Hang, Hecken, Zaun und Pergola – und abends leuchten die Wege.";
+    await R.title("Outdoor area and garden", `HomePlan 3D · episode 9 · part 1${VERSION}`);
+    const l1 = "Lawn, terrace, pool, a driveway on a slope, hedges, a fence and a pergola – and in the evening the paths light up.";
     await sayOver(l1);
     await glideMain(A, B, N.length(l1));
     await R.untitle();
-    const l2 = "In dieser Folge legst du den Garten um dein Haus an. In Teil eins geht es um die Flächen.";
+    const l2 = "In this episode you lay out the garden around your house. Part one is about the areas.";
     await sayOver(l2);
     await glideMain(B, C, N.length(l2));
   }
 
   // ---------------------------------------------------------------- intro
-  await chapter("Was wir heute machen");
+  await chapter("Was wir today machen");
   await start();
   await R.hideCursor(false);
-  await sayOver("Wir starten mit einem fertigen Haus, aber noch ohne Garten. Rechts daneben läuft die 3D-Ansicht mit.");
+  await sayOver("We start with a finished house, but no garden yet. On the right, the 3D view runs alongside.");
   await pointPlan(5, 4.5, 0.6);
   await R.hold(1.2);
   await R.move(1250, 600, 0.6);
   await glide3d(cam(-2.3, 0.92, 34, 6.5, 4.5), 2.5);
   {
-    const line = "Gezeichnet werden Rasen, Terrasse, Weg, Einfahrt, Pool, Beet und Wildfläche – dazu Löcher, Höhen und Gefälle.";
+    const line = "We draw lawn, terrace, path, driveway, pool, flower bed and wild patch – plus holes, heights and slopes.";
     await sayOver(line);
     await glideLine(C_BACK, line);
   }
 
   // ---------------------------------------------------------------- the tool
-  await chapter("Das Werkzeug „Außen“");
-  await sayOver("Oben in der Werkzeugleiste wählst du „Außen“. Unten im Plan steht dann, was zu tun ist: ziehen, um eine Außenfläche aufzuziehen.");
-  await R.clickOn({ text: "Außen", exact: true }, 0.6);
+  await chapter("Das Tool “Outdoor”");
+  await sayOver("In the toolbar at the top you pick “Outdoor”. The bottom of the plan then tells you what to do: drag to draw an outdoor area.");
+  await R.clickOn({ text: "Outdoor", exact: true }, 0.6);
   await R.frame(0.3, 300);
-  await moveToText("Ziehen, um eine Außenfläche", 0.6);
+  await moveToText("Drag to create an outdoor area", 0.6);
   await R.hold(1.2);
-  await sayOver("Ich ziehe hinter dem Haus ein Rechteck auf, für den Garten.");
+  await sayOver("Behind the house I drag open a rectangle for the garden.");
   await dragPlan(-4, 9, 15, 15, 1.4);
   await R.frame(0.3, 500);
-  await sayOver("Eine neue Fläche ist erst einmal Rasen. Rechts im Formular stehen „Art“, Lage und Größe, „Höhenversatz“ und „Gefälle“ und zwei Haken.");
-  await R.moveTo({ label: "Art" }, 0.5);
+  await sayOver("A new area starts out as lawn. The form on the right has the “Type”, position and size, “Height offset”, “Slope”, and two checkboxes.");
+  await R.moveTo({ label: "Type" }, 0.5);
   await R.hold(0.6);
-  await R.moveTo({ label: "Breite (m)" }, 0.4);
+  await R.moveTo({ label: "Width (m)" }, 0.4);
   await R.hold(0.4);
-  await R.moveTo({ label: "Höhenversatz" }, 0.4);
+  await R.moveTo({ label: "Height offset" }, 0.4);
   await R.hold(0.4);
-  await R.moveTo({ text: "Umrisslinie zeigen" }, 0.4);
+  await R.moveTo({ text: "Show the outline" }, 0.4);
   await R.hold(0.4);
-  await sayOver("Das Werkzeug springt danach auf „Auswählen“ zurück. Für jede neue Fläche klickst du „Außen“ wieder an.");
-  await R.moveTo({ text: "Auswählen", exact: true }, 0.6);
+  await sayOver("Afterwards the tool jumps back to “Select”. For every new area you click “Outdoor” again.");
+  await R.moveTo({ text: "Select", exact: true }, 0.6);
   await R.hold(0.8);
-  await R.moveTo({ text: "Außen", exact: true }, 0.5);
+  await R.moveTo({ text: "Outdoor", exact: true }, 0.5);
   await glide3d(cam(0.4, 0.9, 30, 5.5, 10), 2);
 
   // ---------------------------------------------------------------- moving and sizing
-  await chapter("Verschieben und Größe ändern");
-  await sayOver("Eine ausgewählte Fläche verschiebst du, indem du sie ziehst.");
+  await chapter("Move and resize");
+  await sayOver("You move a selected area by dragging it.");
   await dragPlan(5.5, 12, 5.5, 14, 0.8);
   await dragPlan(5.5, 14, 5.5, 12, 0.8);
-  await sayOver("An den Ecken änderst du die Größe. Ein Rechteck bleibt dabei ein Rechteck – die Nachbarecken wandern mit.");
+  await sayOver("The corners change its size. A rectangle stays a rectangle – the neighbouring corners move along.");
   {
     const c = await cornerOf(2);
     if (!c) throw new Error("no corner");
@@ -587,34 +587,34 @@ if (PART === "a") {
     const b = await R.planPoint(17, 16);
     await R.drag(b.x, b.y, 1.2);
   }
-  await sayOver("Genauer geht es mit den Zahlen: X und Y sind die Ecke oben links, dazu Breite und Tiefe. Ich mache den Garten 8 Meter tief.");
+  await sayOver("For exact values use the numbers: X and Y are the top left corner, plus width and depth. I make the garden 8 metres deep.");
   await R.moveTo({ label: "X (m)" }, 0.5);
   await R.hold(0.5);
   await R.moveTo({ label: "Y (m)" }, 0.4);
   await R.hold(0.5);
-  await fill("Tiefe (m)", "8");
-  await sayOver("Die Pfeiltasten schieben eine Fläche in kleinen Schritten. „Duplizieren“ legt eine Kopie daneben, „Löschen“ oder die Entf-Taste entfernt sie wieder.");
+  await fill("Depth (m)", "8");
+  await sayOver("The arrow keys nudge an area in small steps. “Duplicate” puts a copy next to it, and “Delete” or the Delete key removes it again.");
   await pointPlan(5.5, 13, 0.4);
   await press("→", "ArrowRight", 4);
   await press("←", "ArrowLeft", 4);
   await keyCap(null);
-  await R.clickOn({ text: "Duplizieren", exact: true }, 0.6);
+  await R.clickOn({ text: "Duplicate", exact: true }, 0.6);
   await R.frame(0.6, 400);
-  await R.clickOn({ text: "Löschen", exact: true }, 0.5);
+  await R.clickOn({ text: "Delete", exact: true }, 0.5);
   await R.frame(0.3, 400);
 
   // ---------------------------------------------------------------- a plot of several areas
-  await chapter("Ein Grundstück aus mehreren Flächen");
-  await sayOver("Außenflächen sind immer Rechtecke. Ein Grundstück, das ums Haus herum geht, setzt du deshalb aus mehreren Flächen zusammen: links, vorn und rechts vom Haus.");
+  await chapter("A property made of several areas");
+  await sayOver("Outdoor areas are always rectangles. So a plot that goes all around the house is made of several areas: left of the house, in front and on the right.");
   await drawArea(R_LEFT, 0.7);
   await drawArea(R_FRONT, 0.8);
   await drawArea(R_RIGHT, 0.8);
   {
-    const line = "In 3D siehst du jetzt an jeder Naht eine Leuchtlinie.";
+    const line = "In 3D you now see a glowing line at every seam.";
     await sayOver(line);
     await glideLine(C_FRONT, line);
   }
-  await sayOver("Dafür gibt es den Haken „Umrisslinie zeigen“. Ohne ihn hat die Fläche keine Leuchtlinie am Rand – ich nehme ihn bei allen vier Rasenflächen weg.");
+  await sayOver("That is what the “Show the outline” checkbox – “Show the outline” is for. Without it the area has no glowing line along its edge – I untick it on all four lawns.");
   for (const [x, z] of [
     [5, -5],
     [15.5, -4],
@@ -622,131 +622,131 @@ if (PART === "a") {
     [5, 15],
   ]) {
     await tapArea(x, z, 0.45);
-    await R.clickOn({ text: "Umrisslinie zeigen" }, 0.45);
+    await R.clickOn({ text: "Show the outline" }, 0.45);
     await R.frame(0.15, 250);
   }
   {
-    const line = "Jetzt wirkt der Rasen wie aus einem Stück.";
+    const line = "Now the lawn looks like one piece.";
     await sayOver(line);
     await glideLine(C_BACK, line);
   }
 
   // ---------------------------------------------------------------- the area types
-  await chapter("Terrasse, Weg, Einfahrt, Pool und Beet");
-  await sayOver("Jetzt die Terrasse hinter dem Wohnzimmer: „Außen“, aufziehen, und bei „Art“ wähle ich „Terrasse“.");
+  await chapter("Terrace, path, driveway, pool and flower bed");
+  await sayOver("Now the terrace behind the living room: “Outdoor”, drag it open, and under “Type” I pick “Terrace”.");
   await drawArea(R_TERRACE, 0.9);
-  await pick("Art", "Terrasse");
+  await pick("Type", "Terrace");
   {
-    const line = "Eine Terrasse liegt etwas höher als der Rasen und hat einen eigenen Belag.";
+    const line = "A terrace sits a little higher than the lawn and has a surface of its own.";
     await sayOver(line);
     await glideLine(C_BACK_NEAR, line);
   }
-  await sayOver("Vorn kommt der Weg zur Haustür dazu, Art „Weg“ …");
+  await sayOver("At the front comes the path to the front door, type “Path” …");
   await setCam(C_FRONT_NEAR);
   await drawArea(R_PATH, 0.8);
-  await pick("Art", "Weg");
-  await sayOver("… und vor der Garage die „Einfahrt“.");
+  await pick("Type", "Path");
+  await sayOver("… and in front of the garage the “Driveway”.");
   await drawArea(R_DRIVE, 0.8);
-  await pick("Art", "Einfahrt");
-  await sayOver("Hinten im Garten ein „Pool“ – sein Wasser liegt unter dem Boden.");
+  await pick("Type", "Driveway");
+  await sayOver("In the back garden a “Pool” – its water lies below the ground.");
   await setCam(C_BACK_NEAR);
   await drawArea(R_POOL, 0.8);
-  await pick("Art", "Pool");
-  await sayOver("Und ein „Beet“ an der Hauswand, ein Stück höher als der Rasen.");
+  await pick("Type", "Pool");
+  await sayOver("And a “Flower bed” along the house wall, a bit higher than the lawn.");
   await drawArea(R_BED, 0.7);
-  await pick("Art", "Beet");
+  await pick("Type", "Flower bed");
 
   // ---------------------------------------------------------------- holes
-  await chapter("Löcher: Pool und Wildfläche");
+  await chapter("Holes: pool and wild patch");
   {
-    const line = "Schau dir den Pool in 3D an: Das Wasser fehlt. Der Rasen liegt noch darüber, denn der Pool liegt mitten in der Rasenfläche.";
+    const line = "Look at the pool in 3D: the water is missing. The lawn still covers it, because the pool lies in the middle of the lawn.";
     await sayOver(line);
     await glideLine(C_POOL, line, 0.6);
   }
-  await sayOver("Dafür ist der Haken „Aus Flächen darunter ausschneiden“: Jede vorher gezeichnete Fläche, in der diese ganz liegt, bekommt hier ein Loch.");
+  await sayOver("That is what “Cut out of the areas beneath” is for: every area drawn earlier that contains this one completely gets a hole here.");
   await tapArea(11, 12.5);
-  await R.clickOn({ text: "Aus Flächen darunter ausschneiden" }, 0.6);
+  await R.clickOn({ text: "Cut out of the areas beneath" }, 0.6);
   await live(0.8);
   {
-    const line = "Jetzt ist der Rasen dort offen, und du siehst das Wasser.";
+    const line = "Now the lawn is open there, and you can see the water.";
     await sayOver(line);
     await glideLine(cam(0.25, 0.8, 13, 9.5, 13), line);
   }
-  await sayOver("Genauso geht eine „Wildfläche“ für eine ungemähte Ecke mitten im Rasen: aufziehen, Art „Wildfläche“, Haken setzen.");
+  await sayOver("A “Wild patch” for an unmown corner in the middle of the lawn works the same way: drag it open, type “Wild patch”, tick the box.");
   await setCam(cam(0.15, 0.8, 16, 1, 13.5));
   await drawArea(R_WILD, 0.8);
-  await pick("Art", "Wildfläche");
-  await R.clickOn({ text: "Aus Flächen darunter ausschneiden" }, 0.5);
+  await pick("Type", "Wild patch");
+  await R.clickOn({ text: "Cut out of the areas beneath" }, 0.5);
   await live(0.6);
   {
-    const line = "Wichtig ist die Reihenfolge: Das Loch entsteht nur in Flächen, die vorher gezeichnet wurden.";
+    const line = "The order matters: the hole only appears in areas that were drawn before.";
     await sayOver(line);
     await glideLine(cam(-0.3, 0.85, 18, 1, 13.5), line);
   }
 
   // ---------------------------------------------------------------- height offset
-  await chapter("Höhenversatz: die erhöhte Terrasse");
+  await chapter("Height offset: the raised terrace");
   await setCam(C_TERRACE);
-  await sayOver("Jede Fläche hat einen „Höhenversatz“: Plus hebt sie an, Minus senkt sie unter den Boden.");
+  await sayOver("Every area has a height offset: plus raises it, minus lowers it below the ground.");
   await tapArea(4.5, 11.5);
-  await R.moveTo({ label: "Höhenversatz" }, 0.5);
+  await R.moveTo({ label: "Height offset" }, 0.5);
   await R.hold(0.6);
-  await sayOver("Meine Terrasse soll 30 Zentimeter höher liegen, wie mit zwei Stufen. Also trage ich 0,3 ein.");
+  await sayOver("I want my terrace 30 centimetres higher, as if two steps up. So I enter 0.3.");
   await R.hold(1.2);
-  await fill("Höhenversatz", "0,3");
+  await fill("Height offset", "0,3");
   {
-    const line = "Mit einem Minuswert liegt eine Fläche tiefer, etwa vor einer Garage im Untergeschoss. Leuchten auf der Fläche gehen mit hoch oder runter.";
+    const line = "With a minus value an area sits lower, for example in front of a garage in the basement. Lamps on the area move up or down with it.";
     await sayOver(line);
     await glideLine(cam(1.0, 0.75, 13, 3, 11), line);
   }
 
   // ---------------------------------------------------------------- slope
-  await chapter("Gefälle: die Einfahrt am Hang");
+  await chapter("Slope: the driveway on a hill");
   await planTo(FRONT, 0.8);
   await setCam(C_DRIVE);
-  await sayOver("Bei diesem Grundstück liegt die Straße höher als das Haus. Die Einfahrt fällt also zur Garage hin ab.");
+  await sayOver("On this plot the street is higher than the house. So the driveway falls towards the garage.");
   await tapArea(11.75, -4);
   await R.hold(0.6);
-  await sayOver("Erst der „Höhenversatz“: 0,6 – so hoch liegt die Einfahrt oben an der Straße.");
-  await fill("Höhenversatz", "0,6");
-  await sayOver("Dann das „Gefälle“: ebenfalls 0,6 Meter Höhenunterschied. Bei „Fällt nach“ wähle ich „unten“ – im Plan nach unten, zur Garage.");
-  await fill("Gefälle (m)", "0,6");
-  await pick("Fällt nach", "unten (+Z)");
-  await sayOver("Der Hinweis darunter fasst es zusammen: Die hohe Kante liegt auf dem Höhenversatz, die tiefe Kante um das Gefälle tiefer.");
-  await moveToText("Höhenunterschied von der hohen", 0.6);
+  await sayOver("Ridge, the height offset: 0.6 – that is how high the driveway sits up at the street.");
+  await fill("Height offset", "0,6");
+  await sayOver("Then the slope: also 0.6 metres of height difference. Under “Falls towards” I pick “down”: down in the plan, towards the garage.");
+  await fill("Slope (m)", "0,6");
+  await pick("Falls towards", "down (+Z)");
+  await sayOver("The note below sums it up: the high edge sits at the height offset, the low edge lower by the slope.");
+  await moveToText("Height difference from the high", 0.6);
   await R.hold(1);
   {
-    const line = "In 3D läuft die Einfahrt jetzt von der Straße hinunter bis zum Garagentor.";
+    const line = "In 3D the driveway now runs down from the street to the garage door.";
     await sayOver(line);
     await glideLine(cam(-2.45, 1.05, 19, 11, -3), line);
   }
-  await sayOver("Den Vorgarten und den Weg stelle ich genauso ein, dann liegt der ganze Vorgarten am Hang.");
+  await sayOver("I set the front lawn and the path the same way, so the whole front garden lies on the slope.");
   await setCam(C_FRONT_NEAR);
   await tapArea(6, -5, 0.5);
-  await quickFill("Höhenversatz", "0,6");
-  await quickFill("Gefälle (m)", "0,6");
-  await pick("Fällt nach", "unten (+Z)", 0.4);
+  await quickFill("Height offset", "0,6");
+  await quickFill("Slope (m)", "0,6");
+  await pick("Falls towards", "down (+Z)", 0.4);
   {
-    const line = "So baust du auch einen Hang im Garten oder eine Rampe. Zaunpfosten und Leuchten stellen sich später auf die schräge Fläche.";
+    const line = "That is also how you build a slope in the garden or a ramp. Fence posts and lamps will stand on the sloping surface later.";
     await catchUp();
     const t0 = R.time;
     await sayOver(line);
     await tapArea(1.7, -5, 0.5);
-    await quickFill("Höhenversatz", "0,6");
-    await quickFill("Gefälle (m)", "0,6");
-    await pick("Fällt nach", "unten (+Z)", 0.4);
+    await quickFill("Height offset", "0,6");
+    await quickFill("Slope (m)", "0,6");
+    await pick("Falls towards", "down (+Z)", 0.4);
     await glide3d(cam(-2.0, 0.95, 28, 6, -3), Math.max(1.2, t0 + N.length(line) - R.time - 0.3));
   }
 
   // ---------------------------------------------------------------- outro
   await chapter("Wie geht es weiter");
-  await R.title("Teil 2: Hecken, Zaun, Pergola, Licht und Pflanzen", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
-  await say("Das war Teil eins: das Werkzeug „Außen“, alle Flächen, ein Grundstück aus mehreren Rasenflächen ohne Umrisslinien, Löcher, Höhenversatz und Gefälle.");
-  await say("In Teil zwei kommen Hecken, Zaun und Pergola, Außenleuchten, Pflanzen und ein Stellplatz in der Einfahrt.");
-  await say("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. NeonPlan läuft übrigens auch auf alten Wandtablets. Bis gleich in Teil zwei!");
+  await R.title("part 2: Hedges, fence, pergola, lights and plants", `HomePlan 3D – also runs on old wall tablets${VERSION}`);
+  await say("That was part one: the Outdoor tool, every kind of area, a plot made of several lawns without outlines, holes, height offset and slope.");
+  await say("Part two adds hedges, a fence and a pergola, outdoor lights, plants and a parking spot in the driveway.");
+  await say("Left to the online demo and the manual are in the description. NeonPlan also runs on old wall tablets, by the way. See you in part two!");
   await R.hold(0.6);
 } else {
-  // ================================================================ PART 2: Hecken, Zaun, Pergola, Licht und Pflanzen
+  // ================================================================ PART 2: Hedges, fence, pergola, lights and plants
   // ---------------------------------------------------------------- teaser
   await chapter("Teaser");
   await start(GARDEN_B, FURNITURE_B);
@@ -757,23 +757,23 @@ if (PART === "a") {
     const C = cam(-2.5, 0.88, 26, 6.5, 0);
     await setMain(A);
     await R.frame(0.2, 1200);
-    await R.title("Außenbereich und Garten", `HomePlan 3D · Folge 9 · Teil 2${VERSION}`);
-    const l1 = "Eine Thujahecke, ein Zaun am Haus, eine Pergola auf der Terrasse – und abends Licht an Weg, Pool und Haustür.";
+    await R.title("Outdoor area and garden", `HomePlan 3D · episode 9 · part 2${VERSION}`);
+    const l1 = "A thuja hedge, a fence against the house, a pergola on the terrace – and in the evening light on the path, the pool and the front door.";
     await sayOver(l1);
     await glideMain(A, B, N.length(l1));
     await R.untitle();
-    const l2 = "In Teil zwei kommen Hecken, Zaun, Pergola, Licht und Pflanzen in den Garten.";
+    const l2 = "In part two, hedges, a fence, a pergola, lights and plants go into the garden.";
     await sayOver(l2);
     await glideMain(B, C, N.length(l2));
   }
 
   // ---------------------------------------------------------------- intro
-  await chapter("Was wir heute machen");
+  await chapter("Was wir today machen");
   await start(GARDEN_A);
   await R.hideCursor(false);
   await setCam(C_BACK);
   {
-    const line = "Wir machen mit dem Garten aus Teil eins weiter: Rasen, Terrasse, Weg, die Einfahrt am Hang, Pool, Beet und Wildfläche.";
+    const line = "We carry on with the garden from part one: lawn, terrace, path, the driveway on the slope, pool, flower bed and wild patch.";
     await sayOver(line);
     await pointPlan(3, 10.7, 0.6);
     await R.hold(0.6);
@@ -784,39 +784,39 @@ if (PART === "a") {
   }
 
   // ---------------------------------------------------------------- hedges
-  await chapter("Hecken");
+  await chapter("Hedgen");
   await setCam(cam(-2.0, 0.85, 30, 2, 4));
-  await sayOver("Eine Hecke ist auch eine Außenfläche: „Außen“, einen schmalen Streifen aufziehen, Art „Hecke“.");
+  await sayOver("A hedge is an outdoor area too: “Outdoor”, drag open a narrow strip, type “Hedge”.");
   await drawArea(R_THUJA, 1.2);
-  await pick("Art", "Hecke");
-  await sayOver("Hecke, Zaun und Pergola haben zusätzlich eine „Höhe“. Für einen Sichtschutz aus Thuja trage ich 2,5 Meter ein.");
-  await fill("Höhe (m)", "2,5");
+  await pick("Type", "Hedge");
+  await sayOver("Hedge, fence and pergola also have a “Height”. For a thuja privacy screen I enter 2.5 metres.");
+  await fill("Height (m)", "2,5");
   await live(0.5);
-  await sayOver("Eine niedrige Hecke als Einfassung bekommt 0,5 Meter. Ich ziehe sie hinten an der Grundstücksgrenze auf.");
+  await sayOver("A low hedge as an edging gets 0.5 metres. I draw it at the back of the plot.");
   await setCam(cam(0.2, 0.85, 30, 6, 12));
   await drawArea(R_LOWHEDGE, 1.1);
-  await pick("Art", "Hecke");
-  await fill("Höhe (m)", "0,5");
+  await pick("Type", "Hedge");
+  await fill("Height (m)", "0,5");
   {
-    const line = "In 3D stehen die Hecken als grüne Blöcke am Rand – hoch an der Seite, niedrig hinten.";
+    const line = "In 3D the hedges stand as green blocks along the edge – tall at the side, low at the back.";
     await sayOver(line);
     await glideLine(cam(0.9, 0.85, 34, 4, 6), line);
   }
 
   // ---------------------------------------------------------------- fence
-  await chapter("Zaun");
+  await chapter("Fence");
   await planTo(SIDE, 0.8);
   await setCam(C_SIDE);
-  await sayOver("Neben der Garage soll ein kleiner Hof eingezäunt werden. Wieder „Außen“, aufziehen, Art „Zaun“.");
+  await sayOver("Next to the garage I want to fence in a small yard. “Outdoor” again, drag it open, type “Fence”.");
   await drawArea(R_FENCE, 1);
-  await pick("Art", "Zaun");
-  await sayOver("Ein Zaun läuft erst einmal rundherum, auch an der Hauswand entlang. Die Höhe stelle ich auf 1,2 Meter.");
-  await fill("Höhe (m)", "1,2");
-  await sayOver("Mit „Offen“ fällt die Kante vom letzten zum ersten Punkt weg. Bei einem aufgezogenen Rechteck ist das die linke – so lehnt der Zaun am Haus.");
-  await R.clickOn({ text: "Offen (letzte Kante weglassen)" }, 0.6);
+  await pick("Type", "Fence");
+  await sayOver("At first a fence runs all the way round, along the house wall too. I set the height to 1.2 metres.");
+  await fill("Height (m)", "1,2");
+  await sayOver("With “Open” the edge from the last point back to the first is left out. On a rectangle you dragged open, that is the left one – so the fence leans against the house.");
+  await R.clickOn({ text: "Open (letzte Kante weglassen)" }, 0.6);
   await live(0.6);
   {
-    const line = "In 3D: Pfosten etwa alle zwei Meter, zwei Latten, und zur Hauswand hin ist er offen.";
+    const line = "In 3D: posts about every two metres, two rails, and it is open towards the house wall.";
     await sayOver(line);
     await glideLine(cam(2.2, 0.85, 18, 15, 5), line);
   }
@@ -825,71 +825,71 @@ if (PART === "a") {
   await chapter("Pergola");
   await planTo(BACK, 0.8);
   await setCam(C_TERRACE);
-  await sayOver("Auf die Terrasse kommt eine Pergola: aufziehen, Art „Pergola / Rahmen“.");
+  await sayOver("A pergola goes on the terrace: drag it open, type “Pergola / frame”.");
   await drawArea(R_PERGOLA, 0.9);
-  await pick("Art", "Pergola / Rahmen");
-  await sayOver("Sie bekommt Eckpfosten, Balken und Sparren in der eingestellten Höhe – ich nehme 2,4 Meter. Und weil die Terrasse 30 Zentimeter höher liegt, bekommt die Pergola denselben Höhenversatz.");
-  await fill("Höhe (m)", "2,4");
-  await fill("Höhenversatz", "0,3");
-  await sayOver("„X-Verstrebung“ setzt Kreuze in alle Seiten.");
-  await R.clickOn({ text: "X-Verstrebung" }, 0.6);
+  await pick("Type", "Pergola / frame");
+  await sayOver("It gets corner posts, beams and rafters at the height you set – I take 2.4 metres. And because the terrace sits 30 centimetres higher, the pergola gets the same height offset.");
+  await fill("Height (m)", "2,4");
+  await fill("Height offset", "0,3");
+  await sayOver("“X-bracing” puts crosses into every side.");
+  await R.clickOn({ text: "X-bracing" }, 0.6);
   await live(0.5);
-  await sayOver("Mit dem Gefälle neigt sich die Pergola: 0,3 Meter, fällt nach unten – also vom Haus weg.");
-  await fill("Gefälle (m)", "0,3");
-  await pick("Fällt nach", "unten (+Z)");
+  await sayOver("The slope tilts the pergola: 0.3 metres, falling down – that is, away from the house.");
+  await fill("Slope (m)", "0,3");
+  await pick("Falls towards", "down (+Z)");
   {
-    const line = "Den Haken „Offen“ gibt es auch hier. Und als Rahmen taugt sie genauso für ein Carport-Gerüst oder den Unterbau eines Rolldachs.";
+    const line = "The “Open” checkbox is here as well. And as a frame it works just as well for a carport frame or the base of a retractable roof.";
     await sayOver(line);
-    await R.moveTo({ text: "Offen (letzte Kante weglassen)" }, 0.5);
+    await R.moveTo({ text: "Open (letzte Kante weglassen)" }, 0.5);
     await glideLine(cam(1.1, 0.72, 12, 2.2, 10.8), line, 0.9);
   }
 
   // ---------------------------------------------------------------- outdoor lights
-  await chapter("Außenleuchten");
+  await chapter("Outdoor lights");
   await planTo(FRONT, 0.8);
   await setCam(C_FRONT_NEAR);
   await R.editor(`e._roomId = null; e._outdoorId = null;`);
-  await sayOver("Jetzt das Licht. Außenleuchten sind Möbel: Werkzeug „Möbel“, Abschnitt „Leuchten“. Ganz unten stehen „Wegleuchte“ und „Garten-Spot“.");
-  await R.clickOn({ text: "Möbel", exact: true }, 0.6);
+  await sayOver("Now the lights. Outdoor lights are furniture: the “Furniture” tool, section “Lights”. At the very bottom are “Path light” and “Garden spot”.");
+  await R.clickOn({ text: "Furniture", exact: true }, 0.6);
   await R.frame(0.3, 400);
-  await R.moveTo(libItem("Wegleuchte"), 0.6);
+  await R.moveTo(libItem("Path light"), 0.6);
   await R.hold(0.5);
-  await R.moveTo(libItem("Garten-Spot"), 0.4);
+  await R.moveTo(libItem("Garden spot"), 0.4);
   await R.hold(0.4);
-  await sayOver("Ist kein Raum ausgewählt, landet die Leuchte in der Mitte des Plans. Kleine Leuchten setzt du am genauesten mit X und Y – hier an den Weg.");
-  await clickSide(libItem("Wegleuchte"), 0.5);
+  await sayOver("With no room selected, the light lands in the middle of the plan. Small lights are placed most precisely with X and Y – here next to the path.");
+  await clickSide(libItem("Path light"), 0.5);
   await R.frame(0.3, 500);
   await placeXY(...LAMPS[0], false);
-  await sayOver("Bei „Licht oder Schalter“ wähle ich das Licht aus Home Assistant, hier die Wegleuchten.");
-  await reveal({ label: "Licht oder Schalter" });
-  await h.pickEntity("Licht oder Schalter", "weg", "Garten Wegleuchten");
-  await sayOver("„Duplizieren“ macht zwei weitere daraus. Ich verteile sie am Weg, alle zweieinhalb Meter – und alle folgen demselben Licht.");
+  await sayOver("Under “Light or switch” I pick the light from Home Assistant, here the path lights.");
+  await reveal({ label: "Light or switch" });
+  await h.pickEntity("Light or switch", "path", "Garden path lights");
+  await sayOver("“Duplicate” makes two more. I spread them along the path, one every two and a half metres – and they all follow the same light.");
   for (const p of LAMPS.slice(1)) {
-    await clickSide({ text: "Duplizieren", exact: true }, 0.5);
+    await clickSide({ text: "Duplicate", exact: true }, 0.5);
     await R.frame(0.2, 400);
     await placeXY(...p);
   }
-  await sayOver("An die Haustür kommt eine „Wandleuchte“. Draußen rastet sie nicht von selbst ein, also setze ich sie mit X und Y vor die Wand …");
-  await clickSide(libItem("Wandleuchte"), 0.6);
+  await sayOver("A “Wall light” goes by the front door. Outside it does not snap on by itself, so I put it in front of the wall with X and Y …");
+  await clickSide(libItem("Wall light"), 0.6);
   await R.frame(0.3, 500);
   await placeXY(...WALL_LAMP);
-  await sayOver("… drehe sie mit „Drehung“ auf 180 Grad nach außen und hänge sie mit „Höhe über Boden“ auf 2 Meter.");
-  await fillSide("Drehung (°)", "180");
-  await fillSide("Höhe über Boden (m)", "2");
-  await sayOver("Dazu das Licht „Haustür Außenlicht“.");
-  await reveal({ label: "Licht oder Schalter" });
-  await h.pickEntity("Licht oder Schalter", "haus", "Haustür Außenlicht");
-  await sayOver("Den „Garten-Spot“ stelle ich an den Pool, mit dem Pool-Licht. „Leuchtstärke in 3D“ macht ihn kräftiger: 150 Prozent.");
+  await sayOver("… turn it outwards with “Rotation” set to 180 degrees, and hang it at 2 metres with “Height above floor”.");
+  await fillSide("Rotation (°)", "180");
+  await fillSide("Elevation (m)", "2");
+  await sayOver("Plus the light “Front door outdoor light”.");
+  await reveal({ label: "Light or switch" });
+  await h.pickEntity("Light or switch", "front", "Front door outdoor light");
+  await sayOver("I put the garden spot by the pool, with the pool light. “Glow in 3D” makes it stronger: 150 percent.");
   await planTo(BACK, 0.8);
   await setCam(C_POOL);
-  await clickSide(libItem("Garten-Spot"), 0.5);
+  await clickSide(libItem("Garden spot"), 0.5);
   await R.frame(0.3, 500);
   await placeXY(...SPOT);
-  await reveal({ label: "Licht oder Schalter" });
-  await h.pickEntity("Licht oder Schalter", "pool", "Pool Spot");
-  await fillSide("Leuchtstärke in 3D (%)", "150", true);
+  await reveal({ label: "Light or switch" });
+  await h.pickEntity("Light or switch", "pool", "Pool Spot");
+  await fillSide("Glow in 3D (%)", "150", true);
   {
-    const line = "Wegleuchte, Garten-Spot und Wandleuchte außen beleuchten alle Außenflächen und die Fassade. Abends sieht das so aus.";
+    const line = "Path lights, garden spots and outdoor wall lights light up all outdoor areas and the facade. In the evening it looks like this.";
     await sayOver(line);
     await evening();
     await setCam(cam(0.6, 0.8, 16, 10, 13));
@@ -898,66 +898,66 @@ if (PART === "a") {
     await glide3d(cam(-2.3, 0.95, 22, 4, -3), Math.max(1, N.length(line) * 0.6 - 1));
   }
   {
-    const line = "Die Wegleuchten stehen auf dem schrägen Vorgarten, das Licht fällt auf den Weg und die Fassade.";
+    const line = "The path lights stand on the sloping front garden, and their light falls on the path and the facade.";
     await sayOver(line);
     await glideLine(cam(-2.0, 0.9, 16, 2, -2.5), line);
   }
 
   // ---------------------------------------------------------------- plants
-  await chapter("Pflanzen");
+  await chapter("Plants");
   await planTo(BACK, 0.8);
   await setCam(C_TERRACE);
   await R.editor(`e._roomId = null; e._furnitureId = null;`);
-  await sayOver("Für Grün gibt es die eingebaute „Pflanze“ unter „Wohnen“. Ich stelle sie auf die Terrasse und mache sie mit „Höhe“ etwas größer.");
-  await clickSide(libItem("Pflanze"), 0.6);
+  await sayOver("For some green there is the built-in “Plant” under “Living”. I put it on the terrace and make it a bit taller with “Height”.");
+  await clickSide(libItem("Plant"), 0.6);
   await R.frame(0.3, 500);
   await placeXY(...PLANT);
-  await fillSide("Höhe (m)", "1,5");
+  await fillSide("Height (m)", "1,5");
   {
-    const line = "Bäume, Sträucher und Gestrüpp bringt das Pack „Garten & Terrasse“ mit – Breite und Höhe bestimmen dort Krone und Wuchs.";
+    const line = "Trees, shrubs and brush come with the “Garden & Terrace” pack – there, width and height set the crown and the growth.";
     await sayOver(line);
     await glideLine(cam(1.1, 0.75, 12, 4, 11), line);
   }
 
   // ---------------------------------------------------------------- parking spot
-  await chapter("Stellplatz in der Einfahrt");
+  await chapter("Parking space in the driveway");
   await planTo(FRONT, 0.8);
   await setCam(C_DRIVE);
   await R.editor(`e._roomId = null; e._furnitureId = null;`);
-  await sayOver("Für das Auto in der Einfahrt öffne ich den Abschnitt „Stellplätze“ und nehme den „Stellplatz“.");
-  await h.scrollSide({ text: "Stellplätze" }, 620);
-  await R.clickOn({ text: "Stellplätze" }, 0.5);
+  await sayOver("For the car in the driveway I open the “Parking” section and take the “Parking spot”.");
+  await h.scrollSide({ text: "Parking" }, 620);
+  await R.clickOn({ text: "Parking" }, 0.5);
   await R.frame(0.3, 400);
-  await clickSide(libItem("Stellplatz"), 0.5);
+  await clickSide(libItem("Parking spot"), 0.5);
   await R.frame(0.3, 500);
-  await fillSide("Drehung (°)", "0", true);
+  await fillSide("Rotation (°)", "0", true);
   await placeXY(...PARK);
-  await sayOver("Er markiert, wo ein Auto steht. Bei „Sensor Auto anwesend“ wähle ich den Sensor, der das Auto in der Einfahrt meldet.");
+  await sayOver("It marks where a car stands. Under “Sensor \"car present\"” I pick the sensor that reports the car in the driveway.");
   await reveal({ label: "Sensor" });
-  await h.pickEntity("Sensor", "einfahrt", "Auto in der Einfahrt");
+  await h.pickEntity("Sensor", "driveway", "Car in the driveway");
   {
-    const line = "Das Fahrzeug selbst kommt aus dem Pack „Fahrzeuge“ – das zeigt Folge 4.";
+    const line = "The vehicle itself comes from the “Vehicles” pack – episode 4 shows how.";
     await sayOver(line);
-    await h.scrollSide(() => textBox("Kein Fahrzeug-Pack"), 420, 0.5);
-    await moveToText("Kein Fahrzeug-Pack", 0.5);
+    await h.scrollSide(() => textBox("No vehicle pack imported"), 420, 0.5);
+    await moveToText("No vehicle pack imported", 0.5);
     await glideLine(cam(-2.5, 1.0, 18, 11, -3), line);
   }
 
   // ---------------------------------------------------------------- plan lock
-  await chapter("Grundriss sperren");
-  await sayOver("Ist der Garten fertig, sperrst du ihn mit dem Schloss „Grundriss“ oben in der Leiste. Dann verrutschen Räume, Wände, Türen und Außenflächen nicht mehr aus Versehen.");
-  await R.clickOn({ text: "Auswählen", exact: true }, 0.4);
-  await R.clickOn({ text: "Grundriss", nth: 0 }, 0.5);
+  await chapter("Lock the floor plan");
+  await sayOver("Once the garden is done, you lock it with the padlock “Floor plan” in the bar at the top. Then rooms, walls, doors and outdoor areas no longer move by accident.");
+  await R.clickOn({ text: "Select", exact: true }, 0.4);
+  await R.clickOn({ text: "Floor plan", nth: 0 }, 0.5);
   await R.frame(0.4, 400);
   await dragPlan(6, -5, 6, -3, 0.8);
   await R.frame(0.3, 300);
-  await sayOver("Möbel und Leuchten bleiben frei. Ein zweiter Klick hebt die Sperre wieder auf.");
+  await sayOver("Furniture and lights stay free. A second click lifts the lock again.");
   await R.hold(1.2);
-  await R.clickOn({ text: "Grundriss", nth: 0 }, 0.5);
+  await R.clickOn({ text: "Floor plan", nth: 0 }, 0.5);
   await R.frame(0.4, 300);
 
   // ---------------------------------------------------------------- result
-  await chapter("Der Garten in 3D");
+  await chapter("Der Garden in 3D");
   await show3d();
   {
     const A = cam(-2.75, 0.92, 38, 6.5, 3);
@@ -965,7 +965,7 @@ if (PART === "a") {
     const C = cam(0.7, 0.85, 34, 6.5, 6);
     await setMain(A);
     await R.frame(0.2, 600);
-    const line = "Der fertige Garten: Einfahrt am Hang mit Stellplatz, Weg mit Licht, Zaun, Hecken, Pool, Terrasse mit Pergola.";
+    const line = "The finished garden: a driveway on the slope with a parking spot, a lit path, fence, hedges, pool, and a terrace with a pergola.";
     await sayOver(line);
     const len = N.length(line);
     await glideMain(A, B, len * 0.5);
@@ -974,10 +974,10 @@ if (PART === "a") {
 
   // ---------------------------------------------------------------- outro
   await chapter("Wie geht es weiter");
-  await R.title("Nächste Folge: Die 3D-Ansicht bedienen", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
-  await say("Das war Teil zwei: Hecken mit eigener Höhe, ein offener Zaun am Haus, die Pergola mit Verstrebung und Gefälle, Außenleuchten, Pflanzen und der Stellplatz.");
-  await say("In der nächsten Folge geht es um die 3D-Ansicht: alle Schalter, Geräte bedienen, Raumfenster und Suche.");
-  await say("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und NeonPlan läuft auch auf alten Wandtablets. Bis zum nächsten Mal!");
+  await R.title("Next episode: Die 3D-View bedienen", `HomePlan 3D – also runs on old wall tablets${VERSION}`);
+  await say("That was part two: hedges with their own height, an open fence against the house, the pergola with bracing and slope, outdoor lights, plants and the parking spot.");
+  await say("The next episode is about the 3D view: every switch, controlling devices, the room panel and search.");
+  await say("Left to the online demo and the manual are in the description. And NeonPlan also runs on old wall tablets. See you next time!");
   await R.hold(0.6);
 }
 

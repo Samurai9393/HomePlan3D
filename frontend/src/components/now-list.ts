@@ -1,5 +1,5 @@
 // The phone's "What is going on?" (see ../now.ts), in three shapes the host switches between:
-//   bar    one line under the house ("2 Fenster offen · 4 Lichter an") – the house stays free; a tap opens the page
+//   bar    one line under the house ("2 windows open · 4 lights on") – the house stays free; a tap opens the page
 //   page   the whole list on a page of its own: one line per thing worth knowing, the urgent first, with the obvious
 //          thing to do beside it; a tap on a place closes the page and flies there
 //   check  the house check before leaving or going to bed: a small card under the house that steps through every
@@ -24,7 +24,7 @@ export interface NowLabels {
   checkDone: string;
   checkNothing: string;
   windowHint: string;
-  /** "Alle {n} Lichter aus" */
+  /** "Turn off all {n} lights" */
   allLightsOff: string;
 }
 

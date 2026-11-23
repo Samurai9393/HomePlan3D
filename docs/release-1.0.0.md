@@ -23,4 +23,4 @@ Furniture packs and the Pro add-ons *Camera cockpit*, *Weather outside* and *Liv
 
 HACS → Custom repositories → `https://github.com/Mastershort/neonplan3d` (Integration) → install → restart → add the integration *HomePlan 3D*.
 
-Requires Home Assistant 2025.1 or newer. Manual (German): [docs/anleitung.md](https://github.com/Mastershort/neonplan3d/blob/main/docs/anleitung.md).
+Requires Home Assistant 2025.1 or newer. Manual: [docs/anleitung.md](anleitung.md).

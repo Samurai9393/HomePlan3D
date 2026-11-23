@@ -428,7 +428,7 @@ export class Fp3dCardTemplates extends LitElement {
   private renderOpen(selected: CardTemplate | undefined) {
     const list = this._open;
     if (!list) return nothing;
-    const lang = this.hass?.language ?? "de";
+    const lang = this.hass?.language ?? "en";
     const byId = (id: string | null | undefined) => (id ? this.templates.find((x) => x.id === id || x.aliases?.includes(id)) : undefined);
     const time = (s: number) => {
       const d = new Date(s * 1000);
@@ -447,7 +447,7 @@ export class Fp3dCardTemplates extends LitElement {
               const mine = !!tpl && tpl === selected;
               return html`<li class=${mine ? "fp3d-tpl-mine" : ""}>
                 <span class="fp3d-tpl-dev">${s.kind === "panel" ? "🖥" : "📱"} <b>${s.device || this.t("screens_unknown_device")}</b>${s.user ? html` · ${s.user}` : nothing}</span>
-                <span>${shows}${s.screen && s.screen !== tpl?.name ? html` · „${s.screen}“` : nothing}</span>
+                <span>${shows}${s.screen && s.screen !== tpl?.name ? html` · “${s.screen}”` : nothing}</span>
                 <span class="fp3d-sub">${this.t("screens_since", { time: time(s.since) })}${s.version ? ` · v${s.version}` : ""}</span>
                 <span class="fp3d-tpl-old">${old ? this.t("screens_old") : ""}</span>
                 ${s.reloadable

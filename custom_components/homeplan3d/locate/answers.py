@@ -1,5 +1,5 @@
 """Spoken answers of the locating feature, straight from Home Assistant (no screen needed):
-"Wo ist Torsten?", "Wo ist mein iPhone?", "Wer ist zu Hause?", "Lass mein iPhone klingeln"."""
+"Where is Torsten?", "Where is my iPhone?", "Who is home?", "Ring my iPhone"."""
 
 from __future__ import annotations
 
@@ -72,33 +72,16 @@ def taken_off(worn: dict[str, Any], other: dict[str, Any], now: float) -> bool:
     return now - worn_since >= TAKEN_OFF and float(other.get("since") or 0) > worn_since + LEFT_BEHIND
 
 
-_ART_DE = r"(?P<art>mein|meine|meinen|meins|der|die|das|den)?"
 _WHERE = {
-    "de": re.compile(r"^(?:wo (?:ist|steckt|liegt|sind)|finde|such[e]?)\s+" + _ART_DE + r"\s*(?P<what>.+?)[?.!]*$"),
     "en": re.compile(r"^(?:where(?:'s| is| are)|find)\s+(?P<art>my|the)?\s*(?P<what>.+?)[?.!]*$"),
 }
 _WHO = {
-    "de": re.compile(r"^wer ist (?:gerade |denn )?(?:zu ?hause|daheim|da|im haus)[?.!]*$"),
     "en": re.compile(r"^who(?:'s| is) (?:at )?home[?.!]*$"),
 }
 _RING = {
-    "de": re.compile(r"^(?:lass|lasse)\s+" + _ART_DE + r"\s*(?P<what>.+?)\s+(?:klingeln|piepen|läuten)[?.!]*$"),
     "en": re.compile(r"^(?:ring|beep)\s+(?P<art>my|the)?\s*(?P<what>.+?)[?.!]*$"),
 }
 _TEXT = {
-    "de": {
-        "in": "{who} ist im Raum {room}.",
-        "in_ago": "{who} war zuletzt im Raum {room}, vor {min} Minuten.",
-        "away": "{who} ist gerade nicht zu Hause.",
-        "unheard": "Ich höre {who} gerade nicht.",
-        "nobody": "Gerade ist niemand zu Hause, den ich orten kann.",
-        "home": "Zu Hause: {list}.",
-        "ring": "{who} klingelt jetzt.",
-        "no_ring": "Für {who} ist keine App zum Klingeln eingestellt.",
-        "private": "Wo jemand ist, sagt NeonPlan hier nur Admins.",
-        "not_yours": "Du kannst nur deine eigenen Geräte klingeln lassen.",
-        "ring_wait": "{who} hat gerade erst geklingelt.",
-    },
     "en": {
         "in": "{who} is in the {room}.",
         "in_ago": "{who} was last in the {room}, {min} minutes ago.",
@@ -124,17 +107,17 @@ def _person_name(hass: HomeAssistant, entity_id: str | None) -> str | None:
     return str(state.attributes.get("friendly_name") or entity_id) if state else None
 
 
-MINE = {"mein", "meine", "meinen", "meins", "my"}
+MINE = {"my"}
 
 
 def _tokens(text: str) -> list[str]:
-    """Words as speech recognition may write them: lower case, umlauts spelled out, "th" as "t", no punctuation."""
-    text = _norm(text).replace("ä", "ae").replace("ö", "oe").replace("ü", "ue").replace("ß", "ss").replace("th", "t")
+    """Words as speech recognition may write them: lower case, no possessive 's, "th" as "t", no punctuation."""
+    text = _norm(text).replace("'s", "").replace("th", "t")
     return [w for w in re.split(r"[^a-z0-9]+", text) if w]
 
 
 def _same(spoken: str, name: str) -> bool:
-    """One spoken word against one word of a name: equal, a possessive ("Torstens"), or a small mishearing."""
+    """One spoken word against one word of a name: equal, a trailing possessive "s", or a small mishearing."""
     if spoken == name or (spoken.endswith("s") and spoken[:-1] == name):
         return True
     return len(spoken) > 3 and len(name) > 3 and SequenceMatcher(None, spoken, name).ratio() >= 0.8
@@ -161,7 +144,7 @@ def _speaker(hass: HomeAssistant, user_id: str | None) -> str | None:
 def _match(
     hass: HomeAssistant, service: LocateService, what: str, mine: bool = False, user_id: str | None = None
 ) -> tuple[str, list[dict[str, Any]]] | None:
-    """The devices a spoken name means - tolerant of how speech recognition writes it ("Thorstens Apple Watch").
+    """The devices a spoken name means - tolerant of how speech recognition writes it ("Torsten's Apple Watch").
     A person's name alone means all their devices; "my" prefers the devices of the person who asked."""
     spoken = [w for w in _tokens(what) if w not in MINE]
     if not spoken:
@@ -170,7 +153,7 @@ def _match(
     scored = [(_score(spoken, d["name"]), d) for d in service.devices]
     best = max((sc for sc, _d in scored), default=0.0)
     if best < 0.6:
-        # maybe a person's name from Home Assistant ("Wo ist Frauke?")
+        # maybe a person's name from Home Assistant ("Where is Frauke?")
         by_person: dict[str, list[dict[str, Any]]] = {}
         for device in service.devices:
             if device.get("person"):
@@ -185,7 +168,7 @@ def _match(
         own = [d for d in hits if d.get("person") == speaker]
         hits = own or hits
     device = hits[0]
-    # only a person's name said ("Wo ist Torsten?"): the words sit in every device of that person -> the person
+    # only a person's name said ("Where is Torsten?"): the words sit in every device of that person -> the person
     person = device.get("person")
     if person:
         theirs = [d for d in service.devices if d.get("person") == person]
@@ -199,7 +182,7 @@ _NOT_AWAY = ("home", "on", "unknown", "unavailable", "")
 
 
 def _away(hass: HomeAssistant, state: str) -> bool:
-    """A person's state that says away; a zone of their own that touches the home zone ("Garten") is home (#900)."""
+    """A person's state that says away; a zone of their own that touches the home zone ("Garden") is home (#900)."""
     if state in _NOT_AWAY:
         return False
     home = hass.states.get("zone.home")
@@ -308,7 +291,7 @@ async def async_locate(
         if now - _rung.get(notify, -RING_COOLDOWN) < RING_COOLDOWN:
             return Located(t["ring_wait"].format(who=who), [], False)
         _rung[notify] = now
-        await ring(hass, notify, lang, user_id)
+        await ring(hass, notify, user_id)
         return Located(t["ring"].format(who=who), [], False)
     if m := _WHERE[lang].match(sentence):
         found = _match(hass, service, m["what"], (m["art"] or "") in MINE, user_id)
@@ -322,10 +305,10 @@ async def async_locate(
     return None
 
 
-async def ring(hass: HomeAssistant, notify: str, lang: str, user_id: str | None = None) -> None:
+async def ring(hass: HomeAssistant, notify: str, user_id: str | None = None) -> None:
     """A loud notification through the Home Assistant app (critical on iPhone, alarm channel on Android)."""
     service = notify.removeprefix("notify.")
-    message = "NeonPlan sucht dich 🔔" if lang == "de" else "NeonPlan is looking for you 🔔"
+    message = "NeonPlan is looking for you 🔔"
     await hass.services.async_call(
         "notify",
         service,

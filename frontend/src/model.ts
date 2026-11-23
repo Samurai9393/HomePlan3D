@@ -253,11 +253,11 @@ export interface Furniture {
   sign_color?: string | null;
   /** Waste bin: its lid colour ("#rrggbb"; null = like the body, or the country's usual lid). */
   bin_lid?: string | null;
-  /** Haushalt Pro: the waste calendar (calendar.*) or a sensor with the next pickup of this bin. */
+  /** Household Pro: the waste calendar (calendar.*) or a sensor with the next pickup of this bin. */
   bin_source?: EntityRef;
-  /** Haushalt Pro: own words that find this bin's entries in the calendar (comma separated; null = by its kind). */
+  /** Household Pro: own words that find this bin's entries in the calendar (comma separated; null = by its kind). */
   bin_match?: string | null;
-  /** Haushalt Pro: an entity that is on while the bin is out (input_boolean, switch, binary_sensor; null = none). */
+  /** Household Pro: an entity that is on while the bin is out (input_boolean, switch, binary_sensor; null = none). */
   bin_out?: EntityRef;
   /** Digital picture frames: what the frame's face shows (null = nothing, a dark pane). */
   frame_kind?: "calendar" | "camera" | "media" | "person" | "photo" | "weather" | "todo" | "board" | "persons" | null;
@@ -272,24 +272,24 @@ export interface Furniture {
   frame_remind?: number | null;
   /** Photo slideshow: seconds per picture (null = 30). */
   frame_interval?: number | null;
-  /** Haushalt Pro, mailbox: the sensor of the door it is emptied through (post counts until it opens). */
+  /** Household Pro, mailbox: the sensor of the door it is emptied through (post counts until it opens). */
   mailbox_door?: EntityRef;
-  /** Haushalt Pro, plant: a plant.* entity or a soil moisture sensor; thirsty below `moisture_min`. */
+  /** Household Pro, plant: a plant.* entity or a soil moisture sensor; thirsty below `moisture_min`. */
   moisture?: EntityRef;
-  /** Haushalt Pro, plant: the moisture (%) below which it is thirsty (null = 20). */
+  /** Household Pro, plant: the moisture (%) below which it is thirsty (null = 20). */
   moisture_min?: number | null;
-  /** Haushalt Pro, washer, dryer, dishwasher: the time left (minutes, an end time or "H:MM"). */
+  /** Household Pro, washer, dryer, dishwasher: the time left (minutes, an end time or "H:MM"). */
   remaining?: EntityRef;
   /** Radiator: a sensor that says whether it heats (a valve's work state, an opening percentage) when the thermostat does not (D637). */
   heat_sensor?: EntityRef;
-  /** Haushalt Pro: a consumable or service of the item (a filter, salt, rinse aid): due when on, at or below `service_min`, or its date. */
+  /** Household Pro: a consumable or service of the item (a filter, salt, rinse aid): due when on, at or below `service_min`, or its date. */
   service?: EntityRef;
-  /** Haushalt Pro: the number (percent or days left) at or below which the service is due (null = 10). */
+  /** Household Pro: the number (percent or days left) at or below which the service is due (null = 10). */
   service_min?: number | null;
-  /** Haushalt Pro: a second service (a robot vacuum's dock), like `service` with its own threshold `service2_min`. */
+  /** Household Pro: a second service (a robot vacuum's dock), like `service` with its own threshold `service2_min`. */
   service2?: EntityRef;
   service2_min?: number | null;
-  /** Haushalt Pro, fridge: minutes a door may stand open before it warns (null = 2). */
+  /** Household Pro, fridge: minutes a door may stand open before it warns (null = 2). */
   door_alarm?: number | null;
   /** An own symbol for the marker: a Material Design icon name without "mdi:" (null = by kind). */
   icon?: string | null;
@@ -306,14 +306,14 @@ export interface Furniture {
   charge?: EntityRef;
   /** Meter: a separate sensor with the export power (W) when the power sensor only reports import. */
   export?: EntityRef;
-  /** Energie Pro: a glass card over the device with its power now, today's kWh and the day curve. */
+  /** Energy Pro: a glass card over the device with its power now, today's kWh and the day curve. */
   holo?: boolean;
-  /** Energie Pro, inverter: false hides the plant's card over its field. */
+  /** Energy Pro, inverter: false hides the plant's card over its field. */
   plant_card?: boolean;
-  /** Energie Pro, inverter: its plant card moved from its field's middle along the eave (m, + = right) and up the slope (#335). */
+  /** Energy Pro, inverter: its plant card moved from its field's middle along the eave (m, + = right) and up the slope (#335). */
   plant_right?: number;
   plant_up?: number;
-  /** Energie Pro, inverter: where its cable ends – the meter (null, default) or the grid point (#841). */
+  /** Energy Pro, inverter: where its cable ends – the meter (null, default) or the grid point (#841). */
   cable_to?: "meter" | "grid" | null;
   status?: EntityRef;
   /** Robot vacuum: sensor naming the room it cleans right now (null = automatic, "none" = the dock's room). */
@@ -392,7 +392,7 @@ export interface Placement {
   y: number | null;
   /** Lights: how the lamp is mounted; null = ceiling. */
   mount?: LampMount | null;
-  /** A light kept as a device pin on purpose ("Wieder als Geräte-Pin"): not turned into a lamp on load. */
+  /** A light kept as a device pin on purpose ("Kept as a device pin"): not turned into a lamp on load. */
   pin?: boolean;
   /** Turn around the vertical axis (degrees): wall lamps, spots, displays face that way. */
   rotation?: number;
@@ -413,7 +413,7 @@ export interface Placement {
   show_name?: boolean;
   /** Lights: how strongly the light glows in 3D, 0.1–1.5 (1 = as bright as the light reports) – #181. */
   glow_scale?: number | null;
-  /** Energie Pro: a glass card over the device (a smart plug) with its power, today's kWh and the day curve (D178). */
+  /** Energy Pro: a glass card over the device (a smart plug) with its power, today's kWh and the day curve (D178). */
   holo?: boolean;
   /** Cameras: show the field-of-view wedge on the floor (null = yes). */
   cone?: boolean | null;
@@ -565,9 +565,9 @@ export interface RoofSettings {
   strings?: SolarString[];
   /** Roof windows on the roof faces. */
   windows?: RoofWindow[];
-  /** Energie Pro: the hologram's place and size. */
+  /** Energy Pro: the hologram's place and size. */
   hologram?: HologramSettings | null;
-  /** Energie Pro: cables laid by hand (the others find their own way). */
+  /** Energy Pro: cables laid by hand (the others find their own way). */
   cables?: CableRoute[];
 }
 
@@ -620,7 +620,7 @@ export interface SolarField {
  * A roof window on a roof face (u along the eave, v up the slope, in metres, at its lower left corner). Like a
  * window it follows a contact (open or tilted: the sash swings out at the top) and a blind (cover).
  */
-/** Energie Pro: where the hologram hangs – on a solar field, moved along the field and up the slope, scaled. */
+/** Energy Pro: where the hologram hangs – on a solar field, moved along the field and up the slope, scaled. */
 export interface HologramSettings {
   /** Where it hangs: on a solar field (default), or free at a point in the plan. */
   place?: "field" | "free";
@@ -650,7 +650,7 @@ export interface HologramSettings {
 export const DEFAULT_HOLOGRAM: HologramSettings = { field: null, size: 1, right: 0, up: 0 };
 
 /**
- * Energie Pro: a cable laid by hand. Its id names the cable ("solar:<field>", "inv:<inverter>", "bat:<battery>",
+ * Energy Pro: a cable laid by hand. Its id names the cable ("solar:<field>", "inv:<inverter>", "bat:<battery>",
  * "grid"); the points are its way in the plan, run at `height` above the given floor.
  */
 export interface CableRoute {
@@ -715,7 +715,7 @@ export interface CustomButton {
 }
 
 /**
- * Something to play on a speaker from its quick menu (Klang & Kino): media_player.play_media with this
+ * Something to play on a speaker from its quick menu (Sound & Cinema): media_player.play_media with this
  * content type and id – a radio stream URL, a Music Assistant or Sonos URI, or for an Echo (Alexa Media
  * Player) the type SPOTIFY / AMAZON_MUSIC / TUNEIN with what you would say ("Rock Antenne").
  */
@@ -781,7 +781,7 @@ export interface BuildingSettings extends StylePlan {
   } | null;
   /** Fun pack "pets": the animals and whether they are shown. */
   pets?: { on: boolean; list: Pet[] } | null;
-  /** Stations and playlists for the speakers' quick menu (Klang & Kino). */
+  /** Stations and playlists for the speakers' quick menu (Sound & Cinema). */
   media_presets?: MediaPreset[];
   /** Favourites of the house: scenes, scripts, automations, buttons and switches in the central menu of the 3D view (#145). */
   favorites?: string[];
@@ -818,7 +818,7 @@ export interface BuildingSettings extends StylePlan {
   sun_shadow?: boolean;
   /** The real sky behind the house: sunset colours, stars, the moon in its phase, clouds with the weather (default on). */
   sky?: boolean;
-  /** "Anflug aus dem All": the view opens with a globe that dives in onto the house (default off). */
+  /** "Fly-in from space": the view opens with a globe that dives in onto the house (default off). */
   flyin?: boolean;
   /** What the sun's arc and its compass ring stand around: the house (null, default) or everything drawn on the plot (#833). */
   sun_arc?: "house" | "plot" | null;
@@ -831,7 +831,7 @@ export interface BuildingSettings extends StylePlan {
   /** The ground around the house: its height and the earth around cellars. */
   terrain?: Terrain | null;
   /**
-   * Haushalt Pro: from which hour the day before a bin glows (null = 14) and until which hour on the day (null = 12);
+   * Household Pro: from which hour the day before a bin glows (null = 14) and until which hour on the day (null = 12);
    * only the bins of the next pickup wear a tag (`bin_next_only`), tags only from `bin_days` days before (null = always).
    */
   household?: { bin_from?: number | null; bin_until?: number | null; notes?: EntityRef; bin_next_only?: boolean | null; bin_days?: number | null; /** Calendars whose entries of today stand in "Today in the household". */ calendars?: string[] | null } | null;
@@ -1345,7 +1345,7 @@ export interface EnergySettings {
   /** House consumption (W); null = from the balance of grid, solar and battery. */
   consumption: string | null;
   tariff: string | null;
-  /** Energie Pro: gas and water meters (counters such as m³ or litres); the house card shows today's use. */
+  /** Energy Pro: gas and water meters (counters such as m³ or litres); the house card shows today's use. */
   gas?: string | null;
   water?: string | null;
 }

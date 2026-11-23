@@ -7,60 +7,57 @@ const room = (id: string, name: string): Room => ({ id, name, area_id: null, poi
 const building = {
   ...emptyBuilding(),
   floors: [
-    { ...newFloor("eg", "Erdgeschoss", 0), rooms: [room("wz", "Wohnzimmer"), room("wc", "WC"), room("gwc", "Gäste-WC")] },
-    { ...newFloor("og", "Obergeschoss", 2.8), rooms: [room("kz", "Kinderzimmer")] },
+    { ...newFloor("gf", "Ground floor", 0), rooms: [room("lr", "Living room"), room("wc", "WC"), room("gwc", "Guest WC")] },
+    { ...newFloor("uf", "Upper floor", 2.8), rooms: [room("kr", "Kids' room")] },
   ],
 };
 
 test("normalize: lower case, no accents or punctuation", () => {
-  assert.equal(normalize("Gäste-WC!"), "gaste wc");
-  assert.equal(normalize("  Straße "), "strasse");
+  assert.equal(normalize("Guest WC!"), "guest wc");
+  assert.equal(normalize("  Café "), "cafe");
 });
 
 test("a sentence names a room, a floor or the house", () => {
-  assert.deepEqual(findPlace("Zeig mir das Wohnzimmer", building), { kind: "room", floorId: "eg", roomId: "wz", name: "Wohnzimmer" });
-  assert.equal(findPlace("geh ins Gäste-WC", building)?.name, "Gäste-WC");
-  assert.equal(findPlace("WC bitte", building)?.name, "WC");
-  assert.deepEqual(findPlace("Obergeschoss", building), { kind: "floor", floorId: "og", name: "Obergeschoss" });
-  assert.equal(findPlace("zeig das ganze Haus", building)?.kind, "house");
-  assert.equal(findPlace("mach das Licht an", building), null);
+  assert.deepEqual(findPlace("Show me the living room", building), { kind: "room", floorId: "gf", roomId: "lr", name: "Living room" });
+  assert.equal(findPlace("go to the guest WC", building)?.name, "Guest WC");
+  assert.equal(findPlace("WC please", building)?.name, "WC");
+  assert.deepEqual(findPlace("Upper floor", building), { kind: "floor", floorId: "uf", name: "Upper floor" });
+  assert.equal(findPlace("show the whole house", building)?.kind, "house");
+  assert.equal(findPlace("turn the light on", building), null);
   assert.equal(findPlace("", building), null);
 });
 
 test("a command to show: a show word or a bare place name – not a sentence that only names the room", () => {
-  assert.equal(showCommand("Zeig das Wohnzimmer", building)?.name, "Wohnzimmer");
-  assert.equal(showCommand("Wohnzimmer", building)?.name, "Wohnzimmer");
-  assert.equal(showCommand("das Obergeschoss bitte", building)?.name, "Obergeschoss");
+  assert.equal(showCommand("Show the living room", building)?.name, "Living room");
+  assert.equal(showCommand("Living room", building)?.name, "Living room");
+  assert.equal(showCommand("the upper floor please", building)?.name, "Upper floor");
   assert.equal(showCommand("show the whole house", building)?.kind, "house");
-  assert.equal(showCommand("Licht im Wohnzimmer an", building), null);
-  assert.equal(showCommand("Wie warm ist es im Kinderzimmer", building), null);
+  assert.equal(showCommand("Living room light on", building), null);
+  assert.equal(showCommand("How warm is it in the kids' room", building), null);
   // the Home Assistant area's own name counts too
-  assert.equal(showCommand("geh in die Stube", building, (r) => (r.id === "wz" ? "Stube" : null))?.name, "Wohnzimmer");
+  assert.equal(showCommand("go to the den", building, (r) => (r.id === "lr" ? "Den" : null))?.name, "Living room");
 });
 
 test("a sentence said in the tablet's room loses its 'here'", () => {
-  assert.equal(withoutHere("Mach hier das Licht an", "de"), "Mach das Licht an");
-  assert.equal(withoutHere("Licht hier an.", "de-DE"), "Licht an.");
-  assert.equal(withoutHere("Hier Licht aus", "de"), "Licht aus");
-  assert.equal(withoutHere("turn on the lights here", "en"), "turn on the lights");
-  // only whole words, only in the language spoken
-  assert.equal(withoutHere("Licht im Hierzimmer an", "de"), "Licht im Hierzimmer an");
+  assert.equal(withoutHere("Turn the light on here", "en"), "Turn the light on");
+  assert.equal(withoutHere("Light here on.", "en-US"), "Light on.");
+  assert.equal(withoutHere("Here light off", "en"), "light off");
+  // only whole words, not a word that happens to start with it
+  assert.equal(withoutHere("Turn the light on hereabouts", "en"), "Turn the light on hereabouts");
   assert.equal(withoutHere("give her the light", "en"), "give her the light");
-  assert.equal(withoutHere("tænd lyset her", "da"), "tænd lyset");
-  assert.equal(withoutHere("allume la lumière ici", "fr"), "allume la lumière");
   // nothing left: the sentence as said
-  assert.equal(withoutHere("hier", "de"), "hier");
+  assert.equal(withoutHere("here", "en"), "here");
 });
 
 test("room intents: vacuum and everything off, for a named room, here or there", async () => {
   const { roomIntent, saysThere, withoutThere } = await import("./commands.ts");
-  const b = { ...emptyBuilding(), floors: [{ ...newFloor("eg", "EG", 0), rooms: [{ id: "k", name: "Küche", area_id: "kueche", points: [] }] }] } as never;
-  assert.deepEqual(roomIntent("Saug die Küche", b, "de"), { action: "clean", room: { floorId: "eg", roomId: "k" } });
-  assert.deepEqual(roomIntent("Staubsauge hier", b, "de"), { action: "clean", room: "here" });
-  assert.deepEqual(roomIntent("Mach da alles aus", b, "de"), { action: "off", room: "there" });
-  assert.deepEqual(roomIntent("Alles aus", b, "de"), { action: "off", room: null });
-  assert.deepEqual(roomIntent("Turn everything off in the kitchen", b, "en"), { action: "off", room: null }, "an English name is not the room's");
-  assert.equal(roomIntent("Licht in der Küche an", b, "de"), null);
-  assert.equal(saysThere("Mach da das Licht aus", "de"), true);
-  assert.equal(withoutThere("Mach da das Licht aus", "de"), "Mach das Licht aus");
+  const b = { ...emptyBuilding(), floors: [{ ...newFloor("gf", "Ground floor", 0), rooms: [{ id: "k", name: "Kitchen", area_id: "kitchen", points: [] }] }] } as never;
+  assert.deepEqual(roomIntent("Vacuum the kitchen", b, "en"), { action: "clean", room: { floorId: "gf", roomId: "k" } });
+  assert.deepEqual(roomIntent("Vacuum here", b, "en"), { action: "clean", room: "here" });
+  assert.deepEqual(roomIntent("Turn everything off there", b, "en"), { action: "off", room: "there" });
+  assert.deepEqual(roomIntent("Everything off", b, "en"), { action: "off", room: null });
+  assert.deepEqual(roomIntent("Turn everything off in the kitchen", b, "en"), { action: "off", room: { floorId: "gf", roomId: "k" } });
+  assert.equal(roomIntent("Light in the kitchen on", b, "en"), null);
+  assert.equal(saysThere("Turn the light off there", "en"), true);
+  assert.equal(withoutThere("Turn the light off there", "en"), "Turn the light off");
 });

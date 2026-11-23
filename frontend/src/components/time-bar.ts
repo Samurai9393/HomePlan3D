@@ -230,7 +230,7 @@ export class Fp3dTimeBar extends LitElement {
     return `${this.weekday(t)} ${this.time(t)}`;
   }
 
-  /** "vor 3 h 12 min", "vor 2 T 3 h". */
+  /** "3 h 12 min ago", "2 d 3 h ago". */
   private agoText(t: number): string {
     const s = this.session!;
     const min = Math.round((s.end - t) / 60000);

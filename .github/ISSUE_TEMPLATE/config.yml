@@ -1,11 +1,11 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 💡 Ideas and wishes (not as an issue) / Ideen und Wünsche (nicht als Issue)
+  - name: 💡 Ideas and wishes (not as an issue)
     url: https://github.com/Samurai9393/HomePlan3D-main/discussions/categories/ideas
-    about: Feature wishes go here, not into issues – vote with 👍 on what you want most. / Wünsche bitte hier statt als Issue – und mit 👍 abstimmen.
-  - name: 💬 Questions & help / Fragen & Hilfe
+    about: Feature wishes go here, not into issues – vote with 👍 on what you want most.
+  - name: 💬 Questions & help
     url: https://github.com/Samurai9393/HomePlan3D-main/discussions/categories/q-a
-    about: How do I …? Ask the community. / Wie mache ich …? Frag die Community.
-  - name: 📖 Manual / Anleitung
+    about: How do I …? Ask the community.
+  - name: 📖 Manual
     url: https://github.com/Samurai9393/HomePlan3D-main/blob/main/docs/manual.md
-    about: The full manual in German and English. / Die komplette Anleitung auf Deutsch und Englisch.
+    about: The full manual in English.

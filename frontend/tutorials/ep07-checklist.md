@@ -1,104 +1,99 @@
-# Folge 7 – Dächer Teil 1: Satteldach, Walmdach & Co.: Coverage-Checkliste
+# Episode 7 – Roofs part 1: gable, hip and friends: coverage checklist
 
-Quellen: `docs/anleitung.md` 4.19 (erste Hälfte: einfaches Dach, Dachflächen, Formen), Formulare in
-`frontend/src/components/editor.ts` (`renderSettings` → Dach, `renderRoofPanel`, `renderRoofSectionForm`,
-`renderRoofFloors`, `useRoofSections`, `addRoofSection`, `roofFixed`, Taste L in `onKey`), Labels aus `frontend/src/i18n.ts`.
-Zu viel für 8 Minuten in einem Stück → zwei Teile: **a** = Teil 1 „Dachflächen und alle Dachformen“ (4:50),
-**b** = Teil 2 „Traufe, Neigung, Pultdach und Garage“ (4:52). Zeit = Stelle im fertigen Video (Zeilenbeginn, echte Stimme).
-Das Haus ist für diese Folge erfunden: zwei Etagen in L-Form, ein Anbau (Hauswirtschaft) in der Ecke, eine Garage.
+Sources: `docs/anleitung.md` 4.19 (first half: simple roof, roof sections, shapes), forms in `frontend/src/components/editor.ts` (`renderSettings` → roof, `renderRoofPanel`, `renderRoofSectionForm`, `renderRoofFloors`, `useRoofSections`, `addRoofSection`, `roofFixed`, key L in `onKey`), labels from `frontend/src/i18n.ts`.
+Too much for 8 minutes in one piece → two parts: **a** = part 1 "Roof sections and all roof shapes" (4:50), **b** = part 2 "Eave, pitch, pent roof and garage" (4:52). Time = position in the finished video (line start, real voice).
+The house is invented for this episode: two floors in an L shape, a utility lean-to in the inner corner, and a garage.
 
-Bewusst nur erwähnt (Folge 8): „+ Gaube oben/unten“, Zwerchgiebel, Kniestock/Dachschrägen (Hinweistext unter der
-Wandoberkante), „Überdachung“ (Terrassendach, Carport), „Umriss des Geschosses übernehmen“ / „Zurück zum Rechteck“,
-„+ Dachfenster“, „Dach bleibt“ in 3D.
+Only mentioned on purpose (episode 8): "+ dormer above/below", cross gables, knee walls / sloping ceilings (hint text under the top of walls), "Canopy" (patio roof, carport), "Take the floor's outline" / "Back to the rectangle", "+ roof window", "Roof stays" in 3D.
 
-## Einfaches Dach (Einstellungen)
-- [x] a 0:23 · „Einstellungen“ unten in der Seitenleiste (Etage), aufklappen
-- [x] a 0:30 · „Dach“: „Kein Dach“, „Flachdach“, „Satteldach“, „Dachflächen (frei)“ (Liste gezeigt, „Satteldach“ gewählt)
-- [x] a 0:39 · „First“: „Entlang der langen Seite“ / „Entlang der kurzen Seite (z. B. Reihenhaus)“
-- [x] a 0:39 · „Dachneigung (°)“
-- [x] a 0:39 · „Dachüberstand (m)“
-- [x] a 0:48 · Das einfache Dach liegt über dem ganzen obersten Geschoss (in 3D gezeigt)
-- [x] a 0:54 · Beim L-Haus deckt es das ganze Rechteck ab, Anbau und Garage bekommen keins → Dachflächen
-- [x] a 1:03 · Für ein einfaches rechteckiges Haus reicht es
+## Simple roof (settings)
+- [x] a 0:23 · "Settings" at the bottom of the sidebar (floor), expand
+- [x] a 0:30 · "Roof": "No roof", "Flat roof", "Gable roof", "Roof sections (custom)" (list shown, "Gable roof" chosen)
+- [x] a 0:39 · "Ridge": "Along the long side" / "Along the short side (e.g. terraced house)"
+- [x] a 0:39 · "Roof pitch (°)"
+- [x] a 0:39 · "Roof overhang (m)"
+- [x] a 0:48 · The simple roof lies over the whole top floor (shown in 3D)
+- [x] a 0:54 · With the L-shaped house it covers the whole rectangle; lean-to and garage get none → roof sections
+- [x] a 1:03 · Enough for a simple rectangular house
 
-## Dachflächen anlegen
-- [x] a 1:09 · Werkzeug „Dach“ oben in der Leiste
-- [x] a 1:09 · „Dachflächen aus den Räumen erzeugen“ (Knopf im Werkzeug, solange kein Flächen-Dach aktiv)
-- [x] a 1:43 · Gleiches über Einstellungen → „Dach“ → „Dachflächen (frei)“ (gesagt, Option bei 0:30 im Bild)
-- [x] a 1:19 · Vorschlag aus den Räumen: je Etage die Teile ohne höhere Etage darüber, alle mit Satteldach
-- [x] a 1:29 · Ergebnis hier: Haupthaus + Seitenflügel (Obergeschoss), Garage + Anbau (Erdgeschoss)
-- [x] a 1:36 · Das Werkzeug öffnet „3D daneben“ mit dem ganzen Haus, Änderungen sofort sichtbar
-- [x] a 1:50 · Hinweis „🏠 Dach: Hier lassen sich nur Dachflächen und Dachfenster verschieben …“
+## Creating roof sections
+- [x] a 1:09 · Tool "Roof" at the top of the toolbar
+- [x] a 1:09 · "Create roof sections from the rooms" (button in the tool, while no section-based roof is active)
+- [x] a 1:43 · Same via Settings → "Roof" → "Roof sections (custom)" (said, option visible at 0:30)
+- [x] a 1:19 · Proposal from the rooms: per floor the parts without a higher floor above, all with gable roofs
+- [x] a 1:29 · Result here: main house + side wing (upper floor), garage + lean-to (ground floor)
+- [x] a 1:36 · The tool opens "3D beside" with the whole house, changes visible at once
+- [x] a 1:50 · Hint "🏠 Roof: only roof sections and roof windows can be moved here; rooms and furniture are locked."
 
-## Auswählen, Etage, Zeichnen, Verschieben, Größe
-- [x] a 1:56 · Liste: Nummer · Form · Größe · Firsthöhe; Plan-Beschriftung am First (Nummer · Form · Firsthöhe)
-- [x] a 2:04 · Antippen (Liste oder Plan) wählt aus, Formular rechts, Ecken im Plan
-- [x] a 2:12 · „‹ Dachflächen“ zurück zur Liste
-- [x] a 2:15 · Etagen-Knöpfe oben (Obergeschoss / Erdgeschoss): welche Räume der Plan zeigt, zum Zeichnen entlang der Wände
-- [x] a 2:25 · Hinweiszeile unten: „Dachfläche aufziehen · antippen wählt aus · ziehen verschiebt · Ecken ändern die Größe“
-- [x] a 2:30 · „Löschen“ (Vorschlag der Garage)
-- [x] a 2:36 · Neue Dachfläche im Plan aufziehen
-- [x] a 2:41 · Neue Fläche: Satteldach, Höhe von den Wänden darunter, egal welche Etage der Plan zeigt
-- [x] a 2:51 · Ziehen verschiebt die Fläche
-- [x] a 2:55 · Ecken ändern die Größe; Fläche bis zur Außenkante der Wände, Überstand kommt automatisch dazu
-- [x] a 3:03 · „Duplizieren“ (Doppelgarage), „Rückgängig“
+## Selecting, floor, drawing, moving, resizing
+- [x] a 1:56 · List: number · shape · size · ridge height; plan label at the ridge (number · shape · ridge height)
+- [x] a 2:04 · Tap (list or plan) selects, form on the right, corners in the plan
+- [x] a 2:12 · "‹ Roof sections" back to the list
+- [x] a 2:15 · Floor buttons at the top (upper floor / ground floor): which rooms the plan shows, for drawing along the walls
+- [x] a 2:25 · Hint line at the bottom: "Drag to draw a roof section · tap selects · drag moves · corners resize"
+- [x] a 2:30 · "Delete" (the garage proposal)
+- [x] a 2:36 · Draw a new roof section in the plan
+- [x] a 2:41 · New section: gable roof, height from the walls below, no matter which floor the plan shows
+- [x] a 2:51 · Dragging moves the section
+- [x] a 2:55 · Corners resize it; section up to the outer face of the walls, overhang is added automatically
+- [x] a 3:03 · "Duplicate" (double garage), "Undo"
 
-## Formen und Firstrichtung
-- [x] a 3:12 · „Form“-Auswahl (acht Formen, Liste gezeigt)
-- [x] a 3:19 · „Sattel“ in 3D
-- [x] a 3:25 · „Walm“ in 3D
-- [x] a 3:30 · „Krüppelwalm“ in 3D
-- [x] a 3:36 · „Zelt“ in 3D
-- [x] a 3:43 · „Mansard“ in 3D
-- [x] a 3:48 · „Pult“ in 3D
-- [x] a 3:54 · „Flach“ in 3D
-- [x] a 3:57 · „Attika“ in 3D
-- [x] a 4:04 · „First ↔“ / „First ↕“ (Firstrichtung), Wirkung auf die Höhe in 3D
-- [x] a 4:10 · „Firsthöhe“ unten im Formular und im Plan
+## Shapes and ridge direction
+- [x] a 3:12 · "Shape" selection (eight shapes, list shown)
+- [x] a 3:19 · "Gable" in 3D
+- [x] a 3:25 · "Hip" in 3D
+- [x] a 3:30 · "Half-hip" in 3D
+- [x] a 3:36 · "Pyramid" in 3D
+- [x] a 3:43 · "Mansard" in 3D
+- [x] a 3:48 · "Pent" in 3D
+- [x] a 3:54 · "Flat" in 3D
+- [x] a 3:57 · "Parapet" in 3D
+- [x] a 4:04 · "Ridge ↔" / "Ridge ↕" (ridge direction), effect on the height in 3D
+- [x] a 4:10 · "Ridge height" at the bottom of the form and in the plan
 
-## Traufe, Neigung, Seiten
-- [x] b 0:18 · Zwei Seiten je Fläche, „Traufe (m)“ und „Neigung (°)“ je Seite
-- [x] b 0:25 · Traufe = Höhe der unteren Dachkante; Seiten heißen links/rechts (First ↕) bzw. oben/unten (First ↔)
-- [x] b 0:34 · Alle Höhen zählen vom Boden (5,25 m = Wände des Obergeschosses)
-- [x] b 0:40 · Tiefere Traufe auf einer Seite → Abschleppdach (in 3D)
-- [x] b 0:49 · „Rückgängig“; „Neigung“ rechts 50° (in 3D)
-- [x] b 0:56 · „Firsthöhe“ ändert sich mit Traufe und Neigung: Formular, Liste, Plan
+## Eave, pitch, sides
+- [x] b 0:18 · Two sides per section, "Eave (m)" and "Pitch (°)" per side
+- [x] b 0:25 · Eave = height of the lower roof edge; sides are called left/right (Ridge ↕) or top/bottom (Ridge ↔)
+- [x] b 0:34 · All heights are measured from the floor (5.25 m = walls of the upper floor)
+- [x] b 0:40 · Lower eave on one side → catslide roof (in 3D)
+- [x] b 0:49 · "Undo"; "Pitch" on the right 50° (in 3D)
+- [x] b 0:56 · "Ridge height" changes with eave and pitch: form, list, plan
 
-## Anbau mit Pultdach
-- [x] b 1:03 · Form „Pult“ für den Anbau an der Hauswand
-- [x] b 1:10 · Pultdach steigt von der ersten Seite an (hier falsch herum, in 3D)
-- [x] b 1:17 · „⇅ Seiten tauschen“ (hohe Seite an die Hauswand)
-- [x] b 1:22 · Pult: nur eine Traufe und eine Neigung; 15° eingestellt
-- [x] b 1:28 · Wo eine Fläche an einen höheren Hausteil stößt, entfällt dort der Überstand
+## Lean-to with a pent roof
+- [x] b 1:03 · Shape "Pent" for the lean-to against the house wall
+- [x] b 1:10 · Pent roof rises from the first side (here the wrong way round, in 3D)
+- [x] b 1:17 · "⇅ Swap sides" (high side against the house wall)
+- [x] b 1:22 · Pent: only one eave and one pitch; set to 15°
+- [x] b 1:28 · Where a section meets a taller part of the house, the overhang is dropped there
 
-## Wandoberkante, Sitzt auf Etage
-- [x] b 1:33 · „Wandoberkante (m)“: wo die Wände unter dem Dach enden (Anbau 2,5 m)
-- [x] b 1:42 · Giebel/Drempel bis unters Dach hochgezogen, Raum unter dem Pultdach geschlossen (in 3D)
-- [x] b 1:48 · Neue Fläche übernimmt die Wandoberkante der Räume darunter; tiefer als die Decke → Dachschrägen (Folge 8)
-- [x] b 1:58 · „Sitzt auf Etage“ zeigt die Etage der Fläche
-- [x] b 2:05 · Andere Etage wählen: Fläche springt auf deren Wände, Wandoberkante und Traufe wandern mit (in 3D)
-- [x] b 2:12 · Typischer Fall: Fläche auf der falschen Etage (Obergeschoss mit Treppenloch); zurück auf „Erdgeschoss“
+## Top of walls, sits on floor
+- [x] b 1:33 · "Top of walls (m)": where the walls under the roof end (lean-to 2.5 m)
+- [x] b 1:42 · Gables / knee walls raised up to the roof, room under the pent roof closed (in 3D)
+- [x] b 1:48 · A new section takes the top of walls from the rooms below; lower than the ceiling → sloping ceilings (episode 8)
+- [x] b 1:58 · "Sits on floor" shows the floor of the section
+- [x] b 2:05 · Choose another floor: the section jumps to its walls, top of walls and eave move with it (in 3D)
+- [x] b 2:12 · Typical case: section on the wrong floor (upper floor with a stair opening); back to "Ground floor"
 
-## Überschneidungen
-- [x] b 2:23 · Seitenflügel und Anbau ragen ins Haupthaus (im Plan gezeigt), gewollt
-- [x] b 2:29 · Das niedrigere Dach läuft unter das höhere, First verschwindet in der Dachfläche (in 3D)
-- [x] b 2:38 · Fläche weiter hineinziehen ändert nichts in 3D; Flächen müssen nicht genau aneinanderstoßen
+## Overlaps
+- [x] b 2:23 · Side wing and lean-to reach into the main house (shown in the plan), on purpose
+- [x] b 2:29 · The lower roof runs under the higher one, the ridge disappears into the roof section (in 3D)
+- [x] b 2:38 · Pulling the section further in changes nothing in 3D; sections do not have to meet exactly
 
-## Garage mit Flachdach
-- [x] b 2:46 · Form „Flach“
-- [x] b 2:49 · Bei Flach/Attika nur „Höhe (m)“ statt Traufe und Neigung
-- [x] b 2:55 · „Attika“ (Brüstung)
-- [x] b 3:01 · „Dachüberstand (m)“ je Dachfläche (Garage: 0)
-- [x] b 3:08 · Solarfelder mit dem Werkzeug „Energie“, auch aufs Flachdach; Energie Pro (ein Satz)
-- [x] b 3:17 · „Überdachung“, Gauben-Knöpfe, „Umriss des Geschosses übernehmen“ → nächste Folge (im Bild gezeigt)
+## Garage with a flat roof
+- [x] b 2:46 · Shape "Flat"
+- [x] b 2:49 · With Flat / Parapet only "Height (m)" instead of eave and pitch
+- [x] b 2:55 · "Parapet" (upstand)
+- [x] b 3:01 · "Roof overhang (m)" per roof section (garage: 0)
+- [x] b 3:08 · Solar panels with the "Energy" tool, also on the flat roof; Energy Pro (one sentence)
+- [x] b 3:17 · "Canopy", dormer buttons, "Take the floor's outline" → next episode (shown in the picture)
 
-## Fixieren, Neu erzeugen, Zurück zu einem Dach
-- [x] b 3:24 · „🔓 Fixieren“ im Formular, Taste L
-- [x] b 3:29 · Fixiert: Ziehen bewegt nur die Ansicht, Hinweis „🔒 Fixiert – zum Verschieben erst lösen …“ unten
-- [x] b 3:35 · „🔒 Lösen“ / Taste L
-- [x] b 3:39 · „🔒 Grundriss“ in der Leiste sperrt alle Dachflächen („Grundriss gesperrt“ im Formular), zweiter Klick hebt auf
-- [x] b 3:48 · „Neu aus den Räumen erzeugen“ mit Rückfrage („Alle Dachflächen durch einen neuen Vorschlag … ersetzen?“)
-- [x] b 3:58 · „Rückgängig“ holt die eigenen Flächen zurück
-- [x] b 4:02 · „Zurück zu einem Dach“ → einfaches Satteldach
-- [x] b 4:08 · Dachflächen bleiben gespeichert, „Dachflächen aus den Räumen erzeugen“ holt sie zurück
-- [x] b 4:16 · Ergebnis in der 3D-Ansicht
+## Fixing, creating again, back to one roof
+- [x] b 3:24 · "🔓 Fix" in the form, key L
+- [x] b 3:29 · Fixed: dragging only moves the view, hint "🔒 Fixed – release it first to move it (lock in the form, right-click or key L)" at the bottom
+- [x] b 3:35 · "🔒 Release" / key L
+- [x] b 3:39 · "🔒 Floor plan" in the toolbar locks all roof sections ("Floor plan locked" in the form), a second click unlocks
+- [x] b 3:48 · "Create again from the rooms" with confirmation ("Replace all roof sections with a new proposal …?")
+- [x] b 3:58 · "Undo" brings back your own sections
+- [x] b 4:02 · "Back to one roof" → simple gable roof
+- [x] b 4:08 · Roof sections stay saved, "Create roof sections from the rooms" brings them back
+- [x] b 4:16 · Result in the 3D view

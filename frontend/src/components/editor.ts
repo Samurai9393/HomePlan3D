@@ -64,7 +64,7 @@ import { type CarLinks, type Background, OUTDOOR_TOP, sidelightLayout, DEFAULT_W
 } from "../model.ts";
 import { furnishRoom, PACKAGES, type PackageId } from "../packages.ts";
 import { edgeReach, generateWalls, locateOpening, openingHost, pointOnRoomEdge, type Wall, type WallSource } from "../geometry/walls.ts";
-import { formatNumber, languageReady, loadLanguage, translate, type I18nKey } from "../i18n.ts";
+import { formatNumber, translate, type I18nKey } from "../i18n.ts";
 import { iconPath } from "../icons.ts";
 import { moduleAreaFields, moduleFurnitureFields, moduleHelp, moduleRoomFields, modulePipeRules, moduleSettings, moduleWaits, syncModules, type ModuleField, type ModuleHost, type PipeRules } from "../modules.ts";
 import { pipePlanner } from "../pipe-planner.ts";
@@ -945,13 +945,12 @@ export class Fp3dEditor extends LitElement {
   }
 
   protected willUpdate(changed: PropertyValues): void {
-    // this bundle keeps its own pack registry – and its own language table, so it fetches the language itself
+    // this bundle keeps its own pack registry
     if (changed.has("packs")) setPacks(this.packs ?? []);
     // the modules of the packs (Pool Pro's fields and pipe rules, the voice sentences) are loaded here too: an
     // import in the editor must not wait for the 3D view
     if ((changed.has("packs") || changed.has("hass")) && this.hass && this.packs?.some((p) => p.module)) void syncModules(this.hass, this.packs).then(() => this.requestUpdate());
     if (changed.has("_doc")) setTerrain(this._doc);
-    if (changed.has("hass") && this.hass && !languageReady(this.hass.language)) void loadLanguage(this.hass.language).then(() => this.requestUpdate());
     // the 3D pane and the wall view's 3D both show the draft (otherwise a piece moved in the wall view jumps back)
     if (changed.has("_doc") && (this._split || this._wallView)) this.queue3d();
     if ((changed.has("_split") && this._split) || (changed.has("_wallView") && this._wallView)) this._doc3d = this._doc;
@@ -3867,7 +3866,7 @@ export class Fp3dEditor extends LitElement {
     })}</g>`;
   }
 
-  /** Energie Pro: the cables, each to lay by hand with points and a height. */
+  /** Energy Pro: the cables, each to lay by hand with points and a height. */
   private renderCableSettings() {
     const keys = this.cableKeys();
     if (!keys.length) return nothing;
@@ -4351,7 +4350,7 @@ export class Fp3dEditor extends LitElement {
   }
 
   /**
-   * Energie Pro: which solar field the hologram hangs on, how big it is and where exactly. Shown without solar
+   * Energy Pro: which solar field the hologram hangs on, how big it is and where exactly. Shown without solar
    * fields too (the house card then hangs beside the house), only the field's own settings wait for a field (#334).
    */
   private renderHologramSettings() {
@@ -4528,7 +4527,7 @@ export class Fp3dEditor extends LitElement {
     const parked = rooms.find((r) => floor.furniture.some((m) => m.type === "parking" && pointInPolygon([m.x, m.z], r.points)));
     const garage = find(/garage|carport/) ?? parked;
     const utility = find(/hwr|hauswirt|technik|keller|abstell|utility|basement|boiler|heiz/);
-    const hall = find(/flur|diele|eingang|hall|entr|lobby/);
+    const hall = find(/hall|entr|lobby/);
     const room = (type === "wallbox" ? garage : type === "meter" ? (utility ?? hall ?? garage) : (utility ?? garage)) ?? this.room ?? rooms.sort((a, b) => Math.abs(signedArea(b.points)) - Math.abs(signedArea(a.points)))[0];
     const [w, d, h] = furnitureSize(type);
     let [x, z] = room ? centroid(room.points) : this.toWorld(this._size.w / 2, this._size.h / 2);
@@ -4608,7 +4607,7 @@ export class Fp3dEditor extends LitElement {
   }
 
   /**
-   * Energie Pro: where the cables meet (#841) – at the meter cabinet (default), or at a point set by hand such as
+   * Energy Pro: where the cables meet (#841) – at the meter cabinet (default), or at a point set by hand such as
    * the house board while the meter stands at the grid connection.
    */
   private renderHubPoint() {
@@ -5122,7 +5121,7 @@ export class Fp3dEditor extends LitElement {
    */
   private typeChoices(current: string): string[] {
     const shown = new Set<string>(Object.values(FURNITURE_GROUPS).flat());
-    // the smart fridge: its own pack, or Haushalt Pro
+    // the smart fridge: its own pack, or Household Pro
     if (hasFeature("fridge_smart") || hasFeature("household")) shown.add("fridge_smart");
     return FURNITURE_TYPES.filter((t) => shown.has(t) || t === current);
   }
@@ -5392,7 +5391,7 @@ export class Fp3dEditor extends LitElement {
     this._single = false;
   }
 
-  /** "Block auflösen": every part on its own again (the parts stay selected). */
+  /** "Break up block": every part on its own again (the parts stay selected). */
   private ungroupSelection(): void {
     const set = this.selection();
     const ids = new Set(set);
@@ -7585,7 +7584,7 @@ export class Fp3dEditor extends LitElement {
       }
       e.stopPropagation();
       this._runSel = null;
-      // shift (or "Mehrere auswählen" on a tablet): the piece joins the choice or leaves it
+      // shift (or "Select several" on a tablet): the piece joins the choice or leaves it
       if (e.shiftKey || this._multiMode) {
         this.wallToggle(id);
         return;
@@ -7910,7 +7909,7 @@ export class Fp3dEditor extends LitElement {
               .central=${false}
               @furniture-select=${(e: CustomEvent<{ id: string | null }>) => {
                 const id = e.detail.id;
-                // shift (or "Mehrere auswählen"): the piece joins the choice; a piece of the chosen set keeps the set
+                // shift (or "Select several"): the piece joins the choice; a piece of the chosen set keeps the set
                 if (id && (this.shiftHeld || this._multiMode)) this.wallToggle(id);
                 else if (!id) this.wallChoose([]);
                 else if (!this.wallSelection().includes(id) || this._wallSingle) this.wallChoose([id]);
@@ -8408,7 +8407,7 @@ export class Fp3dEditor extends LitElement {
     this._wallPicTick++;
   }
 
-  /** The wall view's side bar: pool devices, ball valves and sight glasses (Pool Pro), energy devices (Energie Pro). */
+  /** The wall view's side bar: pool devices, ball valves and sight glasses (Pool Pro), energy devices (Energy Pro). */
   private renderWallKit(frame: WallFrame, room: Room, rc: RunCtx | null) {
     const pool = !!rc;
     const energy = hasFeature("energy_pro");
@@ -10438,7 +10437,7 @@ export class Fp3dEditor extends LitElement {
 
   /**
    * A module's fields, made only when the item, the plan or Home Assistant's devices change – not on every state
-   * change: Wärme Pro searches every entity for its form, and made anew several times a second it kept the CPU busy
+   * change: Heat Pro searches every entity for its form, and made anew several times a second it kept the CPU busy
    * and closed an open selection list at once (#815).
    */
   private _moduleFieldMemo: { item: object; doc: unknown; entities: unknown; lang: string; fields: ModuleField[] } | null = null;
@@ -11650,7 +11649,7 @@ export class Fp3dEditor extends LitElement {
     const handles = this.entityOptions((id) => {
       const st = this.hass?.states[id];
       if (id.startsWith("binary_sensor.")) return typeof st?.attributes.window_state === "string";
-      return numberish(id) && (windowPosition(st) !== null || /griff|handle|fenster|window|drehgriff/i.test(`${id} ${entityName(this.hass, id)}`));
+      return numberish(id) && (windowPosition(st) !== null || /handle|window/i.test(`${id} ${entityName(this.hass, id)}`));
     });
     const plainContacts = this.entityOptions(isContact);
     type Kind = NonNullable<Opening["sensor"]>;
@@ -12263,7 +12262,7 @@ export class Fp3dEditor extends LitElement {
     </details>`;
   }
 
-  /** Klang & Kino: stations and playlists to start on a speaker from its quick menu. */
+  /** Sound & Cinema: stations and playlists to start on a speaker from its quick menu. */
   private renderMediaPresets() {
     const list = this._doc.settings.media_presets ?? [];
     const set = (next: MediaPreset[]) => this.change((d) => (d.settings.media_presets = next.length ? next : undefined));
@@ -12675,7 +12674,7 @@ export class Fp3dEditor extends LitElement {
   }
 
   /** Awning: its fall, the valance, a position sensor, its run time and the other direction (with the cover above). */
-  /** Haushalt Pro: the house's household settings (the hours the bins glow – for all bins). */
+  /** Household Pro: the house's household settings (the hours the bins glow – for all bins). */
   private setHousehold(patch: NonNullable<Building["settings"]["household"]>): void {
     const next = structuredClone(this._doc);
     next.settings.household = { ...(next.settings.household ?? {}), ...patch };
@@ -13477,7 +13476,7 @@ export class Fp3dEditor extends LitElement {
 
   /** The library's index, built once per language and pack state. */
   private libraryEntries(lang: string): LibraryEntry[] {
-    // the smart fridge is exclusive: an installed pack with the feature "fridge_smart", or Haushalt Pro, offers it
+    // the smart fridge is exclusive: an installed pack with the feature "fridge_smart", or Household Pro, offers it
     const extra = hasFeature("fridge_smart") || hasFeature("household") ? ["fridge_smart"] : [];
     const key = `${lang}|${libPacksVersion()}|${this.packs?.length ?? 0}|${extra.length}`;
     if (this.libIndex?.key === key) return this.libIndex.entries;
@@ -14693,7 +14692,7 @@ export class Fp3dEditor extends LitElement {
     </details>`;
   }
 
-  /** Haushalt Pro: the calendars whose entries of today stand in "Today in the household" (idea: T-Eberle). */
+  /** Household Pro: the calendars whose entries of today stand in "Today in the household" (idea: T-Eberle). */
   private renderHouseholdCalendars() {
     const all = Object.keys(this.hass?.states ?? {}).filter((id) => id.startsWith("calendar.")).sort();
     if (!all.length) return nothing;
@@ -18227,7 +18226,7 @@ function distToSegment(p: Vec2, a: Vec2, b: Vec2): number {
   return Math.hypot(p[0] - a[0] - dx * t, p[1] - a[1] - dz * t);
 }
 
-/** Lower case without accents, so "kuche" finds "Küche" and "chaise" finds "Chaise longue". */
+/** Lower case without accents, so "cafe" finds "Café" and "chaise" finds "Chaise longue". */
 function fold(s: string): string {
   return s.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "");
 }
@@ -18245,16 +18244,16 @@ function binaryish(id: string): boolean {
   return /^(binary_sensor|input_boolean)\./.test(id);
 }
 
-/** Ready wall colours (names in German and English are plain enough for both). */
+/** Ready wall colours. */
 const WALL_SWATCHES: [string, string][] = [
-  ["Weiß / White", "#f0ede8"],
+  ["White", "#f0ede8"],
   ["Sand", "#e3d6bf"],
-  ["Salbei / Sage", "#a9b9a0"],
+  ["Sage", "#a9b9a0"],
   ["Taupe", "#a99c8e"],
   ["Petrol", "#3f6b72"],
-  ["Terrakotta / Terracotta", "#c27b5a"],
-  ["Rauchblau / Smoke blue", "#8fa3b8"],
-  ["Anthrazit / Anthracite", "#4a4e55"],
+  ["Terracotta", "#c27b5a"],
+  ["Smoke blue", "#8fa3b8"],
+  ["Anthracite", "#4a4e55"],
 ];
 
 /** The classic looks as a palette, the start of an own style made from one of them. */

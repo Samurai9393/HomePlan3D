@@ -1,19 +1,19 @@
-// Tutorial episode 11 – "Dashboard-Karte und Wandtablet" (manual chapters 8 and 9), in two parts (the checklist does
+// Tutorial episode 11 – "Dashboard card and wall tablet" (manual chapters 8 and 9), in two parts (the checklist does
 // not fit into 8 minutes):
-//   a) Die Karte anlegen und einstellen: adding the card in Home Assistant (said over the card editor), then every
-//      option of the visual card editor from the top: Etage, Größe, Höhe, Look, Akzentfarbe, Wände, Qualität, Etagen
-//      darunter, Symbole, Heatmap, Stromfluss, Hologramme, Schalter in der Karte (and which), Stern, eigene Namen,
-//      ausgeblendete Bedienelemente / ausblenden nach, Mini-Ansichten, Raumnamen, Energiewerte, Raum-Details,
-//      Vollbild-Taste, Etagen auseinander, Dach ausblenden, and the section „Funktionen“ (Warnungen, Sprung, Szenen,
-//      Bewegungsspur, Kamera-Wand, Wetter with its entity).
-//   b) YAML, Kiosk und alte Wandtablets: the section „Wandtablet (Kiosk)“ (idle return, screensaver turn, night
+//   a) Creating and configuring the card: adding the card in Home Assistant (said over the card editor), then every
+//      option of the visual card editor from the top: Floor, Size, Height, Look, Accent colour, Walls, Quality, Floors
+//      darunter, Markers, Heatmap, power flow, Holograms, Switches in the card (and which), Stern, eigene Names,
+//      hidden controls / hide after, mini views, room names, energy values, room details,
+//      Full screen button, Floors apart, Roof ausblenden, and the section “Features” (Warnings, Sprung, Szenen,
+//      Motion trail, Camera wall, Weather with its entity).
+//   b) YAML, kiosk and old wall tablets: the section “Wall tablet (kiosk)” (idle return, screensaver turn, night
 //      dimming by the sun or a time range, a button to a dashboard), the YAML code with the options that exist only
 //      there (room, floor, start_view, controls_side, keep_view, buttons, free seconds), the performance display (no
 //      drawing while idle), the quality level Tablet (pixel ratio 1, half-rate animations), Auto on weak devices, tips
 //      for wall tablets, the card on a wall tablet in landscape and portrait.
 // The preview's card mode (`preview/index.html?card`: the visual editor left, the card right, like Home Assistant's
 // card dialog) with the invented demo house. The page is shown at 125 % (CSS 1536 × 864, screenshots 1920 × 1080).
-// Usage (from frontend/): node tutorials/ep11-dashboard-karte.mjs <out-dir> a|b [<voice-dir de> [<voice-dir en>]]
+// Usage (from frontend/): node tutorials/ep11-dashboard-karte.mjs <out-dir> a|b [<voice-dir>]
 //   (voice dirs: private/tutorial-audio/ep11a/de and …/en, resp. ep11b)
 // EP11_FAST=1: a quick dry run for checking the steps (the timing is not usable).
 // Then: python ../tools/make-tutorial.py <out-dir> <out.mp4> --en tutorials/ep11a-narration-en.json
@@ -24,10 +24,10 @@ const out = process.argv[2] ?? "tutorial-ep11";
 const PART = process.argv[3] === "b" ? "b" : "a";
 const FAST = !!process.env.EP11_FAST;
 // controls_side and keep_view (shown in part 2) come with 1.12.7
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D 1.12.7</span>`;
+const VERSION = `<br><span style="font-size:20px;opacity:.7">recorded with HomePlan 3D 1.12.7</span>`;
 
 // ---------------------------------------------------------------- recorder
-const R = await startRecorder({ outDir: out, width: 1536, height: 864, lang: "de" });
+const R = await startRecorder({ outDir: out, width: 1536, height: 864, lang: "en" });
 // 125 %: the editor's small labels stay readable in the video
 await R.page.setViewport({ width: 1536, height: 864, deviceScaleFactor: 1.25 });
 const N = narration(R, process.argv.slice(4));
@@ -356,7 +356,7 @@ const fillField = async (label, value, perLetter = 0.07) => {
   });
   await R.frame(1 / FPS, 300);
 };
-/** A small caption at the top of the card ("eine Minute später"), or none. */
+/** A small caption at the top of the card ("a minute later"), or none. */
 const caption = (text) =>
   R.page.evaluate((text) => {
     document.getElementById("tut-cap")?.remove();
@@ -531,8 +531,8 @@ const yamlLastLine = () =>
   });
 
 // ---------------------------------------------------------------- shared places
-const STAR = 'button[aria-label="Zentral: alle Lichter, Rollläden und Favoriten"]';
-const EYE_BACK = 'button[aria-label="Bedienelemente wieder einblenden"]';
+const STAR = 'button[aria-label="Central: all lights, blinds and favourites"]';
+const EYE_BACK = 'button[aria-label="Show the controls again"]';
 // room centres (plan metres) of the demo house
 const WOHNEN = ["eg", 3, 2.3];
 const KUECHE = ["eg", 8, 2.3];
@@ -551,12 +551,12 @@ if (PART === "a") {
   {
     await setCam({ theta: -0.9, phi: 0.95, radius: 34 });
     await R.frame(0.2, 900);
-    await R.title("Dashboard-Karte und Wandtablet", `HomePlan 3D · Folge 11 · Teil 1${VERSION}`);
-    const l1 = "HomePlan 3D als Karte auf deinem Dashboard – und an der Wand, auf einem alten Tablet, den ganzen Tag.";
+    await R.title("Dashboard card and wall tablet", `HomePlan 3D · Episode 11 · part 1${VERSION}`);
+    const l1 = "HomePlan 3D as a card on your dashboard – and on the wall, on an old tablet, all day long.";
     await sayOver(l1);
     await orbit(0.7, 0.92, N.length(l1));
     await R.untitle();
-    const l2 = "In dieser Folge richtest du die Karte ein. Teil eins zeigt jede Option im Karten-Editor.";
+    const l2 = "In this episode you set up the card. Part one shows every option in the card editor.";
     await sayOver(l2);
     await orbit(0.6, 0.95, N.length(l2));
   }
@@ -566,44 +566,44 @@ if (PART === "a") {
   await start();
   await R.hideCursor(false);
   await R.move(700, 420, 0.01);
-  await sayOver("Die Karte legst du in Home Assistant an: Dashboard bearbeiten, „Karte hinzufügen“ und nach „NeonPlan“ suchen.");
+  await sayOver("You add the card in Home Assistant: edit the dashboard, “Add card”, and search for “NeonPlan”.");
   await R.move(1000, 260, 0.8);
   await liveFor(1.5);
-  await sayOver("Sie kommt mit der Integration und wird automatisch geladen. Eine Ressource musst du nicht eintragen.");
+  await sayOver("It comes with the integration and loads by itself. You don't need to add a resource.");
   await R.move(800, 330, 0.8);
-  await sayOver("Dann öffnet sich dieser Editor. Links stehen alle Optionen, rechts siehst du die Karte – jede Änderung sofort.");
-  await moveToText("Ansicht", 0.6, 0);
+  await sayOver("Then this editor opens. All options are on the left, the card is on the right – every change shows at once.");
+  await moveToText("View", 0.6, 0);
   await R.hold(1.2);
   await R.move(1000, 250, 0.7);
-  await sayOver("Was auf dem Standard steht, lässt der Editor im YAML weg. So bleibt die Konfiguration kurz.");
+  await sayOver("Whatever stays at its default, the editor leaves out of the YAML. That keeps the configuration short.");
   await R.move(260, 300, 0.7);
 
   // ---------------------------------------------------------------- view: floor, size, height
-  await chapter("Etage, Größe und Höhe");
-  await sayOver("Ganz oben die „Etage“: „Ganzes Haus“ zeigt alle Etagen, ein Tipp auf eine Etage öffnet sie.");
-  await showList("Etage", "Ganzes Haus (Etage antippen zum Öffnen)", 3);
-  await sayOver("Wählst du eine Etage, startet die Karte dort – zum Beispiel im Erdgeschoss.");
-  await pick("Etage", "Erdgeschoss");
+  await chapter("Floor, size and height");
+  await sayOver("At the top, the floor. “Whole house” shows every floor, and a tap on a floor opens it.");
+  await showList("Floor", "Whole house (tap a floor to open it)", 3);
+  await sayOver("Pick a floor and the card starts there – for example on the ground floor.");
+  await pick("Floor", "Ground floor");
   await liveFor(1.5);
-  await sayOver("Bei „Größe“ hast du „Feste Höhe“ oder „Bildschirm füllen“. Füllen passt am besten in eine Dashboard-Ansicht vom Typ „Panel“.");
-  await pick("Größe", "Bildschirm füllen");
+  await sayOver("Under “Size” you get a fixed height or “Fill the screen”. Filling works best in a dashboard view of the type “Panel”.");
+  await pick("Size", "Fill the screen");
   await liveFor(0.6);
-  await moveToText("Am besten in einer Dashboard-Ansicht", 0.6);
+  await moveToText("Best on a dashboard view", 0.6);
   await liveFor(1.2);
-  await sayOver("Mit fester Höhe stellst du die Höhe in Pixeln ein. Ich nehme 760 statt 420.");
-  await pick("Größe", "Feste Höhe");
-  await fillField("Höhe (Pixel)", "760");
+  await sayOver("With a fixed height you set the height in pixels. I'll take 760 instead of 420.");
+  await pick("Size", "Fixed height");
+  await fillField("Height (pixels)", "760");
   await liveFor(0.8);
 
   // ---------------------------------------------------------------- look, accent, walls
-  await chapter("Look, Akzentfarbe und Wände");
-  await sayOver("Der „Look“: Neon, Blueprint wie ein Bauplan, oder Tag – hell und freundlich.");
+  await chapter("Look, accent colour and walls");
+  await sayOver("The look: neon, blueprint like a building plan, or day – bright and friendly.");
   await pick("Look", "Blueprint", 0.4, 0.2);
   await liveFor(0.4);
-  await pick("Look", "Tag", 0.4, 0.2);
+  await pick("Look", "Day", 0.4, 0.2);
   await liveFor(0.4);
   await pick("Look", "Neon", 0.4, 0.2);
-  await sayOver("Mit der „Akzentfarbe“ bekommen Linien, Knöpfe und Pins deine Farbe. „Zurück zu Cyan“ setzt sie zurück.");
+  await sayOver("The accent colour, “Accent colour”, gives lines, buttons and pins your colour. “Back to cyan” resets it.");
   {
     const b = await R.page.evaluate(() => {
       const r = document.querySelector("homeplan3d-card-editor").shadowRoot.querySelector('input[type="color"]').getBoundingClientRect();
@@ -617,187 +617,187 @@ if (PART === "a") {
       i.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
     });
     await liveFor(2.2);
-    await R.clickOn({ text: "Zurück zu Cyan" }, 0.5);
+    await R.clickOn({ text: "Back to cyan" }, 0.5);
     await liveFor(0.6);
   }
-  await sayOver("„Wände“: „Wände hoch“ zeigt sie in voller Höhe, „Schnitt“ schneidet alle Wände in Hüfthöhe ab.");
-  await pick("Wände", "Schnitt");
+  await sayOver("Walls: “Tall walls” shows them at full height, “Cut” cuts every wall at hip height.");
+  await pick("Walls", "Cut");
   await liveFor(1.2);
-  await pick("Wände", "Wände hoch");
+  await pick("Walls", "Tall walls");
   await liveFor(0.4);
 
   // ---------------------------------------------------------------- quality, floors below
-  await chapter("Qualität und Etagen darunter");
-  await sayOver("„Qualität“: „Auto“, „Tablet“ oder „Hoch“. Auto erkennt schwache Geräte und nimmt dann von selbst die sparsame Stufe Tablet.");
-  await showList("Qualität", "Auto", 3);
-  await moveToText("ist die sparsamste Stufe", 0.6);
-  await sayOver("„Hoch“ zeigt zusätzlich Lichtkegel unter Spots. Was Tablet genau spart, zeige ich in Teil zwei.");
+  await chapter("Quality and floors below");
+  await sayOver("“Quality”: Auto, Tablet or High. Auto spots weak devices and then picks the frugal Tablet level by itself.");
+  await showList("Quality", "Auto", 3);
+  await moveToText("is the most economical setting", 0.6);
+  await sayOver("High also shows light cones under spotlights. What Tablet saves exactly, I show you in part two.");
   await R.hold(0.6);
-  await sayOver("„Etagen darunter“ gilt für eine geöffnete Etage. Ich starte dafür kurz im Obergeschoss.");
-  await pick("Etage", "Obergeschoss");
+  await sayOver("“Floors below” applies to an opened floor. For this I start on the upper floor for a moment.");
+  await pick("Floor", "Upper floor");
   await liveFor(1.4);
-  await sayOver("„Abgedunkelt“ zeigt das Erdgeschoss dunkel darunter, „Gestapelt“ das ganze Haus bis hier, „Ausgeblendet“ nur diese Etage.");
+  await sayOver("“Dimmed” shows the ground floor dark below it, “Stacked” the whole house up to here, “Hidden” only this floor.");
   await liveFor(0.6);
-  await pick("Etagen darunter", "Gestapelt (ganzes Haus bis hier)");
+  await pick("Floors below", "Stacked (the house up to here)");
   await liveFor(1.2);
-  await pick("Etagen darunter", "Ausgeblendet (nur diese Etage)");
+  await pick("Floors below", "Hidden (only this floor)");
   await liveFor(1.2);
-  await pick("Etagen darunter", "Abgedunkelt");
+  await pick("Floors below", "Dimmed");
   await catchUp();
   await setCfg(BASE);
   await R.sleep(1500);
 
   // ---------------------------------------------------------------- markers, heatmap, flows
-  await chapter("Symbole, Heatmap und Stromfluss");
-  await sayOver("Unter „Anzeigen“: „Symbole“ – keine, nur die wichtigen oder alle Gerätesymbole.");
-  await scrollEd("Anzeigen", 120);
-  await pick("Symbole", "Alle");
+  await chapter("Markers, heatmap and power flow");
+  await sayOver("Under “Show”: markers, “Markers” – none, only the important ones, or every device marker.");
+  await scrollEd("Show", 120);
+  await pick("Markers", "All");
   await liveFor(1.2);
-  await pick("Symbole", "Wichtige");
-  await sayOver("Die „Heatmap“ färbt die Böden nach Temperatur, Luftfeuchtigkeit oder CO₂. „Werte am Raumnamen“ schreibt die Zahlen dazu.");
-  await pick("Heatmap", "Temperatur");
+  await pick("Markers", "Important");
+  await sayOver("The heatmap colours the floors by temperature, humidity or CO₂. “Values at the room name” writes the numbers next to it.");
+  await pick("Heatmap", "Temperature");
   await liveFor(1.4);
-  await pick("Heatmap", "Werte am Raumnamen");
+  await pick("Heatmap", "Values at the room names");
   await liveFor(1.4);
   await pick("Heatmap", "Normal");
-  await sayOver("„Stromfluss“ und „Hologramme“: immer an, immer aus, oder ein eigener Schalter in der Karte. Beides gehört zur Erweiterung Energie Pro.");
-  await pick("Stromfluss", "Immer an", 0.4, 0.2);
+  await sayOver("Power flow and holograms: always on, always off, or a switch of their own in the card. Both belong to the Energy Pro extension.");
+  await pick("power flow", "Always on", 0.4, 0.2);
   await liveFor(0.8);
-  await pick("Hologramme", "Immer an", 0.4, 0.2);
+  await pick("Holograms", "Always on", 0.4, 0.2);
   await liveFor(0.8);
-  await pick("Stromfluss", "Schalter in der Karte", 0.4, 0.2);
-  await pick("Hologramme", "Schalter in der Karte", 0.4, 0.2);
+  await pick("power flow", "Switches in the card", 0.4, 0.2);
+  await pick("Holograms", "Switches in the card", 0.4, 0.2);
 
   // ---------------------------------------------------------------- switches in the card
-  await chapter("Schalter in der Karte");
-  await sayOver("„Schalter in der Karte“ legt unten eine Leiste in die Karte. Darunter wählst du, welche: Wände, Etagen, Temperatur, Feuchte und CO₂.");
-  await scrollEd("Schalter in der Karte", 140);
-  await toggle("Schalter in der Karte");
+  await chapter("Switches in the card");
+  await sayOver("“Switches in the card”, puts a bar at the bottom of the card. Below it you pick which ones: walls, floors, temperature, humidity and CO₂.");
+  await scrollEd("Switches in the card", 140);
+  await toggle("Switches in the card");
   await liveFor(0.6);
-  await moveToText("Etagen auseinander", 0.6, 0);
+  await moveToText("Floors apart", 0.6, 0);
   await R.hold(0.6);
   await toggle("CO₂");
   await liveFor(0.4);
-  await sayOver("In der Karte schaltest du dann selbst um – hier auf die Temperatur und wieder zurück.");
+  await sayOver("In the card you then switch yourself – here to temperature and back again.");
   await R.clickOn({ text: "Temp.", exact: true }, 0.6);
   await liveFor(1.4);
   await R.clickOn({ text: "Normal", exact: true }, 0.5);
   await liveFor(0.3);
-  await sayOver("Der „Stern mit Zentral-Menü“ schaltet alle Lichter und Rollläden der Etage und zeigt deine Favoriten.");
+  await sayOver("The star with the central menu switches all lights and blinds of the floor and shows your favourites.");
   await R.clickOn(STAR, 0.6);
   await liveFor(1.8);
   await R.clickOn(STAR, 0.4);
   await liveFor(0.2);
-  await sayOver("„Eigene Namen an den Symbolen“ schreibt unter jedes Gerät mit eigenem Namen diesen Namen.");
-  await toggle("Eigene Namen an den Symbolen");
+  await sayOver("“Own names at the markers” writes the name under every device that has a name of its own.");
+  await toggle("Own names at the markers");
   await liveFor(1.8);
-  await toggle("Eigene Namen an den Symbolen");
-  await sayOver("„Mit ausgeblendeten Bedienelementen starten“ zeigt nur die 3D-Ansicht. Das Auge unten links holt alles zurück.");
-  await toggle("Mit ausgeblendeten Bedienelementen starten");
+  await toggle("Own names at the markers");
+  await sayOver("“Start with the controls hidden” shows only the 3D view. The eye at the bottom left brings everything back.");
+  await toggle("Start with the controls hidden");
   await liveFor(1.4);
   await R.clickOn(EYE_BACK, 0.7);
   await liveFor(1.0);
-  await toggle("Mit ausgeblendeten Bedienelementen starten");
-  await sayOver("„Bedienelemente ausblenden nach“ räumt die Karte nach einer Wartezeit selbst auf, etwa nach zehn Sekunden ohne Berührung.");
-  await pick("Bedienelemente ausblenden nach", "10 s ohne Berührung");
+  await toggle("Start with the controls hidden");
+  await sayOver("“Hide controls after” tidies up the card by itself after a wait, say after ten seconds without a touch.");
+  await pick("Hide the controls after", "10 s without a touch");
   await liveFor(0.8);
   await R.move(1420, 120, 0.6);
   await catchUp();
   // the real ten seconds pass without frames
   await R.sleep(FAST ? 10500 : 10500);
-  await caption("10 Sekunden später");
-  await sayOver("Eine Berührung zeigt alles wieder.");
+  await caption("10 seconds later");
+  await sayOver("One touch shows everything again.");
   await liveFor(0.6);
   await R.click();
   await caption(null);
   await liveFor(0.4);
-  await pick("Bedienelemente ausblenden nach", "Nie", 0.4, 0.2);
+  await pick("Hide the controls after", "Never", 0.4, 0.2);
 
   // ---------------------------------------------------------------- thumbs, names, panel, full screen
-  await chapter("Mini-Ansichten, Raumfenster und Vollbild");
-  await sayOver("„Etagen als Mini-Ansichten“: kleine Bilder der Etagen am Rand. Mit einer Start-Etage sind sie aus, du kannst sie aber einschalten.");
-  await scrollEd("Etagen als Mini-Ansichten", 150);
-  await toggle("Etagen als Mini-Ansichten");
+  await chapter("Mini views, room panel and full screen");
+  await sayOver("“Floors as miniatures”: small pictures of the floors at the side. With a start floor they're off, but you can turn them on.");
+  await scrollEd("Floors as miniatures", 150);
+  await toggle("Floors as miniatures");
   await liveFor(1.0);
-  await moveToText("Die gewählte Etage ist dann die Start-Etage", 0.6);
+  await moveToText("The chosen floor is then the start floor", 0.6);
   await liveFor(0.6);
-  await sayOver("„Raumnamen anzeigen“ und „Energiewerte oben anzeigen“ blenden die Namen und die Energiewerte ein oder aus.");
-  await toggle("Raumnamen anzeigen");
+  await sayOver("“Show room names” and “Show energy values at the top” turn the names and the energy values on or off.");
+  await toggle("Show room names");
   await liveFor(1.0);
-  await toggle("Raumnamen anzeigen");
-  await toggle("Energiewerte oben anzeigen");
+  await toggle("Show room names");
+  await toggle("Energywerte top anzeigen");
   await liveFor(1.0);
-  await toggle("Energiewerte oben anzeigen");
-  await sayOver("„Raum-Details beim Antippen“: Ein Tipp auf einen Raum öffnet sein Raumfenster mit Lichtern, Rollläden und Kameras.");
-  await moveToText("Raum-Details beim Antippen", 0.5);
+  await toggle("Energywerte top anzeigen");
+  await sayOver("“Room details on tap”: tapping a room opens its room panel with lights, blinds and cameras.");
+  await moveToText("Room details on tap", 0.5);
   await R.hold(0.4);
   await tapRoom("eg", WOHNEN[1], WOHNEN[2], 0.5, 1.0);
   await liveFor(0.3);
-  await sayOver("Ohne den Haken wird der Raum nur gewählt, und „Zurück“ unten führt wieder hinaus.");
+  await sayOver("Without the tick the room is only selected, and “Back” at the bottom leads out again.");
   await R.clickOn("button.fp3d-rp-close", 0.4);
   await liveFor(0.6);
-  await toggle("Raum-Details beim Antippen", 0.4);
+  await toggle("Room details on tap", 0.4);
   await tapRoom("eg", WOHNEN[1], WOHNEN[2], 0.5, 1.0);
   await liveFor(0.6);
-  await R.clickOn({ text: "Zurück", exact: true }, 0.5);
+  await R.clickOn({ text: "Back", exact: true }, 0.5);
   await liveFor(0.6);
-  await toggle("Raum-Details beim Antippen", 0.4);
-  await sayOver("Die „Vollbild-Taste“ setzt oben rechts einen Knopf, der das Dashboard drumherum ausblendet – praktisch am Wandtablet.");
-  await toggle("Vollbild-Taste");
+  await toggle("Room details on tap", 0.4);
+  await sayOver("The full-screen button, “Full screen button”, puts a button at the top right that hides the dashboard around the card – handy on a wall tablet.");
+  await toggle("Full screen button");
   await liveFor(0.4);
   {
-    const b = await R.locate('button[aria-label="Vollbild"]');
+    const b = await R.locate('button[aria-label="Full screen"]');
     await R.move(b.x, b.y, 0.6);
     await R.hold(1.2);
   }
-  await sayOver("Etagen auseinanderziehen und das Dach beim Heranzoomen ausblenden kennst du aus der 3D-Ansicht. Die „Leistungsanzeige“ zeige ich in Teil zwei.");
-  await moveToText("Etagen in der Hausansicht auseinanderziehen", 0.6);
+  await sayOver("Pulling the floors apart and fading the roof when you zoom in, you know from the 3D view. The performance display comes in part two.");
+  await moveToText("Pull floors apart in the house view", 0.6);
   await R.hold(1.0);
-  await moveToText("Dach beim Heranzoomen ausblenden", 0.5);
+  await moveToText("Fade the roof out while zooming in", 0.5);
   await R.hold(1.0);
-  await moveToText("Leistungsanzeige", 0.5);
+  await moveToText("Performance display", 0.5);
 
   // ---------------------------------------------------------------- features
-  await chapter("Funktionen: Warnungen, Szenen, Kameras, Wetter");
-  await sayOver("Unter „Funktionen“: „Warnungen anzeigen“. Bei Rauch, Wasser, Alarm oder offenem Fenster im Regen pulsiert der Raum, oben erscheint ein Hinweis.");
-  await scrollEd("Funktionen", 120);
-  await moveToText("Warnungen anzeigen", 0.5);
+  await chapter("Features: Warnings, Szenen, Cameras, Weather");
+  await sayOver("Under features, “Features”: “Show warnings”. With smoke, water, an alarm or a window open in the rain, the room pulses and a note appears at the top.");
+  await scrollEd("Features", 120);
+  await moveToText("Show warnings", 0.5);
   await R.hold(1.0);
-  await sayOver("Mit „Bei neuer Warnung zum Raum springen“ fliegt die Karte selbst hin. Hier meldet der Rauchmelder in der Küche.");
+  await sayOver("With “Jump to the room of a new warning” the card flies there by itself. Here the smoke detector in the kitchen goes off.");
   await setCam({ theta: -0.9, phi: 0.95, radius: 30 });
-  await toggle("Bei neuer Warnung zum Raum springen");
+  await toggle("Jump to the room of a new warning");
   await liveFor(0.6);
   await setState("binary_sensor.kueche_rauch", "on");
   await liveFor(3.2);
   await setState("binary_sensor.kueche_rauch", "off");
   await liveFor(0.4);
-  await toggle("Bei neuer Warnung zum Raum springen");
+  await toggle("Jump to the room of a new warning");
   await setCfg(await getCfg());
   await R.sleep(800);
-  await sayOver("„Szenen-Knöpfe im Raum“ sind die Knöpfe, die du eben ohne Raumfenster unter der Ansicht gesehen hast. Im Raumfenster stehen die Szenen sowieso.");
-  await moveToText("Szenen-Knöpfe im Raum", 0.5);
+  await sayOver("“Scene buttons in the room” are the buttons you just saw under the view without the room panel. The room panel has the scenes anyway.");
+  await moveToText("Scene buttons in the room", 0.5);
   await R.hold(1.0);
-  await sayOver("Die „Bewegungsspur“ zeigt, wo in der letzten halben Stunde Bewegung gemeldet wurde, mit Uhrzeit.");
-  await toggle("Bewegungsspur");
+  await sayOver("The motion trail shows where motion was reported in the last half hour, with the time.");
+  await toggle("Motion trail");
   await liveFor(2.4);
-  await toggle("Bewegungsspur");
-  await sayOver("Der Knopf „Kameras“ unten in der Karte öffnet die Kamera-Wand mit den Bildern aller Kameras.");
-  await toggle("Knopf „Kameras“");
+  await toggle("Motion trail");
+  await sayOver("The “Cameras” button at the bottom of the card opens the camera wall with the pictures of every camera.");
+  await toggle("Knopf “Cameras”");
   await liveFor(0.4);
-  await R.clickOn({ text: "Kameras", exact: true }, 0.6);
+  await R.clickOn({ text: "Cameras", exact: true }, 0.6);
   await liveFor(2.0);
-  await R.clickOn({ text: "Kameras", exact: true }, 0.5).catch(() => undefined);
+  await R.clickOn({ text: "Cameras", exact: true }, 0.5).catch(() => undefined);
   await liveFor(0.4);
-  await toggle("Knopf „Kameras“");
-  await sayOver("„Wetter draußen“ zeigt Regen, Schnee und Wolken am Haus. Darunter wählst du die „Wetter-Entität“.");
-  await scrollEd("Wetter draußen", 300);
-  await toggle("Wetter draußen");
-  await toggle("Wetter draußen");
-  await pick("Wetter-Entität", "Wetter");
+  await toggle("Knopf “Cameras”");
+  await sayOver("“Weather outside” shows rain, snow and clouds around the house. Below it you pick the weather entity.");
+  await scrollEd("Weather outside", 300);
+  await toggle("Weather outside");
+  await toggle("Weather outside");
+  await pick("Weather entity", "Weather");
   await setState("weather.zuhause", "rainy", { cloud_coverage: 85 });
   await liveFor(2.4);
-  await sayOver("Bewegungsspur, Kamera-Wand und Wetter sind Pro-Erweiterungen. Ohne sie bleiben die Schalter einfach wirkungslos.");
-  await moveToText("Bewegungsspur und Wetter sind Pro-Erweiterungen", 0.6);
+  await sayOver("Motion trail, camera wall and weather are Pro extensions. Without them these switches simply do nothing.");
+  await moveToText("Motion trail and weather are Pro extensions", 0.6);
   await liveFor(2.0);
 
   // ---------------------------------------------------------------- outro
@@ -806,12 +806,12 @@ if (PART === "a") {
   await R.hideCursor();
   await tablet({ ...BASE, floor: undefined, controls: true, fullscreen_button: true });
   await setCam({ theta: -0.6, phi: 0.95, radius: 32 });
-  await R.title("Teil 2: YAML, Kiosk und alte Wandtablets", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
-  await sayOver("Das war Teil eins: die Karte anlegen und jede Option im Editor, von der Etage bis zu den Funktionen.");
-  await orbit(0.5, 0.95, N.length("Das war Teil eins: die Karte anlegen und jede Option im Editor, von der Etage bis zu den Funktionen."));
-  await sayOver("In Teil zwei geht es ums Wandtablet: Kiosk, Nachtdimmung, Bildschirmschoner, YAML und die Einstellungen für alte Tablets.");
-  await orbit(0.5, 0.97, N.length("In Teil zwei geht es ums Wandtablet: Kiosk, Nachtdimmung, Bildschirmschoner, YAML und die Einstellungen für alte Tablets."));
-  await say("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Bis gleich in Teil zwei!");
+  await R.title("Part 2: YAML, kiosk and old wall tablets", `HomePlan 3D – also runs on old wall tablets${VERSION}`);
+  await sayOver("That was part one: adding the card and every option in the editor, from the floor to the features.");
+  await orbit(0.5, 0.95, N.length("That was part one: adding the card and every option in the editor, from the floor to the features."));
+  await sayOver("Part two is about the wall tablet: kiosk, night dimming, screensaver, YAML and the settings for old tablets.");
+  await orbit(0.5, 0.97, N.length("Part two is about the wall tablet: kiosk, night dimming, screensaver, YAML and the settings for old tablets."));
+  await say("Left to the online demo and the manual are in the description. See you in part two!");
   await R.hold(0.6);
 }
 
@@ -824,78 +824,78 @@ if (PART === "b") {
   await tablet({ ...BASE, floor: undefined, controls_hidden: true, idle_return: 1, idle_orbit: true });
   {
     await setCam({ theta: -0.9, phi: 0.95, radius: 34 });
-    await R.title("Dashboard-Karte und Wandtablet", `HomePlan 3D · Folge 11 · Teil 2${VERSION}`);
-    const l1 = "Ein altes Tablet an der Wand: Die Karte kehrt von selbst zurück, dreht sich langsam und dimmt nachts.";
+    await R.title("Dashboard card and wall tablet", `HomePlan 3D · Episode 11 · part 2${VERSION}`);
+    const l1 = "An old tablet on the wall: the card returns by itself, turns slowly and dims at night.";
     await sayOver(l1);
     await orbit(0.6, 0.95, N.length(l1) * 0.55);
     await setState("sun.sun", "below_horizon", { elevation: -8 });
     await R.page.evaluate(() => window.fp3dCard.setConfig({ ...window.fp3dCard._config, night: "sun" }));
     await orbit(0.4, 0.97, N.length(l1) * 0.45);
     await R.untitle();
-    const l2 = "Teil zwei: der Kiosk-Bereich, die Optionen, die es nur im YAML gibt, und alles für alte, schwache Wandtablets.";
+    const l2 = "Part two: the kiosk section, the options that only exist in YAML, and everything for old, weak wall tablets.";
     await sayOver(l2);
     await orbit(0.6, 0.95, N.length(l2));
     await setState("sun.sun", "above_horizon", { elevation: 32 });
   }
 
   // ---------------------------------------------------------------- idle return and screensaver
-  await chapter("Zurück zur Startansicht und Bildschirmschoner");
+  await chapter("Back to the start view and screensaver");
   await start({ ...BASE, controls: true, fullscreen_button: true });
   await R.hideCursor(false);
   await R.move(300, 400, 0.01);
-  await sayOver("Ganz unten im Editor steht „Wandtablet (Kiosk)“. „Zurück zur Startansicht nach“: eine, zwei, fünf oder zehn Minuten ohne Bedienung.");
-  await scrollEd("Wandtablet (Kiosk)", 110, 0.8);
-  await showList("Zurück zur Startansicht nach", "1 min ohne Bedienung", 3.2);
-  await sayOver("Dann schließt die Karte den Raum und zeigt wieder die Startansicht. Das Tablet steht morgens nicht mehr im Bad vom Vorabend.");
-  await moveToText("Nach der Wartezeit schließt die Karte", 0.6);
+  await sayOver("At the very bottom of the editor is “Wall tablet (kiosk)”. “Back to the start view after”: one, two, five or ten minutes without a touch.");
+  await scrollEd("Wall tablet (kiosk)", 110, 0.8);
+  await showList("Back to the start view after", "1 min without a touch", 3.2);
+  await sayOver("Then the card closes the room and shows the start view again. In the morning the tablet no longer sits in last night's bathroom.");
+  await moveToText("After the wait the card closes", 0.6);
   await R.hold(0.6);
-  await sayOver("Mit „Kamerafahrt als Bildschirmschoner“ dreht sich danach das Haus langsam, bis jemand das Tablet berührt.");
-  await toggle("Kamerafahrt als Bildschirmschoner");
+  await sayOver("With “Camera turn as screensaver” the house then turns slowly until someone touches the tablet.");
+  await toggle("Camera turn as screensaver");
   await liveFor(0.4);
   await catchUp();
   // tap the bath, then a real minute passes without frames
   const tapped = Date.now();
-  await sayOver("Ich tippe aufs Bad und lasse das Tablet eine Minute in Ruhe.");
+  await sayOver("I tap the bathroom and leave the tablet alone for a minute.");
   await tapRoom("eg", BAD[1], BAD[2]);
   await liveFor(1.4);
   await R.move(300, 560, 0.6);
   await catchUp();
   await R.sleep(Math.max(0, 62000 - (Date.now() - tapped)));
-  await caption("eine Minute später");
-  await sayOver("Eine Minute ohne Berührung: Die Karte ist zurück, und die Kamerafahrt läuft.");
-  await liveFor(N.length("Eine Minute ohne Berührung: Die Karte ist zurück, und die Kamerafahrt läuft."));
-  await sayOver("Ein Tipp beendet sie.");
+  await caption("a minute later");
+  await sayOver("One minute without a touch: the card is back, and the camera turn is running.");
+  await liveFor(N.length("One minute without a touch: the card is back, and the camera turn is running."));
+  await sayOver("A tap ends it.");
   await R.move(1420, 120, 0.5);
   await R.click();
   await caption(null);
   await liveFor(1.0);
 
   // ---------------------------------------------------------------- night
-  await chapter("Nachtdimmung");
-  await sayOver("Die „Nachtdimmung“ dunkelt die ganze Karte ab: „Nach Sonnenstand“, sobald die Sonne untergeht, oder in einem „Zeitraum“.");
-  await showList("Nachtdimmung", "Nach Sonnenstand", 2.6);
+  await chapter("Night dimming");
+  await sayOver("Night dimming, “Night dimming”, darkens the whole card: “By the sun”, as soon as the sun sets, or in a time range.");
+  await showList("Night dimming", "By the sun", 2.6);
   await setState("sun.sun", "below_horizon", { elevation: -8 });
   await liveFor(2.0);
-  await sayOver("Für den Zeitraum trägst du Start und Ende ein, zum Beispiel von 22 bis 6 Uhr.");
+  await sayOver("For the time range you enter the start and the end, for example from 10 pm to 6 am.");
   await setState("sun.sun", "above_horizon", { elevation: 32 });
-  await pick("Nachtdimmung", "Zeitraum");
+  await pick("Night dimming", "Time range");
   await liveFor(0.4);
-  await fillField("Zeitraum (z. B. 22:00-06:00)", "22:00-06:00");
+  await fillField("Time range (e.g. 22:00-06:00)", "22:00-06:00");
   await liveFor(0.6);
-  await pick("Nachtdimmung", "Aus");
+  await pick("Night dimming", "Off");
 
   // ---------------------------------------------------------------- dashboard button
-  await chapter("Knopf zu einem Dashboard");
-  await sayOver("„Knopf zu einem Dashboard“ setzt oben rechts einen Knopf, der eine andere Ansicht öffnet – etwa dein Start-Dashboard.");
-  await fillField("Knopf zu einem Dashboard (Pfad)", "/lovelace/home", 0.06);
+  await chapter("Button to a dashboard");
+  await sayOver("“Button to a dashboard” puts a button at the top right that opens another view – your home dashboard, say.");
+  await fillField("Button to a dashboard (path)", "/lovelace/home", 0.06);
   await liveFor(0.4);
   {
     const b = await R.locate('button[aria-label="/lovelace/home"]');
     await R.move(b.x, b.y, 0.6);
     await R.hold(0.6);
   }
-  await sayOver("Mit „Beschriftung des Knopfs“ steht dort ein Wort. Ohne zeigt er ein kleines Haus.");
-  await fillField("Beschriftung des Knopfs", "Start");
+  await sayOver("With “Label of the button” a word stands there. Without one it shows a small house.");
+  await fillField("Label of the button", "Start");
   await liveFor(0.4);
   {
     const b = await R.locate('button[aria-label="Start"]');
@@ -904,17 +904,17 @@ if (PART === "b") {
   }
 
   // ---------------------------------------------------------------- YAML
-  await chapter("YAML: Optionen nur im Code");
+  await chapter("YAML: options in code only");
   let cfg = await getCfg();
-  await sayOver("Alles geht auch in YAML. In Home Assistant schaltest du im Karten-Dialog auf den Code-Editor um.");
+  await sayOver("Everything also works in YAML. In Home Assistant you switch the card dialog to the code editor.");
   await R.move(260, 200, 0.6);
   await yamlShow(toYaml(cfg));
   await liveFor(1.0);
-  await sayOver("Jede Option aus dem Editor hat dort ihre Zeile. Ein paar gibt es nur hier.");
+  await sayOver("Every option from the editor has its line there. A few exist only here.");
   await yamlMark("floor", "height", "idle_return", "idle_orbit", "dashboard");
-  await liveFor(N.length("Jede Option aus dem Editor hat dort ihre Zeile. Ein paar gibt es nur hier.") - 0.2);
+  await liveFor(N.length("Every option from the editor has its line there. A few exist only here.") - 0.2);
   {
-    const line = "„room“ startet die Karte in einem Raum – ein Display fürs Kinderzimmer. Die Rückkehr führt dann auch dorthin.";
+    const line = "“room” starts the card in a room – a display for the kids' room. The idle return then leads back there too.";
     await sayOver(line);
     await yamlMark("floor");
     await R.page.evaluate(() => {
@@ -927,13 +927,13 @@ if (PART === "b") {
     await liveFor(N.length(line) - 1.6);
   }
   {
-    const line = "„start_view“ gibt der Karte eine eigene Startansicht. Die fertige Zeile steht im Editor unter „Einstellungen“, „Startansicht“.";
+    const line = "“start_view” gives the card a start view of its own. The ready-made line is in the editor under settings, “Start view”.";
     await sayOver(line);
     await yamlType("start_view: { theta: 0.8, phi: 1.0, radius: 20 }", 0.03);
     await liveFor(1.0);
   }
   {
-    const line = "„controls_side: right“ legt Etagenbilder, Stern, Suche und Auge nach rechts – gut, wenn die Karte am linken Rand sitzt.";
+    const line = "“controls_side: right” moves the floor pictures, the star, the search and the eye to the right – good when the card sits at the left edge.";
     await sayOver(line);
     cfg = { type: cfg.type, floor: "eg", height: 760, controls: true, floor_thumbs: true };
     await setCfg(cfg);
@@ -945,14 +945,14 @@ if (PART === "b") {
     await liveFor(1.6);
   }
   {
-    const line = "„keep_view: true“ behält beim Etagenwechsel die Kamera. Nur die Höhe wandert mit.";
+    const line = "“keep_view: true” keeps the camera when you switch floors. Only the height moves along.";
     await sayOver(line);
     await yamlType("keep_view: true");
     cfg = { ...cfg, keep_view: true };
     await setCfg(cfg);
     await R.sleep(1500);
     await orbit(0.9, 0.9, 1.2);
-    const thumb = await R.locate({ text: "Obergeschoss", exact: true });
+    const thumb = await R.locate({ text: "Upper floor", exact: true });
     if (thumb) {
       await R.move(thumb.x, thumb.y, 0.5);
       await R.click();
@@ -960,24 +960,24 @@ if (PART === "b") {
     await liveFor(1.8);
   }
   {
-    const line = "Unter „buttons“ legst du eigene Knöpfe nur für diese Karte in den Stern: eine Seite öffnen, Details, einen Dienst oder ein Popup.";
+    const line = "Under “buttons” you put buttons of your own into the star, just for this card: open a page, details, a service or a popup.";
     await sayOver(line);
     await yamlType("buttons:");
-    await yamlType("  - label: Garten", 0.035);
+    await yamlType("  - label: Garden", 0.035);
     await yamlType("    icon: flower", 0.035);
     await yamlType("    action: navigate", 0.035);
-    await yamlType("    target: /lovelace/garten", 0.035);
-    cfg = { ...cfg, buttons: [{ label: "Garten", icon: "flower", action: "navigate", target: "/lovelace/garten" }] };
+    await yamlType("    target: /lovelace/garden", 0.035);
+    cfg = { ...cfg, buttons: [{ label: "Garden", icon: "flower", action: "navigate", target: "/lovelace/garden" }] };
     await setCfg(cfg);
     await R.sleep(800);
     await R.clickOn(STAR, 0.6);
     await liveFor(0.6);
-    const b = await textBox("Garten");
+    const b = await textBox("Garden");
     if (b) await R.move(b.x, b.y, 0.5);
     await liveFor(1.0);
   }
   {
-    const line = "Und „idle_return“ oder „controls_hide_after“ nehmen hier jede Zahl an Sekunden, nicht nur die Werte aus der Liste.";
+    const line = "And “idle_return” or “controls_hide_after” take any number of seconds here, not just the values from the list.";
     await sayOver(line);
     await R.clickOn(STAR, 0.5).catch(() => undefined);
     await yamlType("idle_return: 90");
@@ -986,7 +986,7 @@ if (PART === "b") {
   }
 
   // ---------------------------------------------------------------- old wall tablets
-  await chapter("Alte und schwache Wandtablets");
+  await chapter("Old and weak wall tablets");
   await start({ ...BASE });
   // a quiet moment in the demo house: no music, the robot docked, no sun on the modules (else they animate)
   for (const id of ["media_player.fernseher", "media_player.kueche_lautsprecher", "media_player.bad_lautsprecher"]) await setState(id, "paused");
@@ -996,16 +996,16 @@ if (PART === "b") {
   await setState("sensor.balkon_leistung", "0");
   await R.sleep(1500);
   await R.move(300, 300, 0.01);
-  await sayOver("NeonPlan läuft auch auf alten, schwachen Wandtablets. Das Wichtigste dabei: kein Rechnen im Leerlauf.");
-  await scrollEd("Leistungsanzeige (Bilder pro Sekunde)", 380, 0.6);
-  await toggle("Leistungsanzeige (Bilder pro Sekunde)");
+  await sayOver("NeonPlan also runs on old, weak wall tablets. The most important part: no work while idle.");
+  await scrollEd("Performance display (frames per second)", 380, 0.6);
+  await toggle("Performance display (frames per second)");
   await liveFor(1.5);
-  await sayOver("Die „Leistungsanzeige“ zeigt es: Steht alles still, zeichnet die Karte kein einziges Bild – „Ruhe, null Bilder pro Sekunde“.");
+  await sayOver("The performance display, “Performance display”, shows it: when nothing moves, the card draws not a single frame – “at rest, zero frames per second”.");
   await R.move(1100, 700, 0.5);
   await statsCallout();
-  await liveFor(N.length("Die „Leistungsanzeige“ zeigt es: Steht alles still, zeichnet die Karte kein einziges Bild – „Ruhe, null Bilder pro Sekunde“.") - 0.8, () => statsCallout());
+  await liveFor(N.length("The performance display, “Performance display”, shows it: when nothing moves, the card draws not a single frame – “at rest, zero frames per second”.") - 0.8, () => statsCallout());
   {
-    const line = "Erst wenn sich etwas bewegt, zeichnet sie – und schreibt dazu, warum. Hier läuft der Farbeffekt einer Lampe.";
+    const line = "Only when something moves does it draw – and it says why. Here a lamp's colour effect is running.";
     await sayOver(line);
     // the LED strip's colour loop runs: the display says why it draws (mirrored big)
     await R.move(1100, 600, 0.5);
@@ -1016,38 +1016,38 @@ if (PART === "b") {
     await setState("light.led_band", "on", { effect: "none" });
     await liveFor(1.0, () => statsCallout());
   }
-  await sayOver("Die Stufe „Tablet“ spart am meisten: keine Muster, Schatten, Halos und Partikel, Animationen mit halber Bildrate.");
-  await scrollEd("Ansicht", 40, 0.6);
-  await pick("Qualität", "Tablet");
+  await sayOver("The Tablet level saves the most: no patterns, shadows, halos or particles, and animations at half the frame rate.");
+  await scrollEd("View", 40, 0.6);
+  await pick("Quality", "Tablet");
   await liveFor(1.8, () => statsCallout());
-  await sayOver("Dazu zeichnet sie mit der Pixeldichte eins statt bis zu zwei. Das sind bis zu viermal weniger Pixel in jedem Bild.");
+  await sayOver("On top of that it draws with a pixel ratio of one instead of up to two. That's up to four times fewer pixels in every frame.");
   await liveFor(2.5, () => statsCallout());
-  await sayOver("Auf Fire-Tablets und Geräten mit wenig Speicher oder höchstens vier Prozessorkernen wählt „Auto“ diese Stufe von selbst.");
-  await pick("Qualität", "Auto");
+  await sayOver("On Fire tablets and on devices with little memory or at most four processor cores, Auto picks this level by itself.");
+  await pick("Quality", "Auto");
   await liveFor(1.0, () => statsCallout());
   await statsCallout(false);
-  await sayOver("Mein Tipp: Fully Kiosk Browser mit Hardwarebeschleunigung, die Karte in einer Panel-Ansicht mit „Bildschirm füllen“, und die Qualität auf „Auto“ lassen.");
-  await pick("Größe", "Bildschirm füllen");
+  await sayOver("My tip: Fully Kiosk Browser with hardware acceleration, the card in a panel view with “Fill the screen”, and leave the quality on Auto.");
+  await pick("Size", "Fill the screen");
   await liveFor(0.8);
-  await moveToText("Am besten in einer Dashboard-Ansicht", 0.6);
+  await moveToText("Best on a dashboard view", 0.6);
   await liveFor(0.8);
-  await sayOver("Welche Tablets sich gut eignen, steht auf meiner Empfehlungsseite. Der Link ist in der Beschreibung.");
+  await sayOver("Which tablets work well is on my recommendation page. The link is in the description.");
   await R.move(1000, 400, 0.6);
   await liveFor(1.0);
 
   // ---------------------------------------------------------------- on the wall
-  await chapter("Am Wandtablet");
+  await chapter("Am Wall tablet");
   await R.hideCursor();
   await tablet({ ...BASE, floor: undefined, controls_hidden: true, idle_return: 60, idle_orbit: true, quality: "low" });
   await setCam({ theta: -0.8, phi: 0.95, radius: 32 });
   {
-    const line = "So sieht das am Wandtablet aus: die Karte bildschirmfüllend, die Bedienelemente ausgeblendet, die Stufe Tablet.";
+    const line = "This is how it looks on a wall tablet: the card filling the screen, the controls hidden, the Tablet level.";
     await sayOver(line);
     await orbit(0.8, 0.92, N.length(line));
   }
   await tablet({ ...BASE, floor: "eg", quality: "low" }, true);
   {
-    const line = "Hochkant erscheint das Raumfenster unten statt an der Seite.";
+    const line = "In portrait, the room panel appears at the bottom instead of at the side.";
     await sayOver(line);
     await R.hideCursor(false);
     const p = await point3d("eg", WOHNEN[1], 0.05, WOHNEN[2]);
@@ -1061,16 +1061,16 @@ if (PART === "b") {
   await chapter("Wie geht es weiter");
   await tablet({ ...BASE, floor: undefined, controls: true, fullscreen_button: true });
   await setCam({ theta: -0.6, phi: 0.95, radius: 32 });
-  await R.title("Nächste Folge: Einstellungen, Sicherung und Umzug", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+  await R.title("Next episode: settings, backup and moving", `HomePlan 3D – also runs on old wall tablets${VERSION}`);
   {
-    const l1 = "Das war Folge elf: die Dashboard-Karte mit allen Optionen, der Kiosk-Bereich, YAML und das Wandtablet.";
+    const l1 = "That was episode eleven: the dashboard card with all its options, the kiosk section, YAML and the wall tablet.";
     await sayOver(l1);
     await orbit(0.5, 0.95, N.length(l1));
-    const l2 = "In der nächsten Folge geht es um die Einstellungen, die Sicherung und den Umzug auf ein neues Home Assistant.";
+    const l2 = "The next episode is about the settings, backups and moving to a new Home Assistant.";
     await sayOver(l2);
     await orbit(0.5, 0.97, N.length(l2));
   }
-  await say("Links zur Online-Demo, zur Anleitung und zur Tablet-Empfehlung stehen in der Beschreibung. Bis zum nächsten Mal!");
+  await say("Left to the online demo, the manual and the tablet recommendation are in the description. See you next time!");
   await R.hold(0.6);
 }
 

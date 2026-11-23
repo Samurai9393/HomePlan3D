@@ -6,79 +6,79 @@ import { showTarget, SYNONYMS, type Shown } from "./targets.ts";
 const room = (id: string, name: string): Room => ({ id, name, area_id: null, points: [], floor_material: "wood" });
 const building = {
   ...emptyBuilding(),
-  floors: [{ ...newFloor("eg", "Erdgeschoss", 0), rooms: [room("wz", "Wohnzimmer"), room("fl", "Flur"), room("ga", "Garten"), room("hw", "HWR")] }],
+  floors: [{ ...newFloor("gf", "Ground floor", 0), rooms: [room("lr", "Living room"), room("hall", "Hallway"), room("ga", "Garden"), room("ut", "Utility room")] }],
 };
 const dev = (entity: string, name: string, room: string, camera = false): Shown => ({ id: entity, entity, name, room, camera });
 const devices: Shown[] = [
-  dev("camera.haustuer", "Kamera Haustür", "Flur", true),
-  dev("camera.garten", "Garten Cam", "Garten", true),
-  dev("switch.waschmaschine", "Waschmaschine", "", false),
-  dev("light.stehlampe", "Stehlampe", "Wohnzimmer"),
-  dev("light.flur", "Flur Licht", "Flur"),
-  dev("light.wz", "Wohnzimmer Decke", "Wohnzimmer"),
+  dev("camera.driveway", "Driveway camera", "Hallway", true),
+  dev("camera.garden", "Garden cam", "Garden", true),
+  dev("switch.washer", "Washing machine", "", false),
+  dev("light.floor_lamp", "Floor lamp", "Living room"),
+  dev("light.hall", "Hallway light", "Hallway"),
+  dev("light.lr", "Living room ceiling", "Living room"),
 ];
 
 const t = (s: string, d: readonly Shown[] = devices) => showTarget(s, building, d);
 const id = (r: ReturnType<typeof t>) => (r as { id: string } | null)?.id;
 
 test("devices by name, with a word that asks to see them", () => {
-  assert.deepEqual(t("Zeig die Waschmaschine"), { kind: "device", id: "switch.waschmaschine", entity: "switch.waschmaschine", name: "Waschmaschine", camera: false });
-  assert.equal(id(t("Wo ist die Stehlampe")), "light.stehlampe");
+  assert.deepEqual(t("Show the washing machine"), { kind: "device", id: "switch.washer", entity: "switch.washer", name: "Washing machine", camera: false });
+  assert.equal(id(t("Where is the floor lamp")), "light.floor_lamp");
   // naming a device without asking to see it is for Assist
-  assert.equal(t("Flur Licht an"), null);
+  assert.equal(t("Hallway light on"), null);
 });
 
 test("cameras: by name, by 'camera' and their room, or all of them", () => {
-  assert.equal(id(t("Zeig die Kamera Haustür")), "camera.haustuer");
-  // a compound: "Haustürkamera" is "Haustür" and "Kamera"; so is "Gartencam"
-  assert.equal(id(t("Zeig die Haustürkamera")), "camera.haustuer");
-  assert.equal(id(t("zeig mal die Gartencam")), "camera.garten");
-  assert.equal(id(t("zeig die Kamera im Garten")), "camera.garten");
-  assert.equal(t("Zeig mir die Kameras")?.kind, "cameras");
+  assert.equal(id(t("Show the driveway camera")), "camera.driveway");
+  // a compound: "drivewaycamera" is "driveway" and "camera", so is "gardencam"
+  assert.equal(id(t("Show the drivewaycamera")), "camera.driveway");
+  assert.equal(id(t("show the gardencam")), "camera.garden");
+  assert.equal(id(t("show the camera in the garden")), "camera.garden");
+  assert.equal(t("Show me the cameras")?.kind, "cameras");
 });
 
 test("own aliases: a device by its further names, a room by its own", () => {
-  const items: Shown[] = [{ id: "media_player.tv", entity: "media_player.tv", name: "Smart TV Pro", names: ["Smart TV Pro", "Wohnzimmerfernseher", "Glotze"], room: "Wohnzimmer", camera: false }];
-  assert.equal(id(t("Zeig den Wohnzimmerfernseher", items)), "media_player.tv");
-  assert.equal(id(t("wo ist die Glotze", items)), "media_player.tv");
-  const b = { ...building, floors: [{ ...building.floors[0], rooms: [{ ...room("wz", "Wohnzimmer"), aliases: ["Stube"] }] }] };
-  assert.equal(showTarget("Zeig die Stube", b, [])?.kind, "room");
+  const items: Shown[] = [{ id: "media_player.tv", entity: "media_player.tv", name: "Smart TV Pro", names: ["Smart TV Pro", "Living room television", "Telly"], room: "Living room", camera: false }];
+  assert.equal(id(t("Show the living room television", items)), "media_player.tv");
+  assert.equal(id(t("where is the telly", items)), "media_player.tv");
+  const b = { ...building, floors: [{ ...building.floors[0], rooms: [{ ...room("lr", "Living room"), aliases: ["Den"] }] }] };
+  assert.equal(showTarget("Show the den", b, [])?.kind, "room");
 });
 
 test("rooms stay rooms when a device only shares their name", () => {
-  assert.deepEqual(t("Zeig das Wohnzimmer"), { kind: "room", floorId: "eg", roomId: "wz", name: "Wohnzimmer" });
-  assert.equal(id(t("Zeig die Wohnzimmer Decke")), "light.wz");
-  assert.equal(t("Garten")?.kind, "room");
+  assert.deepEqual(t("Show the living room"), { kind: "room", floorId: "gf", roomId: "lr", name: "Living room" });
+  assert.equal(id(t("Show the living room ceiling")), "light.lr");
+  assert.equal(t("Garden")?.kind, "room");
 });
 
 test("furniture answers to its kind, its own name, everyday words and its sensor's name without the measuring word", () => {
   const items: Shown[] = [
-    { id: "sensor.waschmaschine_leistung", entity: "sensor.waschmaschine_leistung", name: "Waschmaschine", names: ["Waschmaschine", "Waschmaschine Leistung", ...SYNONYMS.washer], room: "HWR", camera: false },
-    { id: "furniture:t1", entity: null, name: "Trockner", names: ["Trockner", ...SYNONYMS.dryer], room: "HWR", camera: false },
-    { id: "media_player.tv", entity: "media_player.tv", name: "Fernseher", names: ["Samsung TV", "Fernseher", ...SYNONYMS.tv_board], room: "Wohnzimmer", camera: false },
-    { id: "furniture:p1", entity: null, name: "Poolpumpe", names: ["Poolpumpe", ...SYNONYMS.pool_pump], room: "Garten", camera: false },
-    { id: "furniture:h1", entity: null, name: "Heizkörper", names: ["Heizkörper", ...SYNONYMS.radiator], room: "Flur", camera: false },
-    { id: "furniture:h2", entity: null, name: "Heizkörper", names: ["Heizkörper", ...SYNONYMS.radiator], room: "Wohnzimmer", camera: false },
+    { id: "sensor.washer_power", entity: "sensor.washer_power", name: "Washing machine", names: ["Washing machine", "Washing machine power", ...SYNONYMS.washer], room: "Utility room", camera: false },
+    { id: "furniture:d1", entity: null, name: "Dryer", names: ["Dryer", ...SYNONYMS.dryer], room: "Utility room", camera: false },
+    { id: "media_player.tv", entity: "media_player.tv", name: "TV", names: ["Samsung TV", "TV", ...SYNONYMS.tv_board], room: "Living room", camera: false },
+    { id: "furniture:p1", entity: null, name: "Pool pump", names: ["Pool pump", ...SYNONYMS.pool_pump], room: "Garden", camera: false },
+    { id: "furniture:h1", entity: null, name: "Radiator", names: ["Radiator", ...SYNONYMS.radiator], room: "Hallway", camera: false },
+    { id: "furniture:h2", entity: null, name: "Radiator", names: ["Radiator", ...SYNONYMS.radiator], room: "Living room", camera: false },
   ];
-  // the sensor is "Waschmaschine Leistung", asked for as the machine
-  assert.equal(id(t("Zeig die Waschmaschine", items)), "sensor.waschmaschine_leistung");
-  assert.equal(id(t("Läuft die Wäsche? zeig mal", items)), "sensor.waschmaschine_leistung");
+  // the sensor is "Washing machine power", asked for as the machine
+  assert.equal(id(t("Show the washing machine", items)), "sensor.washer_power");
+  assert.equal(id(t("Is the laundry running? show it", items)), "sensor.washer_power");
   // without any entity, by its kind
-  assert.equal(id(t("Wo ist der Trockner", items)), "furniture:t1");
+  assert.equal(id(t("Where is the dryer", items)), "furniture:d1");
   // everyday words
-  assert.equal(id(t("Zeig den Fernseher", items)), "media_player.tv");
-  assert.equal(id(t("zeig mal die Glotze", items)), "media_player.tv");
-  assert.equal(id(t("wo ist die Poolpumpe", items)), "furniture:p1");
-  assert.equal(id(t("zeig die Pumpe", items)), "furniture:p1");
+  assert.equal(id(t("Show the TV", items)), "media_player.tv");
+  assert.equal(id(t("show the telly", items)), "media_player.tv");
+  assert.equal(id(t("where is the pool pump", items)), "furniture:p1");
+  assert.equal(id(t("show the pump", items)), "furniture:p1");
   // two of a kind: the one in the room named, else the first
-  assert.equal(id(t("Zeig die Heizung im Wohnzimmer", items)), "furniture:h2");
-  assert.equal(id(t("Zeig die Heizung", items)), "furniture:h1");
+  assert.equal(id(t("Show the heating in the living room", items)), "furniture:h2");
+  assert.equal(id(t("Show the heating", items)), "furniture:h1");
   // the room still wins over a device that only shares its name
-  assert.equal(t("Zeig das Wohnzimmer", items)?.kind, "room");
+  assert.equal(t("Show the living room", items)?.kind, "room");
 });
 
 test("a room's own name wins over an outdoor area answering to the same name (#668)", () => {
-  // the driveway on the ground floor is linked to the Home Assistant area "Garage"; the room "Garage" is in the cellar
+  // the driveway on the ground floor is linked to the Home Assistant area "Garage"; the room "Garage" is in the basement
   const square: [number, number][] = [
     [0, 0],
     [4, 0],
@@ -86,20 +86,20 @@ test("a room's own name wins over an outdoor area answering to the same name (#6
     [0, 4],
   ];
   const drive = { id: "drive", type: "driveway" as const, points: square, area_id: "garage", name: "" };
-  const eg = { ...newFloor("eg", "Erdgeschoss", 0), rooms: [room("wz", "Wohnzimmer")], outdoor: [drive] };
-  const kg = { ...newFloor("kg", "Keller", -2.5), rooms: [room("vl", "Vorratslager"), { ...room("ga", "Garage"), area_id: "garage" }] };
-  const b = { ...emptyBuilding(), floors: [eg, kg] };
+  const ground = { ...newFloor("gf", "Ground floor", 0), rooms: [room("lr", "Living room")], outdoor: [drive] };
+  const basement = { ...newFloor("bs", "Basement", -2.5), rooms: [room("storage", "Pantry"), { ...room("ga", "Garage"), area_id: "garage" }] };
+  const b = { ...emptyBuilding(), floors: [ground, basement] };
   const areas: Record<string, string> = { garage: "Garage" };
   const alias = (r: Room) => (r.area_id ? areas[r.area_id] : null);
-  assert.deepEqual(showTarget("Zeige mir Garage", b, [], alias), { kind: "room", floorId: "kg", roomId: "ga", name: "Garage" });
-  assert.deepEqual(showTarget("Zeige mir Vorratslager", b, [], alias), { kind: "room", floorId: "kg", roomId: "vl", name: "Vorratslager" });
+  assert.deepEqual(showTarget("Show me garage", b, [], alias), { kind: "room", floorId: "bs", roomId: "ga", name: "Garage" });
+  assert.deepEqual(showTarget("Show me pantry", b, [], alias), { kind: "room", floorId: "bs", roomId: "storage", name: "Pantry" });
   // a device in the driveway called "Garage" (the door's drive) does not take the room's place either
   const opener: Shown[] = [{ id: "cover.garage", entity: "cover.garage", name: "Garage", room: "", camera: false }];
-  assert.equal(showTarget("Zeige mir Garage", b, opener, alias)?.kind, "room");
+  assert.equal(showTarget("Show me garage", b, opener, alias)?.kind, "room");
   // the room's own name only, without Home Assistant's area name: the same
-  const b2 = { ...b, floors: [eg, { ...kg, rooms: [room("vl", "Vorratslager"), room("ga", "Garage")] }] };
-  assert.equal((showTarget("Zeige mir Garage", b2, [], alias) as { roomId: string }).roomId, "ga");
+  const b2 = { ...b, floors: [ground, { ...basement, rooms: [room("storage", "Pantry"), room("ga", "Garage")] }] };
+  assert.equal((showTarget("Show me garage", b2, [], alias) as { roomId: string }).roomId, "ga");
   // an outdoor area's own name still beats a further name (alias) of a room
-  const b3 = { ...b, floors: [{ ...eg, outdoor: [{ ...drive, name: "Einfahrt" }] }, { ...kg, rooms: [{ ...room("ga", "Garage"), aliases: ["Einfahrt"] }] }] };
-  assert.equal((showTarget("Zeige die Einfahrt", b3, [], alias) as { roomId: string }).roomId, "drive");
+  const b3 = { ...b, floors: [{ ...ground, outdoor: [{ ...drive, name: "Driveway" }] }, { ...basement, rooms: [{ ...room("ga", "Garage"), aliases: ["Driveway"] }] }] };
+  assert.equal((showTarget("Show the driveway", b3, [], alias) as { roomId: string }).roomId, "drive");
 });

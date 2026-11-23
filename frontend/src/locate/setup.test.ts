@@ -14,7 +14,7 @@ test("a pasted key: hex with or without separators, or Base64; anything else is 
 
 test("Android phones are found by the Home Assistant app's BLE Transmitter sensor, with their person and weak settings", () => {
   const hass = {
-    language: "de",
+    language: "en",
     states: {
       "sensor.pixel_ble_transmitter": {
         entity_id: "sensor.pixel_ble_transmitter",

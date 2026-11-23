@@ -5,7 +5,7 @@ import { copyFloor, exportFile, parseExport } from "./transfer.ts";
 
 function building() {
   const b = emptyBuilding();
-  const f = newFloor("eg", "EG", 0);
+  const f = newFloor("eg", "Ground floor", 0);
   f.rooms = [{ id: "r", name: "Wohnen", area_id: "living_room", points: [[0, 0], [4, 0], [4, 3], [0, 3]], floor_material: "wood" }];
   f.furniture = [{ id: "m", type: "lamp_ceiling", x: 2, z: 1.5, rotation: 0, w: 0.4, d: 0.4, h: 0.08, variant: null, entity: "light.decke", power: null }];
   f.placements = [{ entity_id: "sensor.temp", x: 1, z: 1, y: null }];
@@ -37,7 +37,7 @@ test("import reads export files and plain buildings, and rejects anything else",
   assert.equal(back.floors[0].background, null, "images are not imported");
   assert.equal(parseExport(JSON.stringify(building())).floors.length, 1);
   assert.throws(() => parseExport("{}"));
-  assert.throws(() => parseExport("kein json"));
+  assert.throws(() => parseExport("not json"));
 });
 
 test("a shareable export leaves no entity anywhere, however new the field", () => {
@@ -76,7 +76,7 @@ test("a duplicated floor gets new ids, keeps its references and loses its links 
   const b = building();
   b.floors[0].openings = [{ id: "o", room_id: "r", edge: 0, offset: 1, width: 1, type: "window", sill: 0.9, cover: "cover.blind" } as never];
   let n = 0;
-  const copy = copyFloor(b, "eg", (p) => `${p}_n${n++}`, "OG", 3)!;
+  const copy = copyFloor(b, "eg", (p) => `${p}_n${n++}`, "Upper floor", 3)!;
   assert.notEqual(copy.id, "eg");
   assert.equal(copy.elevation, 3);
   assert.notEqual(copy.rooms[0].id, "r");
@@ -94,7 +94,7 @@ test("a copy without links drops what is nothing without its entity (#1217)", ()
   const m = b.floors[0].furniture[0] as unknown as Record<string, unknown>;
   m.show_if = { entity: "input_boolean.christmas", state: "on" };
   m.pictures = [{ entity: "media_player.tv", state: "playing", image: "abc" }];
-  const copy = copyFloor(b, "eg", (p) => `${p}_x`, "OG", 3)!;
+  const copy = copyFloor(b, "eg", (p) => `${p}_x`, "Upper floor", 3)!;
   const c = copy.furniture[0] as unknown as Record<string, unknown>;
   assert.equal(c.show_if, null);
   assert.deepEqual(c.pictures, []);

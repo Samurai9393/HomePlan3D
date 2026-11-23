@@ -2,7 +2,7 @@
 
 The videos themselves are uploaded by hand in YouTube Studio (as private drafts): uploads through an unaudited API
 project stay locked to private, editing your own videos does not. This tool finds each video by its file name
-(e.g. ep01-de.mp4) and applies what the episode's Upload folder holds (YouTube.md, .srt, .en.srt). Torsten then
+(e.g. ep01.mp4) and applies what the episode's Upload folder holds (YouTube.md, .en.srt). Torsten then
 publishes in the YouTube Studio app. The English audio track cannot be added through the API (YouTube Studio:
 Subtitles → language → Audio).
 
@@ -11,7 +11,7 @@ Usage:
   python tools/youtube.py list                      your videos: file name, id, visibility, title
   python tools/youtube.py apply <Upload dir>... [--dry-run] [--synthetic yes|no]
   python tools/youtube.py apply-all <root> [--dry-run] [--synthetic yes|no] [--no-captions] [--replace]
-                                                    every Upload folder below <root> ("NeonPlan neue Packs")
+                                                    every Upload folder below <root> ("NeonPlan new packs")
 
 OAuth client: C:/Users/Becke/.floorplan3d/youtube_client.json (Desktop app); the refresh token is kept in
 youtube_token.json beside it. Neither is ever printed.
@@ -67,7 +67,7 @@ def login() -> None:
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.end_headers()
-            self.wfile.write("NeonPlan Upload: angemeldet. Du kannst dieses Fenster schließen.".encode())
+            self.wfile.write("HomePlan 3D upload: signed in. You can close this window.".encode())
 
         def log_message(self, *_args) -> None:
             pass
@@ -209,20 +209,17 @@ def read_upload(folder: Path) -> dict:
     b = blocks(md)
     if len(b) < 5:
         raise RuntimeError(f"{folder}: YouTube.md has {len(b)} code blocks, expected 5 (titles, descriptions, tags)")
-    video = next(folder.glob("*-de.mp4"), None)
+    video = next(iter(sorted(folder.glob("*.mp4"))), None)
     if not video:
-        raise RuntimeError(f"{folder}: no *-de.mp4")
-    stem = video.name[: -len("-de.mp4")]
+        raise RuntimeError(f"{folder}: no *.mp4")
+    stem = video.stem
     return {
         "file": video.name,
         "stem": stem,
-        "title": b[0].strip(),
-        "description": b[1],
-        "title_en": b[2].strip(),
-        "description_en": b[3],
+        "title": b[2].strip(),
+        "description": b[3],
         "tags": [t.strip() for t in b[4].split(",") if t.strip()],
-        "srt_de": folder / f"{stem}.srt",
-        "srt_en": folder / f"{stem}.en.srt",
+        "srt": folder / f"{stem}.en.srt",
     }
 
 
@@ -232,7 +229,7 @@ def ensure_playlist(dry: bool) -> str | None:
         if p["snippet"]["title"] == PLAYLIST:
             return p["id"]
     if dry:
-        print(f"  [dry] would create the playlist „{PLAYLIST}“ (private)")
+        print(f"  [dry] would create the playlist \"{PLAYLIST}\" (private)")
         return None
     p = call(
         "POST",
@@ -241,8 +238,8 @@ def ensure_playlist(dry: bool) -> str | None:
         {
             "snippet": {
                 "title": PLAYLIST,
-                "defaultLanguage": "de",
-                "description": "Schritt für Schritt: dein Zuhause in 3D mit HomePlan 3D und Home Assistant.",
+                "defaultLanguage": "en",
+                "description": "Step by step: your home in 3D with HomePlan 3D and Home Assistant.",
             },
             "status": {"privacyStatus": "private"},
         },
@@ -310,16 +307,15 @@ def apply(folders: list[Path], dry: bool, synthetic: bool | None, captions: bool
                 "description": it["description"],
                 "tags": it["tags"],
                 "categoryId": CATEGORY,
-                "defaultLanguage": "de",
-                "defaultAudioLanguage": "de",
+                "defaultLanguage": "en",
+                "defaultAudioLanguage": "en",
             },
-            "localizations": {"en": {"title": it["title_en"], "description": it["description_en"]}},
             "status": status,
         }
         done = v.get("snippet", {}).get("title") == it["title"]
         if dry:
             print(
-                f"  [dry] „{it['title']}“ / „{it['title_en']}“, {len(it['tags'])} tags, stays {status['privacyStatus']}"
+                f"  [dry] \"{it['title']}\", {len(it['tags'])} tags, stays {status['privacyStatus']}"
             )
         elif done and not replace:
             print("  title already set")
@@ -329,11 +325,11 @@ def apply(folders: list[Path], dry: bool, synthetic: bool | None, captions: bool
         if captions:
             caps = call("GET", "/captions", {"part": "snippet", "videoId": vid}).get("items", [])
             existing = {c["snippet"]["language"]: c["id"] for c in caps if c["snippet"].get("trackKind") != "asr"}
-            for lang, name, srt in (("de", "Deutsch", it["srt_de"]), ("en", "English", it["srt_en"])):
-                if lang in existing and not replace:
-                    print(f"  caption {lang}: already there")
-                else:
-                    upload_caption(vid, lang, name, srt, existing, dry)
+            lang, name, srt = "en", "English", it["srt"]
+            if lang in existing and not replace:
+                print(f"  caption {lang}: already there")
+            else:
+                upload_caption(vid, lang, name, srt, existing, dry)
         if playlist:
             ordered = sorted(i["stem"] for i in items)
             in_list = call("GET", "/playlistItems", {"part": "snippet", "playlistId": playlist, "maxResults": 50}).get(

@@ -1,41 +1,40 @@
-name: 💡 Feature request / Funktionswunsch
-description: A concrete idea for HomePlan 3D. For open ideas and voting use the Ideas discussions. / Eine konkrete Idee. Zum Sammeln und Abstimmen gibt es die Ideen-Diskussionen.
+name: 💡 Feature request
+description: A concrete idea for HomePlan 3D. For open ideas and voting use the Ideas discussions.
 labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
         Tip: ideas in [Discussions → Ideas](https://github.com/Samurai9393/HomePlan3D-main/discussions/categories/ideas) can be voted on 👍, the most wanted ones come first.
-        Tipp: Ideen unter [Discussions → Ideas](https://github.com/Samurai9393/HomePlan3D-main/discussions/categories/ideas) können alle mit 👍 bewerten, die beliebtesten kommen zuerst.
   - type: textarea
     id: problem
     attributes:
-      label: What do you want to do? / Was möchtest du machen?
-      description: Describe the situation at home, not only the solution. / Beschreibe die Situation bei dir, nicht nur die Lösung.
+      label: What do you want to do?
+      description: Describe the situation at home, not only the solution.
       placeholder: "I have an open kitchen with a counter and want to …"
     validations:
       required: true
   - type: textarea
     id: idea
     attributes:
-      label: Your idea / Deine Idee
-      description: How could it look or work in HomePlan 3D? / Wie könnte es aussehen oder funktionieren?
+      label: Your idea
+      description: How could it look or work in HomePlan 3D?
     validations:
       required: true
   - type: dropdown
     id: area
     attributes:
-      label: Area / Bereich
+      label: Area
       multiple: true
       options:
-        - 3D view / 3D-Ansicht
-        - Plan editor / Editor
-        - Devices and control / Geräte und Bedienung
-        - Furniture / Möbel
-        - Dashboard card / Dashboard-Karte
-        - Other / Sonstiges
+        - 3D view
+        - Plan editor
+        - Devices and control
+        - Furniture
+        - Dashboard card
+        - Other
   - type: textarea
     id: more
     attributes:
-      label: Pictures or examples / Bilder oder Beispiele
-      description: Optional. Sketches, photos, screenshots. / Optional. Skizzen, Fotos, Screenshots.
+      label: Pictures or examples
+      description: Optional. Sketches, photos, screenshots.

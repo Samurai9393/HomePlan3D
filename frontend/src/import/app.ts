@@ -8,78 +8,7 @@ import { buildPlan, type BuildOptions, type BuildResult, type Warning } from "./
 import { readFile, type ReadOptions, type ReadResult } from "./detect.ts";
 import type { LayerRole } from "./dxf.ts";
 
-const DE = {
-  title: "Plan importieren",
-  lead: "Bring deinen Grundriss aus einem anderen Programm in HomePlan 3D – Räume, Wände, Türen, Fenster und Möbel. Die Datei bleibt auf deinem Computer: alles läuft hier im Browser.",
-  drop: "Datei hierher ziehen oder klicken",
-  formats: "Sweet Home 3D (.sh3d) · iPhone-/iPad-Scan mit RoomPlan (.json) · CAD (.dxf) · 3D-Modell aus Blender, SketchUp & Co. (.glb, .gltf, .obj, .stl) · Floorplanner (.json) · Valetudo-Saugroboterkarte (.json) · NeonPlan-Importformat oder ein NeonPlan-Plan von einer KI (.json)",
-  how: "So exportierst du aus …",
-  how_items: [
-    ["Sweet Home 3D", "Die gespeicherte .sh3d-Datei direkt hierher ziehen. Dateien aus Versionen vor 5.3 (2016) einmal in einer aktuellen Version öffnen und speichern."],
-    ["iPhone/iPad mit LiDAR", "In einer Scan-App mit RoomPlan den Raum oder die Wohnung scannen und als RoomPlan-JSON (CapturedRoom/CapturedStructure) exportieren."],
-    ["CAD / Architekt", "Als DXF speichern (z. B. AutoCAD, ArchiCAD, Revit, LibreCAD, magicplan). Wände, Räume, Türen und Fenster werden an den Layer-Namen erkannt; unten kannst du die Layer zuordnen."],
-    ["Blender, SketchUp, Revit & Co.", "Als glTF/GLB, OBJ oder STL exportieren. Das Modell wird je Etage waagerecht geschnitten; Räume, Türen und Fenster ergeben sich aus den Wänden."],
-    ["Floorplanner", "Projekt als JSON/FML exportieren."],
-    ["Saugroboter mit Valetudo", "Die Karte als JSON speichern (Valetudo: Karte herunterladen bzw. /api/v2/robot/state/map). Jeder Raum der Karte wird ein Raum."],
-    ["KI (ChatGPT, Claude …)", "Mit der Vorlage aus docs/ai-import.md einen Plan erzeugen lassen und die JSON-Datei hier prüfen und reparieren lassen."],
-  ],
-  reading: "Lese …",
-  source: "Erkannt",
-  floors: "Etagen",
-  rooms: "Räume",
-  doors: "Türen",
-  windows: "Fenster",
-  furniture: "Möbel",
-  walls: "freie Wände",
-  options: "Einstellungen",
-  join: "Räume an den Wänden zusammenführen",
-  join_hint: "Für Pläne, deren Räume an den Innenkanten der Wände gezeichnet sind: Nachbarräume teilen sich danach eine Wand.",
-  square: "Fast gerade Kanten gerade ziehen",
-  align: "Gerade ausrichten",
-  align_hint: "Dreht den Plan so, dass die Wände waagerecht und senkrecht liegen (ein Scan oder eine Roboterkarte liegt oft schräg).",
-  with_furniture: "Möbel übernehmen",
-  mirror: "Spiegeln (links ↔ rechts)",
-  turn: "Drehen",
-  unit: "Einheit",
-  auto: "automatisch",
-  up: "Achse nach oben",
-  levels: "Etagenhöhen (m, mit Komma)",
-  levels_hint: "Gefunden: {levels}. Ändern, falls eine Etage fehlt oder zu viel ist, z. B. 0; 2,85",
-  layers: "Layer",
-  role_wall: "Wand",
-  role_room: "Raum",
-  role_door: "Tür",
-  role_window: "Fenster",
-  role_ignore: "ignorieren",
-  preview: "Vorschau",
-  room_names: "Räume umbenennen",
-  download: "NeonPlan-Datei herunterladen",
-  next: "In NeonPlan: Editor → Sicherung → Importieren … und diese Datei wählen. Danach Räume mit Home-Assistant-Bereichen verknüpfen und Geräte setzen.",
-  warnings: "Hinweise",
-  w_no_rooms: "Keine Räume gefunden.",
-  w_no_rooms_found: "{floor}: aus den Wänden ergaben sich keine geschlossenen Räume – Layer oder Einheit prüfen.",
-  w_room_tiny: "{floor}: einen sehr kleinen Raum weggelassen.",
-  w_openings_dropped: "{floor}: {n} Türen/Fenster lagen an keiner Raumkante und wurden weggelassen.",
-  w_furniture_unknown: "{floor}: {n} Möbel unbekannter Art wurden zu Schränken mit ihrem Namen.",
-  w_furniture_mapped: "{floor}: {n} Möbel mit unbekanntem Typ wurden zugeordnet.",
-  w_furniture_decor: "{floor}: {n} Deko- und Kleinteile (Bilder, Vasen, Vorhänge, Steckdosen …) weggelassen.",
-  w_rooms_skipped: "{n} Räume mit zu wenigen Punkten weggelassen.",
-  w_robot_map: "Die Räume stammen aus der Saugroboterkarte: Die Umrisse sind eine Näherung (der Roboter kommt nicht unter jedes Möbel) – Ecken im Editor nachziehen. Türen und Fenster kennt die Karte nicht, die setzt du im Editor.",
-  e_unknown_format: "Dieses Dateiformat kenne ich nicht. Unterstützt sind die oben genannten.",
-  e_not_json: "Die Datei ist kein gültiges JSON.",
-  e_sh3d_old: "Diese Sweet-Home-3D-Datei ist zu alt (vor Version 5.3). Bitte in einer aktuellen Version öffnen und neu speichern.",
-  e_sh3d_broken: "Die Sweet-Home-3D-Datei ist beschädigt.",
-  e_nothing_found: "In der Datei habe ich keinen Grundriss gefunden.",
-  e_dxf_broken: "Die DXF-Datei enthält keine Zeichnung (ENTITIES fehlt).",
-  e_gltf_external: "Die glTF-Datei verweist auf externe Dateien. Bitte als .glb (alles in einer Datei) exportieren.",
-  e_zip_broken: "Die Datei ist beschädigt.",
-  e_not_plan: "Das ist kein vollständiger NeonPlan-Plan.",
-  privacy: "Datenschutz: Die Datei wird nur in deinem Browser gelesen und nirgendwohin hochgeladen.",
-  ai: "Plan mit KI erstellen: Vorlage",
-  format_doc: "Importformat",
-  floor_n: "Etage",
-};
-const EN: typeof DE = {
+const T = {
   title: "Import a plan",
   lead: "Bring your floor plan from another program into HomePlan 3D – rooms, walls, doors, windows and furniture. The file stays on your computer: everything runs here in the browser.",
   drop: "Drop a file here or click",
@@ -151,8 +80,6 @@ const EN: typeof DE = {
   floor_n: "Floor",
 };
 
-let lang = new URLSearchParams(location.search).get("lang") ?? ((navigator.language || "en").toLowerCase().startsWith("de") ? "de" : "en");
-const T = () => (lang === "de" ? DE : EN);
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 const fill = (s: string, v: Record<string, string | number | undefined>) => s.replace(/\{(\w+)\}/g, (_, k) => String(v[k] ?? ""));
 const REPO = "https://github.com/Samurai9393/HomePlan3D-main/blob/main/docs";
@@ -195,15 +122,15 @@ async function reread(): Promise<void> {
   // let the page show "reading" before a large model blocks the thread
   await new Promise((r) => setTimeout(r, 30));
   try {
-    state.read = await readFile(state.name, state.bytes, { ...state.readOpt, lang }, state.cache);
-    if (state.read.mesh && !state.levelsText) state.levelsText = state.read.mesh.levels.map((l) => String(l).replace(".", lang === "de" ? "," : ".")).join(lang === "de" ? "; " : ", ");
+    state.read = await readFile(state.name, state.bytes, state.readOpt, state.cache);
+    if (state.read.mesh && !state.levelsText) state.levelsText = state.read.mesh.levels.map((l) => String(l)).join(", ");
     rebuild();
   } catch (e) {
     state.read = null;
     state.result = null;
     state.building = null;
     const code = (e as Error).message;
-    state.error = (T() as Record<string, unknown>)[`e_${code}`] ? String((T() as Record<string, unknown>)[`e_${code}`]) : `${code}`;
+    state.error = (T as Record<string, unknown>)[`e_${code}`] ? String((T as Record<string, unknown>)[`e_${code}`]) : `${code}`;
   }
   state.busy = false;
   render();
@@ -216,7 +143,7 @@ function rebuild(): void {
     state.result = null;
     state.building = structuredClone(r.building);
   } else if (r.raw) {
-    state.result = buildPlan(r.raw, { ...state.build, lang });
+    state.result = buildPlan(r.raw, state.build);
     state.building = structuredClone(state.result.building);
   }
   if (state.building) for (const [k, v] of Object.entries(state.names)) {
@@ -240,7 +167,7 @@ function stats(b: Building) {
 }
 
 function warningText(w: Warning): string {
-  const t = (T() as Record<string, unknown>)[`w_${w.code}`];
+  const t = (T as Record<string, unknown>)[`w_${w.code}`];
   return typeof t === "string" ? fill(t, { floor: w.floor, n: w.n, name: w.name }) : w.code;
 }
 
@@ -278,13 +205,13 @@ function preview(f: Floor): string {
   }
   for (const r of f.rooms) {
     const c = centroid(r.points);
-    out.push(`<text x="${c[0]}" y="${c[1]}" font-size="${fs}">${esc(r.name)}</text><text class="area" x="${c[0]}" y="${c[1] + fs * 1.2}" font-size="${fs * 0.8}">${polygonArea(r.points).toFixed(1).replace(".", lang === "de" ? "," : ".")} m²</text>`);
+    out.push(`<text x="${c[0]}" y="${c[1]}" font-size="${fs}">${esc(r.name)}</text><text class="area" x="${c[0]}" y="${c[1] + fs * 1.2}" font-size="${fs * 0.8}">${polygonArea(r.points).toFixed(1)} m²</text>`);
   }
   return `<svg viewBox="${x0} ${z0} ${x1 - x0} ${z1 - z0}" preserveAspectRatio="xMidYMid meet">${out.join("")}</svg>`;
 }
 
 function optionsHtml(): string {
-  const t = T();
+  const t = T;
   const r = state.read!;
   const o = state.build;
   const check = (key: keyof BuildOptions, label: string, hint = "") =>
@@ -315,9 +242,9 @@ function optionsHtml(): string {
 }
 
 function render(): void {
-  const t = T();
+  const t = T;
   const root = document.getElementById("app")!;
-  document.documentElement.lang = lang;
+  document.documentElement.lang = "en";
   document.title = `HomePlan 3D – ${t.title}`;
   const b = state.building;
   const s = b ? stats(b) : null;
@@ -326,7 +253,6 @@ function render(): void {
     <header>
       <a class="brand" href="../">HomePlan 3D</a>
       <h1>${esc(t.title)}</h1>
-      <button class="lang" data-lang="${lang === "de" ? "en" : "de"}">${lang === "de" ? "English" : "Deutsch"}</button>
     </header>
     <p class="lead">${esc(t.lead)}</p>
     <label class="drop ${state.busy ? "busy" : ""}" id="drop">
@@ -354,7 +280,7 @@ function render(): void {
           </section>
           <section class="card">
             <h2>${esc(t.room_names)}</h2>
-            <div class="names">${(b.floors[state.floor]?.rooms ?? []).map((r, i) => `<label><span>${polygonArea(r.points).toFixed(1).replace(".", lang === "de" ? "," : ".")} m²</span><input data-room="${state.floor}:${i}" value="${esc(r.name)}"></label>`).join("")}</div>
+            <div class="names">${(b.floors[state.floor]?.rooms ?? []).map((r, i) => `<label><span>${polygonArea(r.points).toFixed(1)} m²</span><input data-room="${state.floor}:${i}" value="${esc(r.name)}"></label>`).join("")}</div>
           </section>
           <section class="card go">
             <button id="download" class="primary">${esc(t.download)}</button>
@@ -367,7 +293,7 @@ function render(): void {
 
 function download(): void {
   if (!state.building) return;
-  const base = (state.name ?? "plan").replace(/\.[^.]+$/, "").replace(/[^\w\-äöüÄÖÜß]+/g, "_").slice(0, 40);
+  const base = (state.name ?? "plan").replace(/\.[^.]+$/, "").replace(/[^\w\-]+/g, "_").slice(0, 40);
   const file = { format: EXPORT_FORMAT, version: 1, exported_at: new Date().toISOString(), building: state.building };
   const url = URL.createObjectURL(new Blob([JSON.stringify(file, null, 2)], { type: "application/json" }));
   const a = document.createElement("a");
@@ -406,7 +332,7 @@ function wire(): void {
       if (el.dataset.mesh === "levels") {
         state.levelsText = el.value;
         const list = el.value
-          .split(lang === "de" ? /[;\s]+/ : /[,;\s]+/)
+          .split(/[,;\s]+/)
           .map((v) => parseFloat(v.replace(",", ".")))
           .filter((v) => Number.isFinite(v));
         m.levels = list.length ? list : null;
@@ -425,9 +351,6 @@ function wire(): void {
     else if (el.dataset.floor) {
       state.floor = Number(el.dataset.floor);
       render();
-    } else if (el.dataset.lang) {
-      lang = el.dataset.lang;
-      void reread().then(render);
     }
   });
   root.addEventListener("dragover", (e) => {

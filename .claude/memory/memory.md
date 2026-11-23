@@ -4,3 +4,4 @@
 - `general.md` — Prompt/Plan files go to `Prompts/`/`Plans/` without execution; code changes need a descriptive branch from main, user-only merge (2026-11-22)
 - `domain/open-source-refactor.md` — Refactor committed on `refactor/open-source-config` (`bacc759`), green checks, unsigned packs, local diagnostics (2026-11-23)
 - `domain/pack-format.md` — Furniture packs are unsigned `fp3dpack` v1 JSON; schema in `packs.py`, spec in `docs/packs.md` (2026-11-23)
+- `domain/english-only.md` — English-only product: no language catalogues or locale branches; stable IDs kept; branch and verification baseline (2026-11-23)

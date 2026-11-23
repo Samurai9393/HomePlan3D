@@ -49,10 +49,10 @@ test("the clock follows the time format of the user's profile, not only the lang
   const time = (format: string | undefined, lang = "en") =>
     at.toLocaleTimeString(lang, { hour: "2-digit", minute: "2-digit", timeZone: "UTC", ...hourCycle({ locale: format ? { time_format: format } : undefined } as unknown as HomeAssistant) });
   assert.equal(time("24"), "18:08");
-  assert.match(time("12", "de"), /06:08/);
+  assert.match(time("12", "en-GB"), /06:08/);
   // "language" and older Home Assistant versions without the setting: as the language says
   assert.match(time("language"), /PM/);
   assert.match(time(undefined), /PM/);
-  assert.equal(time(undefined, "de"), "18:08");
+  assert.equal(time(undefined, "en-GB"), "18:08");
   assert.equal(JSON.stringify(hourCycle(null)), "{}");
 });

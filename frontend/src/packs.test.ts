@@ -8,7 +8,7 @@ const pack: FurniturePack = {
   name: "Demo",
   publisher: "Demo",
   licensee: null,
-  items: [{ id: "tv", name: { de: "Fernseher groß", en: "Big TV" }, size: [2, 0.3, 1.2], electric: true, parts: [{ shape: "box", x: 0, z: 0, w: 1, d: 1, y: 0, h: 1, color: "dark" }] }],
+  items: [{ id: "tv", name: { en: "Big TV" }, size: [2, 0.3, 1.2], electric: true, parts: [{ shape: "box", x: 0, z: 0, w: 1, d: 1, y: 0, h: 1, color: "dark" }] }],
 };
 
 test("pack furniture resolves by type, with size, name and power link", () => {
@@ -17,7 +17,7 @@ test("pack furniture resolves by type, with size, name and power link", () => {
   assert.equal(type, "pack:demo.pack:tv");
   assert.deepEqual(furnitureSize(type), [2, 0.3, 1.2]);
   assert.equal(isElectric(type), true);
-  assert.equal(packItemName(packItem(type)!, "de-DE"), "Fernseher groß");
+  assert.equal(packItemName(packItem(type)!, "en"), "Big TV");
   assert.equal(packItemName(packItem(type)!, "fr"), "Big TV");
   // built-in types keep their sizes; a removed pack leaves a plain default box
   assert.equal(furnitureSize("sofa").length, 3);
@@ -57,18 +57,18 @@ test("pack items stand on the floor, on furniture, on a wall or hang from the ce
   setPacks([]);
 });
 
-test("our packs show an English name outside German, others keep theirs (#224)", () => {
-  assert.equal(packName({ id: "mastershort.office", name: "Büro & Gaming" }, "en"), "Office & Gaming");
-  assert.equal(packName({ id: "mastershort.office", name: "Büro & Gaming" }, "de-DE"), "Büro & Gaming");
-  assert.equal(packName({ id: "mastershort.living_sample", name: "Wohnzimmer – Schnupper-Pack" }, "fr"), "Living Room – Sampler");
-  assert.equal(packName({ id: "pro_weather", name: "Wetter draußen" }, "en"), "Pro: Weather Outside");
+test("our packs keep their English names in every locale, others keep theirs (#224)", () => {
+  assert.equal(packName({ id: "mastershort.office", name: "Office & Gaming" }, "en"), "Office & Gaming");
+  assert.equal(packName({ id: "mastershort.office", name: "Office & Gaming" }, "fr"), "Office & Gaming");
+  assert.equal(packName({ id: "mastershort.living_sample", name: "Living Room – Sampler" }, "fr"), "Living Room – Sampler");
+  assert.equal(packName({ id: "pro_weather", name: "Weather Outside" }, "en"), "Pro: Weather Outside");
   // #825: the newer packs, Pro add-ons and modules have English names too
-  assert.equal(packName({ id: "mastershort.announce", name: "Modul: Durchsagen" }, "en"), "Module: Announcements");
-  assert.equal(packName({ id: "pro_heat", name: "Pro: Wärme Pro" }, "en-GB"), "Pro: Heat Pro");
-  assert.equal(packName({ id: "mastershort.cabinet_kit", name: "Schränke & Regale – Baukasten" }, "en"), "Cabinets & Shelves – Kit");
-  // one newer than the table keeps its name, its kind in English
-  assert.equal(packName({ id: "mastershort.later", name: "Modul: Später" }, "en"), "Module: Später");
-  assert.equal(packName({ id: "someone.else", name: "Möbel" }, "en"), "Möbel");
+  assert.equal(packName({ id: "mastershort.announce", name: "Module: Announcements" }, "en"), "Module: Announcements");
+  assert.equal(packName({ id: "pro_heat", name: "Heat Pro" }, "en-GB"), "Pro: Heat Pro");
+  assert.equal(packName({ id: "mastershort.cabinet_kit", name: "Cabinets & Shelves – Kit" }, "en"), "Cabinets & Shelves – Kit");
+  // one newer than the table keeps the name its file carries
+  assert.equal(packName({ id: "mastershort.later", name: "Module: Later" }, "en"), "Module: Later");
+  assert.equal(packName({ id: "someone.else", name: "Furniture" }, "en"), "Furniture");
 });
 
 test("a status light is no display: printers ask for a device, TVs for a media player", () => {
@@ -94,11 +94,11 @@ test("a pack cooktop is found by its zones: thin discs on its top (they glow whi
     format: "fp3dpack",
     version: 1,
     id: "test.kitchen",
-    name: "Küche",
+    name: "Kitchen",
     publisher: "t",
     licensee: null,
     items: [
-      { id: "hob_80", name: "Kochfeld", size: [0.8, 0.62, 0.92], electric: true, parts: [{ shape: "box", x: 0, z: 0, w: 1, d: 1, y: 0, h: 0.95, color: "white" }, zone, { ...zone, x: 0.2 }] },
+      { id: "hob_80", name: "Cooktop", size: [0.8, 0.62, 0.92], electric: true, parts: [{ shape: "box", x: 0, z: 0, w: 1, d: 1, y: 0, h: 0.95, color: "white" }, zone, { ...zone, x: 0.2 }] },
       { id: "sideboard", name: "Sideboard", size: [1.6, 0.45, 0.8], parts: [{ shape: "box", x: 0, z: 0, w: 1, d: 1, y: 0, h: 1, color: "wood" }, zone, { ...zone, x: 0.2 }] },
     ],
   } as unknown as FurniturePack;
@@ -112,7 +112,7 @@ test("a pack cooktop is found by its zones: thin discs on its top (they glow whi
 });
 
 test("items outside the rooms stand on the ground beneath them, also when it lies lower than the floor (#708)", () => {
-  const floor = { ...newFloor("eg", "EG", 0), rooms: [{ id: "r", name: "R", area_id: null, points: [[0, 0], [4, 0], [4, 3], [0, 3]], floor_material: "wood" }] } as Building["floors"][number];
+  const floor = { ...newFloor("eg", "Ground floor", 0), rooms: [{ id: "r", name: "R", area_id: null, points: [[0, 0], [4, 0], [4, 3], [0, 3]], floor_material: "wood" }] } as Building["floors"][number];
   const item = (type: string, x: number) => ({ id: type, type, x, z: 1, w: 0.6, d: 0.6, h: 1, rotation: 0, variant: null }) as Furniture;
   setTerrain({ settings: { terrain: { level: -0.55 } } } as unknown as Building);
   try {

@@ -1,11 +1,11 @@
-// Tutorial episode 0 – the teaser "Das ist HomePlan 3D": the first video of the playlist, 2–3 minutes of the full
+// Tutorial episode 0 – the teaser "This is HomePlan 3D": the first video of the playlist, 2–3 minutes of the full
 // demo house at its best in short scenes with hard cuts (each scene loads the preview fresh): the flight in, floors,
 // lights and colours, the room panel, blinds, heatmap, sun and evening, weather, warnings, Energy Pro, cameras,
 // search, the dashboard card and the wall tablet, a glimpse of the editor, the extensions, and the way into episode 1.
 // Drives the preview with invented demo data. States the viewer cannot get from a tap (sun position, weather,
 // a smoke alarm) are set on the mock Home Assistant directly, and the camera glides are set on the 3D view – both
 // only for the picture, never as a step the viewer is meant to copy.
-// Usage (from frontend/): node tutorials/ep00-teaser.mjs <out-dir> [<voice-dir de> [<voice-dir en>]]
+// Usage (from frontend/): node tutorials/ep00-teaser.mjs <out-dir> [<voice-dir>]
 //   (voice dirs: private/tutorial-audio/ep00/de and …/en; a line then lasts the longer of both plus 0.3 s)
 // Then: python ../tools/make-tutorial.py <out-dir> <out.mp4> --en tutorials/ep00-narration-en.json
 
@@ -14,10 +14,10 @@ import { join } from "node:path";
 import { appVersion, FPS, narration, startRecorder } from "./recorder.mjs";
 
 const out = process.argv[2] ?? "tutorial-ep00";
-const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "de" });
+const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "en" });
 const N = narration(R, process.argv.slice(3));
 const { sayOver, chapter } = N;
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D ${appVersion()}</span>`;
+const VERSION = `<br><span style="font-size:20px;opacity:.7">recorded with HomePlan 3D ${appVersion()}</span>`;
 const PLAN = join(import.meta.dirname, "assets", "bauplan-eg.png");
 
 // every scene starts from the stored defaults (the panel remembers the look, hidden bars and more per device)
@@ -78,7 +78,7 @@ const scene = async (query = "", cursor = false) => {
 };
 /** Hide every bar: only the 3D view stays (the eye button of the app). */
 const clean = async () => {
-  await quiet('button[aria-label="Bedienelemente ausblenden – nur die 3D-Ansicht bleibt"]', 700);
+  await quiet('button[aria-label="Hide the controls – only the 3D view remains"]', 700);
 };
 /** Set states on the mock Home Assistant (sun, weather, a smoke alarm) – the next service call resets them. */
 const setStates = (patch) =>
@@ -121,7 +121,7 @@ const tap = async (selector, nth = 0, seconds = 0.5) => {
   await R.click();
 };
 const rect = async (x0, z0, x1, z1, seconds = 0.6, hop = 0.35) => {
-  await R.clickOn({ text: "Rechteck", exact: true }, hop);
+  await R.clickOn({ text: "Rectangle", exact: true }, hop);
   const a = await R.planPoint(x0, z0);
   const b = await R.planPoint(x1, z1);
   await R.move(a.x, a.y, hop);
@@ -136,7 +136,7 @@ const quiet = async (target, wait = 300) => {
 const flash = (on) => R.page.evaluate((on) => (document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-view3d")._flash = on), on);
 
 // ---------------------------------------------------------------- 1. The flight in, title card
-await chapter("Das ist HomePlan 3D");
+await chapter("This is HomePlan 3D");
 await scene("flows");
 await clean();
 {
@@ -145,13 +145,13 @@ await clean();
   const near = { theta: -0.45, phi: 0.88, radius: 30, target: [6.8, 3.0, 4.6] };
   await cam(far);
   await R.sleep(1200);
-  await R.title("HomePlan 3D", `Dein Zuhause in 3D – live mit Home Assistant${VERSION}`);
+  await R.title("HomePlan 3D", `Your home in 3D – live with Home Assistant${VERSION}`);
   // a moment of picture before the first word
   await live(R.time + 0.8, far, mix(far, mid, 0.08));
-  let end = await line("Das ist HomePlan 3D: dein Zuhause in 3D – live mit Home Assistant.");
+  let end = await line("This is HomePlan 3D: your home in 3D – live with Home Assistant.");
   await live(end, mix(far, mid, 0.08), mid);
   await R.untitle();
-  end = await line("Jeder Raum, jedes Licht, jedes Fenster – genau da, wo es bei dir wirklich ist.");
+  end = await line("Every room, every light, every window – exactly where it really is in your home.");
   await live(end, mid, near);
 }
 
@@ -163,54 +163,54 @@ await scene("flows");
   const b = { theta: 0.35, phi: 0.95, radius: 29, target: [6.8, 2.6, 4.6] };
   await cam(a);
   await R.sleep(800);
-  const end = await line("Die Etagen stapelst du, ziehst sie auseinander oder schaust in jede einzeln hinein.");
+  const end = await line("Stack your floors, pull them apart, or look into each one on its own.");
   const t0 = R.time;
   const span = end - t0;
-  await quiet({ text: "Gestapelt", exact: true }, 0);
+  await quiet({ text: "Stacked", exact: true }, 0);
   await live(t0 + span * 0.36, a, mix(a, b, 0.4));
-  await quiet({ text: "Auseinander", exact: true }, 0);
+  await quiet({ text: "Apart", exact: true }, 0);
   await live(t0 + span * 0.66, mix(a, b, 0.4), mix(a, b, 0.75));
-  await quiet({ text: "Obergeschoss", exact: true, nth: 0 }, 0);
+  await quiet({ text: "Upper floor", exact: true, nth: 0 }, 0);
   await live(end + 0.4);
 }
 
 // ---------------------------------------------------------------- 3. Lights live, colours, the room panel
-await chapter("Live mit Home Assistant");
+await chapter("Live with Home Assistant");
 await scene("", true);
-await quiet({ text: "Erdgeschoss", exact: true, nth: 0 });
+await quiet({ text: "Ground floor", exact: true, nth: 0 });
 await R.sleep(800);
-await quiet({ text: "Wohnzimmer", exact: true });
+await quiet({ text: "Living room", exact: true });
 await R.sleep(1800);
 await R.move(1300, 640, 0.01);
 {
-  let end = await line("Tippst du ein Licht an, schaltet es auch in echt – und in 3D siehst du es sofort.");
-  await R.clickOn({ text: "Alle aus", exact: true }, 0.5);
+  let end = await line("Tap a light and it switches for real – and you see it in 3D right away.");
+  await R.clickOn({ text: "All off", exact: true }, 0.5);
   await live(R.time + 0.9);
   await tap('button[aria-label="LED Band"]', 0, 0.5);
   await live(R.time + 0.7);
-  await tap('button[aria-label="Stehlampe"]', 0, 0.5);
+  await tap('button[aria-label="Floor lamp"]', 0, 0.5);
   await live(end);
-  end = await line("Mit Helligkeit und Farbe, genau wie Home Assistant es meldet.");
+  end = await line("With brightness and colour, just as Home Assistant reports it.");
   await tap('button[aria-label="rgb(255, 95, 210)"]', 0, 0.5);
   await live(R.time + 0.5);
-  await tap('button[aria-label="Deckenlicht"]', 0, 0.5);
+  await tap('button[aria-label="Ceiling light"]', 0, 0.5);
   await live(R.time + 0.4);
   await tap('button[aria-label="rgb(55, 224, 255)"]', 1, 0.5);
   await live(end);
-  end = await line("Im Raumfenster steht alles aus dem Raum: Licht, Rollladen, Heizung und Fernseher.");
-  await R.moveTo({ text: "Rollladen" }, 0.5);
+  end = await line("The room panel holds everything in the room: lights, blinds, heating and the TV.");
+  await R.moveTo({ text: "Blind" }, 0.5);
   await live(R.time + 0.4);
-  await tap('button[aria-label="Wärmer"]', 0, 0.5);
-  await tap('button[aria-label="Wärmer"]', 0, 0.2);
+  await tap('button[aria-label="Warmer"]', 0, 0.5);
+  await tap('button[aria-label="Warmer"]', 0, 0.2);
   await live(R.time + 0.3);
-  await R.moveTo({ text: "Fernseher" }, 0.5);
+  await R.moveTo({ text: "TV" }, 0.5);
   await live(end);
 }
 
 // ---------------------------------------------------------------- 4. Blinds moving
 
 await scene("");
-await quiet({ text: "Erdgeschoss", exact: true, nth: 0 });
+await quiet({ text: "Ground floor", exact: true, nth: 0 });
 await R.sleep(900);
 await clean();
 {
@@ -218,7 +218,7 @@ await clean();
   const b = { theta: 3.3, phi: 1.16, radius: 8.5, target: [3, 0.8, 0.5] };
   await cam(a);
   await R.sleep(900);
-  const end = await line("Fährt der Rollladen runter, fährt er auch in 3D – live.");
+  const end = await line("When the blind goes down, it goes down in 3D too – live.");
   const t0 = R.time;
   const pos = (k) => (k < 0.55 ? Math.round(70 - (70 * k) / 0.55) : Math.round(((k - 0.55) / 0.45) * 100));
   let last = -1;
@@ -235,9 +235,9 @@ await clean();
 // ---------------------------------------------------------------- 5. Heatmap
 
 await scene("");
-await quiet({ text: "Erdgeschoss", exact: true, nth: 0 });
+await quiet({ text: "Ground floor", exact: true, nth: 0 });
 await R.sleep(900);
-await quiet({ text: "Schnitt", exact: true });
+await quiet({ text: "Cut", exact: true });
 await quiet({ text: "Temp.", exact: true });
 await R.sleep(600);
 {
@@ -245,14 +245,14 @@ await R.sleep(600);
   const b = { theta: 0.55, phi: 0.52, radius: 17 };
   await cam(a);
   await R.sleep(1200);
-  const end = await line("Wo ist es zu warm, wo zu kalt? Die Heatmap zeigt es auf einen Blick.");
+  const end = await line("Where is it too warm, where too cold? The heatmap shows you at a glance.");
   await live(end + 0.2, a, b);
 }
 
 // ---------------------------------------------------------------- 6. The sun through the windows, evening
-await chapter("Sonne, Wetter und Warnungen");
+await chapter("Sun, weather and warnings");
 await scene("");
-await quiet({ text: "Erdgeschoss", exact: true, nth: 0 });
+await quiet({ text: "Ground floor", exact: true, nth: 0 });
 await R.sleep(900);
 await clean();
 {
@@ -265,14 +265,14 @@ await clean();
   await setStates({ "sun.sun": { state: "above_horizon", attributes: sun(0) } });
   await cam(a);
   await R.sleep(1200);
-  let end = await line("Die Sonne steht, wo sie wirklich steht, und scheint durch deine Fenster.");
+  let end = await line("The sun is where it really is, and it shines through your windows.");
   const t0 = R.time;
   const m = mix(a, b, 0.55);
   await live(end, a, m, async (i, n) => {
     // the sun sinks from the afternoon towards the evening (every few frames, the patches are rebuilt each time)
     if (i % 3 === 0) await setStates({ "sun.sun": { attributes: sun((0.7 * i) / n) } });
   });
-  end = await line("Wird es Abend, wird es auch in 3D dunkel – und die Lichter gehen an.");
+  end = await line("When evening comes, it gets dark in 3D too – and the lights come on.");
   const t1 = R.time;
   let lit = false;
   await live(end + 0.3, m, b, async (i, n) => {
@@ -284,7 +284,7 @@ await clean();
         "light.wohnzimmer_decke": { state: "on", attributes: { brightness: 200 } },
         "light.stehlampe": { state: "on", attributes: { brightness: 160 } },
         "light.led_band": { state: "on", attributes: { brightness: 220, rgb_color: [255, 95, 210], color_mode: "hs" } },
-        "light.schlafzimmer": { state: "on", attributes: { brightness: 170 } },
+        "light.schlafzalways": { state: "on", attributes: { brightness: 170 } },
         "light.nachttisch": { state: "on", attributes: { brightness: 90 } },
         "light.flur": { state: "on", attributes: { brightness: 120 } },
       });
@@ -305,13 +305,13 @@ await clean();
   await setStates({ "weather.zuhause": { state: "pouring", attributes: { cloud_coverage: 85, wind_speed: 25, wind_speed_unit: "km/h" } } });
   await cam(a);
   await R.sleep(1500);
-  let end = await line("Das Wetter draußen kommt mit ins Bild: Regen, Schnee …");
+  let end = await line("The weather outside comes into the picture: rain, snow …");
   const t0 = R.time;
   await live(t0 + (end - t0) * 0.5, a, mix(a, b, 0.5));
   await setStates({ "weather.zuhause": { state: "snowy" } });
   await live(end, mix(a, b, 0.5), b);
   await setStates({ "weather.zuhause": { state: "lightning-rainy" } });
-  end = await line("und sogar ein Gewitter über deinem Haus.");
+  end = await line("and even a thunderstorm over your house.");
   // two flashes at fixed frames (the app's own flashes come at random real-time moments)
   await live(end + 0.5, b, c, async (i, n) => {
     const f = Math.round(n * 0.25);
@@ -325,27 +325,27 @@ await clean();
 // ---------------------------------------------------------------- 8. Open windows in the rain, a smoke alarm
 
 await scene("");
-await quiet({ text: "Erdgeschoss", exact: true, nth: 0 });
+await quiet({ text: "Ground floor", exact: true, nth: 0 });
 await R.sleep(1000);
 {
   const a = { theta: -0.75, phi: 0.92, radius: 21 };
   const b = { theta: -0.35, phi: 0.85, radius: 19 };
   await cam(a);
   await R.sleep(1000);
-  let end = await line("Offene Fenster leuchten – und regnet es rein, sagt dir NeonPlan Bescheid.");
+  let end = await line("Open windows glow – and if it starts raining in, NeonPlan lets you know.");
   const t0 = R.time;
   await live(t0 + 1.4, a, mix(a, b, 0.25));
   await setStates({ "weather.zuhause": { state: "pouring", attributes: { cloud_coverage: 85, wind_speed: 25, wind_speed_unit: "km/h" } } });
   await live(end, mix(a, b, 0.25), mix(a, b, 0.55));
   await setStates({ "binary_sensor.kueche_rauch": { state: "on" } });
-  end = await line("Schlägt ein Rauchmelder an, blinkt der Raum rot, und oben steht, was los ist.");
+  end = await line("When a smoke alarm goes off, the room flashes red and the top tells you what's wrong.");
   await live(end + 0.3, mix(a, b, 0.55), b);
 }
 
 // ---------------------------------------------------------------- 9. Energy Pro: power flow, solar fields, holograms
-await chapter("Energie Pro und Kameras");
+await chapter("Energy Pro and cameras");
 await scene("flows&pv=5400");
-await quiet({ text: "Gestapelt", exact: true });
+await quiet({ text: "Stacked", exact: true });
 await R.sleep(600);
 await clean();
 {
@@ -355,18 +355,18 @@ await clean();
   const d = { theta: 1.3, phi: 0.95, radius: 25, target: [6.8, 3.8, 4.6] };
   await cam(a);
   await R.sleep(1500);
-  let end = await line("Mit Energie Pro siehst du den Strom fließen: vom Dach in den Akku, ins Haus und ins Auto.");
+  let end = await line("With Energy Pro you see the power flow: from the roof into the battery, into the house and into the car.");
   await live(end, a, b);
   await cam(c);
   await R.sleep(900);
-  end = await line("Jedes Solarfeld liegt auf dem Dach, und darüber schweben Hologramme mit den Werten von heute.");
+  end = await line("Every solar field sits on the roof, and above it float holograms with today's numbers.");
   await live(end + 0.2, c, d);
 }
 
 // ---------------------------------------------------------------- 10. Cameras
 
 await scene("", true);
-await quiet({ text: "Erdgeschoss", exact: true, nth: 0 });
+await quiet({ text: "Ground floor", exact: true, nth: 0 });
 await R.sleep(900);
 {
   const a = { theta: -0.95, phi: 0.95, radius: 11, target: [2.2, 0.6, 1.6] };
@@ -376,23 +376,23 @@ await R.sleep(900);
   await R.move(1500, 700, 0.01);
   // the camera's field of view on the floor: faint first, red as soon as it sees motion
   await setStates({ "binary_sensor.wohnzimmer_kamera_bewegung": { state: "off" } });
-  let end = await line("Kameras hängen da, wo sie wirklich hängen – mit Blickfeld und erkannten Personen.");
+  let end = await line("Cameras hang where they really hang – with their field of view and the people they detect.");
   const t0 = R.time;
   await live(t0 + 1.6, a, mix(a, b, 0.35));
   await setStates({ "binary_sensor.wohnzimmer_kamera_bewegung": { state: "on" } });
   await live(end, mix(a, b, 0.35), b);
-  end = await line("Ein Tipp, und du siehst alle Kamerabilder auf einmal.");
-  await R.clickOn({ text: "Kameras", exact: true }, 0.6);
+  end = await line("One tap, and you see every camera picture at once.");
+  await R.clickOn({ text: "Cameras", exact: true }, 0.6);
   await live(end + 0.3);
 }
 
 // ---------------------------------------------------------------- 11. Search
-await chapter("Suche, Dashboard und Wandtablet");
+await chapter("Search, dashboard and wall tablet");
 await scene("", true);
 {
   await R.move(500, 700, 0.01);
-  const end = await line("Wo war noch mal die Stehlampe? Einfach suchen – und die Ansicht fliegt hin.");
-  await R.clickOn('button[aria-label="Suchen"]', 0.5);
+  const end = await line("Where was that floor lamp again? Just search – and the view flies there.");
+  await R.clickOn('button[aria-label="Search"]', 0.5);
   await R.clickOn("input", 0.3);
   await R.type("Stehl", 0.09);
   await live(R.time + 0.6);
@@ -406,7 +406,7 @@ await scene("", true);
 await scene("card", true);
 await R.sleep(1500);
 {
-  let end = await line("Als Karte kommt NeonPlan auf dein Dashboard – mit einem eigenen Editor für alle Einstellungen.");
+  let end = await line("As a card, NeonPlan goes on your dashboard – with its own editor for every setting.");
   await R.move(300, 300, 0.5);
   try {
     await R.pickOption("Look", "Blueprint", 0.5);
@@ -437,34 +437,34 @@ await R.sleep(1500);
     card.setConfig({ type: "custom:homeplan3d-card", quality: "low", floor: "eg", height: 838, flows: false, controls: true, fullscreen_button: false, floor_thumbs: true, idle_return: 1, idle_orbit: true });
   });
   await R.sleep(2500);
-  end = await line("Und es läuft sogar auf alten Wandtablets – mit einer eigenen, sparsamen Stufe dafür.");
+  end = await line("And it even runs on old wall tablets – with its own lightweight setting just for them.");
   await live(end + 0.3);
 }
 
 // ---------------------------------------------------------------- 13. The editor: picture, rooms, 3D beside, furniture
-await chapter("Der Editor");
+await chapter("The editor");
 await scene("empty", true);
 await quiet({ text: "Editor", exact: true });
 await R.sleep(500);
-await quiet({ text: "Etage hinzufügen" });
-await quiet({ text: "Erdgeschoss", nth: 0 });
+await quiet({ text: "Add floor" });
+await quiet({ text: "Ground floor", nth: 0 });
 await R.sleep(500);
 {
   const png = "data:image/png;base64," + readFileSync(PLAN).toString("base64");
   await R.page.evaluate((png) => window.fp3dPanel.hass.callWS({ type: "homeplan3d/image/set", image_id: "img_plan", data: png }), png);
   await R.editor(`e.change((doc, f) => { f.background = { image_id: "img_plan", width: 12, rotation: 0, x: -1.5, z: -1.5, opacity: 0.6 }; }); e.past = []; e._canUndo = false; e.fit();`);
   await R.sleep(800);
-  await quiet({ text: "3D daneben", exact: true });
+  await quiet({ text: "3D beside", exact: true });
   await R.sleep(1500);
   await R.editor("e.fit();");
   await R.sleep(700);
   await R.move(700, 500, 0.01);
-  let end = await line("Dein eigenes Haus zeichnest du selbst: Bauplan als Bild darunterlegen und die Räume nachziehen.");
+  let end = await line("You draw your own house yourself: put your floor plan underneath as a picture and trace the rooms.");
   await rect(0, 0, 6, 4.5, 0.7);
   await rect(6, 0, 9.5, 4.5, 0.5);
   await rect(0, 4.5, 3, 7.5, 0.45);
   await live(end);
-  end = await line("Daneben wächst dein Haus gleich in 3D mit.");
+  end = await line("Right beside it, your house grows in 3D.");
   await rect(3, 4.5, 6, 7.5, 0.4, 0.25);
   await rect(6, 4.5, 9.5, 7.5, 0.4, 0.25);
   await live(end + 0.2);
@@ -472,14 +472,14 @@ await R.sleep(500);
 await scene("", true);
 await quiet({ text: "Editor", exact: true });
 await R.sleep(600);
-await quiet({ text: "3D daneben", exact: true });
+await quiet({ text: "3D beside", exact: true });
 await R.sleep(1200);
 await R.editor("e._roomId = 'wohnen'; e._furnitureId = 'm2'; e.fit();");
 await R.sleep(1500);
 {
   const p = await R.planPoint(2.4, 3.7);
   await R.move(p.x + 60, p.y - 80, 0.01);
-  const end = await line("Möbel stellst du einfach hin und schiebst sie zurecht – im Plan und in 3D.");
+  const end = await line("You simply put furniture in and push into place – in the plan and in 3D.");
   await R.move(p.x, p.y, 0.5);
   const q = await R.planPoint(3.3, 3.1);
   await R.drag(q.x, q.y, 1.2);
@@ -490,7 +490,7 @@ await R.sleep(1500);
 }
 
 // ---------------------------------------------------------------- 14. Free, open source, extensions
-await chapter("Kostenlos, erweiterbar und wie es weitergeht");
+await chapter("Free, extensible and what comes next");
 await scene("flows");
 await clean();
 {
@@ -498,14 +498,14 @@ await clean();
   const b = { theta: 1.5, phi: 1.0, radius: 29, target: [6.8, 3.0, 4.6] };
   await cam(a);
   await R.sleep(1200);
-  const end = await line("HomePlan 3D ist kostenlos und Open Source.");
+  const end = await line("HomePlan 3D is free and open source.");
   await live(end, a, b);
 }
 await scene("flows");
-await quiet({ text: "Erweiterungen" });
+await quiet({ text: "Extensions" });
 await R.sleep(1500);
 {
-  const end = await line("Wer mehr will, findet Möbel-Packs und Pro-Erweiterungen – zum Beispiel für Energie, Kameras und Wetter.");
+  const end = await line("If you want more, there are furniture packs and Pro extensions – for energy, cameras and the weather, for example.");
   await live(end + 0.2);
 }
 
@@ -518,8 +518,8 @@ await clean();
   const b = { theta: 2.6, phi: 0.95, radius: 34, target: [6.8, 3.0, 4.6] };
   await cam(a);
   await R.sleep(1200);
-  await R.title("Folge 1: Dein erster Grundriss", `HomePlan 3D – Tutorials · kostenlos und Open Source${VERSION}`);
-  const end = await line("In dieser Playlist zeige ich dir Schritt für Schritt, wie du dein eigenes Zuhause baust – los geht's mit Folge 1.");
+  await R.title("Episode 1: Your first floor plan", `HomePlan 3D – tutorials · free and open source${VERSION}`);
+  const end = await line("In this playlist I'll show you step by step how to build your own home – let's get started with episode 1.");
   await live(end + 1.5, a, b);
 }
 

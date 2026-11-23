@@ -845,7 +845,7 @@ async def ws_voice_converse(
     hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
 ) -> None:
     """A sentence for Assist from a wall tablet that hangs in a room (any user, like Assist's own
-    `conversation/process`): "Licht an" switches the lights of that room."""
+    `conversation/process`): "Lights on" switches the lights of that room."""
     try:
         result = await async_converse_here(
             hass, msg["text"], msg.get("language"), msg["area_id"], connection.context(msg)

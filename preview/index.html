@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>HomePlan 3D – Vorschau</title>
+    <title>HomePlan 3D – Preview</title>
     <style>
       /* Like HA: the panel's parent has no explicit height, the panel sizes itself. */
       body {
@@ -41,11 +41,9 @@
       }
       let revision = 1;
       // ?plans: further floor plans (the garden house, a holiday flat); the main plan is `building` above
-      const EN_PLAN = { Gartenhaus: "Garden house", Ferienwohnung: "Holiday flat" };
-      const english = params.get("lang") === "en";
-      const plans = params.has("plans") ? structuredClone(DEMO_PLANS).map((pl) => ({ ...pl, name: english ? (EN_PLAN[pl.name] ?? pl.name) : pl.name, revision: 1, created: Date.now() / 1000 })) : [];
+      const plans = params.has("plans") ? structuredClone(DEMO_PLANS).map((pl) => ({ ...pl, revision: 1, created: Date.now() / 1000 })) : [];
       const planTrash = [];
-      let mainEntry = { id: "main", name: params.has("plans") ? (english ? "House" : "Haus") : null, icon: null, site: null, created: null };
+      let mainEntry = { id: "main", name: params.has("plans") ? "House" : null, icon: null, site: null, created: null };
       let locatePlan = "main";
       const sizeOf = (b) => ({ floors: b.floors.length, rooms: b.floors.reduce((n, f) => n + f.rooms.length, 0), furniture: b.floors.reduce((n, f) => n + f.furniture.length, 0) });
       const planList = () => ({
@@ -99,7 +97,7 @@
       }
 
       const hass = {
-        language: params.get("lang") || "de",
+        language: "en",
         user: { is_admin: !params.has("user"), name: "Demo" },
         areas: DEMO_AREAS,
         floors: DEMO_FLOORS,
@@ -119,9 +117,9 @@
           if (!path.startsWith("calendars/calendar.abfallkalender")) throw new Error("not in the demo");
           const day = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
           return [
-            { summary: "Restmüll", start: { date: day(0) }, end: { date: day(1) } },
-            { summary: "Papiertonne", start: { date: day(1) }, end: { date: day(2) } },
-            { summary: "Biotonne", start: { date: day(3) }, end: { date: day(4) } },
+            { summary: "Residual waste", start: { date: day(0) }, end: { date: day(1) } },
+            { summary: "Paper bin", start: { date: day(1) }, end: { date: day(2) } },
+            { summary: "Bio bin", start: { date: day(3) }, end: { date: day(4) } },
           ];
         },
         async callService(domain, service, data) {
@@ -262,7 +260,7 @@
                 enabled: diag.enabled,
                 can_delete: clients.length > 0,
                 preview: {
-                  v: 1, id: diag.enabled ? "3f0c9a52-7d1e-4b8a-9c61-2e5f8d4a7b10" : null, neonplan: "1.17.0", ha: "2026.10.1", python: "3.13", lang: "de",
+                  v: 1, id: diag.enabled ? "3f0c9a52-7d1e-4b8a-9c61-2e5f8d4a7b10" : null, neonplan: "1.17.0", ha: "2026.10.1", python: "3.13", lang: "en",
                   packs: [], features: ["camera_cockpit", "weather", "screens", "energy_pro", "sound", "auto_pro", "time_travel", "pool", "household", "frames", "fridge_smart", "fun_pets", "fun_halloween", "fun_winter", "room_bar", "diagnostics", "locate"],
                   plan: { floors: building.floors.length, rooms: building.floors.reduce((n, f) => n + f.rooms.length, 0), furniture: building.floors.reduce((n, f) => n + f.furniture.length, 0), devices_linked: building.floors.reduce((n, f) => n + f.placements.length, 0), outdoor: 0, cameras: 1 },
                   clients,
@@ -358,7 +356,6 @@
       await import("../custom_components/homeplan3d/frontend/homeplan3d.js");
       if (params.has("site")) {
         // ?site: the public online demo says what it is and where to get HomePlan 3D
-        const de = hass.language === "de";
         // phones: short and at the top of the 3D area, clear of the toolbars at the bottom
         const narrow = innerWidth < 700;
         const bar = document.createElement("div");
@@ -366,24 +363,20 @@
           (narrow ? "position:fixed;left:50%;top:244px;" : "position:fixed;left:50%;bottom:64px;") +
           "transform:translateX(-50%);z-index:10;display:flex;gap:10px;align-items:center;flex-wrap:nowrap;white-space:nowrap;justify-content:center;max-width:calc(100vw - 32px);padding:8px 14px;border-radius:999px;background:rgba(7,11,20,.88);border:1px solid rgba(0,229,255,.45);color:#cfe9ff;font:13px/1.3 Figtree,Roboto,sans-serif;box-shadow:0 0 18px rgba(0,229,255,.25)";
         const link = (href, text) => `<a href="${href}" target="_blank" rel="noopener" style="color:#00e5ff;font-weight:600;text-decoration:none">${text}</a>`;
-        // the install button stands out; GitHub, the manual and the language as plain links
+        // the install button stands out; GitHub and the manual as plain links
         const install = (text) =>
           `<a href="https://github.com/Samurai9393/HomePlan3D-main#installation" target="_blank" rel="noopener" style="background:#00e5ff;color:#06101c;font-weight:700;text-decoration:none;padding:5px 12px;border-radius:999px">${text}</a>`;
         const github = link("https://github.com/Samurai9393/HomePlan3D-main", "★ GitHub");
-        bar.innerHTML = de
-          ? `<span>${narrow ? "Demo" : "Demo mit erfundenen Daten – probier alles aus"}</span>${install(narrow ? "Installieren" : "Jetzt installieren")}${github}${narrow ? "" : link("https://github.com/Samurai9393/HomePlan3D-main/blob/main/docs/manual.md", "Anleitung")}${link("?site&lang=en", narrow ? "EN" : "English")}`
-          : `<span>${narrow ? "Demo" : "Demo with invented data – try everything"}</span>${install(narrow ? "Install" : "Install now")}${github}${narrow ? "" : link("https://github.com/Samurai9393/HomePlan3D-main/blob/main/docs/manual.md", "Manual")}${link("?site&lang=de", narrow ? "DE" : "Deutsch")}`;
+        bar.innerHTML = `<span>${narrow ? "Demo" : "Demo with invented data – try everything"}</span>${install(narrow ? "Install" : "Install now")}${github}${narrow ? "" : link("https://github.com/Samurai9393/HomePlan3D-main/blob/main/docs/manual.md", "Manual")}`;
         const close = document.createElement("button");
         close.textContent = "×";
-        close.setAttribute("aria-label", de ? "Schließen" : "Close");
+        close.setAttribute("aria-label", "Close");
         close.style.cssText = "background:none;border:0;color:#cfe9ff;font-size:16px;cursor:pointer;padding:0 2px";
         close.onclick = () => bar.remove();
         bar.append(close);
         document.body.append(bar);
         // the styles, big and right at the top: visitors should see that NeonPlan is not only neon
-        const names = de
-          ? { neon: "Neon", blueprint: "Blueprint", day: "Tag", focus: "Nacht / Fokus", synth: "Synthwave", cozy: "Wohnlich", evening: "Wohnlich Abend", winter: "Winterabend", model: "Architekturmodell", pastel: "Pastell", warm: "Holz & Papier" }
-          : { neon: "Neon", blueprint: "Blueprint", day: "Day", focus: "Night / Focus", synth: "Synthwave", cozy: "Homely", evening: "Homely evening", winter: "Winter evening", model: "Architect's model", pastel: "Pastel", warm: "Wood & paper" };
+        const names = { neon: "Neon", blueprint: "Blueprint", day: "Day", focus: "Night / Focus", synth: "Synthwave", cozy: "Homely", evening: "Homely evening", winter: "Winter evening", model: "Architect's model", pastel: "Pastel", warm: "Wood & paper" };
         // at the right edge, clear of the house: a narrow column (on phones folded to one button until tapped)
         const looks = document.createElement("div");
         looks.style.cssText =
@@ -392,8 +385,8 @@
         const head = document.createElement("button");
         head.style.cssText = "display:grid;gap:2px;text-align:left;background:none;border:0;color:#fff;cursor:pointer;padding:0 2px;font:inherit";
         head.setAttribute("aria-expanded", "true");
-        const title = de ? "🎨 Designs" : "🎨 Designs";
-        const sub = de ? "Schau dir die verschiedenen Stile an" : "Have a look at the different styles";
+        const title = "🎨 Designs";
+        const sub = "Have a look at the different styles";
         const row = document.createElement("div");
         row.style.cssText = "display:grid;gap:6px;overflow-y:auto;min-height:0";
         const fold = (open) => {
@@ -448,12 +441,7 @@
             "max-width:360px;padding:20px 18px;border-radius:18px;background:#0b1424;border:1px solid rgba(0,229,255,.45);box-shadow:0 0 24px rgba(0,229,255,.25)";
           const btn = (text, primary) =>
             `<button style="width:100%;margin-top:10px;padding:11px 14px;border-radius:12px;font:600 15px Figtree,Roboto,sans-serif;cursor:pointer;${primary ? "background:#00e5ff;color:#06101c;border:0" : "background:none;color:#cfe9ff;border:1px solid rgba(0,229,255,.45)"}">${text}</button>`;
-          box.innerHTML = de
-            ? `<b style="font-size:18px;color:#fff">Willkommen in der Demo 👋</b>
-               <p style="margin:10px 0 0">HomePlan 3D ist für <b>Wandtablets, Tablets und den PC</b> gemacht – den Grundriss zeichnet man am PC. Am Handy siehst du nur einen kleinen Ausschnitt, deshalb wirken die vielen Knöpfe hier etwas eng.</p>
-               <p style="margin:8px 0 0">Tipp: Handy <b>quer</b> halten oder die Demo am PC öffnen.</p>
-               ${btn("Nur das Haus zeigen", true)}${btn("Alles ansehen", false)}<p style="margin:10px 0 0;font-size:13px;opacity:.75">Das Auge 👁 unten links holt die Knöpfe zurück.</p>`
-            : `<b style="font-size:18px;color:#fff">Welcome to the demo 👋</b>
+          box.innerHTML = `<b style="font-size:18px;color:#fff">Welcome to the demo 👋</b>
                <p style="margin:10px 0 0">HomePlan 3D is made for <b>wall tablets, tablets and the PC</b> – you draw the floor plan on a PC. A phone shows only a small part, so all the buttons feel a bit cramped here.</p>
                <p style="margin:8px 0 0">Tip: turn your phone <b>sideways</b> or open the demo on a PC.</p>
                ${btn("Show just the house", true)}${btn("See everything", false)}<p style="margin:10px 0 0;font-size:13px;opacity:.75">The eye 👁 at the bottom left brings the buttons back.</p>`;
@@ -507,7 +495,7 @@
         };
         // ?tpl: the card only names a card template made in the editor (the room bar and the upper floor come from it)
         if (params.has("tpl")) {
-          building.card_templates = [{ id: "kitchen_tablet", name: params.get("lang") === "en" ? "Kitchen tablet" : "Küchen-Tablet", config: { floor: "og", controls: ["walls"], quality: "low" } }];
+          building.card_templates = [{ id: "kitchen_tablet", name: "Kitchen tablet", config: { floor: "og", controls: ["walls"], quality: "low" } }];
           config = { type: "custom:homeplan3d-card", template: "kitchen_tablet" };
         }
         card.setConfig(config);

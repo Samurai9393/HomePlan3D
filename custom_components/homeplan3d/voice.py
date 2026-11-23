@@ -50,11 +50,9 @@ ASK_SCHEMA = vol.Schema(
 
 # what Assist says when no view answers, by the language of Home Assistant
 _NO_SCREEN = {
-    "de": "Kein NeonPlan-Bildschirm ist gerade offen.",
     "en": "No NeonPlan screen is open right now.",
 }
 _NOT_UNDERSTOOD = {
-    "de": "Das hat NeonPlan nicht verstanden.",
     "en": "NeonPlan did not understand that.",
 }
 
@@ -64,19 +62,6 @@ DEFAULT_SENTENCE_MODE = "off"
 
 # the distinct sentences: nobody says them to Home Assistant itself, so they never take a sentence meant for it
 _DISTINCT = {
-    "de": [
-        "zeig[e] [mir] [mal] [bitte] {text}",
-        "geh[e] [mal] (in|ins|in die|in den|auf|aufs|auf die|auf den|zu|zum|zur) {text}",
-        "(frag|frage) das haus {text}",
-        "(haus|neonplan|neon plan) {text}",
-        "gute nacht",
-        "guten morgen",
-        "was kannst du [alles]",
-        "wo (ist|liegt|steckt) (mein|meine|meinen) {text}",
-        "wer ist [gerade] (zu hause|zuhause|daheim)",
-        "(lass|lasse) [mein|meine|meinen] {text} klingeln",
-        "finde [mein|meine|meinen] {text}",
-    ],
     "en": [
         "show [me] {text}",
         "go to [the] {text}",
@@ -95,23 +80,6 @@ _DISTINCT = {
 # the questions: handy, but some of them Home Assistant answers itself ("which windows are open", #641), so
 # they go to NeonPlan only with the setting "all"
 _QUESTIONS = {
-    "de": [
-        "wo (ist|sind|steht|stehen) {text}",
-        "was ist [alles|gerade|denn] offen",
-        "ist [irgend]was offen",
-        "welche (fenster|türen) sind [noch] offen",
-        "ist (ein|das) fenster (im|in der|in dem|auf dem|auf der) {text} offen",
-        "wo ist es (kalt|warm|zu kalt|zu warm)",
-        "was (zieht|verbraucht|braucht) [gerade|denn] [den] strom",
-        "was macht die (solaranlage|solar|pv|pv-anlage|photovoltaik)",
-        "wie voll ist (der|die) (akku|batterie|speicher)",
-        "sind die (rollläden|rolläden|jalousien|rollos) (unten|oben|zu|offen)",
-        "ist (die|das) {text} (abgeschlossen|verschlossen|zu|offen|an|aus|ein)",
-        "läuft (die|der|das) {text}",
-        "was läuft [gerade|noch|alles]",
-        "was (steht|ist) heute an",
-        "wie (ist|wird) das wetter [heute|morgen]",
-    ],
     "en": [
         "where (is|are) [the] {text}",
         "what is open",
@@ -132,18 +100,17 @@ _QUESTIONS = {
 }
 
 
-# "Wo ist Frauke?": the names locating knows, as a list (not a wildcard), so Assist matches them even when it
+# "Where is Frauke?": the names locating knows, as a list (not a wildcard), so Assist matches them even when it
 # prefers its local commands and leaves everything else to an AI agent (which would only say "is at home")
 WHO_LIST = "neonplan_who"
 _WHO_SENTENCES = {
-    "de": [f"wo (ist|steckt|sind) [der|die|das|mein|meine] {{{WHO_LIST}}}"],
     "en": [f"where (is|are) [the|my] {{{WHO_LIST}}}"],
 }
 
 
 def located_names(hass: HomeAssistant) -> list[str]:
     """The people and things locating knows, the way they are said: device names ("Frauke iPhone", also
-    "Fraukes iPhone"), the person's name and first name."""
+    "Frauke's iPhone"), the person's name and first name."""
     service = hass.data.get(DATA_LOCATE)
     if service is None or not service.enabled:
         return []
@@ -165,9 +132,9 @@ def located_names(hass: HomeAssistant) -> list[str]:
         add(full.split()[0] if full.split() else "")
         words = str(device.get("name") or "").split()
         if len(words) > 1:
-            # the owner's name in front ("Torsten iPhone"): the first name alone and "Torstens iPhone"
+            # the owner's name in front ("Torsten iPhone"): the first name alone and "Torsten's iPhone"
             add(words[0])
-            add(f"{words[0]}s {' '.join(words[1:])}")
+            add(f"{words[0]}'s {' '.join(words[1:])}")
     return names[:200]
 
 
@@ -180,7 +147,7 @@ def sentences_of(language: str, mode: str = DEFAULT_SENTENCE_MODE) -> list[str]:
 
 def sentences_yaml(language: str, mode: str = DEFAULT_SENTENCE_MODE, names: list[str] | tuple[str, ...] = ()) -> str:
     """The custom sentences file of a language (written by hand: the file stays readable for the user); `names`
-    are the people and things locating knows ("Wo ist Frauke?")."""
+    are the people and things locating knows ("Where is Frauke?")."""
     lines = [
         "# Written by HomePlan 3D: the sentences Assist hands to the open NeonPlan views (the first one that",
         "# understands answers). Put your own sentences for NeonPlanAsk into another file.",
@@ -465,7 +432,7 @@ def show_located(hass: HomeAssistant, located: Located, screen: str | None = Non
 
 def area_device(hass: HomeAssistant, area_id: str) -> str | None:
     """A device of the area that a wall tablet's sentence is said in. Assist takes a sentence's room from the device
-    that heard it ("Licht an" switches the lights there); a tablet that only runs a browser is no device of Home
+    that heard it ("lights on" switches the lights there); a tablet that only runs a browser is no device of Home
     Assistant's, so a device of its room stands in for it. None when the area is gone or has no device."""
     if ar.async_get(hass).async_get_area(area_id) is None:
         return None
@@ -476,7 +443,7 @@ def area_device(hass: HomeAssistant, area_id: str) -> str | None:
 async def async_converse_here(
     hass: HomeAssistant, text: str, language: str | None, area_id: str, context: Context
 ) -> dict[str, Any]:
-    """A sentence for Assist, said in a room ("Licht an" on the kitchen's tablet switches the kitchen's lights)."""
+    """A sentence for Assist, said in a room ("lights on" on the kitchen's tablet switches the kitchen's lights)."""
     from homeassistant.components import conversation  # not a dependency: Assist may be off
 
     result = await conversation.async_converse(
@@ -549,7 +516,7 @@ async def async_setup_voice(hass: HomeAssistant) -> None:
     hass.data[DATA_VOICE] = settings
     await settings.async_refresh()
 
-    # a device added or renamed, locating switched on or off: "Wo ist …?" learns the names
+    # a device added or renamed, locating switched on or off: "Where is …?" learns the names
     @callback
     def names_changed() -> None:
         hass.async_create_task(settings.async_refresh())

@@ -86,9 +86,9 @@ def window(cx, cz, w):
         d.line([P(x, cz - EXT / 2), P(x, cz + EXT / 2)], fill=INK, width=3)
 
 
-door(1.5, 4.5, True, INT, (-1, -1))  # Flur -> Wohnzimmer
-door(3, 6, False, INT, (-1, -1))  # Flur -> Bad
-door(1.5, 7.5, True, EXT, (1, -1))  # Haustür
+door(1.5, 4.5, True, INT, (-1, -1))  # Hallway -> Living room
+door(3, 6, False, INT, (-1, -1))  # Hallway -> Bathroom
+door(1.5, 7.5, True, EXT, (1, -1))  # Front door
 window(3, 0, 1.6)
 window(7.75, 0, 1.2)
 # a window on the right wall of the bedroom (vertical)
@@ -109,11 +109,11 @@ def label(x, z, name, area):
         d.text((px - tw / 2, py + dy - f.size / 2), text, font=f, fill=INK)
 
 
-label(3, 2.25, "WOHNEN", "27,00 m²")
-label(7.75, 2.25, "KÜCHE", "15,75 m²")
-label(1.5, 5.6, "FLUR", "9,00 m²")
-label(4.1, 6.0, "BAD", "9,00 m²")
-label(7.75, 5.3, "SCHLAFEN", "10,50 m²")
+label(3, 2.25, "LIVING", "27,00 m²")
+label(7.75, 2.25, "KITCHEN", "15,75 m²")
+label(1.5, 5.6, "HALLWAY", "9,00 m²")
+label(4.1, 6.0, "BATH", "9,00 m²")
+label(7.75, 5.3, "BEDROOM", "10,50 m²")
 
 # a few simple fixtures (thin lines): kitchen counter, bath tub, bed
 d.rectangle([P(6.2, 0.2), P(9.3, 0.8)], outline=INK, width=2)
@@ -161,7 +161,7 @@ for z in (0, 4.5, 7.5):
     d.line([P(-0.25, z), P(-0.95, z)], fill=INK, width=1)
 
 # title block
-d.text(P(6.6, 8.75), "GRUNDRISS ERDGESCHOSS   M 1:100", font=F(30, True), fill=INK)
+d.text(P(6.6, 8.75), "FLOOR PLAN GROUND FLOOR   M 1:100", font=F(30, True), fill=INK)
 img.save(Path(__file__).with_name("bauplan-eg.png"))
 print(img.size)
 
@@ -280,11 +280,11 @@ def label2(x, z, name, area):
 
 
 label2(1.75, 3.0, "GARAGE", "21,00 m²")
-label2(6.0, 2.2, "WOHNEN / ESSEN", "44,00 m²")
-label2(12.0, 2.0, "KÜCHE", "16,00 m²")
-label2(10.75, 4.75, "FLUR", "9,75 m²")
-label2(9.0, 7.0, "BAD", "9,00 m²")
-label2(12.25, 7.0, "SCHLAFEN", "10,50 m²")
+label2(6.0, 2.2, "LIVING / DINING", "44,00 m²")
+label2(12.0, 2.0, "KITCHEN", "16,00 m²")
+label2(10.75, 4.75, "HALLWAY", "9,75 m²")
+label2(9.0, 7.0, "BATH", "9,00 m²")
+label2(12.25, 7.0, "BEDROOM", "10,50 m²")
 d.text(P(4.0, 5.2), "Raumteiler h = 1,20", font=F(20), fill=INK)
 d.text(P(8.55, 0.9), "Theke h = 1,10", font=F(20), fill=INK)
 
@@ -296,7 +296,7 @@ dim_h(0, 14, 9.4, "14,00")
 dim_v(0, 6, -0.8, "6,00")
 for x in (0, 3.5, 10, 14):
     d.line([P(x, -0.25), P(x, -0.95)], fill=INK, width=1)
-d.text(P(9.0, 9.75), "GRUNDRISS ERDGESCHOSS   M 1:100", font=F(22, True), fill=INK)
+d.text(P(9.0, 9.75), "FLOOR PLAN GROUND FLOOR   M 1:100", font=F(22, True), fill=INK)
 
 # scanned crooked: turn the sheet and keep track of a few points
 w0, h0 = img.size

@@ -5,15 +5,14 @@ export const DEMO_LOCAL_PACKS = [
   "format": "fp3dpack",
   "version": 1,
   "id": "mastershort.garden",
-  "name": "Garten & Terrasse",
+  "name": "Garden & Terrace",
   "publisher": "Mastershort",
-  "description": "Lounge-Möbel, Essgruppen, Liegen, Hängesessel, Hollywoodschaukel, Sonnenschirme, Markise, Sonnensegel, Pergolen mit Lamellendach, Pavillon, Gas-, Kugel- und Pelletgrill, Outdoor-Küche, Hochbeete, Gewächshäuser, Gartenhäuser, Whirlpool, Feuerstellen, Schaukel, Sandkasten, Spielhaus, Mähroboter, Gartenleuchten, Zäune, Hecke – und Bäume, Palme, Olivenbaum, Sträucher.",
+  "description": "Lounge furniture, dining sets, loungers, hanging chairs, porch swings, parasols, awnings, shade sails, pergolas with louvered roofs, gazebos, gas, kettle and pellet grills, outdoor kitchens, raised beds, greenhouses, garden houses, hot tubs, fire pits, swings, sandpits, playhouses, robotic mowers, garden lights, fences, hedges – plus trees, palms, olive trees and shrubs.",
   "release": 5,
   "items": [
    {
     "id": "tree_oak",
     "name": {
-     "de": "Eiche",
      "en": "Oak"
     },
     "size": [
@@ -111,14 +110,12 @@ export const DEMO_LOCAL_PACKS = [
     ],
     "family": "tree",
     "variant": {
-     "de": "Eiche",
      "en": "oak"
     }
    },
    {
     "id": "tree_birch",
     "name": {
-     "de": "Birke",
      "en": "Birch"
     },
     "size": [
@@ -246,14 +243,12 @@ export const DEMO_LOCAL_PACKS = [
     ],
     "family": "tree",
     "variant": {
-     "de": "Birke",
      "en": "birch"
     }
    },
    {
     "id": "tree_fruit",
     "name": {
-     "de": "Obstbaum",
      "en": "Fruit tree"
     },
     "size": [
@@ -379,14 +374,12 @@ export const DEMO_LOCAL_PACKS = [
     ],
     "family": "tree",
     "variant": {
-     "de": "Obstbaum",
      "en": "fruit tree"
     }
    },
    {
     "id": "shrub",
     "name": {
-     "de": "Strauch",
      "en": "Shrub"
     },
     "size": [
@@ -449,7 +442,6 @@ export const DEMO_LOCAL_PACKS = [
     ],
     "family": "shrub",
     "variant": {
-     "de": "Strauch",
      "en": "shrub"
     }
    }
@@ -459,15 +451,14 @@ export const DEMO_LOCAL_PACKS = [
   "format": "fp3dpack",
   "version": 1,
   "id": "mastershort.vehicles",
-  "name": "Fahrzeuge",
+  "name": "Vehicles",
   "publisher": "Mastershort",
-  "description": "Autos für Garage, Einfahrt und Grundstück im Neon-Look: Familien-Van, Kombi, SUV, Kleinwagen, Limousine, Coupé, Cabrio, Bus, Transporter, Pickup, Camper, Wohnmobil, Wohnwagen, Anhänger.",
+  "description": "Cars for the garage, driveway and plot in a neon look: family van, estate, SUV, compact, saloon, coupe, convertible, bus, van, pickup, camper, motorhome, caravan, trailer.",
   "release": 2,
   "items": [
    {
     "id": "van",
     "name": {
-     "de": "Familien-Van",
      "en": "Family van"
     },
     "size": [

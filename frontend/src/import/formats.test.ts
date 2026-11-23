@@ -26,10 +26,10 @@ function dxf(): string {
   line("A-WALL", 6060, 150, 6060, 3550);
   line("A-WALL", 6060, 4450, 6060, 7850);
   // a dimension that must be ignored
-  line("BEMASSUNG", -1000, -1000, 11000, -1000);
-  out.push("0", "TEXT", "8", "TEXT", "10", "3000", "20", "4000", "1", "Wohnzimmer");
-  out.push("0", "TEXT", "8", "TEXT", "10", "8000", "20", "4000", "1", "Küche");
-  out.push("0", "TEXT", "8", "TEXT", "10", "8000", "20", "3000", "1", "14,5 m²");
+  line("DIMENSIONS", -1000, -1000, 11000, -1000);
+  out.push("0", "TEXT", "8", "TEXT", "10", "3000", "20", "4000", "1", "Living room");
+  out.push("0", "TEXT", "8", "TEXT", "10", "8000", "20", "4000", "1", "Kitchen");
+  out.push("0", "TEXT", "8", "TEXT", "10", "8000", "20", "3000", "1", "14.5 m²");
   out.push("0", "ENDSEC", "0", "EOF");
   return out.join("\n");
 }
@@ -38,10 +38,10 @@ test("a DXF with walls as two faces: units guessed, rooms found and joined, the 
   const read = readDxf(dxf());
   assert.equal(read.unit, 0.001);
   assert.equal(read.layers.find((l) => l.name === "A-WALL")?.role, "wall");
-  assert.equal(read.layers.find((l) => l.name === "BEMASSUNG")?.role, "ignore");
+  assert.equal(read.layers.find((l) => l.name === "DIMENSIONS")?.role, "ignore");
   const { building: b, stats } = buildPlan(read.plan);
   const f = b.floors[0];
-  assert.deepEqual(f.rooms.map((r) => r.name).sort(), ["Küche", "Wohnzimmer"]);
+  assert.deepEqual(f.rooms.map((r) => r.name).sort(), ["Kitchen", "Living room"]);
   const areas = f.rooms.map((r) => Math.round(polygonArea(r.points) * 10) / 10).sort((a, c) => a - c);
   // joined on the inner wall's centre line at x = 6 m (inner faces from 0.15 to 9.85 / 7.85)
   assert.deepEqual(areas, [Math.round(3.85 * 7.7 * 10) / 10, Math.round(5.85 * 7.7 * 10) / 10]);
@@ -51,11 +51,11 @@ test("a DXF with walls as two faces: units guessed, rooms found and joined, the 
 });
 
 test("layer roles are guessed from their names", () => {
-  assert.equal(guessRole("Wände tragend"), "wall");
+  assert.equal(guessRole("Walls bearing"), "wall");
   assert.equal(guessRole("A-DOOR"), "door");
-  assert.equal(guessRole("Fenster"), "window");
-  assert.equal(guessRole("Räume"), "room");
-  assert.equal(guessRole("Möbel"), "ignore");
+  assert.equal(guessRole("Windows"), "window");
+  assert.equal(guessRole("Rooms"), "room");
+  assert.equal(guessRole("Furniture"), "ignore");
 });
 
 test("a Valetudo map: its segments become rooms with their names", () => {
@@ -70,7 +70,7 @@ test("a Valetudo map: its segments become rooms with their names", () => {
     pixelSize: 5,
     layers: [
       { __class: "MapLayer", type: "floor", compressedPixels: [] },
-      { __class: "MapLayer", type: "segment", compressedPixels: run(0, 80, 60), metaData: { segmentId: "1", name: "Wohnzimmer" } },
+      { __class: "MapLayer", type: "segment", compressedPixels: run(0, 80, 60), metaData: { segmentId: "1", name: "Living room" } },
       { __class: "MapLayer", type: "segment", compressedPixels: run(83, 40, 60), metaData: { segmentId: "2", name: "" } },
     ],
   };
@@ -78,8 +78,8 @@ test("a Valetudo map: its segments become rooms with their names", () => {
   const { building: b } = buildPlan(readValetudo(map));
   const f = b.floors[0];
   assert.equal(f.rooms.length, 2);
-  assert.equal(f.rooms[0].name, "Wohnzimmer");
-  assert.equal(f.rooms[1].name, "Raum 2");
+  assert.equal(f.rooms[0].name, "Living room");
+  assert.equal(f.rooms[1].name, "Room 2");
   // 4 × 3 m and 2 × 3 m, joined across the 15 cm gap
   const areas = f.rooms.map((r) => polygonArea(r.points)).sort((a, c) => a - c);
   assert.ok(Math.abs(areas[0] - 2.075 * 3) < 0.05 && Math.abs(areas[1] - 4.075 * 3) < 0.05, String(areas));
@@ -89,7 +89,7 @@ test("a Floorplanner export: walls with their openings, areas, items", () => {
   const data = {
     floors: [
       {
-        name: "EG",
+        name: "Ground floor",
         level: 0,
         height: 260,
         designs: [
@@ -100,7 +100,7 @@ test("a Floorplanner export: walls with their openings, areas, items", () => {
               { a: { x: 500, y: 400 }, b: { x: 0, y: 400 }, thickness: 24, height: 260 },
               { a: { x: 0, y: 400 }, b: { x: 0, y: 0 }, thickness: 24, height: 260 },
             ],
-            areas: [{ name: "Büro", poly: [{ x: 12, y: 12 }, { x: 488, y: 12 }, { x: 488, y: 388 }, { x: 12, y: 388 }] }],
+            areas: [{ name: "Office", poly: [{ x: 12, y: 12 }, { x: 488, y: 12 }, { x: 488, y: 388 }, { x: 12, y: 388 }] }],
             items: [{ name: "Desk", x: 250, y: 100, width: 140, height: 70, z_height: 75, rotation: 90 }],
           },
         ],
@@ -109,7 +109,7 @@ test("a Floorplanner export: walls with their openings, areas, items", () => {
   };
   assert.ok(isFloorplanner(data));
   const { building: b, stats } = buildPlan(readFloorplanner(data));
-  assert.equal(b.floors[0].rooms[0].name, "Büro");
+  assert.equal(b.floors[0].rooms[0].name, "Office");
   assert.equal(stats.windows, 1);
   assert.equal(stats.doors, 1);
   assert.equal(b.floors[0].furniture[0].type, "desk");
@@ -143,12 +143,12 @@ test("geometry: faces of a grid of lines, gaps closed, pixel outlines", () => {
   assert.equal(cleanPolygon([[0, 0], [1, 0], [2, 0], [2, 2], [0, 2]]).length, 4);
 });
 
-test("furniture names in several languages", () => {
-  assert.equal(furnitureType("Doppelbett 180"), "bed");
-  assert.equal(furnitureType("Canapé 3 places"), "sofa");
-  assert.equal(furnitureType("Kühlschrank"), "fridge");
-  assert.equal(furnitureType("Nachttisch"), "nightstand");
+test("furniture names in English", () => {
+  assert.equal(furnitureType("Double bed 180"), "bed");
+  assert.equal(furnitureType("Sofa 3 seats"), "sofa");
+  assert.equal(furnitureType("Fridge"), "fridge");
+  assert.equal(furnitureType("Nightstand"), "nightstand");
   assert.equal(furnitureType("Wall cabinet"), "kitchen_wall");
   assert.equal(furnitureType("Ceiling light", 0.1, 2.3), "lamp_ceiling");
-  assert.equal(furnitureType("Kaminofen"), null);
+  assert.equal(furnitureType("Fireplace"), null);
 });

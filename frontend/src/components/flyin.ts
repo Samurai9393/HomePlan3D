@@ -1,4 +1,4 @@
-// "Anflug aus dem All" (an option, off by default): when the view opens, a neon globe turns to the home's place,
+// "Fly-in from space" (an option, off by default): when the view opens, a neon globe turns to the home's place,
 // a beam marks it, the view dives in – and the 3D camera comes down from high above onto the house. A tap skips it.
 // Drawn on a 2D canvas over the stage; nothing of it stays once it is done.
 import { LitElement, css, html } from "lit";

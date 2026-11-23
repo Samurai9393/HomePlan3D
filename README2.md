@@ -9,7 +9,7 @@ Lights glow in their colours, blinds move, doors open, cameras watch, energy flo
 
 **MIT open source · 100 % local · no cloud**
 
-**[📖 Manual](docs/manual.md)** · **[📖 Anleitung](docs/anleitung.md)** · **[Changelog](CHANGELOG.md)** · **[Roadmap](ROADMAP.md)**
+**[📖 Manual](docs/manual.md)** · **[📖 Guide](docs/anleitung.md)** · **[Changelog](CHANGELOG.md)** · **[Roadmap](ROADMAP.md)**
 
 ## Neon was just the beginning.
 
@@ -168,7 +168,7 @@ Plus **Auto** (day while the sun is up, neon after sunset), an accent colour of 
 |---|---|
 | ✏️ **Editor** | Plan editor inside Home Assistant · 3D beside the plan while you draw · floors from your HA floors · rooms as rectangles, free shapes or by wall lengths · one room per HA area with one tap · snapping, undo/redo, right-click menu · lock the plan, fix single items · floor material, ceiling height, area per room |
 | 🧱 **Walls & openings** | Automatic walls with clean corners · thickness and height per wall · split walls · sloping walls · open floor plans · free-standing partitions · doors, windows, glass walls, terrace and garage doors · front doors with sidelights, sliding and double doors · door opening angle · contacts and tilt sensors · smart locks on doors · "ask before switching" |
-| 🛋️ **Furniture** | 80 built-in models with pictures · library by room and kind, search in English and German, favourites · free resizing · mirror, height above floor · ready-made room sets · furniture blocks · wall view with measures to the centimetre · "only show while …" for seasonal decoration · beds and sofas that glow when occupied |
+| 🛋️ **Furniture** | 80 built-in models with pictures · library by room and kind, search by name, favourites · free resizing · mirror, height above floor · ready-made room sets · furniture blocks · wall view with measures to the centimetre · "only show while …" for seasonal decoration · beds and sofas that glow when occupied |
 | 🌳 **Outside** | Lawn, terrace, path, driveway, beds, hedges, fences, balcony, pergola · gates with motor or contact · pools (round, oval, free, sunken) · slopes and heights · outdoor areas that open like rooms |
 | 🏚️ **Roofs & ground** | Flat and gable roofs · roof sections in 8 shapes, turned at any angle · dormers, cross gables, carports · roof windows with blind, contact and motor · cellars in the ground, light wells · metres or feet and inches |
 | 🏘️ **Several plans (3.0)** | Several houses and flats · picker at the top · copy or import a plan · bin for 30 days · the whole property in 3D, every building with its own roof · all floor plans at a glance · warnings from every plan |
@@ -266,7 +266,7 @@ npm run screenshot  # renders preview/index.html (invented demo data) with a loc
 - **Preview without Home Assistant:** open `preview/index.html` through any local web server.
 - **Deploy to a test instance:** create `deploy.local.json` with `{"target": "<config>/custom_components/homeplan3d"}` and run `npm run deploy` in `frontend/`.
 - **Python tests** run in CI with `pytest-homeassistant-custom-component`.
-- **Furniture and module pack format:** [docs/packs.md](docs/packs.md) (German).
+- **Furniture and module pack format:** [docs/packs.md](docs/packs.md).
 
 ## 📄 Licence
 

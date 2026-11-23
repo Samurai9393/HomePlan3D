@@ -275,7 +275,7 @@ test("rooms with a ceiling of their own: walls end at the taller room, a room wi
 });
 
 test("a socket dropped into a low balcony wall is drawn on its face (#593)", () => {
-  const balcony = { id: "b", name: "Balkon", area_id: null, points: [[0.24, -6.011], [2.23, -6.011], [2.23, -0.241], [0.24, -0.241]], wall_heights: [1.28, 0, 1.28, 1.28] } as unknown as Room;
+  const balcony = { id: "b", name: "Balcony", area_id: null, points: [[0.24, -6.011], [2.23, -6.011], [2.23, -0.241], [0.24, -0.241]], wall_heights: [1.28, 0, 1.28, 1.28] } as unknown as Room;
   const { walls } = generateWalls([balcony], { exterior: 0.24, interior: 0.08 });
   // in the middle of the 24 cm wall, its front towards the balcony
   const at = placeWallPlate(walls, { x: 0.46, z: -6.18, rotation: 0, d: 0.014, h: 0.085 }, 2.4, 0.3);

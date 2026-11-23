@@ -1,15 +1,15 @@
-// Tutorial episode 4 – "Möbel: platzieren, drehen, anpassen", in two parts (the checklist does not fit into 8 minutes):
-//   a) Möbel platzieren, drehen und anpassen: the library (sections, search, preview, symbols), placing, moving (wall
-//      snap, Alt, arrow keys, X/Y), every way to turn (handle, Alt, ↺/↻ 90°, R, „Drehung“, 45° in 3D beside),
-//      „Spiegeln“, size, „Höhe über Boden“ (dryer on the washer, wall cabinet, „Höhe automatisch“), a table lamp on
-//      a table, name and „Möbelstück“, „Fixieren“ (L), „Duplizieren“, delete, the right-click menu, all keys, and
-//      „Einrichten …“ (room packages).
-//   b) Elektrische Möbel, Stellplatz und Saugroboter: TV with media player and power sensor (automatic), washer,
-//      radiator, „Zustand von“ with two halves (bed), the parking spot with its sensors, the robot vacuum with its
+// Tutorial episode 4 – "Furniture: place, turn, adjust", in two parts (the checklist does not fit into 8 minutes):
+//   a) place, turn and adjust furniture: the library (sections, search, preview, symbols), placing, moving (wall
+//      snap, Alt, arrow keys, X/Y), every way to turn (handle, Alt, ↺/↻ 90°, R, “Turn”, 45° in 3D beside),
+//      “Mirror”, size, “Height above the floor” (dryer on the washer, wall cabinet, “Automatic height”), a table lamp on
+//      a table, name and “Furniture item”, “Fix” (L), “Duplicate”, delete, the right-click menu, all keys, and
+//      “Furnish …” (room packages).
+//   b) Electrical furniture, parking space and robot vacuum: TV with media player and power sensor (automatic), washer,
+//      radiator, “State from” with two halves (bed), the parking spot with its sensors, the robot vacuum with its
 //      current-room sensor, everything live in 3D.
 // Only built-in (free) furniture: the preview's packs are hidden (no demo pack, no Pro features), like a fresh install.
 // Starts from the house of episode 3 (loaded invisibly); part b starts from the furnished ground floor of part a.
-// Usage (from frontend/): node tutorials/ep04-moebel.mjs <out-dir> a|b [<voice-dir de> [<voice-dir en>]]
+// Usage (from frontend/): node tutorials/ep04-moebel.mjs <out-dir> a|b [<voice-dir>]
 //   (voice dirs: private/tutorial-audio/ep04a/de and …/en, resp. ep04b)
 // EP04_FAST=1: a quick dry run for checking the steps (the timing is not usable).
 // Then: python ../tools/make-tutorial.py <out-dir> <out.mp4>
@@ -20,7 +20,7 @@ import { helpers, tap } from "./ep02-common.mjs";
 const out = process.argv[2] ?? "tutorial-ep04";
 const PART = process.argv[3] === "b" ? "b" : "a";
 const FAST = !!process.env.EP04_FAST;
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D ${appVersion()}</span>`;
+const VERSION = `<br><span style="font-size:20px;opacity:.7">recorded with HomePlan 3D ${appVersion()}</span>`;
 
 // ---------------------------------------------------------------- states (the invented house of episode 3)
 const rectRoom = (id, name, area_id, x0, z0, x1, z1, floor_material = "wood") => ({ id, name, area_id, points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]], floor_material });
@@ -31,15 +31,15 @@ const item = (id, type, x, z, w, d, h, rotation = 0, extra = {}) => ({ id, type,
 const ground = (garage = false) =>
   floorOf(
     "eg",
-    "Erdgeschoss",
+    "Ground floor",
     0,
     "erdgeschoss",
     [
-      rectRoom("r_wohnen", "Wohnzimmer", "wohnzimmer", 0, 0, 6, 4.5),
-      rectRoom("r_kueche", "Küche", "kueche", 6, 0, 9.5, 4.5, "tiles"),
-      rectRoom("r_flur", "Flur", "flur", 0, 4.5, 4, 7.5, "tiles"),
-      rectRoom("r_bad", "Bad", "bad", 4, 4.5, 6.5, 7.5, "tiles"),
-      rectRoom("r_schlafen", "Schlafzimmer", "schlafzimmer", 6.5, 4.5, 9.5, 7.5, "carpet"),
+      rectRoom("r_wohnen", "Living room", "wohnzimmer", 0, 0, 6, 4.5),
+      rectRoom("r_kueche", "Kitchen", "kueche", 6, 0, 9.5, 4.5, "tiles"),
+      rectRoom("r_flur", "Hall", "flur", 0, 4.5, 4, 7.5, "tiles"),
+      rectRoom("r_bad", "Bathroom", "bad", 4, 4.5, 6.5, 7.5, "tiles"),
+      rectRoom("r_schlafen", "Bedroom", "schlafzalways", 6.5, 4.5, 9.5, 7.5, "carpet"),
       ...(garage ? [rectRoom("r_garage", "Garage", "garage", 9.5, 0, 13, 5.5, "concrete")] : []),
     ],
     [
@@ -57,24 +57,24 @@ const ground = (garage = false) =>
 const upper = () =>
   floorOf(
     "og",
-    "Obergeschoss",
+    "Upper floor",
     2.75,
     "obergeschoss",
-    [rectRoom("r_kind", "Kinderzimmer", "kinderzimmer", 0, 0, 4.5, 4.5), rectRoom("r_arbeit", "Arbeitszimmer", "arbeitszimmer", 4.5, 0, 9.5, 4.5), rectRoom("r_flur_og", "Flur oben", null, 0, 4.5, 9.5, 7.5)],
+    [rectRoom("r_kind", "Kids' room", "kinderzalways", 0, 0, 4.5, 4.5), rectRoom("r_arbeit", "Study", "arbeitszalways", 4.5, 0, 9.5, 4.5), rectRoom("r_flur_og", "Upper hallway", null, 0, 4.5, 9.5, 7.5)],
     [hole("p1", "window", "r_kind", 0, 2.25, 1.2), hole("p2", "window", "r_arbeit", 0, 2.5, 1.6), hole("p3", "door", "r_kind", 2, 2.25, 0.9), hole("p4", "door", "r_arbeit", 2, 2.5, 0.9), hole("p5", "window", "r_flur_og", 2, 4.75, 1.2)],
     { start_view: { theta: 3.6, phi: 0.85, radius: 15 } },
   );
 const cellar = () =>
   floorOf(
     "kg",
-    "Keller",
+    "Cellar",
     -2.45,
     "keller",
-    [rectRoom("k_heiz", "Heizungsraum", "heizung", 0, 1.38, 4, 4.44), rectRoom("k_hobby", "Hobbyraum", "hobby", 4, 1.38, 8, 4.44), rectRoom("k_vorrat", "Vorratsraum", "vorrat", 0, 4.44, 4, 7.5), rectRoom("k_wasch", "Waschküche", "waschkueche", 4, 4.44, 8, 7.5)],
+    [rectRoom("k_heiz", "Heating room", "heizung", 0, 1.38, 4, 4.44), rectRoom("k_hobby", "Hobby room", "hobby", 4, 1.38, 8, 4.44), rectRoom("k_vorrat", "Storage room", "vorrat", 0, 4.44, 4, 7.5), rectRoom("k_wasch", "Laundry room", "waschkueche", 4, 4.44, 8, 7.5)],
     [],
     { height: 2.2 },
   );
-const attic = () => floorOf("dg", "Dachgeschoss", 5.5, "dachgeschoss", [rectRoom("d_boden", "Dachboden", null, 0, 0, 9.5, 7.5)], [], { height: 2.2 });
+const attic = () => floorOf("dg", "Attic", 5.5, "dachgeschoss", [rectRoom("d_boden", "Attic floor", null, 0, 0, 9.5, 7.5)], [], { height: 2.2 });
 /** The house as episode 3 left it (with its stairs). */
 const houseEp03 = (garage = false) => {
   const f = [cellar(), ground(garage), upper(), attic()];
@@ -82,7 +82,7 @@ const houseEp03 = (garage = false) => {
   f[2].furniture.push(item("h_gallery", "stairwell", 2.0, 6.2, 3.2, 0.5, 0.02));
   return f;
 };
-/** Room packages of the furnished ground floor (applied with the editor's own „Einrichten …“). */
+/** Room packages of the furnished ground floor (applied with the editor's own “Furnish …”). */
 const PACKAGES = [
   ["r_wohnen", "living"],
   ["r_kueche", "kitchen_row"],
@@ -92,7 +92,7 @@ const PACKAGES = [
 ];
 
 // ---------------------------------------------------------------- recorder
-const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "de" });
+const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "en" });
 const N = narration(R, process.argv.slice(4));
 const { say, sayOver, chapter, catchUp } = N;
 const h = helpers(R);
@@ -137,7 +137,7 @@ const robotSensor = (room) =>
     const hass = p.hass;
     hass.entities["vacuum.saugi"].device_id = "d_saugi";
     hass.entities["sensor.saugi_aktueller_raum"] = { entity_id: "sensor.saugi_aktueller_raum", area_id: "wohnzimmer", device_id: "d_saugi" };
-    hass.states["sensor.saugi_aktueller_raum"] = { entity_id: "sensor.saugi_aktueller_raum", state: room, attributes: { friendly_name: "Saugi Aktueller Raum" } };
+    hass.states["sensor.saugi_aktueller_raum"] = { entity_id: "sensor.saugi_aktueller_raum", state: room, attributes: { friendly_name: "Vacuum current room" } };
     p.hass = { ...hass };
   }, room);
 /** Load a state invisibly (no undo step) and show a floor. */
@@ -145,7 +145,7 @@ const loadState = async (floors, floorId) => {
   await R.editor(`const d = structuredClone(e._doc); d.floors = ${JSON.stringify(floors)}; e.setDoc(d, null); e.past = []; e._canUndo = false; e._floorId = ${JSON.stringify(floorId)}; e._roomId = null; e._furnitureId = null; e.fit();`);
   await R.sleep(900);
 };
-/** Furnish rooms invisibly with the editor's room packages (the same code as „Einrichten …“). */
+/** Furnish rooms invisibly with the editor's room packages (the same code as “Furnish …”). */
 const furnish = async (list) => {
   await R.editor(`for (const [id, pkg] of ${JSON.stringify(list)}) { const room = e.floor.rooms.find((r) => r.id === id); e._roomId = id; e.applyPackage(room, pkg); } e._roomId = null; e._notice = null; e.past = []; e._canUndo = false;`);
   await R.sleep(600);
@@ -202,7 +202,7 @@ const clickEl = async (selector, n = 0, seconds = 0.5) => {
   await moveEl(selector, n, seconds);
   await R.click();
 };
-/** A key cap at the bottom left of the plan ("Alt", "Umschalt + R"), or none. */
+/** A key cap at the bottom left of the plan ("Alt", "Shift + R"), or none. */
 const keyCap = (text) =>
   R.page.evaluate((text) => {
     document.getElementById("tut-key")?.remove();
@@ -220,22 +220,22 @@ const keyCard = (show) =>
     document.getElementById("tut-keys")?.remove();
     if (!show) return;
     const rows = [
-      ["R", "90° rechts herum drehen"],
-      ["Umschalt + R", "90° links herum drehen"],
-      ["L", "Fixieren / Lösen"],
-      ["Entf", "Löschen"],
-      ["Pfeiltasten", "5 cm schieben (Umschalt 10 cm, Alt 1 cm)"],
-      ["Alt beim Ziehen", "frei schieben, am Drehgriff 1°-Schritte"],
-      ["Strg + Z / Strg + Y", "Rückgängig / Wiederholen"],
-      ["Esc", "Menü schließen, Auswahl aufheben"],
-      ["Rechtsklick", "Fixieren, Duplizieren, Drehen, Spiegeln, Löschen"],
+      ["R", "Turn 90° right"],
+      ["Shift + R", "Turn 90° left"],
+      ["L", "Fix / Unfix"],
+      ["Delete", "Delete"],
+      ["Arrow keys", "Nudge 5 cm (Shift 10 cm, Alt 1 cm)"],
+      ["Alt while dragging", "Move freely, turn handle in 1° steps"],
+      ["Ctrl + Z / Ctrl + Y", "Undo / Redo"],
+      ["Esc", "Close menu, clear selection"],
+      ["Right-click", "Fix, Duplicate, Turn, Mirror, Delete"],
     ];
     const d = document.createElement("div");
     d.id = "tut-keys";
     d.style.cssText =
       "position:fixed;left:120px;top:190px;z-index:2147483643;padding:28px 36px;border-radius:20px;background:rgba(8,16,34,.92);border:1px solid rgba(55,224,255,.6);box-shadow:0 0 40px rgba(55,224,255,.35);color:#eaf6ff;font:400 25px/1.25 system-ui,'Segoe UI',sans-serif";
     d.innerHTML =
-      `<div style="font-weight:700;font-size:32px;margin-bottom:18px">Möbel: alle Tasten</div>` +
+      `<div style="font-weight:700;font-size:32px;margin-bottom:18px">Furniture: all keys</div>` +
       rows
         .map(
           ([k, t]) =>
@@ -244,14 +244,14 @@ const keyCard = (show) =>
         .join("");
     document.body.appendChild(d);
   }, show);
-/** The app's confirm() as a visible box with OK and „Abbrechen“ (native dialogs are not in headless screenshots). */
+/** The app's confirm() as a visible box with OK and “Cancel” (native dialogs are not in headless screenshots). */
 const fakeConfirm = (text) =>
   R.page.evaluate((t) => {
     const d = document.createElement("div");
     d.id = "tut-dialog";
     d.style.cssText =
       "position:fixed;left:50%;top:22%;transform:translateX(-50%);z-index:2147483644;max-width:620px;padding:22px 26px;border-radius:12px;background:#f4f6fa;color:#111;font:18px/1.4 system-ui,'Segoe UI',sans-serif;box-shadow:0 12px 50px rgba(0,0,0,.6)";
-    d.innerHTML = `<div style="font-size:14px;color:#555;margin-bottom:8px">127.0.0.1 meldet</div>${t}<div style="text-align:right;margin-top:18px"><span id="tut-ok" style="display:inline-block;padding:7px 22px;border-radius:6px;background:#1a73e8;color:#fff;margin-right:10px">OK</span><span id="tut-cancel" style="display:inline-block;padding:7px 18px;border-radius:6px;border:1px solid #1a73e8;color:#1a73e8">Abbrechen</span></div>`;
+    d.innerHTML = `<div style="font-size:14px;color:#555;margin-bottom:8px">127.0.0.1 says</div>${t}<div style="text-align:right;margin-top:18px"><span id="tut-ok" style="display:inline-block;padding:7px 22px;border-radius:6px;background:#1a73e8;color:#fff;margin-right:10px">OK</span><span id="tut-cancel" style="display:inline-block;padding:7px 18px;border-radius:6px;border:1px solid #1a73e8;color:#1a73e8">Cancel</span></div>`;
     document.body.appendChild(d);
   }, text);
 const noDialog = () => R.page.evaluate(() => document.getElementById("tut-dialog")?.remove());
@@ -425,8 +425,8 @@ const live = async (seconds) => {
   const end = R.time + seconds;
   while (R.time < end - 0.02) await R.frame(1 / 25, 30);
 };
-/** „Alles zeigen“: the whole plan in view again (adding an item pans the plan to it). */
-const fitPlan = () => R.clickOn({ text: "Alles zeigen", exact: true }, 0.4);
+/** “Whole plan”: the whole plan in view again (adding an item pans the plan to it). */
+const fitPlan = () => R.clickOn({ text: "Whole plan", exact: true }, 0.4);
 /** Tap an empty spot of a room; if the tap missed (it should not), select the room the way the tap would. */
 const tapRoom = async (x, z, id, seconds = 0.5) => {
   await tapPlan(x, z, seconds);
@@ -437,13 +437,13 @@ const tapRoom = async (x, z, id, seconds = 0.5) => {
     await R.frame(1 / 25, 200);
   }
 };
-/** Up to the floor form: select tool, then "Zurück zu …" until nothing is selected. */
+/** Up to the floor form: select tool, then "Back to …" until nothing is selected. */
 const toFloor = async () => {
-  await R.clickOn({ text: "Auswählen", exact: true }, 0.45);
+  await R.clickOn({ text: "Select", exact: true }, 0.45);
   for (let i = 0; i < 3; i++) {
-    const up = await R.locate({ text: "Zurück zu" }).catch(() => null);
+    const up = await R.locate({ text: "Back to" }).catch(() => null);
     if (!up) break;
-    await R.clickOn({ text: "Zurück zu" }, 0.45);
+    await R.clickOn({ text: "Back to" }, 0.45);
   }
 };
 
@@ -460,7 +460,7 @@ if (process.argv[3] === "dump") {
   process.exit(0);
 }
 
-// ================================================================ PART 1: Möbel platzieren, drehen und anpassen
+// ================================================================ PART 1: place, turn and adjust furniture
 if (PART === "a") {
   // ---------------------------------------------------------------- teaser: the furnished ground floor in 3D
   await chapter("Teaser");
@@ -472,7 +472,7 @@ if (PART === "a") {
   await furnish(PACKAGES);
   await tap(R, { text: "3D", exact: true, nth: 0 });
   await R.sleep(1500);
-  await tap(R, { text: "Erdgeschoss", exact: true, nth: 0 });
+  await tap(R, { text: "Ground floor", exact: true, nth: 0 });
   await R.sleep(2500);
   {
     const A = { theta: 0.35, phi: 0.95, radius: 15 };
@@ -480,16 +480,16 @@ if (PART === "a") {
     const C = { theta: 1.9, phi: 0.85, radius: 14 };
     await setPane("eg", 4.75, 3.75, A, true);
     await R.sleep(900);
-    await R.title("Möbel: platzieren, drehen, anpassen", `HomePlan 3D · Folge 4 · Teil 1${VERSION}`);
-    await sayOver("Ein Erdgeschoss, fertig eingerichtet: Sofa, Küche, Bett und Bad – und die Lampen leuchten mit Home Assistant.");
+    await R.title("Furniture: place, turn, adjust", `HomePlan 3D · episode 4 · part 1${VERSION}`);
+    await sayOver("A ground floor, fully furnished: sofa, kitchen, bed and bathroom – and the lamps glow with Home Assistant.");
     await glidePane("eg", 4.75, 3.75, A, B, 5.5, true);
     await R.untitle();
-    await sayOver("In diesem Video zeige ich dir alles rund um Möbel: setzen, verschieben, drehen, Größe und Höhe.");
+    await sayOver("In this video I'll show you everything about furniture: placing, moving, turning, size and height.");
     await glidePane("eg", 4.75, 3.75, B, C, 4.5, true);
   }
 
   // ---------------------------------------------------------------- intro
-  await chapter("Was wir heute machen");
+  await chapter("Was wir today machen");
   await R.open("empty");
   await freeOnly();
   await editorOpen();
@@ -497,147 +497,147 @@ if (PART === "a") {
   await view2d(112, 270, 60);
   await R.sleep(500);
   await R.hideCursor(false);
-  await sayOver("Wir machen mit dem Haus aus Folge drei weiter. Das Erdgeschoss ist noch leer, nur die Treppe steht schon im Flur.");
+  await sayOver("We carry on with the house from episode three. The ground floor is still empty, only the stairs are already in the hall.");
   await pointPlan(2, 6.85, 0.6);
   await R.hold(0.4);
-  await sayOver("Alles, was du heute siehst, ist eingebaut und kostenlos.");
+  await sayOver("Everything you see today is built in and free.");
   await pointPlan(3, 2.2, 0.6);
 
   // ---------------------------------------------------------------- the library
-  await chapter("Die Möbel-Bibliothek");
-  await sayOver("Erst tippe ich den Raum an, in den das Möbel soll: das Wohnzimmer. Dann oben auf „Möbel“.");
+  await chapter("The furniture library");
+  await sayOver("Ridge, I tap the room the furniture should go into: the living room. Then “Furniture” at the top.");
   await tapRoom(3, 1.2, "r_wohnen");
-  await R.clickOn({ text: "Möbel", exact: true }, 0.6);
-  await sayOver("Rechts öffnet sich die Bibliothek. Oben steht: Neue Möbel kommen in die Mitte vom Wohnzimmer.");
-  await moveToText("Neue Möbel kommen in die Mitte", 0.6);
+  await R.clickOn({ text: "Furniture", exact: true }, 0.6);
+  await sayOver("The library opens on the right. At the top it says: new furniture goes into the middle of the living room.");
+  await moveToText("New furniture appears in the middle", 0.6);
   await R.hold(0.6);
-  await sayOver("Darunter die Abschnitte: Leuchten, Wohnen, Essen, Küche, Schlafen, Bad und Hauswirtschaft, Arbeiten und Stellplätze.");
-  await R.moveTo({ text: "Leuchten" }, 0.5);
+  await sayOver("Below are the sections: lights, living, dining, kitchen, sleeping, bathroom and utility, work, and parking spots.");
+  await R.moveTo({ text: "Lights" }, 0.5);
   await R.hold(0.4);
-  await R.moveTo({ text: "Wohnen" }, 0.5);
+  await R.moveTo({ text: "Living" }, 0.5);
   await R.hold(0.4);
-  await R.moveTo({ text: "Stellplätze" }, 0.6);
-  await sayOver("Ein Klick klappt einen Abschnitt auf und wieder zu.");
-  await R.clickOn({ text: "Essen" }, 0.5);
+  await R.moveTo({ text: "Parking" }, 0.6);
+  await sayOver("One click opens a section, another one closes it again.");
+  await R.clickOn({ text: "Dining" }, 0.5);
   await R.hold(0.7);
-  await R.clickOn({ text: "Essen" }, 0.4);
-  await sayOver("Fährst du mit der Maus über einen Eintrag, zeigt eine kleine Vorschau das Möbel in 3D.");
+  await R.clickOn({ text: "Dining" }, 0.4);
+  await sayOver("When you move the mouse over an entry, a small preview shows the item in 3D.");
   await R.moveTo({ text: "Sofa", exact: true }, 0.5);
   await R.frame(0.9, 600);
-  await R.moveTo({ text: "Sessel", exact: true }, 0.4);
+  await R.moveTo({ text: "Armchair", exact: true }, 0.4);
   await R.frame(0.9, 600);
-  await sayOver("Die kleine Glühbirne heißt: eine Leuchte, die du mit einem Licht verknüpfst. Das Symbol am TV-Board: ein elektrisches Möbel. Dazu mehr in Teil zwei.");
-  await R.moveTo(".fp3d-lib-electric .fp3d-lib-badge", 0.5).catch(() => R.moveTo({ text: "Deckenleuchte" }, 0.5));
+  await sayOver("The little bulb means: a lamp you link to a light. The symbol on the TV board means: an electric item. More on that in part two.");
+  await R.moveTo(".fp3d-lib-electric .fp3d-lib-badge", 0.5).catch(() => R.moveTo({ text: "Ceiling light" }, 0.5));
   await R.frame(0.9, 600);
-  await R.moveTo({ text: "TV-Board" }, 0.6);
+  await R.moveTo({ text: "TV board" }, 0.6);
   await R.frame(1.2, 600);
-  await sayOver("Das Suchfeld kennt deutsche und englische Namen. Ich tippe „bench“ – und finde Sitzbank und Eckbank.");
+  await sayOver("The search field knows names. I type “bench” – and find the bench and the corner bench.");
   await R.clickOn("input.fp3d-search", 0.5);
   await R.type("bench", 0.08);
   await R.frame(0.5, 150);
-  await sayOver("Mehrere Wörter gehen auch, in beliebiger Reihenfolge. Escape leert das Feld wieder.");
+  await sayOver("Several words work too, in any order. Escape clears the field again.");
   await typeOver("tisch rund");
   await R.hold(0.6);
-  await sayOver("Ein Sonderfall ist die „Arbeitsplatte“: eine freie Platte ohne Unterbau, für Lücken in der Küche oder einen selbst gebauten Schreibtisch. Ihre Höhe ist die Oberkante.");
+  await sayOver("A special case is the “Worktop”: a free-standing top without a base, for gaps in the kitchen or a home-made desk. Its height is the top edge.");
   await typeOver("arbeitsplatte");
-  await R.moveTo({ text: "Arbeitsplatte", exact: true, nth: 0 }, 0.5);
+  await R.moveTo({ text: "Worktop", exact: true, nth: 0 }, 0.5);
   await R.frame(1.2, 600);
-  await R.moveTo({ text: "Arbeitsplatte", exact: true, nth: 1 }, 0.5);
+  await R.moveTo({ text: "Worktop", exact: true, nth: 1 }, 0.5);
   await R.frame(0.6, 400);
   await catchUp();
   await R.clickOn("input.fp3d-search", 0.4);
   await R.key("Escape");
-  await sayOver("Ganz unten führt „Erweiterungen öffnen“ zu mehr Möbeln – die zeige ich dir in Folge fünf. Heute nehmen wir nur die eingebauten.");
-  await scrollSide({ text: "Erweiterungen öffnen" }, 900, 0.8);
-  await R.moveTo({ text: "Erweiterungen öffnen" }, 0.5);
+  await sayOver("At the very bottom, “Open extensions” – leads to more furniture; I'll show you that in episode five. Today we only use the built-in items.");
+  await scrollSide({ text: "Open extensions" }, 900, 0.8);
+  await R.moveTo({ text: "Open extensions" }, 0.5);
   await R.hold(0.6);
   await sideTop(0.6);
 
   // ---------------------------------------------------------------- placing and moving
-  await chapter("Möbel setzen und verschieben");
-  await sayOver("Ein Klick auf „Sofa“ – es steht in der Mitte des Raums und ist gleich ausgewählt. Im Plan steht sein Maß.");
+  await chapter("Place and move furniture");
+  await sayOver("One click on “Sofa” – it stands in the middle of the room and is selected right away. The plan shows its size.");
   await R.clickOn({ text: "Sofa", exact: true }, 0.5);
   await pointPlan(3, 1.55, 0.6);
   await R.hold(0.4);
-  await sayOver("Die Linie vorne markiert die Vorderseite – beim Sofa die Sitzseite.");
+  await sayOver("The line at the front marks the front – on the sofa, the side you sit on.");
   await pointPlan(3.6, 2.7, 0.5);
   await R.hold(0.6);
-  await sayOver("Ziehen verschiebt es. In der Nähe einer Wand rastet es bündig ein, mit dem Rücken zur Wand – steht es nur ungefähr richtig, richtet es sich dabei gerade aus.");
+  await sayOver("Dragging moves it. Near a wall it snaps in flush, with its back to the wall – and if it's only roughly lined up, it straightens itself out.");
   await dragPlan(3, 2.25, 1.6, 0.6, 1.4);
   const sofa = await selected();
   console.log("sofa after snap:", sofa.x, sofa.z, sofa.rotation);
   await R.hold(0.5);
-  await sayOver("Mit gedrückter Alt-Taste schiebst du frei, ohne Einrasten.");
+  await sayOver("Hold down the Alt key to move it freely, without snapping.");
   await keyCap("Alt");
   await holding("Alt", () => dragPlan(sofa.x, sofa.z, sofa.x + 0.1, sofa.z + 0.5, 1));
   await keyCap(null);
-  await sayOver("Fein geht es mit den Pfeiltasten: Ein Druck sind fünf Zentimeter, mit Umschalt zehn, mit Alt einer.");
+  await sayOver("For fine moves use the arrow keys: one press is five centimetres, with Shift ten, with Alt one.");
   await press("↑", "ArrowUp", [], 2);
-  await press("Umschalt + ↑", "ArrowUp", ["Shift"], 2);
+  await press("Shift + ↑", "ArrowUp", ["Shift"], 2);
   await press("Alt + ↑", "ArrowUp", ["Alt"], 2);
   await keyCap(null);
-  await sayOver("Und ganz genau mit „X“ und „Y“ im Formular – jetzt sitzt das Sofa wieder an der Wand.");
+  await sayOver("And for exact positions use “X” and “Y” in the form – now the sofa is back against the wall.");
   await sideTop(0.3);
   await fill("X (m)", de(sofa.x));
   await fill("Y (m)", de(sofa.z));
   await R.hold(0.3);
 
   // ---------------------------------------------------------------- turning
-  await chapter("Drehen – alle Wege");
-  await sayOver("Jetzt das Drehen. Dafür gibt es gleich mehrere Wege – ich nehme einen Sessel.");
+  await chapter("Turning – every method");
+  await sayOver("Now turning. There are several ways to do it – I'll take an armchair.");
   await tapRoom(3.2, 3.6, "r_wohnen");
-  await R.clickOn({ text: "Sessel", exact: true }, 0.5);
-  await sayOver("Vor dem Möbel sitzt der Drehgriff. Ziehst du daran, dreht es sich in 15-Grad-Schritten – die Vorderseite zeigt immer zum Mauszeiger.");
+  await R.clickOn({ text: "Armchair", exact: true }, 0.5);
+  await sayOver("In front of the item sits the turn handle. Drag it and the item turns in 15-degree steps – the front always points at the mouse.");
   await turnHandle(-150, 2.6);
   await R.hold(0.4);
-  await sayOver("Hältst du dabei Alt gedrückt, dreht er in einzelnen Grad.");
+  await sayOver("Hold Alt while you do it, and it turns in single degrees.");
   await keyCap("Alt");
   await holding("Alt", () => turnHandle(37, 1.4));
   await keyCap(null);
-  await R.moveTo({ label: "Drehung" }, 0.5);
-  await sayOver("Unten im Formular drehen die beiden Pfeil-Knöpfe um genau 90 Grad – links herum oder rechts herum.");
+  await R.moveTo({ label: "Turn" }, 0.5);
+  await sayOver("At the bottom of the form, the two arrow buttons turn it by exactly 90 degrees – anticlockwise or clockwise.");
   await R.clickOn({ text: "↺ 90°", exact: true }, 0.5);
   await R.hold(0.5);
   await R.clickOn({ text: "↻ 90°", exact: true }, 0.5);
-  await sayOver("Noch schneller geht es mit der Taste R. Mit Umschalt dreht sie andersherum.");
+  await sayOver("Even quicker is the R key. With Shift it turns the other way.");
   await h.side(0.3);
   await press("R", "r");
   await R.hold(0.3);
-  await press("Umschalt + R", "R", ["Shift"]);
+  await press("Shift + R", "R", ["Shift"]);
   await keyCap(null);
-  await sayOver("Für jeden Winkel gibt es das Feld „Drehung“. Ich tippe 45 – jetzt steht der Sessel schräg.");
-  await fill("Drehung", "45");
+  await sayOver("For any angle there's the “Rotation” field – “Turn”. I type 45 – now the armchair stands at a slant.");
+  await fill("Turn", "45");
   await R.hold(0.4);
-  await sayOver("Null Grad heißt übrigens: Die Vorderseite zeigt im Plan nach unten.");
-  await R.moveTo({ label: "Drehung" }, 0.4);
+  await sayOver("By the way, zero degrees means the front points down in the plan.");
+  await R.moveTo({ label: "Turn" }, 0.4);
   await R.hold(0.4);
 
   // ---------------------------------------------------------------- mirror
-  await chapter("Spiegeln");
-  await sayOver("„Spiegeln“ ist etwas anderes: Es tauscht nur links und rechts. Das sieht man am besten an der Eckbank.");
+  await chapter("Mirror");
+  await sayOver("“Mirror” – is something else: it only swaps left and right. You see that best on the corner bench.");
   await tapRoom(5, 3.9, "r_wohnen");
   await search("eckbank");
-  await R.clickOn({ text: "Eckbank", exact: true }, 0.5);
-  await sayOver("Ich ziehe sie in die Ecke oben rechts – sie rastet an der Wand ein.");
+  await R.clickOn({ text: "Corner bench", exact: true }, 0.5);
+  await sayOver("I drag it into the top right corner – it snaps against the wall.");
   await dragPlan(3, 2.25, 5.0, 0.85, 1.3);
   const bench = await selected();
   console.log("bench after snap:", bench.x, bench.z, bench.rotation);
-  await sayOver("Haken bei „Spiegeln“ – und das kurze Stück zeigt zur anderen Seite. So bekommst du auch den Schrank mit der Tür auf der anderen Seite.");
-  await R.clickOn({ label: "Spiegeln" }, 0.5);
+  await sayOver("Tick “Mirror” – and the short part points to the other side. That's also how you get the cupboard with its door on the other side.");
+  await R.clickOn({ label: "Mirror" }, 0.5);
   await R.hold(1);
-  await sayOver("Drehen dreht die Vorderseite, Spiegeln tauscht nur die Seiten.");
+  await sayOver("Turning turns the front, mirroring only swaps the sides.");
   await pointPlan(bench.x, bench.z, 0.5);
   await R.hold(0.4);
 
   // ---------------------------------------------------------------- 3D beside: 45° steps
-  await chapter("In 3D daneben drehen");
-  await sayOver("Schalten wir „3D daneben“ ein. „Alles zeigen“ holt den Plan wieder ganz ins Bild.");
-  await R.clickOn({ text: "3D daneben", exact: true }, 0.6);
+  await chapter("In 3D beside drehen");
+  await sayOver("Let's switch on “3D beside”. “Whole plan” – brings the whole plan back into view.");
+  await R.clickOn({ text: "3D beside", exact: true }, 0.6);
   await R.sleep(1500);
-  await R.clickOn({ text: "Alles zeigen", exact: true }, 0.5);
+  await R.clickOn({ text: "Whole plan", exact: true }, 0.5);
   await setPane("eg", 2.6, 1.6, { theta: 0.3, phi: 0.8, radius: 8.5 });
   await R.frame(0.4, 300);
-  await sayOver("Auch in der 3D-Hälfte tippst du ein Möbel an. Unten erscheint dann eine Leiste.");
+  await sayOver("You can tap an item in the 3D half as well. A bar then appears at the bottom.");
   {
     const chair = await R.editor(`return e.floor.furniture.find((f) => f.type === "armchair").id;`);
     const p = await panePoint("eg", 3, 0.6, 2.25);
@@ -650,18 +650,18 @@ if (PART === "a") {
     }
     await R.frame(1 / 25, 300);
   }
-  await sayOver("Hier drehen die Pfeile in 45-Grad-Schritten.");
+  await sayOver("Here the arrows turn it in 45-degree steps.");
   await R.clickOn({ text: "↻ 45°", exact: true }, 0.5);
   await R.hold(0.5);
   await R.clickOn({ text: "↻ 45°", exact: true }, 0.4);
   await R.hold(0.4);
-  await sayOver("Daneben Breite, Tiefe, Höhe und die Höhe über Boden, dazu Fixieren und Löschen.");
+  await sayOver("Next to them: width, depth, height and the height above the floor, plus fix and delete.");
   await moveEl(".fp3d-3d-bar .fp3d-3d-size", 0);
   await R.hold(0.3);
   await moveEl(".fp3d-3d-bar .fp3d-3d-size", 3);
   await R.hold(0.3);
   await moveEl(".fp3d-3d-bar .fp3d-fix");
-  await sayOver("Ziehen geht in 3D auch – dabei bleibt ein Möbel in seinem Raum. In einen anderen Raum ziehst du es im Plan.");
+  await sayOver("Dragging works in 3D too – the item stays in its room. To move it into another room, drag it in the plan.");
   {
     const a = await panePoint("eg", 3, 0.6, 2.25);
     const b = await panePoint("eg", 3.6, 0.6, 2.9);
@@ -671,8 +671,8 @@ if (PART === "a") {
   await R.hold(0.4);
 
   // ---------------------------------------------------------------- size
-  await chapter("Größe ändern");
-  await sayOver("Die Größe änderst du an den Ecken des ausgewählten Möbels. Ich mache das Sofa etwas länger.");
+  await chapter("Change size");
+  await sayOver("You change the size at the corners of the selected item. I make the sofa a bit longer.");
   await tapPlan(sofa.x, sofa.z, 0.5);
   await setPane("eg", 1.8, 0.8, { theta: 0.25, phi: 0.75, radius: 7 });
   {
@@ -684,93 +684,93 @@ if (PART === "a") {
     await R.move(corner.x, corner.y, 0.5);
     await R.drag(corner.x + Math.cos(a) * k, corner.y + Math.sin(a) * k, 1);
   }
-  await sayOver("Genau geht es mit „Breite“, „Tiefe“ und „Höhe“ im Formular. Ich stelle die Breite auf 2,40.");
+  await sayOver("For exact sizes use “Width”, “Depth” and “Height” in the form. I set the width to 2.40.");
   await sideTop(0.3);
-  await fill("Breite", "2,4");
+  await fill("Width", "2,4");
   await R.hold(0.4);
 
   // ---------------------------------------------------------------- height above the floor
-  await chapter("Höhe über Boden");
-  await sayOver("„Höhe über Boden“ hebt ein Möbel an. Damit stellst du zum Beispiel den Trockner auf die Waschmaschine.");
+  await chapter("Height above the floor");
+  await sayOver("“Height above floor” – lifts an item. With it you can, for example, put the dryer on top of the washing machine.");
   await tapRoom(5.25, 5.4, "r_bad");
   await setPane("eg", 5.8, 5.3, { theta: 0.2, phi: 0.75, radius: 5 });
-  await search("waschmaschine");
-  await R.clickOn({ text: "Waschmaschine", exact: true }, 0.5);
-  await sayOver("Erst die Waschmaschine an die Wand, dann der Trockner – mit „X“ und „Y“ genau auf dieselbe Stelle.");
+  await search("washing machine");
+  await R.clickOn({ text: "Washing machine", exact: true }, 0.5);
+  await sayOver("Ridge, the washing machine against the wall, then the dryer – with “X” and “Y” exactly on the same spot.");
   await dragPlan(5.25, 6, 6.1, 4.85, 1);
   const washer = await selected();
   console.log("washer:", washer.x, washer.z, washer.rotation);
   await tapRoom(4.5, 5.2, "r_bad");
   await search("trockner");
-  await R.clickOn({ text: "Trockner", exact: true }, 0.5);
+  await R.clickOn({ text: "Dryer", exact: true }, 0.5);
   await fill("X (m)", de(washer.x));
   await fill("Y (m)", de(washer.z));
-  await fill("Drehung", String(washer.rotation));
-  await sayOver("Die Waschmaschine ist 85 Zentimeter hoch. Also „Höhe über Boden“ 0,85 – und der Trockner steht obendrauf.");
-  await fill("Höhe über Boden", "0,85");
+  await fill("Turn", String(washer.rotation));
+  await sayOver("The washing machine is 85 centimetres tall. So height above floor 0.85 – and the dryer sits on top.");
+  await fill("Height above the floor", "0,85");
   await R.hold(1);
-  await sayOver("Manche Möbel hängen von selbst: Ein Oberschrank sitzt auf 1,45 Meter, ein Wand-Fernseher mittig auf 1,30.");
+  await sayOver("Some items hang by themselves: a wall cabinet sits at 1.45 metres, a wall TV is centred at 1.30.");
   await tapRoom(7.75, 3.6, "r_kueche");
   await setPane("eg", 6.6, 0.9, { theta: 0.15, phi: 0.95, radius: 5 });
   await search("oberschrank");
-  await R.clickOn({ text: "Oberschrank", exact: true }, 0.5);
+  await R.clickOn({ text: "Wall cabinet", exact: true }, 0.5);
   await dragPlan(7.75, 2.25, 6.6, 0.3, 1);
-  await R.moveTo({ label: "Höhe über Boden" }, 0.5);
+  await R.moveTo({ label: "Height above the floor" }, 0.5);
   await R.hold(0.4);
-  await sayOver("Ich setze ihn auf 1,60. „Höhe automatisch“ bringt ihn zurück. Ein Regal oder einen Netzwerkschrank hängst du genauso an die Wand – die Höhe zählt immer vom Boden.");
-  await fill("Höhe über Boden", "1,6");
+  await sayOver("I set it to 1.60. “Automatic height” – brings it back. You hang a shelf or a network cabinet on the wall the same way – the height always counts from the floor.");
+  await fill("Height above the floor", "1,6");
   await R.hold(0.6);
-  await R.clickOn({ text: "Höhe automatisch" }, 0.5);
+  await R.clickOn({ text: "Automatic height" }, 0.5);
   await R.hold(0.6);
-  await sayOver("Deckenleuchten, Treppe und Stellplatz haben dieses Feld nicht: Sie hängen an der Decke oder liegen auf dem Boden.");
-  await R.moveTo({ label: "Höhe über Boden" }, 0.5);
+  await sayOver("Ceiling lights, stairs and parking spots don't have this field: they hang from the ceiling or lie on the floor.");
+  await R.moveTo({ label: "Height above the floor" }, 0.5);
   await R.hold(0.4);
 
   // ---------------------------------------------------------------- stacking
-  await chapter("Lampe auf dem Tisch");
-  await sayOver("Eine Tischlampe stellt sich von selbst auf das Möbel darunter. Erst ein Couchtisch vor das Sofa …");
+  await chapter("Lamp on the table");
+  await sayOver("A table lamp stands on the item below it by itself. Ridge a coffee table in front of the sofa …");
   await tapRoom(2.2, 3.9, "r_wohnen");
   await setPane("eg", sofa.x, sofa.z + 0.8, { theta: 0.3, phi: 0.75, radius: 5.5 });
   await search("couchtisch");
-  await R.clickOn({ text: "Couchtisch", exact: true }, 0.5);
+  await R.clickOn({ text: "Coffee table", exact: true }, 0.5);
   await fill("X (m)", de(sofa.x));
   await fill("Y (m)", de(sofa.z + 1.1));
-  await sayOver("… dann eine Tischlampe. Mit „X“ und „Y“ setze ich sie auf den Tisch – in 3D steht sie obendrauf. Das klappt auch auf Nachttisch, Sideboard oder Schreibtisch.");
+  await sayOver("… then a table lamp. With “X” and “Y” I put it on the table – in 3D it stands on top. That works on a bedside table, a sideboard or a desk too.");
   await tapRoom(2.2, 3.9, "r_wohnen");
   await search("tischlampe");
-  await R.clickOn({ text: "Tischlampe", exact: true }, 0.5);
+  await R.clickOn({ text: "Table lamp", exact: true }, 0.5);
   await fill("X (m)", de(sofa.x + 0.3));
   await fill("Y (m)", de(sofa.z + 1.1));
   await R.hold(1);
 
   // ---------------------------------------------------------------- name and item type
-  await chapter("Name und Möbelstück");
-  await sayOver("Oben im Formular gibst du einem Möbel einen eigenen „Namen“. Dann erscheint ein Haken: Der Name steht in 3D unter seinem Symbol.");
+  await chapter("Name and furniture item");
+  await sayOver("At the top of the form you give an item a name of its own. Then a tick box appears: the name is shown in 3D under its symbol.");
   await tapItem("armchair");
   await sideTop(0.3);
-  await fill("Name", "Lesesessel");
-  await R.moveTo({ text: "Name unter dem Symbol" }, 0.5).catch(() => moveToText("Name unter dem Symbol", 0.5));
+  await fill("Name", "Reading chair");
+  await R.moveTo({ text: "Name under the marker" }, 0.5).catch(() => moveToText("Name under the marker", 0.5));
   await R.hold(0.4);
-  await sayOver("Mit „Möbelstück“ tauschst du die Art, ohne neu zu setzen – aus dem Sessel wird ein Hocker. Ich nehme es gleich wieder zurück.");
-  await setSelect("Möbelstück", "Hocker");
+  await sayOver("With “Item” – you swap the type without placing it again: the armchair becomes a stool. I'll undo that right away.");
+  await setSelect("Furniture item", "Stool");
   await R.hold(0.8);
-  await R.clickOn({ text: "Rückgängig", exact: true }, 0.5);
+  await R.clickOn({ text: "Undo", exact: true }, 0.5);
 
   // ---------------------------------------------------------------- fix
-  await chapter("Fixieren");
-  await sayOver("Steht ein Möbel richtig, fixierst du es: oben „Fixieren“ – oder die Taste L.");
+  await chapter("Fix");
+  await sayOver("Once an item is in the right place, you fix it: “Fix” at the top – “Fix” – or the L key.");
   await tapPlan(sofa.x, sofa.z, 0.5);
   await sideTop(0.3);
   await clickEl("aside .fp3d-fix");
-  await sayOver("Jetzt lässt es sich nicht mehr verschieben – Ziehen bewegt nur die Ansicht. Im Formular änderst du es trotzdem.");
+  await sayOver("Now it can't be moved any more – dragging only moves the view. You can still change it in the form.");
   await dragPlan(sofa.x, sofa.z, sofa.x + 1.2, sofa.z + 0.4, 1.1);
   await R.hold(0.3);
-  await R.clickOn({ text: "Alles zeigen", exact: true }, 0.5);
-  await sayOver("Löschen geht nur nach einer Rückfrage. Und in der 3D-Hälfte bleibt ein fixiertes Möbel genauso stehen.");
+  await R.clickOn({ text: "Whole plan", exact: true }, 0.5);
+  await sayOver("Deleting it only works after a confirmation. And in the 3D half a fixed item stays put as well.");
   await muteDialogs(true);
   await h.side(0.3);
-  await press("Entf", "Delete");
-  await fakeConfirm("Dieses Element ist fixiert. Trotzdem löschen?");
+  await press("Delete", "Delete");
+  await fakeConfirm("This item is fixed. Delete it anyway?");
   await keyCap(null);
   await R.hold(0.6);
   {
@@ -783,7 +783,7 @@ if (PART === "a") {
   }
   await noDialog();
   await muteDialogs(false);
-  await sayOver("„Lösen“ gibt es wieder frei – auch das geht mit L.");
+  await sayOver("“Release” – frees it again; that works with L too.");
   await h.side(0.3);
   await press("L", "l");
   await keyCap(null);
@@ -791,28 +791,28 @@ if (PART === "a") {
   await R.hold(0.4);
 
   // ---------------------------------------------------------------- duplicate, delete
-  await chapter("Duplizieren und Löschen");
-  await sayOver("„Duplizieren“ legt eine Kopie daneben – praktisch für Stühle oder einen zweiten Sessel.");
+  await chapter("Duplicate and delete");
+  await sayOver("“Duplicate” – puts a copy next to it; handy for chairs or a second armchair.");
   {
     const chair = await R.editor(`const f = e.floor.furniture.find((f) => f.type === "armchair"); return { x: f.x, z: f.z };`);
     await tapPlan(chair.x, chair.z, 0.5);
     await sideTop(0.3);
-    await R.clickOn({ text: "Duplizieren", exact: true }, 0.5);
+    await R.clickOn({ text: "Duplicate", exact: true }, 0.5);
     await R.hold(0.4);
     const copy = await selected();
     await dragPlan(copy.x, copy.z, chair.x + 0.2, chair.z - 1.25, 1.1);
   }
-  await sayOver("„Löschen“ – oder die Taste Entfernen – nimmt es weg. Strg+Z holt es zurück.");
+  await sayOver("“Delete” – or the Delete key removes it. Ctrl+Z brings it back.");
   await h.side(0.3);
-  await press("Entf", "Delete");
+  await press("Delete", "Delete");
   await R.hold(0.4);
-  await press("Strg + Z", "z", ["Control"]);
+  await press("Ctrl + Z", "z", ["Control"]);
   await keyCap(null);
   await R.hold(0.3);
 
   // ---------------------------------------------------------------- context menu
-  await chapter("Das Rechtsklick-Menü");
-  await sayOver("Die wichtigsten Befehle stehen auch im Rechtsklick-Menü. Auf dem Tablet drückst du dafür lange auf das Möbel.");
+  await chapter("The right-click menu");
+  await sayOver("The most important commands are in the right-click menu as well. On a tablet you press and hold the item.");
   {
     const p = await R.planPoint(bench.x, bench.z);
     await R.move(p.x, p.y, 0.6);
@@ -830,12 +830,12 @@ if (PART === "a") {
     await R.page.mouse.click(p.x, p.y, { button: "right" });
     for (let i = 0; i < 8; i++) await R.frame(1 / 25, 25);
   }
-  await sayOver("Fixieren, Duplizieren, Drehen 90°, Spiegeln und Löschen.");
-  for (const t of ["Fixieren", "Duplizieren", "Drehen 90°", "Spiegeln", "Löschen"]) {
-    await R.moveTo(`.fp3d-ctx button:nth-child(${["Fixieren", "Duplizieren", "Drehen 90°", "Spiegeln", "Löschen"].indexOf(t) + 1})`, 0.4);
+  await sayOver("Fix, duplicate, turn 90°, mirror and delete.");
+  for (const t of ["Fix", "Duplicate", "Turn 90°", "Mirror", "Delete"]) {
+    await R.moveTo(`.fp3d-ctx button:nth-child(${["Fix", "Duplicate", "Turn 90°", "Mirror", "Delete"].indexOf(t) + 1})`, 0.4);
     await R.hold(0.35);
   }
-  await sayOver("Ich nehme „Spiegeln“ – und die Eckbank ist wieder wie vorher. Escape schließt das Menü und hebt die Auswahl auf.");
+  await sayOver("I choose “Mirror” – and the corner bench is back as before. Escape closes the menu and clears the selection.");
   await R.clickOn(".fp3d-ctx button:nth-child(4)", 0.4);
   await R.hold(0.8);
   await h.side(0.3);
@@ -843,48 +843,48 @@ if (PART === "a") {
   await keyCap(null);
 
   // ---------------------------------------------------------------- all keys
-  await chapter("Alle Tasten auf einen Blick");
+  await chapter("All keys at a glance");
   await keyCard(true);
-  await say("Hier alle Tasten auf einen Blick: R dreht, L fixiert, Entfernen löscht, die Pfeiltasten schieben, Alt macht alles frei und fein, Strg+Z nimmt zurück.");
+  await say("Here are all the keys at a glance: R turns, L fixes, Delete deletes, the arrow keys nudge, Alt makes everything free and fine, Ctrl+Z undoes.");
   await R.hold(1.2);
   await keyCard(false);
 
   // ---------------------------------------------------------------- room packages
-  await chapter("Räume einrichten");
-  await sayOver("Zum Schluss der schnelle Weg: einen ganzen Raum auf einmal. Ich wähle „Auswählen“, tippe das Schlafzimmer an – und unten „Einrichten …“.");
-  await R.clickOn({ text: "Auswählen", exact: true }, 0.5);
+  await chapter("Set up rooms");
+  await sayOver("Finally the quick way: a whole room at once. I pick “Select” – tap the bedroom, and at the bottom “Furnish …”.");
+  await R.clickOn({ text: "Select", exact: true }, 0.5);
   await tapRoom(8, 6, "r_schlafen");
   await setPane("eg", 8, 6, { theta: 0.25, phi: 0.45, radius: 8.5 });
-  await scrollSide({ text: "Einrichten …" }, 380, 0.8);
-  await R.clickOn({ text: "Einrichten …" }, 0.5);
-  await sayOver("Neun Pakete stehen zur Wahl, und unter jedem steht, was dazugehört.");
-  await moveToText("Zeile an der Rückwand", 0.5);
-  await scrollSide({ text: "Doppelbett mit zwei" }, 560, 0.8);
-  await sayOver("Küchenzeile, Küche in L-Form, Bad, Schlafzimmer, Wohnzimmer, Esszimmer, Büro, Kinderzimmer und Flur.");
-  await moveToText("Waschtisch, WC", 0.4);
+  await scrollSide({ text: "Furnish …" }, 380, 0.8);
+  await R.clickOn({ text: "Furnish …" }, 0.5);
+  await sayOver("There are nine packages to choose from, and each one lists what's in it.");
+  await moveToText("row at the back wall", 0.5);
+  await scrollSide({ text: "Double bed with two" }, 560, 0.8);
+  await sayOver("Kitchen row, L-shaped kitchen, bathroom, bedroom, living room, dining room, office, kids' room and hall.");
+  await moveToText("Washbasin, WC", 0.4);
   await R.hold(0.3);
-  await moveToText("Schreibtisch mit Bürostuhl", 0.5);
+  await moveToText("Desk with office chair", 0.5);
   await R.hold(0.3);
-  await scrollSide({ text: "Garderobe, zwei" }, 900, 0.6).catch(() => {});
-  await moveToText("Garderobe, zwei", 0.5).catch(() => {});
+  await scrollSide({ text: "Coat rack, two downlights" }, 900, 0.6).catch(() => {});
+  await moveToText("Coat rack, two downlights", 0.5).catch(() => {});
   await R.hold(0.3);
-  await scrollSide({ text: "Doppelbett mit zwei" }, 560, 0.6);
-  await sayOver("Ich nehme „Schlafzimmer“: Doppelbett mit Nachttischen, Schrank, Kommode und Deckenleuchte – alles an den Wänden.");
-  await R.clickOn({ text: "Doppelbett mit zwei" }, 0.5);
+  await scrollSide({ text: "Double bed with two" }, 560, 0.6);
+  await sayOver("I take “Bedroom”: a double bed with bedside tables, a wardrobe, a chest of drawers and a ceiling light – all against the walls.");
+  await R.clickOn({ text: "Double bed with two" }, 0.5);
   await R.hold(1.2);
-  await sayOver("Die Deckenleuchte ist schon mit dem Licht des Bereichs verknüpft. Gefällt dir das Paket nicht, nimmt Strg+Z alles auf einmal zurück.");
-  await moveToText("Möbel gesetzt", 0.5).catch(() => R.move(1700, 760, 0.5));
+  await sayOver("The ceiling light is already linked to the area's light. If you don't like the package, Ctrl+Z takes it all back at once.");
+  await moveToText("Furniture placed", 0.5).catch(() => R.move(1700, 760, 0.5));
   await R.hold(0.4);
   await h.side(0.3);
-  await press("Strg + Z", "z", ["Control"]);
+  await press("Ctrl + Z", "z", ["Control"]);
   await R.hold(0.6);
-  await press("Strg + Y", "y", ["Control"]);
+  await press("Ctrl + Y", "y", ["Control"]);
   await keyCap(null);
-  await sayOver("Den Flur richte ich genauso ein – Küche und Bad gehen auch so. Danach passt du einzelne Möbel an, wie vorhin gezeigt.");
-  for (const [x, z, pkg, id] of [[3, 5.4, "Garderobe, zwei", "r_flur"]]) {
+  await sayOver("I furnish the hall the same way – kitchen and bathroom work like that too. Afterwards you adjust single items, as shown before.");
+  for (const [x, z, pkg, id] of [[3, 5.4, "Coat rack, two downlights", "r_flur"]]) {
     await tapRoom(x, z, id, 0.4);
-    await scrollSide({ text: "Einrichten …" }, 380, 0.5);
-    await R.clickOn({ text: "Einrichten …" }, 0.35);
+    await scrollSide({ text: "Furnish …" }, 380, 0.5);
+    await R.clickOn({ text: "Furnish …" }, 0.35);
     await scrollSide({ text: pkg }, 600, 0.4);
     await R.clickOn({ text: pkg }, 0.4);
     await R.frame(0.3, 300);
@@ -892,29 +892,29 @@ if (PART === "a") {
 
   // ---------------------------------------------------------------- 3D check
   await chapter("Das Ergebnis in 3D");
-  await sayOver("Und so sieht das Erdgeschoss jetzt in 3D aus.");
+  await sayOver("And this is what the ground floor looks like in 3D now.");
   await R.clickOn({ text: "3D", exact: true, nth: 0 }, 0.6);
   await R.sleep(1500);
-  await R.clickOn({ text: "Erdgeschoss", exact: true, nth: 0 }, 0.6);
+  await R.clickOn({ text: "Ground floor", exact: true, nth: 0 }, 0.6);
   await R.sleep(2000);
   await R.hideCursor();
   {
     const A = { theta: 0.3, phi: 0.9, radius: 14 };
     const B = { theta: 1.3, phi: 0.75, radius: 11.5 };
     await setPane("eg", 4.75, 3.75, A, true);
-    await sayOver("Sofa und Sessel, die Eckbank, der Trockner auf der Waschmaschine, die Lampe auf dem Tisch – und das eingerichtete Schlafzimmer.");
+    await sayOver("Sofa and armchair, the corner bench, the dryer on the washing machine, the lamp on the table – and the furnished bedroom.");
     await glidePane("eg", 4.75, 3.75, A, B, 8, true);
   }
   await R.hideCursor(false);
 
   // ---------------------------------------------------------------- outro
   await chapter("Wie geht es weiter");
-  await R.title("Teil 2: Elektrische Möbel, Stellplatz und Saugroboter", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
-  await say("Das war Teil eins: setzen, verschieben, drehen, spiegeln, Größe, Höhe, fixieren und ganze Räume einrichten. In Teil zwei verknüpfen wir Möbel mit Home Assistant.");
-  await say("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. NeonPlan läuft übrigens auch auf alten Wandtablets. Bis gleich in Teil zwei!");
+  await R.title("part 2: Electrical furniture, parking space and robot vacuum", `HomePlan 3D – also runs on old wall tablets${VERSION}`);
+  await say("That was part one: placing, moving, turning, mirroring, size, height, fixing and furnishing whole rooms. In part two we link furniture to Home Assistant.");
+  await say("Left to the online demo and the manual are in the description. NeonPlan also runs on old wall tablets, by the way. See you in part two!");
   await R.hold(0.6);
 } else {
-  // ================================================================ PART 2: Elektrische Möbel, Stellplatz und Saugroboter
+  // ================================================================ PART 2: Electrical furniture, parking space and robot vacuum
   const startB = async () => {
     await R.open("empty");
     await freeOnly();
@@ -927,7 +927,7 @@ if (PART === "a") {
   const finishB = () =>
     R.editor(`e.change((_, f) => {
       const bed = f.furniture.find((x) => x.type === "bed");
-      Object.assign(bed, { state_entity: "binary_sensor.bett_links", state_entity2: "binary_sensor.bett_rechts", state_split: "left_right" });
+      Object.assign(bed, { state_entity: "binary_sensor.bett_left", state_entity2: "binary_sensor.bett_right", state_split: "left_right" });
       f.furniture.push({ id: "t_rad", type: "radiator", x: 1.1, z: 0.05, w: 1, d: 0.1, h: 0.6, rotation: 0, variant: null });
       f.furniture.push({ id: "t_park", type: "parking", x: 11.25, z: 2.75, w: 2.6, d: 5.2, h: 0.02, rotation: 0, variant: null, entity: "binary_sensor.garage_auto" });
       f.furniture.push({ id: "t_robot", type: "robot_vacuum", x: 5.6, z: 4.15, w: 0.36, d: 0.5, h: 0.1, rotation: 180, variant: null });
@@ -940,7 +940,7 @@ if (PART === "a") {
   await R.hideCursor();
   await tap(R, { text: "3D", exact: true, nth: 0 });
   await R.sleep(1500);
-  await tap(R, { text: "Erdgeschoss", exact: true, nth: 0 });
+  await tap(R, { text: "Ground floor", exact: true, nth: 0 });
   await R.sleep(2500);
   {
     const A = { theta: 0.5, phi: 0.85, radius: 13 };
@@ -948,195 +948,195 @@ if (PART === "a") {
     const C = { theta: 2.0, phi: 0.8, radius: 13 };
     await setPane("eg", 5.5, 3.5, A, true);
     await R.sleep(900);
-    await R.title("Elektrische Möbel, Stellplatz und Saugroboter", `HomePlan 3D · Folge 4 · Teil 2${VERSION}`);
-    await sayOver("Der Fernseher leuchtet, das Bett zeigt, wer drin liegt, und der Saugroboter fährt durch die Küche.");
+    await R.title("Electrical furniture, parking space and robot vacuum", `HomePlan 3D · episode 4 · part 2${VERSION}`);
+    await sayOver("The TV glows, the bed shows who's lying in it, and the robot vacuum drives through the kitchen.");
     await glidePane("eg", 5.5, 3.5, A, B, 5.5, true);
     await R.untitle();
-    await sayOver("In diesem Video verknüpfen wir Möbel mit Home Assistant – dazu kommen Stellplatz und Saugroboter.");
+    await sayOver("In this video we link furniture to Home Assistant – plus the parking spot and the robot vacuum.");
     await glidePane("eg", 5.5, 3.5, B, C, 4.5, true);
   }
 
   // ---------------------------------------------------------------- intro
-  await chapter("Was wir heute machen");
+  await chapter("Was wir today machen");
   await startB();
-  await tap(R, { text: "3D daneben", exact: true });
+  await tap(R, { text: "3D beside", exact: true });
   await R.sleep(1500);
-  await tap(R, { text: "Alles zeigen", exact: true });
+  await tap(R, { text: "Whole plan", exact: true });
   await setPane("eg", 5.5, 3, { theta: 0.5, phi: 0.85, radius: 15 });
   await R.sleep(800);
   await R.hideCursor(false);
-  await sayOver("Wir machen mit dem Erdgeschoss aus Teil eins weiter. Alle Räume sind eingerichtet, und neben dem Haus steht jetzt eine Garage.");
+  await sayOver("We carry on with the ground floor from part one. All rooms are furnished, and there's now a garage next to the house.");
   await pointPlan(11.25, 2.75, 0.6);
   await R.hold(0.4);
-  await sayOver("Auch heute ist alles kostenlos dabei.");
+  await sayOver("Again, everything today is included for free.");
   await pointPlan(3, 2.25, 0.6);
 
   // ---------------------------------------------------------------- electric furniture: the TV
-  await chapter("Elektrische Möbel: der Fernseher");
-  await sayOver("Elektrische Möbel erkennst du in der Bibliothek an diesem Symbol: Fernseher, Waschmaschine, Trockner, Spülmaschine, Heizkörper, Saugroboter und mehr.");
-  await R.clickOn({ text: "Möbel", exact: true }, 0.5);
-  await R.moveTo({ text: "TV-Board" }, 0.6);
+  await chapter("Electrical furniture: the TV");
+  await sayOver("In the library you recognise electric furniture by this symbol: TV, washing machine, dryer, dishwasher, radiator, robot vacuum and more.");
+  await R.clickOn({ text: "Furniture", exact: true }, 0.5);
+  await R.moveTo({ text: "TV board" }, 0.6);
   await R.frame(1.2, 600);
-  await sayOver("Ich tippe das TV-Board im Wohnzimmer an.");
+  await sayOver("I tap the TV board in the living room.");
   {
     const tv = await R.editor(`const f = e.floor.furniture.find((f) => f.type === "tv_board"); return { x: f.x, z: f.z };`);
     await tapPlan(tv.x, tv.z, 0.6);
     await setPane("eg", tv.x, tv.z, { theta: 0.6, phi: 0.8, radius: 7 });
   }
   await sideTop(0.3);
-  await sayOver("Im Feld „Fernseher“ steht „Automatisch“: NeonPlan sucht den passenden Media-Player im Bereich selbst – hier den Fernseher.");
-  await scrollSide({ label: "Fernseher (Media-Player" }, 380, 0.6);
-  await pickerMove("Fernseher (Media-Player", 0.5);
+  await sayOver("The “TV” field – “TV” – says “Automatic”: NeonPlan looks for the matching media player in the area by itself – here, the TV.");
+  await scrollSide({ label: "TV (Media-Player" }, 380, 0.6);
+  await pickerMove("TV (Media-Player", 0.5);
   await R.hold(0.6);
-  await sayOver("Hast du einen älteren Fernseher an einer smarten Steckdose, nimmst du hier einfach deren Schalter.");
+  await sayOver("If you have an older TV on a smart plug, simply pick the plug's switch here.");
   await R.hold(0.4);
-  await sayOver("Darunter der „Leistungssensor“, auch automatisch gefunden. Damit zeigt das Möbel seine Watt.");
-  await pickerMove("Leistungssensor", 0.5);
+  await sayOver("Below it, the “Power sensor” – also found automatically. With it the item shows its watts.");
+  await pickerMove("Power sensor", 0.5);
   await R.hold(0.8);
-  await sayOver("„Vor dem Schalten nachfragen“ fragt erst, bevor ein Tipp in 3D schaltet. Das „Symbol in 3D“ zeige ich dir in Folge sechs bei den Geräten.");
-  await R.clickOn({ text: "Vor dem Schalten nachfragen" }, 0.5);
+  await sayOver("“Ask before switching” – asks first before a tap in 3D switches it. I'll show you the “Marker in 3D” in episode six, with the devices.");
+  await R.clickOn({ text: "Ask before switching" }, 0.5);
   await R.hold(0.4);
-  await R.clickOn({ text: "Vor dem Schalten nachfragen" }, 0.4);
-  await R.moveTo({ label: "Symbol in 3D" }, 0.5);
+  await R.clickOn({ text: "Ask before switching" }, 0.4);
+  await R.moveTo({ label: "Marker in 3D" }, 0.5);
   await R.hold(0.4);
-  await sayOver("Wählst du die Entität von Hand, steht unten „Wieder als Geräte-Pin“: Das macht aus dem Möbel wieder einen einfachen Pin.");
-  await pickEntity("Fernseher (Media-Player", "fern", "Fernseher", 0.5);
-  await scrollSide({ text: "Wieder als Geräte-Pin" }, 760, 0.6);
-  await R.moveTo({ text: "Wieder als Geräte-Pin" }, 0.5);
+  await sayOver("If you pick the entity by hand, “Back to a device pin” – appears at the bottom: it turns the item back into a plain pin.");
+  await pickEntity("TV (Media-Player", "fern", "TV", 0.5);
+  await scrollSide({ text: "Back to a device pin" }, 760, 0.6);
+  await R.moveTo({ text: "Back to a device pin" }, 0.5);
   await R.hold(0.6);
 
   // ---------------------------------------------------------------- washer, radiator
-  await chapter("Waschmaschine und Heizkörper");
-  await sayOver("Die Waschmaschine im Bad findet ihren Leistungssensor ebenfalls selbst. Sie leuchtet in 3D, solange sie arbeitet – also Strom zieht.");
+  await chapter("Washing machine and radiator");
+  await sayOver("The washing machine in the bathroom finds its power sensor by itself as well. It glows in 3D while it's working – that is, while it draws power.");
   {
     const w = await R.editor(`const f = e.floor.furniture.find((f) => f.type === "washer"); return { x: f.x, z: f.z };`);
     await tapPlan(w.x, w.z, 0.6);
     await setPane("eg", w.x + 0.4, w.z - 0.3, { theta: 1.9, phi: 0.65, radius: 5 });
   }
   await sideTop(0.3);
-  await scrollSide({ label: "Leistungssensor" }, 420, 0.5);
-  await pickerMove("Leistungssensor", 0.5);
+  await scrollSide({ label: "Power sensor" }, 420, 0.5);
+  await pickerMove("Power sensor", 0.5);
   await R.hold(0.6);
-  await sayOver("Ins Feld „Gerät“ kommt ein Schalter, eine Steckdose – oder ein Status-Sensor, etwa der Druckstatus eines 3D-Druckers.");
-  await pickerMove("Gerät", 0.5);
+  await sayOver("The “Device” field takes a switch, a plug, or a status sensor, such as the print status of a 3D printer.");
+  await pickerMove("Device", 0.5);
   await R.hold(0.8);
-  await sayOver("Ein Heizkörper nimmt das Thermostat. Ich setze einen an die Wand links neben das TV-Board.");
-  await R.clickOn({ text: "Möbel", exact: true }, 0.4);
+  await sayOver("A radiator takes the thermostat. I put one on the wall to the left of the TV board.");
+  await R.clickOn({ text: "Furniture", exact: true }, 0.4);
   await fitPlan();
   await tapRoom(4.6, 3.6, "r_wohnen");
   await sideTop(0.3);
   await search("heizk");
-  await R.clickOn({ text: "Heizkörper", exact: true }, 0.5);
+  await R.clickOn({ text: "Radiator", exact: true }, 0.5);
   await dragPlan(3, 2.25, 1.1, 0.15, 1.1);
   await setPane("eg", 1.2, 0.8, { theta: 0.3, phi: 0.7, radius: 5.5 });
-  await sayOver("„Heizung“ steht auf automatisch und findet das Thermostat. Weil es gerade heizt, glüht der Heizkörper in 3D.");
-  await scrollSide({ label: "Heizung (Thermostat)" }, 420, 0.5).catch(() => {});
-  await pickerMove("Heizung (Thermostat)", 0.5).catch(() => {});
+  await sayOver("“Heating” – is set to automatic and finds the thermostat. Because it's heating right now, the radiator glows in 3D.");
+  await scrollSide({ label: "Heating (thermostat)" }, 420, 0.5).catch(() => {});
+  await pickerMove("Heating (thermostat)", 0.5).catch(() => {});
   await R.hold(1.2);
 
   // ---------------------------------------------------------------- state from: the bed's halves
-  await chapter("Zustand von: das Bett mit zwei Hälften");
-  await sayOver("Jedes andere Möbel kann mit „Zustand von“ leuchten: das Bett mit Belegungsmatte, der Sessel, die Sauna.");
+  await chapter("State from: the bed with two halves");
+  await sayOver("Any other item can glow with “State from”: the bed with an occupancy mat, the armchair, the sauna.");
   {
     const b = await R.editor(`const f = e.floor.furniture.find((f) => f.type === "bed"); return { x: f.x, z: f.z };`);
-    await R.clickOn({ text: "Auswählen", exact: true }, 0.4);
+    await R.clickOn({ text: "Select", exact: true }, 0.4);
     await tapPlan(b.x, b.z + 0.3, 0.6);
     await setPane("eg", b.x, b.z + 0.4, { theta: 5.7, phi: 0.55, radius: 7.5 });
   }
   await sideTop(0.3);
-  await scrollSide({ label: "Zustand von" }, 420, 0.5);
-  await sayOver("Ich wähle „Bett links belegt“. Dann erscheint ein zweites Feld für die andere Hälfte: „Bett rechts belegt“.");
-  await pickEntity("Zustand von", "bett", "Bett links belegt", 0.5);
-  await pickEntity("Zweiter Zustand", "bett", "Bett rechts belegt", 0.5);
-  await sayOver("Bei „Hälften“ wählst du links und rechts – oder unten und oben, für ein Hochbett.");
-  await R.pickOption("Hälften", "Unten / oben (Hochbett)", 0.5);
+  await scrollSide({ label: "State from" }, 420, 0.5);
+  await sayOver("I pick “bed left occupied”. Then a second field appears for the other half: “bed right occupied”.");
+  await pickEntity("State from", "bed", "Bed left occupied", 0.5);
+  await pickEntity("Second state", "bed", "Bed right occupied", 0.5);
+  await sayOver("Under “Halves” – you choose left and right, or bottom and top for a loft bed.");
+  await R.pickOption("Halves", "Bottom / top (bunk bed)", 0.5);
   await R.hold(0.4);
-  await R.pickOption("Hälften", "Links / rechts", 0.5);
-  await sayOver("In 3D leuchtet jetzt die linke Hälfte – dort liegt gerade jemand.");
+  await R.pickOption("Halves", "Left / right", 0.5);
+  await sayOver("In 3D the left half glows now – someone is lying there.");
   await R.hold(1.2);
 
   // ---------------------------------------------------------------- parking spot
-  await chapter("Stellplatz in der Garage");
-  await sayOver("Jetzt die Garage. In der Bibliothek, unter „Stellplätze“, steht der „Stellplatz“.");
-  await R.clickOn({ text: "Möbel", exact: true }, 0.4);
+  await chapter("Parking space in the garage");
+  await sayOver("Now the garage. In the library, under “Parking spots” – you'll find the “Parking spot”.");
+  await R.clickOn({ text: "Furniture", exact: true }, 0.4);
   await fitPlan();
   await tapRoom(11.25, 4.4, "r_garage");
   await sideTop(0.3);
   await clearSearch();
-  await scrollSide({ text: "Stellplätze" }, 600, 0.6);
-  await R.clickOn({ text: "Stellplätze" }, 0.5);
-  await R.clickOn({ text: "Stellplatz", exact: true }, 0.5);
+  await scrollSide({ text: "Parking" }, 600, 0.6);
+  await R.clickOn({ text: "Parking" }, 0.5);
+  await R.clickOn({ text: "Parking spot", exact: true }, 0.5);
   await setPane("eg", 11.25, 2.75, { theta: 0.6, phi: 0.8, radius: 9 });
-  await sayOver("Er markiert, wo ein Auto steht: in der Garage, in der Einfahrt oder irgendwo auf dem Grundstück.");
+  await sayOver("It marks where a car is parked: in the garage, on the driveway or anywhere on your property.");
   await pointPlan(11.25, 2.75, 0.5);
   await R.hold(0.5);
   await sideTop(0.3);
-  await scrollSide({ label: "Sensor „Auto anwesend“" }, 330, 0.5);
-  await sayOver("Beim „Sensor Auto anwesend“ wähle ich „Auto in der Garage“. Solange er ein Auto meldet, steht das Fahrzeug da – ohne Sensor steht es immer da.");
-  await pickEntity("Sensor „Auto anwesend“", "auto", "Auto in der Garage", 0.5);
-  await sayOver("Das Fahrzeug selbst kommt aus dem Pack „Fahrzeuge“ – darum steht hier der Hinweis. Der Stellplatz ist kostenlos.");
-  await moveToText("Kein Fahrzeug-Pack", 0.5);
+  await scrollSide({ label: "Sensor \"car present\"" }, 330, 0.5);
+  await sayOver("For the “Sensor \"car present\"” field – I pick “car in the garage”. As long as it reports a car, the vehicle is shown – without a sensor it's always there.");
+  await pickEntity("Sensor \"car present\"", "auto", "Car in the garage", 0.5);
+  await sayOver("The vehicle itself comes from the “Vehicles” pack – that's why this note is here. The parking spot is free.");
+  await moveToText("No vehicle pack imported", 0.5);
   await R.hold(0.6);
-  await sayOver("„Größe“ passt das Fahrzeug an den Platz an. Ist es höher als der Raum, warnt der Editor.");
-  await R.moveTo({ label: "Größe (%)" }, 0.5);
+  await sayOver("“Size” – fits the vehicle to the spot. If it's taller than the room, the editor warns you.");
+  await R.moveTo({ label: "Size (%)" }, 0.5);
   await R.hold(0.5);
-  await sayOver("Und der „Fahrzeugtyp-Sensor“: Meldet etwa eine Kamera-Auswertung, welches Auto da ist, ordnest du jedem Zustand ein Fahrzeug zu.");
-  await pickEntity("Fahrzeugtyp-Sensor", "fahrzeug", "Fahrzeugtyp Garage", 0.5);
-  await scrollSide({ text: "+ Zuordnung" }, 600, 0.5);
-  await R.clickOn({ text: "+ Zuordnung" }, 0.5);
+  await sayOver("And the “Vehicle type sensor”: if, say, a camera analysis reports which car is there, you assign a vehicle to each state.");
+  await pickEntity("Vehicle type sensor", "vehicle", "Garage vehicle type", 0.5);
+  await scrollSide({ text: "+ Mapping" }, 600, 0.5);
+  await R.clickOn({ text: "+ Mapping" }, 0.5);
   await R.hold(0.6);
 
   // ---------------------------------------------------------------- robot vacuum
-  await chapter("Der Saugroboter");
-  await sayOver("Zum Schluss der Saugroboter. Er kommt dorthin, wo seine Station steht – bei mir ins Wohnzimmer.");
+  await chapter("Der Robot vacuum");
+  await sayOver("Finally the robot vacuum. It goes where its dock is – in my case, the living room.");
   await fitPlan();
   await tapRoom(4.6, 3.6, "r_wohnen");
   await sideTop(0.3);
   await search("saug");
-  await R.clickOn({ text: "Saugroboter", exact: true }, 0.5);
+  await R.clickOn({ text: "Robot vacuum", exact: true }, 0.5);
   await setPane("eg", 4.6, 3.4, { theta: 0.3, phi: 0.7, radius: 6 });
   await dragPlan(3, 2.25, 5.6, 4.1, 1.1);
-  await sayOver("„Saugroboter“ steht auf automatisch und findet „Saugi“. Saugt er in Home Assistant, fährt er in 3D Bahnen durch den Raum und danach zurück zur Station.");
+  await sayOver("“Robot vacuum” – is set to automatic and finds “Saugi”. When it cleans in Home Assistant, it drives lanes through the room in 3D and then back to its dock.");
   await sideTop(0.3);
-  await scrollSide({ label: "Saugroboter" }, 400, 0.5);
-  await pickerMove("Saugroboter", 0.5);
+  await scrollSide({ label: "Robot vacuum" }, 400, 0.5);
+  await pickerMove("Robot vacuum", 0.5);
   await R.hold(0.5);
-  await sayOver("Die Bahn ist simuliert, denn Home Assistant kennt die genaue Position meistens nicht. Viele Roboter melden aber den Raum, den sie gerade saugen.");
+  await sayOver("The path is simulated, because Home Assistant usually doesn't know the exact position. But many robots report the room they're cleaning.");
   await R.hold(0.3);
-  await sayOver("Diesen Sensor findet NeonPlan am Gerät des Roboters von selbst: „Aktueller Raum“. Hier meldet er „Kueche“ – ohne Umlaut.");
-  await pickerMove("Aktueller Raum", 0.5);
+  await sayOver("NeonPlan finds this sensor on the robot's device by itself: “Current room”. Here it reports “Kueche”, the kitchen spelled without the umlaut.");
+  await pickerMove("Aktueller Room", 0.5);
   await R.hold(0.6);
-  await sayOver("Groß- und Kleinschreibung und Umlaute spielen keine Rolle: „Kueche“ passt zur Küche. Also fährt er jetzt dort.");
+  await sayOver("Upper and lower case and umlauts don't matter: “Kueche” matches the kitchen. So that's where it drives now.");
   await setPane("eg", 7.75, 2.5, { theta: 0.6, phi: 0.7, radius: 7.5 });
-  await live(N.length("Groß- und Kleinschreibung und Umlaute spielen keine Rolle: „Kueche“ passt zur Küche. Also fährt er jetzt dort."));
-  await sayOver("Um Schränke, Sofas und Betten macht er einen Bogen. Unter Tischen und Stühlen fährt er durch, auch über Teppiche und unter Oberschränken.");
-  await live(N.length("Um Schränke, Sofas und Betten macht er einen Bogen. Unter Tischen und Stühlen fährt er durch, auch über Teppiche und unter Oberschränken."));
-  await sayOver("Passt kein Raum, bleibt er im Raum seiner Station.");
-  await live(N.length("Passt kein Raum, bleibt er im Raum seiner Station."));
+  await live(N.length("Upper and lower case and umlauts don't matter: “Kueche” matches the kitchen. So that's where it drives now."));
+  await sayOver("It steers around cupboards, sofas and beds. It drives under tables and chairs, over rugs and under wall cabinets.");
+  await live(N.length("It steers around cupboards, sofas and beds. It drives under tables and chairs, over rugs and under wall cabinets."));
+  await sayOver("If no room matches, it stays in the room of its dock.");
+  await live(N.length("If no room matches, it stays in the room of its dock."));
 
   // ---------------------------------------------------------------- everything live in 3D
-  await chapter("Alles live in 3D");
-  await sayOver("Jetzt alles zusammen in der 3D-Ansicht.");
+  await chapter("All live in 3D");
+  await sayOver("Now everything together in the 3D view.");
   await R.clickOn({ text: "3D", exact: true, nth: 0 }, 0.6);
   await R.sleep(1500);
-  await R.clickOn({ text: "Erdgeschoss", exact: true, nth: 0 }, 0.6);
+  await R.clickOn({ text: "Ground floor", exact: true, nth: 0 }, 0.6);
   await R.sleep(2000);
   await R.hideCursor();
   {
     const A = { theta: 0.3, phi: 0.85, radius: 16 };
     const B = { theta: 1.0, phi: 0.7, radius: 10.5 };
     await setPane("eg", 7, 3, A, true);
-    await sayOver("Der Fernseher leuchtet, der Heizkörper glüht, die Waschmaschine läuft, im Bett liegt jemand links – und der Saugroboter fährt durch die Küche.");
+    await sayOver("The TV glows, the radiator glows, the washing machine is running, someone is lying on the left of the bed – and the robot vacuum drives through the kitchen.");
     await glidePane("eg", 7, 3, A, B, 9, true);
   }
   await R.hideCursor(false);
 
   // ---------------------------------------------------------------- outro
   await chapter("Wie geht es weiter");
-  await R.title("Nächste Folge: lokale Packs und Module", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
-  await say("Das waren elektrische Möbel, Zustand und Hälften, der Stellplatz und der Saugroboter – alles mit den kostenlosen Möbeln.");
-  await say("In Folge fünf zeige ich dir lokale JSON-Packs: mehr Möbel und Fahrzeuge zum Importieren – und Module, die ein Admin freigibt.");
-  await say("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und NeonPlan läuft auch auf alten Wandtablets. Bis zum nächsten Mal!");
+  await R.title("Next episode: local packs and modules", `HomePlan 3D – also runs on old wall tablets${VERSION}`);
+  await say("That was electric furniture, state and halves, the parking spot and the robot vacuum – all with the free furniture.");
+  await say("In episode five I'll show you local JSON packs: more furniture and vehicles to import – and modules that an admin approves.");
+  await say("Left to the online demo and the manual are in the description. And NeonPlan also runs on old wall tablets. See you next time!");
   await R.hold(0.6);
 }
 

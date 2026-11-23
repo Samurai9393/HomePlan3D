@@ -1,84 +1,84 @@
-# Folge 3 – Etagen, Treppen und Keller: Coverage-Checkliste
+# Episode 3 – Floors, stairs and cellars: coverage checklist
 
-Quellen: `docs/anleitung.md` 4.2, 4.16, 4.18 (dazu 5.1/5.2 für die Etagen in 3D), Formulare in
-`frontend/src/components/editor.ts` (Etagen-Formular, Möbelformular, Werkzeug Bodenöffnung, 3D daneben),
-`frontend/src/viewer/build.ts` (`stairHoles`), Labels aus `frontend/src/i18n.ts`.
-Zu lang für 8 Minuten → zwei Teile: **a** = Teil 1 „Etagen und Keller“ (5:15), **b** = Teil 2 „Treppen und
-Bodenöffnungen“ (4:34). Zeit = Stelle im jeweiligen Entwurf (geschätztes Timing, ohne Stimme).
+Sources: `docs/anleitung.md` 4.2, 4.16, 4.18 (plus 5.1/5.2 for the floors in 3D), forms in
+`frontend/src/components/editor.ts` (floor form, furniture form, floor-opening tool, 3D beside),
+`frontend/src/viewer/build.ts` (`stairHoles`), labels from `frontend/src/i18n.ts`.
+Too long for 8 minutes → two parts: **a** = part 1 "Floors and cellars" (5:15), **b** = part 2 "Stairs and
+floor openings" (4:34). Time = position in the respective draft (estimated timing, no voice).
 
-## Etagen (4.2)
-- [x] a 0:24 Etagenliste oben in der Seitenleiste („Etagen“): Etage antippen wechselt die Etage im Plan
-- [x] a 0:34 Etagen-Formular erscheint nur ohne Auswahl („Zurück zur Etage“)
-- [x] a 0:52 „+ Etage hinzufügen“ öffnet das Menü „Etagen aus Home Assistant:“ mit „· Ebene n“
-- [x] a 0:52 Nur HA-Etagen, die noch fehlen, stehen im Menü
-- [x] a 0:52 / 3:20 „Leere Etage“ (im Menü gezeigt; sind alle HA-Etagen vergeben, legt der Knopf direkt eine leere Etage an)
-- [x] a 0:59 Neue Etage aus HA: Höhe kommt aus der Ebene, Keller Ebene −1 → −2,75
-- [x] a 1:03 Etagen werden von unten nach oben einsortiert (Keller landet unten)
-- [x] a 0:41 „Name“
-- [x] a 0:41 / 1:03 „Höhe über Boden (m)“; negativ = Keller unter der Erde
-- [x] a 0:46 / 1:12 / 3:03 „Raumhöhe (m)“ (Keller und Dachgeschoss 2,20)
-- [x] a 1:16–1:23 Faustregel: Höhe über Boden + Raumhöhe + Decke (0,25 m) = nächste Etage (Keller −2,45)
-- [x] a 0:46 / 3:27 „Etage in Home Assistant“ (Auswahl, „– keine –“; schon verknüpfte HA-Etagen fehlen)
-- [x] a 1:30 „Räume aus HA-Bereichen anlegen (4)“: je Bereich eine 4 × 3 m Kachel, schon verknüpft
-- [x] a 1:45 Raum ziehen: Ecken rasten an anderen Räumen ein
-- [x] a 1:50 Raum genau setzen mit „X (m)“ / „Y (m)“
-- [x] a 2:02 „Lücken schließen“: bis 60 cm, Abstand wird Innenwandstärke (Meldung „2 Stellen geschlossen, Innenwand jetzt 0,12 m“)
-- [x] a 2:02 Wann es hilft: Innenmaße gemessen
-- [x] a 2:15–2:31 „Etage verschieben (m)“: X- und Y-Feld + „Verschieben“ (was mitwandert, was liegen bleibt)
-- [x] a 2:38 „90° drehen“ (im Uhrzeigersinn um die Mitte der Räume)
-- [x] a 2:45 Strg+Z / „Rückgängig“
-- [x] a 2:49 „Alle Etagen mitnehmen (ganzes Haus)“
-- [x] a 3:58–4:10 „Ansicht als Start der Etage“ (3D drehen, klicken)
-- [x] a 4:17 ↺ neben der Startansicht nimmt sie zurück
-- [x] a 3:49 Meldung ohne „3D daneben“
-- [x] a 3:34 „Nach oben“ / „Nach unten“ (nur Reihenfolge der Liste; Lage bestimmt die Höhe über Boden)
-- [x] a 3:42 „Etage löschen“ (Rückfrage, samt Räumen, Strg+Z)
-- [x] a 0:30 / 3:08 Untere Etage gestrichelt unter dem Plan
-- [x] a 3:16 Gespeichert wird von selbst
+## Floors (4.2)
+- [x] a 0:24 Floor list at the top of the sidebar ("Floors"): tapping a floor switches the floor in the plan
+- [x] a 0:34 Floor form appears only with nothing selected ("Back to the floor")
+- [x] a 0:52 "+ Add floor" opens the menu "Floors from Home Assistant:" with "· Level n"
+- [x] a 0:52 Only HA floors that are still missing appear in the menu
+- [x] a 0:52 / 3:20 "Empty floor" (shown in the menu; when all HA floors are assigned, the button creates an empty floor directly)
+- [x] a 0:59 New floor from HA: its height comes from the level, cellar level −1 → −2.75
+- [x] a 1:03 Floors are sorted from bottom to top (the cellar ends up at the bottom)
+- [x] a 0:41 "Name"
+- [x] a 0:41 / 1:03 "Height above the floor (m)"; negative = cellar below ground
+- [x] a 0:46 / 1:12 / 3:03 "Ceiling height (m)" (cellar and attic 2.20)
+- [x] a 1:16–1:23 Rule of thumb: height above the floor + ceiling height + slab (0.25 m) = next floor (cellar −2.45)
+- [x] a 0:46 / 3:27 "Floor in Home Assistant" (dropdown, "– none –"; already linked HA floors are missing)
+- [x] a 1:30 "Add rooms from HA areas (4)": one 4 × 3 m tile per area, already linked
+- [x] a 1:45 Drag a room: corners snap to other rooms
+- [x] a 1:50 Place a room precisely with "X (m)" / "Y (m)"
+- [x] a 2:02 "Close gaps": up to 60 cm, the gap becomes the interior wall thickness (message "2 spots closed, interior wall now 0.12 m")
+- [x] a 2:02 When it helps: measured inside dimensions
+- [x] a 2:15–2:31 "Shift the floor (m)": X and Y fields + "Shift" (what moves with it, what stays)
+- [x] a 2:38 "Turn 90°" (clockwise about the centre of the rooms)
+- [x] a 2:45 Ctrl+Z / "Undo"
+- [x] a 2:49 "Take every floor along (whole house)"
+- [x] a 3:58–4:10 "View as this floor's start" (turn the 3D pane, then click)
+- [x] a 4:17 ↺ next to the start view removes it
+- [x] a 3:49 Message without "3D beside"
+- [x] a 3:34 "Move up" / "Move down" (only the order of the list; position is set by height above the floor)
+- [x] a 3:42 "Delete floor" (confirmation, including its rooms, Ctrl+Z)
+- [x] a 0:30 / 3:08 Lower floor dashed beneath the plan
+- [x] a 3:16 Saved automatically
 
-## Treppen (4.16)
-- [x] b 0:33 Werkzeug „Möbel“ → Bibliothek, Suchfeld „Möbel suchen …“
-- [x] b 0:25 Erst Raum antippen: neue Möbel landen in seiner Mitte
-- [x] b 0:39 „Treppe“ (in „Arbeiten & Sonstiges“, kostenlos)
-- [x] b 0:45 Höhe automatisch bis zur Etage darüber („Höhe (m)“ 2,75)
-- [x] b 0:51 Richtung: steigt von der markierten Vorderkante nach hinten (Pfeil im Plan)
-- [x] b 0:57 Drehen: „↻ 90°“ und „Drehung (°)“ („↺ 90°“ steht daneben)
-- [x] b 1:03–1:09 Verschieben (ziehen), „X (m)“ / „Y (m)“, „Breite (m)“ / „Tiefe (m)“
-- [x] b 0:25 Die Treppe gehört zur unteren Etage
-- [x] b 1:15–1:31 Reicht sie bis zur Etage darüber, schneidet sie die Öffnung selbst (in 3D gezeigt)
-- [x] b 1:36 Die Öffnung muss oben ganz in einem Raum liegen
-- [x] b 1:09 Hinweistext im Formular („Die Treppe steigt nach hinten an …“)
-- [x] b 3:09 „Möbelstück“-Auswahl: Art tauschen ohne neu zu setzen (L → U)
-- [x] b 2:53 Pack „Treppen & Geländer“: gerade, freitragend, L, U, Wendel, Raumspar-, Außentreppe, Podest, Geländer (einmal als Erweiterung erwähnt)
-- [x] b 3:00 L-Treppe: Richtung mit „Drehung“, andere Seite mit „Spiegeln“
-- [x] b 3:27 Pack-Treppen haben eine feste Höhe (3,80): „Höhe (m)“ auf den Etagenabstand stellen (häufiger Fehler)
-- [x] b 3:15–3:35 Wendeltreppe Keller → Erdgeschoss (Öffnung im Flur, in 3D gezeigt)
-- [x] b 3:41–3:51 Raumspartreppe Obergeschoss → Dachgeschoss (Öffnung im Dachboden, in 3D gezeigt)
+## Stairs (4.16)
+- [x] b 0:33 "Furniture" tool → library, search field "Search furniture …"
+- [x] b 0:25 Tap a room first: new furniture lands in its centre
+- [x] b 0:39 "Stairs" (in "Work & other", free)
+- [x] b 0:45 Height automatically up to the floor above ("Height (m)" 2.75)
+- [x] b 0:51 Direction: rises from the marked front edge towards the back (arrow in the plan)
+- [x] b 0:57 Turning: "↻ 90°" and "Rotation (°)" ("↺ 90°" is beside it)
+- [x] b 1:03–1:09 Moving (drag), "X (m)" / "Y (m)", "Width (m)" / "Depth (m)"
+- [x] b 0:25 The stairs belong to the lower floor
+- [x] b 1:15–1:31 If they reach the floor above, they cut the opening themselves (shown in 3D)
+- [x] b 1:36 The opening must lie entirely inside a room above
+- [x] b 1:09 Hint text in the form ("The stair rises towards the back …")
+- [x] b 3:09 "Furniture item" dropdown: swap the type without placing it again (L → U)
+- [x] b 2:53 Pack "Stairs & railings": straight, floating, L, U, spiral, space-saver, outdoor stairs, landing, railings (mentioned once as an extension)
+- [x] b 3:00 L-stairs: direction with "Rotation", other side with "Mirror"
+- [x] b 3:27 Pack stairs have a fixed height (3.80): set "Height (m)" to the floor spacing (common mistake)
+- [x] b 3:15–3:35 Spiral stairs cellar → ground floor (opening in the hallway, shown in 3D)
+- [x] b 3:41–3:51 Space-saver stairs upper floor → attic (opening in the attic, shown in 3D)
 
-## Bodenöffnungen (4.16)
-- [x] b 1:43 Werkzeug „Bodenöffnung“, b 1:49 Hinweis unten im Plan
-- [x] b 1:49 Öffnung gehört zur Etage, deren Boden sie öffnet
-- [x] b 1:43 Wofür: Galerie, Luftraum, breiteres Treppenloch
-- [x] b 2:04 Ragt über eine Raumgrenze → Meldung „Diese Öffnung ragt über eine Raumgrenze …“, dann korrigiert
-- [x] b 2:15 Mehrere Öffnungen dürfen sich überlappen (L-Form)
-- [x] b 4:07 Von oben sieht man hindurch (3D, Obergeschoss gestapelt)
-- [x] b 2:09 / 2:22 Größe/Lage im Formular oder an den Ecken; „Löschen“
+## Floor openings (4.16)
+- [x] b 1:43 "Floor opening" tool, b 1:49 hint at the bottom of the plan
+- [x] b 1:49 The opening belongs to the floor whose floor it opens
+- [x] b 1:43 What it is for: gallery, open space, wider stairwell
+- [x] b 2:04 It crosses a room boundary → message "This opening crosses a room boundary …", then corrected
+- [x] b 2:15 Several openings may overlap (L shape)
+- [x] b 4:07 Seen through from above (3D, upper floor stacked)
+- [x] b 2:09 / 2:22 Size and position in the form or at the corners; "Delete"
 
-## 3D daneben (4.18)
-- [x] a 3:55 „3D daneben“ schaltet die 3D-Hälfte ein
-- [x] a 3:55 Änderungen erscheinen nach einem Augenblick in 3D
-- [x] a 4:02 Leiste zwischen Plan und 3D ziehen
-- [x] b 2:27 „Wände hoch“ / „Schnitt“
-- [x] b 2:31 Möbel in 3D antippen (ziehen gesagt); Leiste B, T, H, ↺ 45° / ↻ 45°, Fixieren, Löschen
-- [x] b 2:39–2:46 Seitenleiste klappt ein; Knöpfe am rechten Rand (☰, ⚙, 🛋, 🚪)
-- [x] b 2:46 „📌 Anheften“ / „Angeheftet“
-- [x] b 1:23 3D-Hälfte zeigt die gewählte Etage
+## 3D beside (4.18)
+- [x] a 3:55 "3D beside" switches on the 3D half
+- [x] a 3:55 Changes appear in 3D after a moment
+- [x] a 4:02 Drag the bar between plan and 3D
+- [x] b 2:27 "Tall walls" / "Cut"
+- [x] b 2:31 Tap furniture in 3D (dragging is mentioned); bar with W, D, H, "↺ 45°" / "↻ 45°", "Fix", "Delete"
+- [x] b 2:39–2:46 Sidebar collapses; buttons at the right edge (☰, ⚙, 🛋, 🚪)
+- [x] b 2:46 "📌 Pin" / "Pinned"
+- [x] b 1:23 The 3D half shows the selected floor
 
-## Prüfen in 3D (5.1/5.2)
-- [x] a 4:21 / b 3:56 Oben „3D“, „Alle Etagen“
-- [x] a 4:26 „Auseinander“ / a 4:33 „Gestapelt“
-- [x] a 4:42 Etagenknöpfe oben / Etagen-Bilder links
-- [x] a 4:33 Keller liegt unter dem Erdgeschoss, unter der Erde
-- [x] a 4:51 „Abgedunkelt“ / „Gestapelt“ / „Einzeln“
-- [x] a 4:42 Startansicht wirkt beim Öffnen (Obergeschoss von hinten)
-- [x] b 4:07 Treppenöffnung von oben sichtbar
+## Checking in 3D (5.1/5.2)
+- [x] a 4:21 / b 3:56 Top "3D", "All floors"
+- [x] a 4:26 "Apart" / a 4:33 "Stacked"
+- [x] a 4:42 Floor buttons at the top / floor pictures on the left
+- [x] a 4:33 Cellar lies under the ground floor, below ground
+- [x] a 4:51 "Dimmed" / "Stacked" / "Alone"
+- [x] a 4:42 Start view takes effect on opening (upper floor from the back)
+- [x] b 4:07 Stair opening visible from above

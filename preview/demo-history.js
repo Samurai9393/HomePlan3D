@@ -63,8 +63,8 @@ function buildEvents() {
   add("climate.wohnzimmer", start, "heat", { hvac_action: "idle", current_temperature: 19.6, temperature: 18 });
   add("climate.schlafzimmer", start, "heat", { hvac_action: "idle", current_temperature: 17.8, temperature: 17 });
 
-  const RADIO = ["Morgenmagazin", "Nachrichten", "Frühstücksradio", "Wetter und Verkehr"];
-  const SHOWS = ["Serie", "Tatort", "Dokumentation", "Fußball", "Quiz am Abend"];
+  const RADIO = ["Morning magazine", "News", "Breakfast radio", "Weather and traffic"];
+  const SHOWS = ["Series", "Crime drama", "Documentary", "Football", "Evening quiz"];
   for (let back = DAYS; back >= 0; back--) {
     const day = midnight(back);
     const r = rng(1000 + back);
@@ -139,7 +139,7 @@ function buildEvents() {
     // the robot at ten, the washing machine from eleven to twenty to one, home office upstairs
     // the robot reports the room it cleans (the trail through the rooms follows it)
     const v0 = at(day, 10.0, 1, r);
-    ["Wohnzimmer", "Essen", "Küche", "Flur"].forEach((room, i) => add("vacuum.saugi", v0 + i * 690000, "cleaning", { current_room: room }));
+    ["Living room", "Dining", "Kitchen", "Hallway"].forEach((room, i) => add("vacuum.saugi", v0 + i * 690000, "cleaning", { current_room: room }));
     add("vacuum.saugi", at(day, 10.8, 2, r), "returning");
     add("vacuum.saugi", at(day, 10.87, 2, r), "docked");
     span("binary_sensor.wohnzimmer_kamera_bewegung", at(day, 10.1, 1, r), at(day, 10.7, 1, r));

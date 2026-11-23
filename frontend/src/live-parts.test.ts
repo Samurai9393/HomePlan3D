@@ -58,10 +58,10 @@ test("finishes: the roles a built-in or a pack item is drawn with, and a placed 
 });
 
 test("the library indexes installed local packs with their items, sizes and search words", () => {
-  const living = { id: "mastershort.living", name: "Wohnzimmer", items: [{ id: "sofa_3", name: { de: "Sofa 3-Sitzer" }, size: [2.1, 0.9, 0.8], parts: [] }] };
-  const entries = buildIndex({ packs: [living as never], basics: [], language: "de", basicName: (t) => t, basicNameEn: (t) => t, kindName: (k) => k, size: () => [1, 1, 1] });
+  const living = { id: "mastershort.living", name: "Living room", items: [{ id: "sofa_3", name: { en: "3-seat sofa" }, size: [2.1, 0.9, 0.8], parts: [] }] };
+  const entries = buildIndex({ packs: [living as never], basics: [], language: "en", basicName: (t) => t, basicNameEn: (t) => t, kindName: (k) => k, size: () => [1, 1, 1] });
   assert.deepEqual(entries.map((e) => e.type), ["pack:mastershort.living:sofa_3"]);
-  assert.equal(entries[0].label, "Sofa 3-Sitzer");
+  assert.equal(entries[0].label, "3-seat sofa");
   assert.equal(entries[0].pack, "mastershort.living");
   assert.equal((entries[0] as { locked?: unknown }).locked, undefined);
   const f = { query: "sofa", room: null, electric: false, light: false, outdoor: false };

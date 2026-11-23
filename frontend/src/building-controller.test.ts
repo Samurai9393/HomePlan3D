@@ -26,7 +26,7 @@ test("a plan that is gone (in the bin, a card of a deleted one) shows the main p
 function fakeHass() {
   const named = (name: string): Building => ({ ...emptyBuilding(), floors: [newFloor("f1", name, 0)] });
   const plans: Record<string, { building: Building; revision: number }> = {
-    main: { building: named("Haus"), revision: 1 },
+    main: { building: named("House"), revision: 1 },
     pgarage: { building: named("Garage"), revision: 1 },
   };
   const calls: Record<string, unknown>[] = [];
@@ -80,12 +80,12 @@ test("switching plans saves the open edits to their own plan first, then follows
 
   // an edit in the garage, then off to the house before the save was due
   const edited = structuredClone(c.building!);
-  edited.floors[0].name = "Werkstatt";
+  edited.floors[0].name = "Workshop";
   c.edit(edited);
   await c.switchPlan("main");
-  assert.equal(plans.pgarage.building.floors[0].name, "Werkstatt");
-  assert.equal(plans.main.building.floors[0].name, "Haus");
-  assert.equal(c.building?.floors[0].name, "Haus");
+  assert.equal(plans.pgarage.building.floors[0].name, "Workshop");
+  assert.equal(plans.main.building.floors[0].name, "House");
+  assert.equal(c.building?.floors[0].name, "House");
   // the main plan is asked for without naming it (an older backend does not know the field)
   const save = calls.find((m) => m.type === "homeplan3d/building/save")!;
   assert.equal(save.plan, "pgarage");
@@ -106,24 +106,24 @@ test("an edit made on an older plan does not overwrite one saved elsewhere meanw
   c.setHass(hass);
   c.hostConnected();
   await new Promise((r) => setTimeout(r, 10));
-  assert.equal(c.building?.floors[0].name, "Haus");
+  assert.equal(c.building?.floors[0].name, "House");
   // the PC saves meanwhile; this device (asleep) did not hear of it
-  plans.main = { building: { ...plans.main.building, floors: [newFloor("f1", "Neuer Stand", 0)] }, revision: 2 };
+  plans.main = { building: { ...plans.main.building, floors: [newFloor("f1", "New version", 0)] }, revision: 2 };
   const edited = structuredClone(c.building!);
-  edited.floors[0].name = "Alter Stand geändert";
+  edited.floors[0].name = "Old version changed";
   c.edit(edited);
   await c.flush();
   // refused: the newer plan stays and is shown, the edit waits as a draft
-  assert.equal(plans.main.building.floors[0].name, "Neuer Stand");
-  assert.equal(c.building?.floors[0].name, "Neuer Stand");
+  assert.equal(plans.main.building.floors[0].name, "New version");
+  assert.equal(c.building?.floors[0].name, "New version");
   assert.equal(c.draft?.conflict, true);
-  assert.equal(c.draft?.building.floors[0].name, "Alter Stand geändert");
+  assert.equal(c.draft?.building.floors[0].name, "Old version changed");
   assert.equal(c.saveState, "idle");
   assert.equal(calls.filter((m) => m.type === "homeplan3d/building/save")[0].base_revision, 1);
   // taken over on purpose: saved over the newer plan
   c.restoreDraft();
   await c.flush();
-  assert.equal(plans.main.building.floors[0].name, "Alter Stand geändert");
+  assert.equal(plans.main.building.floors[0].name, "Old version changed");
   assert.equal(plans.main.revision, 3);
   c.hostDisconnected();
 });

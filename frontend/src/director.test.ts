@@ -11,7 +11,7 @@ const hass = {
   states: {
     "event.front_ding": st("event.front_ding", "2026-10-17T10:00:00.000Z", { device_class: "doorbell" }),
     "event.button": st("event.button", "2026-10-17T10:00:00.000Z", { device_class: "button" }),
-    "binary_sensor.haustuer_visitor": st("binary_sensor.haustuer_visitor", "off", { friendly_name: "Haustür Besucher" }),
+    "binary_sensor.haustuer_visitor": st("binary_sensor.haustuer_visitor", "off", { friendly_name: "Front door visitor" }),
     "binary_sensor.motion": st("binary_sensor.motion", "off"),
     "camera.haustuer": st("camera.haustuer", "idle"),
     "camera.garten": st("camera.garten", "idle"),

@@ -238,7 +238,7 @@ type Conversed = { response?: { speech?: { plain?: { speech?: string } } } };
 
 /**
  * Hand a sentence to Assist's conversation ("Licht im Flur an"); its spoken answer as text. `area`: the Home
- * Assistant area this device hangs in – "Licht an" and "Mach hier das Licht an" switch the lights there.
+ * Assistant area this device hangs in – "Lights on" and "Turn on the light here" switch the lights there.
  */
 export async function converse(hass: HomeAssistant, text: string, area: string | null = null): Promise<string> {
   if (area) {

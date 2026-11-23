@@ -11,7 +11,7 @@ setPacks([{ id: "local.fun_winter", name: "Winter", publisher: "Local", items: [
 const plan = (winter: Building["settings"]["winter"] = {}): Building => {
   const b = emptyBuilding();
   b.settings.winter = winter;
-  b.floors = [{ ...newFloor("eg", "EG", 0), outdoor: [{ id: "lawn", type: "lawn", points: [[0, 0], [5, 0], [5, 5], [0, 5]] }] } as never];
+  b.floors = [{ ...newFloor("eg", "Ground floor", 0), outdoor: [{ id: "lawn", type: "lawn", points: [[0, 0], [5, 0], [5, 5], [0, 5]] }] } as never];
   return b;
 };
 const hass = (states: Record<string, { state: string; attributes?: Record<string, unknown> }>) => ({ states }) as unknown as HomeAssistant;

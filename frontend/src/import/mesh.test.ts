@@ -60,7 +60,7 @@ function house(): number[] {
 }
 
 test("a 3D model of a house: storeys found, rooms between the walls, doors and the window from the gaps", () => {
-  const { plan, info } = readMesh(house(), { lang: "de" });
+  const { plan, info } = readMesh(house());
   assert.equal(info.up, "y");
   assert.equal(info.unit, 1);
   assert.equal(plan.floors.length, 2, JSON.stringify(info.levels));

@@ -6,7 +6,7 @@ import { lampSwitches, roomEntities } from "./rooms.ts";
 
 test("an outdoor area with an area of its own is a room of the time travel: its sensors replay (#974)", () => {
   const floor = newFloor("eg", "EG", 0);
-  floor.rooms = [{ id: "living", name: "Wohnen", area_id: "living", floor_material: "wood", points: [[0, 0], [5, 0], [5, 4], [0, 4]] }];
+  floor.rooms = [{ id: "living", name: "Living", area_id: "living", floor_material: "wood", points: [[0, 0], [5, 0], [5, 4], [0, 4]] }];
   floor.outdoor = [
     { id: "balcony", type: "balcony", area_id: "balcony", name: "Balkon", points: [[5, 0], [7, 0], [7, 4], [5, 4]] },
     // a lawn without an area is no room
@@ -28,7 +28,7 @@ test("an outdoor area with an area of its own is a room of the time travel: its 
 
 test("a switch that drives a lamp of the plan counts as the room's light in the day summary (#1032)", () => {
   const floor = newFloor("eg", "EG", 0);
-  floor.rooms = [{ id: "living", name: "Wohnen", area_id: "living", floor_material: "wood", points: [[0, 0], [5, 0], [5, 4], [0, 4]] }];
+  floor.rooms = [{ id: "living", name: "Living", area_id: "living", floor_material: "wood", points: [[0, 0], [5, 0], [5, 4], [0, 4]] }];
   floor.furniture = [{ id: "lamp", type: "lamp_floor", x: 1, z: 1, rotation: 0, w: 0.4, d: 0.4, h: 1.6 } as never, { id: "tv", type: "tv", x: 3, z: 1, rotation: 0, w: 1, d: 0.2, h: 0.6 } as never];
   const b = { ...emptyBuilding(), floors: [floor] };
   const ids = ["switch.plug_lamp", "switch.plug_tv", "light.ceiling"];

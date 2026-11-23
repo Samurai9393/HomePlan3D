@@ -8,26 +8,26 @@ import type { HomeAssistant } from "./types.ts";
 function setup() {
   const st = (entity_id: string, state: string, attributes: Record<string, unknown> = {}) => ({ entity_id, state, attributes });
   const hass = {
-    language: "de",
-    areas: { kueche: { area_id: "kueche", name: "Küche" }, bad: { area_id: "bad", name: "Bad" } },
+    language: "en",
+    areas: { kueche: { area_id: "kueche", name: "Kitchen" }, bad: { area_id: "bad", name: "Bathroom" } },
     entities: {
       "binary_sensor.rauch": { entity_id: "binary_sensor.rauch", area_id: "kueche" },
       "binary_sensor.wasser": { entity_id: "binary_sensor.wasser", area_id: "bad" },
       "binary_sensor.fenster": { entity_id: "binary_sensor.fenster", area_id: "kueche" },
     },
     states: {
-      "binary_sensor.rauch": st("binary_sensor.rauch", "off", { device_class: "smoke", friendly_name: "Rauchmelder" }),
-      "binary_sensor.wasser": st("binary_sensor.wasser", "off", { device_class: "moisture", friendly_name: "Wassermelder" }),
-      "binary_sensor.fenster": st("binary_sensor.fenster", "on", { device_class: "window", friendly_name: "Küche Fenster" }),
+      "binary_sensor.rauch": st("binary_sensor.rauch", "off", { device_class: "smoke", friendly_name: "Smoke detector" }),
+      "binary_sensor.wasser": st("binary_sensor.wasser", "off", { device_class: "moisture", friendly_name: "Water detector" }),
+      "binary_sensor.fenster": st("binary_sensor.fenster", "on", { device_class: "window", friendly_name: "Kitchen window" }),
       "weather.zuhause": st("weather.zuhause", "sunny"),
       "alarm_control_panel.haus": st("alarm_control_panel.haus", "disarmed"),
     },
   } as unknown as HomeAssistant;
   const b = emptyBuilding();
-  const floor = newFloor("eg", "EG", 0);
+  const floor = newFloor("eg", "Ground floor", 0);
   floor.rooms = [
-    { id: "k", name: "Küche", area_id: "kueche", points: [[0, 0], [4, 0], [4, 3], [0, 3]], floor_material: "tiles" },
-    { id: "b", name: "Bad", area_id: "bad", points: [[4, 0], [7, 0], [7, 3], [4, 3]], floor_material: "tiles" },
+    { id: "k", name: "Kitchen", area_id: "kueche", points: [[0, 0], [4, 0], [4, 3], [0, 3]], floor_material: "tiles" },
+    { id: "b", name: "Bathroom", area_id: "bad", points: [[4, 0], [7, 0], [7, 3], [4, 3]], floor_material: "tiles" },
   ];
   const win: Opening = { id: "w", room_id: "k", edge: 0, offset: 2, width: 1.2, type: "window", sill: 0.9, height: 1.3, hinge: "left", leaves: 1, swing: "in", cover: null, contact: "binary_sensor.fenster", contact2: null, tilt: null };
   floor.openings = [win];
@@ -57,12 +57,12 @@ test("smoke and water raise room warnings, a triggered alarm a house-wide one", 
     alerts.map((a) => [a.kind, a.roomId]),
     [["smoke", "k"], ["water", "b"], ["alarm", null]],
   );
-  assert.equal(alertText(hass, b, alerts[0]), "Küche · Rauch: Rauchmelder");
-  assert.equal(alertText(hass, b, alerts[2]), "Alarm ausgelöst");
+  assert.equal(alertText(hass, b, alerts[0]), "Kitchen · Smoke: Smoke detector");
+  assert.equal(alertText(hass, b, alerts[2]), "Alarm triggered");
   // without device names only the room and the kind remain; a warning without a room keeps its text (#374)
   b.settings.alert_names = false;
-  assert.equal(alertText(hass, b, alerts[0]), "Küche · Rauch");
-  assert.equal(alertText(hass, b, alerts[2]), "Alarm ausgelöst");
+  assert.equal(alertText(hass, b, alerts[0]), "Kitchen · Smoke");
+  assert.equal(alertText(hass, b, alerts[2]), "Alarm triggered");
   delete b.settings.alert_names;
   hass.states["alarm_control_panel.haus"].state = "pending";
   assert.equal(findAlerts(hass, b, src, links).at(-1)?.kind, "alarm_pending");
@@ -119,12 +119,12 @@ test("a power outage: grid sensors off, helpers on, a UPS on battery, a low main
 
   const b = emptyBuilding();
   b.settings.outage_entity = "binary_sensor.netz";
-  const hass = { language: "de", areas: {}, entities: {}, devices: {}, states: { "binary_sensor.netz": st("binary_sensor.netz", "off", { device_class: "power", friendly_name: "Netz" }) } } as unknown as HomeAssistant;
+  const hass = { language: "en", areas: {}, entities: {}, devices: {}, states: { "binary_sensor.netz": st("binary_sensor.netz", "off", { device_class: "power", friendly_name: "Grid" }) } } as unknown as HomeAssistant;
   const sources = alertSources(hass, b);
   assert.deepEqual(alertEntities(sources), ["binary_sensor.netz"]);
   const alerts = findAlerts(hass, b, sources, new Map());
   assert.deepEqual(alerts.map((a) => a.kind), ["power_outage"]);
-  assert.equal(alertText(hass, b, alerts[0]), "Stromausfall: Netz");
+  assert.equal(alertText(hass, b, alerts[0]), "Power outage: Grid");
 });
 
 test("the outage picker offers grid and UPS sources, not switches or meters (#831)", async () => {
@@ -143,20 +143,20 @@ test("the outage picker offers grid and UPS sources, not switches or meters (#83
 test("household warns when a fridge door stands open too long, without a pack", () => {
   const open = new Date(Date.now() - 5 * 60_000).toISOString();
   const hass = {
-    language: "de",
-    states: { "binary_sensor.kuehlschrank": { entity_id: "binary_sensor.kuehlschrank", state: "on", attributes: { friendly_name: "Kühlschranktür" }, last_changed: open } },
+    language: "en",
+    states: { "binary_sensor.kuehlschrank": { entity_id: "binary_sensor.kuehlschrank", state: "on", attributes: { friendly_name: "Fridge door" }, last_changed: open } },
     entities: {},
   } as unknown as HomeAssistant;
   const b = emptyBuilding();
-  const floor = newFloor("eg", "EG", 0);
-  floor.rooms = [{ id: "k", name: "Küche", area_id: null, points: [[0, 0], [4, 0], [4, 3], [0, 3]], floor_material: "tiles" }];
+  const floor = newFloor("eg", "Ground floor", 0);
+  floor.rooms = [{ id: "k", name: "Kitchen", area_id: null, points: [[0, 0], [4, 0], [4, 3], [0, 3]], floor_material: "tiles" }];
   floor.furniture = [{ id: "f1", type: "fridge", x: 1, z: 1, rotation: 0, w: 0.6, d: 0.65, h: 1.8, variant: null, door_left: "binary_sensor.kuehlschrank" }];
   b.floors = [floor];
   const sources = alertSources(hass, b);
   assert.ok(alertEntities(sources).includes("binary_sensor.kuehlschrank"));
   const alerts = findAlerts(hass, b, sources, new Map());
   assert.deepEqual(alerts.map((a) => [a.kind, a.roomId]), [["fridge_door", "k"]]);
-  assert.equal(alertText(hass, b, alerts[0]), "Küche · Kühlschrank offen: Kühlschranktür");
+  assert.equal(alertText(hass, b, alerts[0]), "Kitchen · Fridge open: Fridge door");
 });
 
 test("a contact unavailable for 10 minutes warns only when switched on; a short gap passes", () => {

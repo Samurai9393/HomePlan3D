@@ -49,7 +49,7 @@ export interface LibraryEntry {
   /** Placed mirrored (the twin of an item that comes left-handed only: the corner sofa for the other side). */
   mirror?: boolean;
   label: string;
-  /** Every word that finds it (names in all languages, the id, the pack's name, the kind). */
+  /** Every word that finds it (the English name, the id, the pack's name, the kind). */
   search: string;
   kind: Kind;
   rooms: Room[];
@@ -223,7 +223,7 @@ const RULES: Rule[] = [
   [/\b(bed|beds|boxspring|box-spring|futon|canopy)\b/, "bed", ["bedroom"]],
   [/\b(wardrobe|closet|clothes|dresser|chest of|nightstand|bedside)\b/, "storage", ["bedroom"]],
   [/\b(desk|office|whiteboard|filing|file cabinet)\b/, "office", ["office"]],
-  [/\b(sofa|chesterfield|chaise|r[ée]camière|recamiere|lounge set)\b/, "sofa", ["living"]],
+  [/\b(sofa|chesterfield|chaise|recamier|recamiere|lounge set)\b/, "sofa", ["living"]],
   [/\b(table|tables|workbench|vanity)\b/, "table", null],
   [/\b(armchair|chair|chairs|stool|stools|bench|recliner|bean bag|pouf|seat|rocking)\b/, "seating", null],
   [/\b(waste|bin|mailbox|drying rack|basket|coat|laundry|hooks)\b/, "household", null],
@@ -255,22 +255,22 @@ export function classify(packId: string, item: PackItem): { kind: Kind; rooms: R
   return { kind: "deco", rooms: ownRooms ?? packRooms };
 }
 
-/** Which room kind a room is, by its name (German, English and the languages NeonPlan speaks); null when unclear. */
+/** Which room kind a room is, by its English name; null when unclear. */
 export function roomKindOf(name: string): Room | null {
   const n = name.toLowerCase();
   const table: [RegExp, Room][] = [
-    [/kinder|kids|child|niñ|bambin|enfant|dziec|děts|barn|lapsi|gyerek|copi|otro|儿童|kinderkamer/, "kids"],
-    [/schlaf|bedroom|dormit|camera da letto|chambre|slaapkamer|sypial|ložnic|sover|makuu|háló|dormitor|spaln|卧室|soveværelse/, "bedroom"],
-    [/wohn|living|lounge|salon|soggiorno|sala de estar|woonkamer|obývací|stue|olohuone|nappali|sufrag|dnevn|客厅/, "living"],
-    [/\bess|dining|comedor|pranzo|salle à manger|eetkamer|jadal|jídel|spise|ruokailu|étkez|jedil|餐厅/, "dining"],
-    [/küche|kueche|kitchen|cocina|cucina|cuisine|keuken|kuchn|kuchyn|kjøkken|køkken|keittiö|konyha|bucăt|kuhinj|厨房/, "kitchen"],
-    [/\bbad\b|bath|baño|bagno|salle de bain|badkamer|łazienk|koupeln|baderom|badevær|kylpy|fürdő|baie|kopaln|wc|toilet|gäste|guest|浴室|dusch|shower/, "bath"],
-    [/büro|buero|office|arbeit|studio|bureau|kantoor|biuro|pracovn|kontor|työhuone|iroda|birou|pisarn|gaming|办公/, "office"],
-    [/flur|diele|hall|corridor|entrance|eingang|ingresso|gang|hal\b|przedpok|chodba|entré|eteinen|előszoba|hol\b|hodnik|treppe|stair|walk/, "hall"],
-    [/hauswirtschaft|hwr|utility|technik|keller|wasch|laundry|lavander|buanderie|berging|bijkeuken|pralni|prádeln|vaskerom|kodinhoito|mosó|tehnic|pralnic|cellar|basement|abstell|storage|vorrat|pantry|heizung|boiler/, "utility"],
-    [/garage|carport|werkstatt|workshop|garaje|garaż|garáž|verkstad|autotalli|garázs|garaj|garaž|车库/, "garage"],
-    [/garten|garden|terrasse|terrace|balkon|balcony|jardin|giardino|tuin|ogród|zahrad|hage|have|puutarha|kert|grădin|vrt|pool|yard|patio|einfahrt|driveway|花园/, "garden"],
-    [/fitness|gym|sport|hobby|kino|cinema|heimkino|home theater|spiel|play|party|bar\b|sauna|wellness/, "hobby"],
+    [/kids|child|teen|nursery|playroom/, "kids"],
+    [/bedroom|guest room|guest loft|dressing room|flat/, "bedroom"],
+    [/living|lounge|gallery|sitting room/, "living"],
+    [/dining/, "dining"],
+    [/kitchen/, "kitchen"],
+    [/\bbath\b|bathroom|wc|toilet|guest|shower/, "bath"],
+    [/office|study/, "office"],
+    [/hall|corridor|entrance|cloakroom|walk/, "hall"],
+    [/utility|laundry|basement|cellar|storage|pantry|heating|workshop/, "utility"],
+    [/garage|carport/, "garage"],
+    [/garden|terrace|balcony|yard|patio|driveway/, "garden"],
+    [/fitness|gym|sport|hobby|cinema|home theater|play|party|bar\b|sauna/, "hobby"],
   ];
   for (const [re, room] of table) if (re.test(n)) return room;
   return null;
@@ -279,13 +279,13 @@ export function roomKindOf(name: string): Room | null {
 // ---------------------------------------------------------------------------------------------- families
 
 /** The sizes and counts in a name that make it a variant: "160 × 200", "2-seater", "3-door", "4 × 2", "15″". */
-const VARIANT_WORDS = /\s*\(?\b\d+(?:[.,]\d+)?\s*(?:[×x]\s*\d+(?:[.,]\d+)?)*\s*(?:cm|m|l|u|″|"|-seater|-sitzer|-door|-türig|-drawer|-teilig|-piece|seats|parts)?\)?/gi;
+const VARIANT_WORDS = /\s*\(?\b\d+(?:[.,]\d+)?\s*(?:[×x]\s*\d+(?:[.,]\d+)?)*\s*(?:cm|m|l|″|"|-seater|-door|-drawer|-piece|seats|parts)?\)?/gi;
 
 /** A name without its numbers: "Dining table 160 × 90" → "Dining table", "2-seater sofa" → "Sofa". */
 export function familyLabel(name: string): string {
   const out = name
     .replace(VARIANT_WORDS, " ")
-    .replace(/\s+(mit|with|avec|con)\s*$/i, "")
+    .replace(/\s+with\s*$/i, "")
     .replace(/\s{2,}/g, " ")
     .replace(/^[\s,–-]+|[\s,–-]+$/g, "")
     .trim();
@@ -296,21 +296,21 @@ export function familyLabel(name: string): string {
 export function variantLabel(name: string): string | null {
   const hits = [...name.matchAll(/\d+(?:[.,]\d+)?(?:\s*[×x]\s*\d+(?:[.,]\d+)?)*/g)].map((m) => m[0].replace(/\s*[×x]\s*/g, " × "));
   if (hits.length) return hits.join(" · ");
-  const side = name.match(/\b(links|rechts|left|right)\b/i);
+  const side = name.match(/\b(left|right)\b/i);
   return side ? side[1].toLowerCase() : null;
 }
 
 /** The side an item is made for, by its name: "left" / "right", null for the rest. */
 export function sideOf(name: string): "left" | "right" | null {
-  if (/\b(links|left)\b/i.test(name)) return "left";
-  if (/\b(rechts|right)\b/i.test(name)) return "right";
+  if (/\bleft\b/i.test(name)) return "left";
+  if (/\bright\b/i.test(name)) return "right";
   return null;
 }
 
-/** The name for the other side: "Ecksofa links" → "Ecksofa rechts", "Corner sofa (left)" → "Corner sofa (right)". */
+/** The name for the other side: "Corner sofa left" → "Corner sofa right", "Corner sofa (left)" → "Corner sofa (right)". */
 export function otherSideName(name: string): string {
-  return name.replace(/\b(links|rechts|left|right)\b/i, (w) => {
-    const map: Record<string, string> = { links: "rechts", rechts: "links", left: "right", right: "left" };
+  return name.replace(/\b(left|right)\b/i, (w) => {
+    const map: Record<string, string> = { left: "right", right: "left" };
     const out = map[w.toLowerCase()] ?? w;
     return w[0] === w[0].toUpperCase() ? out[0].toUpperCase() + out.slice(1) : out;
   });
@@ -319,7 +319,7 @@ export function otherSideName(name: string): string {
 /** An item's family key: its own field, else its id without the size suffix (sofa_3 → sofa, base_60 → base, cube_4x2 → cube). */
 export function familyOf(item: PackItem): string | null {
   if (item.family) return item.family;
-  const m = item.id.match(/^(.*?)_(\d+(?:x\d+)?|left|right|links|rechts)$/);
+  const m = item.id.match(/^(.*?)_(\d+(?:x\d+)?|left|right)$/);
   return m ? m[1] : null;
 }
 
@@ -339,32 +339,32 @@ export interface IndexSource {
 
 const OUTDOOR_ROOMS = new Set<Room>(["garden"]);
 
-/** Everyday words (German and English) that find a kind: "Lampe" finds the lights, "Schrank" the cabinets. */
+/** Everyday words that find a kind: "lamp" finds the lights, "cabinet" the cabinets. */
 const KIND_WORDS: Record<Kind, string> = {
   sofa: "sofa couch",
-  seating: "stuhl sessel hocker bank sitz chair stool bench seat",
-  table: "tisch table",
-  storage: "schrank regal kommode vitrine cabinet shelf dresser wardrobe",
-  bed: "bett bed",
-  kitchen: "küche kitchen",
-  appliance: "gerät geräte appliance",
-  bath: "bad bath",
-  lamp: "lampe lampen leuchte licht lamp light",
-  media: "tv fernseher lautsprecher audio speaker",
-  office: "büro schreibtisch desk office",
-  tech: "technik smart home sensor",
-  heating: "heizung heizkörper klima heating climate",
-  energy: "energie strom solar energy power",
-  household: "haushalt household",
-  deco: "deko dekoration decoration",
-  plant: "pflanze pflanzen baum plant tree",
-  outdoor: "garten außen draußen garden outdoor",
-  kids: "kinder kids",
+  seating: "chair stool bench seat",
+  table: "table",
+  storage: "cabinet shelf dresser wardrobe",
+  bed: "bed",
+  kitchen: "kitchen",
+  appliance: "appliance",
+  bath: "bath",
+  lamp: "lamp light",
+  media: "tv speaker audio",
+  office: "desk office",
+  tech: "tech smart home sensor",
+  heating: "heating climate",
+  energy: "solar energy power",
+  household: "household",
+  deco: "deco decoration",
+  plant: "plant tree",
+  outdoor: "garden outdoor",
+  kids: "kids",
   sport: "fitness sport",
-  pets: "haustier tier pet",
-  vehicle: "auto fahrzeug car vehicle",
-  stairs: "treppe geländer stairs railing",
-  architecture: "architektur architecture",
+  pets: "pet",
+  vehicle: "car vehicle",
+  stairs: "stairs railing",
+  architecture: "architecture",
 };
 
 export function buildIndex(src: IndexSource): LibraryEntry[] {
@@ -425,7 +425,7 @@ export function buildIndex(src: IndexSource): LibraryEntry[] {
   for (const e of [...out]) {
     const side = sideOf(e.label);
     if (!side || e.mirror) continue;
-    const twinType = e.type.replace(/(_|\b)(left|right|links|rechts)(?=$|[_\s)])/i, (_m: string, sep: string, w: string) => sep + (({ left: "right", right: "left", links: "rechts", rechts: "links" } as Record<string, string>)[w.toLowerCase()] ?? w));
+    const twinType = e.type.replace(/(_|\b)(left|right)(?=$|[_\s)])/i, (_m: string, sep: string, w: string) => sep + (({ left: "right", right: "left" } as Record<string, string>)[w.toLowerCase()] ?? w));
     if (twinType !== e.type && byType.has(twinType)) continue;
     const label = otherSideName(e.label);
     out.push({ ...e, key: `${e.type}#m`, mirror: true, label, search: `${e.search} ${label}`, family: e.family ?? e.type, variant: variantLabel(label) });
@@ -439,8 +439,7 @@ export function fold(s: string): string {
   return s
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/ß/g, "ss");
+    .replace(/[̀-ͯ]/g, "");
 }
 
 export interface LibraryFilter {
@@ -495,11 +494,10 @@ export function cardsOf(entries: readonly LibraryEntry[], kind: Kind): LibraryCa
   return cards;
 }
 
-/** "210 × 92 cm" (or "2,10 × 0,92 m" for big things) for a card. */
-export function sizeText(size: [number, number, number], language: string): string {
+/** "210 × 92 cm" (or "2.10 × 0.92 m" for big things) for a card. */
+export function sizeText(size: [number, number, number], _language: string): string {
   const [w, d] = size;
   const cm = (v: number) => Math.round(v * 100);
-  const sep = language.startsWith("de") || language.startsWith("fr") || language.startsWith("it") || language.startsWith("es") || language.startsWith("nl") ? "," : ".";
-  if (w >= 10 || d >= 10) return `${(Math.round(w * 10) / 10).toString().replace(".", sep)} × ${(Math.round(d * 10) / 10).toString().replace(".", sep)} m`;
+  if (w >= 10 || d >= 10) return `${Math.round(w * 10) / 10} × ${Math.round(d * 10) / 10} m`;
   return `${cm(w)} × ${cm(d)} cm`;
 }

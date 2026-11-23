@@ -1,6 +1,6 @@
 """The NeonPlan views open now: every panel and dashboard card that listens (voice/subscribe) tells what it shows.
 
-The editor's card templates list them ("the kitchen tablet shows "Küche", version 2.3.0, since 7:02") and can let
+The editor's card templates list them ("the kitchen tablet shows "Kitchen", version 2.3.0, since 7:02") and can let
 one of them load its page again. Kept in memory only: a view that goes away (closed, the tablet asleep and cut off)
 leaves the list with its connection.
 """

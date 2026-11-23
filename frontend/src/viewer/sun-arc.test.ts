@@ -11,7 +11,7 @@ function rect(id: string, x0: number, z0: number, x1: number, z1: number): Room 
 /** A 15 × 10 m house on an 80 × 52 m plot: a lawn, a fence of free walls along its far side (#833). */
 function plot(): Building {
   const b = emptyBuilding();
-  const eg = { ...newFloor("eg", "EG", 0), rooms: [rect("a", 0, 0, 15, 10)] };
+  const eg = { ...newFloor("eg", "Ground floor", 0), rooms: [rect("a", 0, 0, 15, 10)] };
   eg.outdoor = [{ id: "lawn", type: "lawn", points: [[-20, -15], [40, -15], [40, 30], [-20, 30]] }] as Building["floors"][0]["outdoor"];
   eg.walls = [{ id: "fence", a: [-20, 37], b: [60, 37] }];
   b.floors = [eg];
@@ -41,7 +41,7 @@ test("the sun arc can stand around the whole plot: outdoor areas and free walls 
 
 test("no house, no arc; a small house keeps the arc's least size", () => {
   const b = emptyBuilding();
-  b.floors = [newFloor("eg", "EG", 0)];
+  b.floors = [newFloor("eg", "Ground floor", 0)];
   b.settings.sun_arc = "plot";
   assert.equal(sunArcFrame(b), null);
   b.floors[0].rooms = [rect("a", 0, 0, 2, 2)];

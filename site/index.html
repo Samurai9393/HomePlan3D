@@ -13,12 +13,10 @@
       a { color: #00e5ff; }
     </style>
     <script>
-      // German browsers get the German demo, everyone else the English one
-      const lang = (navigator.language || "en").toLowerCase().startsWith("de") ? "de" : "en";
-      location.replace("preview/index.html?site&lang=" + lang);
+      location.replace("preview/index.html?site");
     </script>
   </head>
   <body>
-    <p>Loading the demo … <a href="preview/index.html?site&amp;lang=en">open it here</a></p>
+    <p>Loading the demo … <a href="preview/index.html?site">open it here</a></p>
   </body>
 </html>

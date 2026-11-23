@@ -18,7 +18,8 @@
 
 ## Instruction sources
 
-- `CLAUDE.md` is copied upstream guidance: keep its German user-prose / English code, identifiers and comments convention, but treat its `private/docs/...` paths and upstream repo links as absent here, and do not follow its "push" step without explicit instruction.
+- `CLAUDE.md` is copied upstream guidance, adapted to this repo's English-only rule: all user prose, UI strings, docs and comments are English; treat its `private/docs/...` paths and upstream repo links as absent here, and do not follow its "push" step without explicit instruction.
+- The product is English-only (since 2026-11-23): no German or other-language UI catalogues, no language-loading machinery, no `frontend/lang/`. Do not reintroduce translations or locale branches; `translate()` ignores `hass.language`.
 
 ## Developer commands
 
