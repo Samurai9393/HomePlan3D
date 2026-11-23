@@ -1,5 +1,5 @@
 name: 💡 Feature request / Funktionswunsch
-description: A concrete idea for NeonPlan 3D. For open ideas and voting use the Ideas discussions. / Eine konkrete Idee. Zum Sammeln und Abstimmen gibt es die Ideen-Diskussionen.
+description: A concrete idea for HomePlan 3D. For open ideas and voting use the Ideas discussions. / Eine konkrete Idee. Zum Sammeln und Abstimmen gibt es die Ideen-Diskussionen.
 labels: ["enhancement"]
 body:
   - type: markdown
@@ -19,7 +19,7 @@ body:
     id: idea
     attributes:
       label: Your idea / Deine Idee
-      description: How could it look or work in NeonPlan 3D? / Wie könnte es aussehen oder funktionieren?
+      description: How could it look or work in HomePlan 3D? / Wie könnte es aussehen oder funktionieren?
     validations:
       required: true
   - type: dropdown

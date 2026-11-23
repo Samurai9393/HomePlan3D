@@ -1,8 +1,8 @@
-# NeonPlan 3D – Manual
+# HomePlan 3D – Manual
 
 🇬🇧 English · [🇩🇪 Deutsch](anleitung.md)
 
-NeonPlan 3D draws your home right inside Home Assistant and shows it as a 3D model in a neon look. Lights glow in their colours, blinds move, windows tilt, doors swing open, cameras look into the room and the TV shows what is playing. Everything runs locally in Home Assistant, without a cloud or external programs, and it is built for wall tablets.
+HomePlan 3D draws your home right inside Home Assistant and shows it as a 3D model in a neon look. Lights glow in their colours, blinds move, windows tilt, doors swing open, cameras look into the room and the TV shows what is playing. Everything runs locally in Home Assistant, without a cloud or external programs, and it is built for wall tablets.
 
 This manual describes every feature of the current version. What changed in which version is in the [changelog](../CHANGELOG.md) and on the [releases page](https://github.com/Mastershort/neonplan3d/releases). The pictures come from the demo with invented data. The app follows the language of your Home Assistant user (profile → language); the labels below are the English ones. German and English are built in; French, Spanish, Dutch, Italian, Hungarian, Danish, Swedish, Norwegian (Bokmål and Nynorsk), Finnish, Czech, Polish, Romanian, Slovenian, Slovak, Portuguese, Turkish and Chinese (Simplified) are fetched when needed, so the bundles stay small for wall tablets. A text missing in a language shows in English.
 
@@ -20,7 +20,7 @@ This manual describes every feature of the current version. What changed in whic
 6. [Pro add-ons](#6-pro-add-ons)
 7. [Extensions, shop and furniture packs](#7-extensions-shop-and-furniture-packs)
 8. [The dashboard card](#8-the-dashboard-card)
-9. [NeonPlan 3D on a wall tablet](#9-neonplan-3d-on-a-wall-tablet)
+9. [HomePlan 3D on a wall tablet](#9-neonplan-3d-on-a-wall-tablet)
 10. [Backup and moving](#10-backup-and-moving)
 11. [Data and privacy](#11-data-and-privacy)
 12. [FAQ and troubleshooting](#12-faq-and-troubleshooting)
@@ -37,21 +37,21 @@ This manual describes every feature of the current version. What changed in whic
 
 ### With the Marketplace
 
-[![Open your Home Assistant instance and open the NeonPlan 3D repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
+[![Open your Home Assistant instance and open the HomePlan 3D repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
 
-Since Home Assistant 2026.11, HACS is built in as the **Marketplace**. The button opens NeonPlan 3D straight in the Marketplace of your installation. NeonPlan 3D is in the official list, no need to add it from a link. By hand:
+Since Home Assistant 2026.11, HACS is built in as the **Marketplace**. The button opens HomePlan 3D straight in the Marketplace of your installation. HomePlan 3D is in the official list, no need to add it from a link. By hand:
 
 1. Open **Settings → Marketplace**. The first time, accept the note about community content.
-2. Search for **NeonPlan 3D**, select **Install** and restart Home Assistant.
-3. **Settings → Devices & services → Add integration → NeonPlan 3D**, or straight with this button:
+2. Search for **HomePlan 3D**, select **Install** and restart Home Assistant.
+3. **Settings → Devices & services → Add integration → HomePlan 3D**, or straight with this button:
 
-   [![Open your Home Assistant instance and start setting up NeonPlan 3D.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=neonplan3d)
+   [![Open your Home Assistant instance and start setting up HomePlan 3D.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=neonplan3d)
 
-**NeonPlan 3D** now appears in the sidebar. The dashboard card is available right away, no resource needed.
+**HomePlan 3D** now appears in the sidebar. The dashboard card is available right away, no resource needed.
 
-**Home Assistant before 2026.11:** it works the same with **HACS**: open HACS, search for **NeonPlan 3D**, download it and restart, or [open it straight in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=neonplan3d&category=integration).
+**Home Assistant before 2026.11:** it works the same with **HACS**: open HACS, search for **HomePlan 3D**, download it and restart, or [open it straight in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=neonplan3d&category=integration).
 
-If you installed NeonPlan 3D with HACS before, also as a custom repository, there is nothing to do: when you update to Home Assistant 2026.11 the Marketplace takes it over, and updates keep coming as usual.
+If you installed HomePlan 3D with HACS before, also as a custom repository, there is nothing to do: when you update to Home Assistant 2026.11 the Marketplace takes it over, and updates keep coming as usual.
 
 ### By hand
 
@@ -59,14 +59,14 @@ Copy the folder `custom_components/neonplan3d` from the repository into `config/
 
 ### Updates
 
-The Marketplace (or HACS) reports new versions by itself under **Settings → System → Updates**. Restart Home Assistant after every update. Until then NeonPlan 3D shows a note at the top that a restart is pending. Your plan always stays, even if you remove the integration and add it again.
+The Marketplace (or HACS) reports new versions by itself under **Settings → System → Updates**. Restart Home Assistant after every update. Until then HomePlan 3D shows a note at the top that a restart is pending. Your plan always stays, even if you remove the integration and add it again.
 
 ---
 
 ## 2. Your first 3D plan in ten minutes
 
-1. Open **NeonPlan 3D** in the sidebar and switch to **Editor** at the top.
-2. Choose **Add floor** on the right. If you have floors in Home Assistant, NeonPlan 3D offers them directly.
+1. Open **HomePlan 3D** in the sidebar and switch to **Editor** at the top.
+2. Choose **Add floor** on the right. If you have floors in Home Assistant, HomePlan 3D offers them directly.
 3. If the floor has areas, **"Add … rooms from HA areas"** creates a room for each area. Drag the rooms into place and adjust the corners. Or draw under **Build → Room** with **Rectangle**, **Free shape** or **By measure**.
 4. Tap a wall with **Doors & windows** to add doors and windows.
 5. Tap a room and tap **Place** under **Devices** on the right for the devices you want, e.g. the lights, covers, thermostats, media players and sensors of the area. Below the list, **Place all …** puts all main devices in at once after asking.
@@ -155,7 +155,7 @@ On the far left of the toolbar is **Floor: Ground floor ▾** – the floor you 
 
 A selected room shows on the right:
 
-- **Name** and **Area**: The link to a Home Assistant area matters most. Through it NeonPlan 3D finds the room's lights, covers, sensors and scenes.
+- **Name** and **Area**: The link to a Home Assistant area matters most. Through it HomePlan 3D finds the room's lights, covers, sensors and scenes.
 - **Move the name (since 3.2):** a small handle ✥ stands left of the selected room's name in the plan. Drag it and the name stands elsewhere – in the plan and in 3D, e.g. where the names of many small rooms cover each other. It moves along when you move the room. A double tap on the handle or **Name back to the middle of the room** puts it back. How big the names are in 3D is set under **⚙ Settings → House → Size of the room names in 3D** (50–200 %).
 - **Floor**: wood, oak, tiles, carpet, stone or concrete show as a subtle pattern in 3D.
 - **View as this room's start**: turn on **3D beside**, turn and zoom the room the way it should show, then tap the button. When you tap the room in 3D later, the camera flies right there – angle, zoom and framing. ↺ removes it, and the room is shown from above again.
@@ -268,7 +268,7 @@ Doors and windows can also be tapped in a wide band around the opening in the pl
 | **Contact second leaf** | For double windows and doors |
 | **Garage door** | A garage door follows a cover entity or a contact (on = open; sensors reporting “open”/“closed” work too). A **switch or input_boolean** that drives the door works as the contact too: on = open, a tap in 3D switches it. If your opener only takes a short pulse, choose the **switch, button or `input_button` under Drive** and the real door contact under Contact: a tap on the door switches the switch on or presses the button (asking first with *Ask before switching*), and open or closed comes from the contact. Its open part lies under the ceiling. **Kind of door (since 3.2):** **Sectional door** (as before: runs in sections under the ceiling) or **Up-and-over door** – one leaf whose bottom edge swings out and up; open, it lies under the ceiling with a part sticking out like a canopy. A gate or garage-door cover on a **door** (e.g. a sliding gate) moves the door leaf instead of a roller shutter |
 
-NeonPlan 3D matches covers and contacts through the area automatically. You can change them by hand at any time.
+HomePlan 3D matches covers and contacts through the area automatically. You can change them by hand at any time.
 
 ### 4.8 Furniture
 
@@ -388,7 +388,7 @@ TVs, media walls, the wall unit with a TV (the wall unit without a TV is a lamp:
 - **Ask before switching** and **Marker in 3D** as with devices.
 - **Pictures by state** on screens: a Pro add-on, see [6.3](#63-live-screens).
 
-"Automatic" means NeonPlan 3D finds the matching entity in the area by itself.
+"Automatic" means HomePlan 3D finds the matching entity in the area by itself.
 
 ### 4.13 Cameras
 
@@ -420,7 +420,7 @@ The item **Parking spot** in the Parking group marks where a car stands: in the 
 
 The robot vacuum item – and the **robot vacuum with dock** from the Smart Home pack just the same – links to the `vacuum` entity. While the robot cleans, it drives lanes through the room of its dock in 3D and then returns. The lanes are simulated because Home Assistant usually does not know the real position. With the robot vacuum with dock, the model's own robot drives off: while it is away, the dock stands empty.
 
-Many robots do report the room they are cleaning, for example Roborock and Dreame with a "current room" sensor. NeonPlan 3D finds this sensor on the robot's device by itself; the **Current room (sensor)** field lets you pick another one. The reported name is compared with the room name and the Home Assistant area, ignoring case and the spelling of umlauts ("Kueche" matches "Küche"). When the robot changes rooms it appears there in 3D and drives its lanes. If no room matches, it stays in the room of its dock.
+Many robots do report the room they are cleaning, for example Roborock and Dreame with a "current room" sensor. HomePlan 3D finds this sensor on the robot's device by itself; the **Current room (sensor)** field lets you pick another one. The reported name is compared with the room name and the Home Assistant area, ignoring case and the spelling of umlauts ("Kueche" matches "Küche"). When the robot changes rooms it appears there in 3D and drives its lanes. If no room matches, it stays in the room of its dock.
 
 Its lanes keep clear of furniture standing on the floor: cabinets, sofas, beds, kitchen units and appliances. It drives under tables, desks, chairs, stools and benches, over rugs and under anything hung on the wall, such as wall cabinets.
 
@@ -456,7 +456,7 @@ With **Outside → Outdoor** you draw lawn, terrace, path, driveway, flower bed,
 
 A simple house gets a flat or gable roof over the whole top floor under **Build → Roof** at **Roof shape**, with the ridge (along the long or the short side, e.g. a terraced house), pitch and overhang. For everything else – an L- or T-shaped house, a house with a barn, an extension with a pent roof, a roof that reaches far down on one side – you build the roof from **roof sections**.
 
-- Choose **Roof sections (custom)** under **Roof**, or the **Roof** tool. The first time, NeonPlan 3D proposes the sections from your rooms: per floor the parts no higher floor covers, each with a gable roof. Then you adjust them.
+- Choose **Roof sections (custom)** under **Roof**, or the **Roof** tool. The first time, HomePlan 3D proposes the sections from your rooms: per floor the parts no higher floor covers, each with a gable roof. Then you adjust them.
 - In the **Roof** tool you drag a new section in the plan. Tap selects one, dragging moves it, the corners resize it. At the top you choose the floor whose rooms the plan shows. The 3D view opens beside it with the whole house, so you see every change at once.
 - With the lock **🔓 Fix** (or the key **L**) a finished section stays put and no longer slips when you tap it; **Lock floor plan** locks all sections too.
 - Each section has a **shape** – gable, hip, half-hip (a gable hipped at the top), pyramid (four slopes to a point), mansard (steep below, flatter above; set the upper pitch under **Upper roof pitch** since 3.5.0, default 30°), pent, flat and parapet (a flat roof with a wall ring) – and a **ridge direction** (↔ or ↕).
@@ -569,7 +569,7 @@ Under **Furniture → Home technology** (in the wall view under 🔌 **Switches*
 One installation can hold several floor plans: the house, the garage, the garden house, a granny flat or the holiday flat by the sea. Each floor plan has its own floors, rooms, furniture, devices, card templates and restore points. Your plan so far stays as it is – it is the first floor plan.
 
 - **Create:** ⚙ Settings → 🏘 **Floor plans** → **New floor plan**: type a name, choose where it comes from (**Empty**, **Copy of …** or **From a file** – an export, also one from the import page) and **Create**. The new floor plan opens in the editor at once.
-- **Switch:** the picker with every floor plan sits at the top next to "NeonPlan 3D"; admins also create one there with **＋ New floor plan**. Other users see the picker once there are two. Each device remembers which one was open last. A link with `?plan=<id>` opens a particular one.
+- **Switch:** the picker with every floor plan sits at the top next to "HomePlan 3D"; admins also create one there with **＋ New floor plan**. Other users see the picker once there are two. Each device remembers which one was open last. A link with `?plan=<id>` opens a particular one.
 - **Manage:** in the same list you rename a plan, choose an icon (🏠 🏡 🏢 🏖️ …), sort with ↑ ↓ and open it with **Open**. 🗑 moves a floor plan to the **bin**: it can be restored for 30 days, only then is it deleted. The first floor plan cannot be deleted. Each floor plan shows its id for the dashboard card.
 - **All floor plans:** in the picker, **▦ All floor plans** shows a tile per floor plan with the lights that are on, open windows and doors, the temperature and warnings. A tap opens it.
 - **Warnings from everywhere:** if the water sensor in the garden house goes off while the house is open, "Garden house: Workshop · Water …" shows at the top with **Show**, which jumps straight into the room. The picker's button shows the number of warnings.
@@ -737,7 +737,7 @@ With north set, sunlight from `sun.sun` falls through the windows facing the sun
 
 ![A warning](images/view-alert-banner.jpg)
 
-NeonPlan 3D warns for free and without setup:
+HomePlan 3D warns for free and without setup:
 
 | Warning | Trigger |
 |---|---|
@@ -963,7 +963,7 @@ Lights, open windows and active devices keep their signal colour in every style,
 
 **By voice.** "NeonPlan style homely", "House to synthwave", "Style winter evening" – the style applies at once on the screen you speak to. "Style back" (or "style normal") brings the set style back. Through Assist this works with the sentence starting "NeonPlan …" or "House …".
 
-**From automations.** The action **NeonPlan 3D: Set style** (`neonplan3d.set_style`) switches the open NeonPlan screens:
+**From automations.** The action **HomePlan 3D: Set style** (`neonplan3d.set_style`) switches the open NeonPlan screens:
 
 ```yaml
 action: neonplan3d.set_style
@@ -1133,7 +1133,7 @@ The weather around the house follows your weather entity:
 | windy | Wind drives rain and snow at an angle |
 | sunny, clear-night | Sun by day, moon by night |
 
-If the entity provides `cloud_coverage` and `wind_speed`, NeonPlan 3D uses them.
+If the entity provides `cloud_coverage` and `wind_speed`, HomePlan 3D uses them.
 
 ![Snow](images/view-weather-snow.jpg)
 
@@ -1358,7 +1358,7 @@ The faces follow the look: pale in the Day look, dark in Neon and Blueprint.
 
 ![Extensions](images/extensions.jpg)
 
-The **✦ Extensions** tab gathers everything you can add to NeonPlan 3D.
+The **✦ Extensions** tab gathers everything you can add to HomePlan 3D.
 
 ### 7.1 Shop connection
 
@@ -1370,11 +1370,11 @@ With your first purchase at mastershort.de you get a **licence key** in the form
 
 After that:
 
-- **Updates come by themselves.** Once a day NeonPlan 3D asks whether there are new purchases or newer versions and installs them. **Check now** asks right away.
+- **Updates come by themselves.** Once a day HomePlan 3D asks whether there are new purchases or newer versions and installs them. **Check now** asks right away.
 - **Everything keeps working offline.** Installed packs are checked locally, the shop is never needed for that.
 - **Disconnect** removes the key. Installed packs stay.
 - **Pack updates:** When a bought pack grows, the page shows once what was added.
-- **New in the shop:** With a shop connection the page shows the packs and Pro add-ons you do not have yet at the top, with **NEW** for fresh ones. A badge on the **✦ Extensions** tab shows what is waiting: **"2 ready"** for bought or given packs that can be installed or updated, **"3 new"** for new offers in the shop (only once you have bought something; the offers are always here anyway). When a pack newly belongs to you (bought or a gift), Home Assistant also announces it once under **Notifications** (several packs at once in one notice); it is dismissed when the pack is installed. Without a key NeonPlan 3D never contacts the shop.
+- **New in the shop:** With a shop connection the page shows the packs and Pro add-ons you do not have yet at the top, with **NEW** for fresh ones. A badge on the **✦ Extensions** tab shows what is waiting: **"2 ready"** for bought or given packs that can be installed or updated, **"3 new"** for new offers in the shop (only once you have bought something; the offers are always here anyway). When a pack newly belongs to you (bought or a gift), Home Assistant also announces it once under **Notifications** (several packs at once in one notice); it is dismissed when the pack is installed. Without a key HomePlan 3D never contacts the shop.
 - **Loyalty discount:** With your first purchase you get a personal discount code for every further pack and Pro add-on (not for bundles). It is in the order e-mail, in your account and at the top under **New in the shop**; tapping an offer puts it straight into the cart.
 - **4 furniture packs as a gift:** With a shop connection, if you have not subscribed to the NeonPlan newsletter yet, a small box shows here. After signing up and confirming by mail, the taster packs living room, kitchen, bedroom and bathroom (4 items each) appear under Extensions by themselves – at the next daily check at the latest, at once with **Check now**. **Don't show again** hides the box on this device.
 
@@ -1470,7 +1470,7 @@ Modules today:
 | Module | What it does | Price |
 |---|---|---|
 | **The house answers** | answers spoken questions – "What is open?", "What is the weather like?", "Good morning" … (5.10) | free |
-| **Announcements** (from NeonPlan 2.0.7) | Tap a room, **📢 Announcement**, tap "Dinner is ready!" – and the speaker in that room says it. Ready sentences (in ⚙ Settings → Announcements: ✕ takes one out, your own are added below, "Bring back the ready sentences" restores them), your own words, or spoken into the 🎙 microphone (needs HTTPS and a voice pipeline with speech-to-text, like the voice control). From the central menu to **all rooms**, to **one floor** or only **where someone is** (locating, presence and motion sensors). In the room's form (editor) every room has a **🌙 quiet time** (a kids' room from 8 pm until 7 am, for example): announcements to several rooms then leave it out, an announcement to this room alone still goes out. There are also **the room's own sentences**, shown first in that room. Words you typed lately come back as **↻** to send again. Which speaker talks: the one chosen in the room's form under **📢 Announcements through**, else a speaker placed in the room on the plan – only when none is placed there, one of the room's area (never a TV or an unreachable device on its own), else the default speaker from ⚙ Settings. An **outdoor area with a Home Assistant area** (a terrace, say) counts as a room since 2.0.11: its speaker gets announcements and its 📢 button. One speaker talks per room – with two in a room, choose which one in the room's form. Echos (Alexa Media Player, or since 2.0.11 Home Assistant's own **Alexa Devices** integration) and voice satellites like the Home Assistant Voice PE make a real announcement with a chime; other speakers talk through Home Assistant's text-to-speech (TTS), with chime_tts with a chime too; speakers that can announce (Sonos, for example) lower their music for it and play on after. The volume stays as it is. The speaker lights up in the plan for a moment, and in the 3D view **🔊** over it shows where it is talking. With **Also show 📢 right in the room** (⚙ Settings → Announcements) a 📢 button floats over every room's speaker in the floor's 3D view – a tap opens the sentences at once. **From automations** (from NeonPlan 2.0.9): the action **NeonPlan 3D: Announcement** (`neonplan3d.announce`) says a message with the same settings – when the doorbell rings, say –, also with no NeonPlan page open; without a room to every room, with **Rooms** to those named, with **Floor** to one floor; several rooms leave out those in their quiet time. With **On NeonPlan screens** every open NeonPlan screen speaks the message itself – with a chime – and shows it big; with **Screens** only those with these screen names. So an old wall tablet becomes an announcement speaker too. This needs a voice pipeline with text-to-speech in Home Assistant; browsers play sound only after a first tap on the page – in Fully Kiosk switch on **Autoplay Audio** under Web Content Settings. A wall tablet with Fully Kiosk can be a speaker itself: choose the Fully Kiosk integration's media player in the room form under **📢 Announcements through** | 3.90 €, in the Supporter Pass |
+| **Announcements** (from NeonPlan 2.0.7) | Tap a room, **📢 Announcement**, tap "Dinner is ready!" – and the speaker in that room says it. Ready sentences (in ⚙ Settings → Announcements: ✕ takes one out, your own are added below, "Bring back the ready sentences" restores them), your own words, or spoken into the 🎙 microphone (needs HTTPS and a voice pipeline with speech-to-text, like the voice control). From the central menu to **all rooms**, to **one floor** or only **where someone is** (locating, presence and motion sensors). In the room's form (editor) every room has a **🌙 quiet time** (a kids' room from 8 pm until 7 am, for example): announcements to several rooms then leave it out, an announcement to this room alone still goes out. There are also **the room's own sentences**, shown first in that room. Words you typed lately come back as **↻** to send again. Which speaker talks: the one chosen in the room's form under **📢 Announcements through**, else a speaker placed in the room on the plan – only when none is placed there, one of the room's area (never a TV or an unreachable device on its own), else the default speaker from ⚙ Settings. An **outdoor area with a Home Assistant area** (a terrace, say) counts as a room since 2.0.11: its speaker gets announcements and its 📢 button. One speaker talks per room – with two in a room, choose which one in the room's form. Echos (Alexa Media Player, or since 2.0.11 Home Assistant's own **Alexa Devices** integration) and voice satellites like the Home Assistant Voice PE make a real announcement with a chime; other speakers talk through Home Assistant's text-to-speech (TTS), with chime_tts with a chime too; speakers that can announce (Sonos, for example) lower their music for it and play on after. The volume stays as it is. The speaker lights up in the plan for a moment, and in the 3D view **🔊** over it shows where it is talking. With **Also show 📢 right in the room** (⚙ Settings → Announcements) a 📢 button floats over every room's speaker in the floor's 3D view – a tap opens the sentences at once. **From automations** (from NeonPlan 2.0.9): the action **HomePlan 3D: Announcement** (`neonplan3d.announce`) says a message with the same settings – when the doorbell rings, say –, also with no NeonPlan page open; without a room to every room, with **Rooms** to those named, with **Floor** to one floor; several rooms leave out those in their quiet time. With **On NeonPlan screens** every open NeonPlan screen speaks the message itself – with a chime – and shows it big; with **Screens** only those with these screen names. So an old wall tablet becomes an announcement speaker too. This needs a voice pipeline with text-to-speech in Home Assistant; browsers play sound only after a first tap on the page – in Fully Kiosk switch on **Autoplay Audio** under Web Content Settings. A wall tablet with Fully Kiosk can be a speaker itself: choose the Fully Kiosk integration's media player in the room form under **📢 Announcements through** | 3.90 €, in the Supporter Pass |
 | **Window watch** | warns when a window has been open in the cold (below 12 °C outside) for more than 20 minutes or the heating runs with a window open (10 minutes): the room pulses, the warning bar names the window and the time; "Which windows have been open too long?" visits them. Quiet at night (from release 3): create a helper (toggle) `input_boolean.window_watch_quiet` in Home Assistant, and it does not warn while that is on – turned on by an automation at night or when the blinds are down | free |
 
 ## 8. The dashboard card
@@ -1597,11 +1597,11 @@ In the card dialog under **Only these rooms**, tap rooms on the small view from 
 
 ---
 
-## 9. NeonPlan 3D on a wall tablet
+## 9. HomePlan 3D on a wall tablet
 
 ![Tablet](images/tablet.jpg)
 
-NeonPlan 3D is built for wall tablets such as the Amazon Fire:
+HomePlan 3D is built for wall tablets such as the Amazon Fire:
 
 - **No work while idle.** If nothing changes, the view draws not a single frame. The FPS display then reads "At rest (0 fps)".
 - **Tablet quality level:** "Auto" picks it by itself on Fire tablets, and on any device that turns the view at under 20 frames a second – the browser remembers that. Patterns, shadows, halos and particles are left out. Moving decorations (energy flow, solar fields, sound rings, pool water, robot vacuums, colour effects, pets) run at about 5 frames a second and stand still 30 seconds after the last touch; a tap, or something new that starts to move, wakes them. Measured values alone (watts, temperature) show at most every 2 seconds, switches, doors and alarms at once.
@@ -1632,7 +1632,7 @@ Under **Backup** in the editor:
 - **Full backup:** **Back up everything (plan, pictures, packs)** saves one file with every floor plan, every background and screen picture and the installed packs. **Restore a full backup …** brings it back into the same or another installation. Every pack is checked again. Packs signed for another installation are fetched there again through the shop connection. The licence key is not in the file.
 - **Two devices, one plan** (since 3.1.1): every save knows which state of the plan it was made on. If another device saved meanwhile – the PC, say, while the phone slept in the background overnight – NeonPlan does not write the old state over it: you see the newer plan, and your change waits at the top with **Restore and save** or **Discard**. An app coming back from the background loads the plan again.
 
-Home Assistant's own backup includes NeonPlan 3D completely as well.
+Home Assistant's own backup includes HomePlan 3D completely as well.
 
 **From other programs:** the **import page** (<https://neonplan3d.mastershort.de/import/>, also under **Backup → To the import page**) turns plans of other programs into a NeonPlan file: Sweet Home 3D (`.sh3d`), iPhone/iPad LiDAR scans (RoomPlan JSON), CAD drawings (`.dxf`), 3D models from Blender, SketchUp & co. (`.glb`, `.gltf`, `.obj`, `.stl`), Floorplanner and Valetudo robot vacuum maps. It shows a preview with rooms, doors, windows and furniture, lets you rename rooms and, depending on the format, set the unit, the layers or the floor levels; the file stays on your computer. Load the downloaded file here with **Import …**. If you would rather let an AI write the plan, the template is in [docs/ai-import.md](https://github.com/Mastershort/neonplan3d/blob/main/docs/ai-import.md); the import page checks and repairs the result.
 
@@ -1641,7 +1641,7 @@ Home Assistant's own backup includes NeonPlan 3D completely as well.
 ## 11. Data and privacy
 
 - The plan, pictures and packs are stored in Home Assistant under `.storage`. None of it leaves your installation.
-- NeonPlan 3D only connects to the internet if you enter a licence key. Then it asks mastershort.de once a day for updates and sends the key and the anonymous installation id.
+- HomePlan 3D only connects to the internet if you enter a licence key. Then it asks mastershort.de once a day for updates and sends the key and the anonymous installation id.
 - Camera pictures, history and states stay in Home Assistant and are only shown in the browser.
 - Time travel reads the history from Home Assistant's recorder, only for the devices of the plan. It never reads people or their trackers.
 - **Locating** evaluates the Bluetooth signals only in Home Assistant. Nothing about who is where leaves your house.
@@ -1657,7 +1657,7 @@ Home Assistant's own backup includes NeonPlan 3D completely as well.
 **Help and feedback:** report a bug as an [issue on GitHub](https://github.com/Mastershort/neonplan3d/issues/new/choose) and an idea as a [discussion](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas). Nothing gets lost, everyone sees the state, and you are credited in the release notes once it is built. The two buttons for it are also at the bottom of the editor's sidebar and on the Extensions page.
 
 **How do I get the latest update?**
-Settings → System → Updates. The Marketplace only looks for new versions every few hours, so a fresh update may not show there yet; then look again a little later. With HACS (Home Assistant before 2026.11) it works right away: HACS → NeonPlan 3D → ⋮ → **Update information** → **Download**. Then restart Home Assistant and reload the page (Ctrl+F5; in the Companion app: Settings → Companion app → reset frontend cache).
+Settings → System → Updates. The Marketplace only looks for new versions every few hours, so a fresh update may not show there yet; then look again a little later. With HACS (Home Assistant before 2026.11) it works right away: HACS → HomePlan 3D → ⋮ → **Update information** → **Download**. Then restart Home Assistant and reload the page (Ctrl+F5; in the Companion app: Settings → Companion app → reset frontend cache).
 
 **Can I use helpers instead of real sensors?**
 Yes. Wherever NeonPlan expects a number (power, charge, range, position …), `input_number` and `number` helpers can be picked too, and wherever it expects on/off (contact, presence …), `input_boolean` as well. For power the helper needs the unit W or kW.
@@ -1704,7 +1704,7 @@ The key was connected to more than five new installations in the last twelve mon
 **Activation says "The shop is busy right now" or "HTTP 429".**
 The shop's web host throttles too many requests from one address. Since 1.9.1 NeonPlan retries twice with a pause by itself; if it still fails, wait a minute and click **Activate** again. Versions before 1.9.1 were turned away by the host because of their user agent – there only the update helps.
 
-**The notice "This page still shows NeonPlan 3D x.y, Home Assistant already has …" stays.**
+**The notice "This page still shows HomePlan 3D x.y, Home Assistant already has …" stays.**
 The browser or the companion app still holds an old NeonPlan bundle. Tap **Reload**; in the companion app go to Settings → Companion app → **Reset frontend cache**, then close the app completely and open it again. Restarting Home Assistant does not help here. The same applies when a bought Pro add-on says "needs a newer NeonPlan version" under the packs.
 
 **Two holograms hang on the roof (Energy Pro).**

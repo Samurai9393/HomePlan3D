@@ -1,4 +1,4 @@
-# NeonPlan 3D – notes for Claude
+# HomePlan 3D – notes for Claude
 
 - Spec and phase plan: `private/docs/plan.md` (German, not public). Unreleased docs (Pool Pro) live in `private/docs/pending/`. Talk to the user in German; code, identifiers and comments in English.
 - Domain `neonplan3d`, repo `mastershort/neonplan3d`, minimum Home Assistant 2025.1.

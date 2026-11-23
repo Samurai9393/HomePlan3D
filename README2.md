@@ -1,13 +1,13 @@
 <div align="center">
 
-# NeonPlan 3D
+# HomePlan 3D
 
 ### The original 3D floor plan for Home Assistant
 
 **Draw your home right inside Home Assistant – and live in it as a glowing neon house, or in any style you like.**<br>
 Lights glow in their colours, blinds move, doors open, cameras watch, energy flows through the walls – and you can simply talk to it.
 
-[![Open your Home Assistant instance and open the NeonPlan 3D repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
+[![Open your Home Assistant instance and open the HomePlan 3D repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
 
 [![Latest release](https://img.shields.io/github/v/release/Mastershort/neonplan3d?label=release&color=00e5ff)](https://github.com/Mastershort/neonplan3d/releases)
 [![Home Assistant Marketplace](https://img.shields.io/badge/Marketplace-default-41BDF5?logo=homeassistant&logoColor=white)](https://www.home-assistant.io/integrations/marketplace/)
@@ -40,7 +40,7 @@ Lights glow in their colours, blinds move, doors open, cameras watch, energy flo
 
 > **No other floor plan for Home Assistant draws several houses and flats, shows single rooms on the dashboard and puts your whole property in 3D.** The original keeps leading. 😉
 
-[![NeonPlan 3D: the house turns with its solar roof and energy cards, voice control opens the living room, the doorbell rings and the live director looks through the front door camera](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/demo.webp)](https://neonplan3d.mastershort.de/)
+[![HomePlan 3D: the house turns with its solar roof and energy cards, voice control opens the living room, the doorbell rings and the live director looks through the front door camera](https://raw.githubusercontent.com/Mastershort/neonplan3d/main/docs/images/demo.webp)](https://neonplan3d.mastershort.de/)
 
 ---
 
@@ -224,12 +224,12 @@ Bought packs and modules are signed for your installation and update by themselv
 
 ## 📦 Installation
 
-[![Open your Home Assistant instance and open the NeonPlan 3D repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
+[![Open your Home Assistant instance and open the HomePlan 3D repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
 
-1. Click the button above, or open **Settings → Marketplace** and search for **NeonPlan 3D** (it is in the default list). On Home Assistant before 2026.11, use HACS the same way.
-2. Install **NeonPlan 3D** and restart Home Assistant.
-3. Add the integration: [![Open your Home Assistant instance and start setting up NeonPlan 3D.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=neonplan3d) or *Settings → Devices & services → Add integration → NeonPlan 3D*.
-4. Open **NeonPlan 3D** in the sidebar, switch to **Editor** and draw your first floor – or import a plan. More buildings: **＋ New floor plan** at the top.
+1. Click the button above, or open **Settings → Marketplace** and search for **HomePlan 3D** (it is in the default list). On Home Assistant before 2026.11, use HACS the same way.
+2. Install **HomePlan 3D** and restart Home Assistant.
+3. Add the integration: [![Open your Home Assistant instance and start setting up HomePlan 3D.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=neonplan3d) or *Settings → Devices & services → Add integration → HomePlan 3D*.
+4. Open **HomePlan 3D** in the sidebar, switch to **Editor** and draw your first floor – or import a plan. More buildings: **＋ New floor plan** at the top.
 5. Put it on a dashboard: **Add card** → search "NeonPlan". For one room: select it in the editor → **🖥 Card for this room**.
 
 **Manual install:** copy `custom_components/neonplan3d` into `config/custom_components/` and restart Home Assistant. Requires Home Assistant 2025.1 or newer.
@@ -256,7 +256,7 @@ Every option is described in the manual, chapter 8 *The dashboard card*.
 
 ## 🔒 Privacy
 
-NeonPlan 3D stores the plans, their pictures and the packs in Home Assistant's `.storage`. It talks to the internet only when you enter a licence key in **Extensions**: then it asks mastershort.de once a day for updates of your packs, sending the key and an anonymous installation fingerprint. Voice control uses only your own Assist pipeline; the microphone is open only while you speak. Locating works only inside Home Assistant – nothing about who is where leaves the house. Anonymous usage and error reports are off unless you switch them on (⚙ Settings → 🛟 Help improve); you can view every report before it is sent and delete the data at any time.
+HomePlan 3D stores the plans, their pictures and the packs in Home Assistant's `.storage`. It talks to the internet only when you enter a licence key in **Extensions**: then it asks mastershort.de once a day for updates of your packs, sending the key and an anonymous installation fingerprint. Voice control uses only your own Assist pipeline; the microphone is open only while you speak. Locating works only inside Home Assistant – nothing about who is where leaves the house. Anonymous usage and error reports are off unless you switch them on (⚙ Settings → 🛟 Help improve); you can view every report before it is sent and delete the data at any time.
 
 ## 💬 Ideas, questions and bugs
 
@@ -283,11 +283,11 @@ npm run screenshot  # renders preview/index.html (invented demo data) with a loc
 
 ## 📄 Licence
 
-MIT – see [LICENSE](https://github.com/Mastershort/neonplan3d/blob/main/LICENSE). "NeonPlan 3D" is the name of the original project by Mastershort; furniture packs and Pro add-ons sold in the shop are not part of this repository.
+MIT – see [LICENSE](https://github.com/Mastershort/neonplan3d/blob/main/LICENSE). "HomePlan 3D" is the name of the original project by Mastershort; furniture packs and Pro add-ons sold in the shop are not part of this repository.
 
 ## ☕ Support
 
-NeonPlan 3D is free. If you like it, you can buy me a coffee – or have a look at the packs in the shop: https://mastershort.de/en/neonplan3d/?lang=en<br>
-NeonPlan 3D ist kostenlos. Wenn es dir gefällt, freue ich mich über einen Kaffee ☕ – oder schau dir die Packs im Shop an: https://mastershort.de/neonplan3d/
+HomePlan 3D is free. If you like it, you can buy me a coffee – or have a look at the packs in the shop: https://mastershort.de/en/neonplan3d/?lang=en<br>
+HomePlan 3D ist kostenlos. Wenn es dir gefällt, freue ich mich über einen Kaffee ☕ – oder schau dir die Packs im Shop an: https://mastershort.de/neonplan3d/
 
 [![PayPal](https://img.shields.io/badge/PayPal-Spenden-00457C?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=Z3G2VWKSK5VJL)

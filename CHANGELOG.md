@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to NeonPlan 3D. The full notes in German and English are on the
+All notable changes to HomePlan 3D. The full notes in German and English are on the
 [releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
 [Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
 
@@ -435,7 +435,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 
 ### New
 
-- **Announcements from automations:** the action **NeonPlan 3D: Announcement** (`neonplan3d.announce`) says a message on the rooms' speakers with the Announcements module's settings (speaker per room, quiet time, text-to-speech), also with no NeonPlan page open – to every room, to rooms by name or area, or to one floor. **On NeonPlan screens** every open NeonPlan screen speaks it itself with a chime and shows it big – an old wall tablet becomes a speaker. Needs the Announcements module.
+- **Announcements from automations:** the action **HomePlan 3D: Announcement** (`neonplan3d.announce`) says a message on the rooms' speakers with the Announcements module's settings (speaker per room, quiet time, text-to-speech), also with no NeonPlan page open – to every room, to rooms by name or area, or to one floor. **On NeonPlan screens** every open NeonPlan screen speaks it itself with a chime and shows it big – an old wall tablet becomes a speaker. Needs the Announcements module.
 
 ## 2.0.8
 
@@ -1140,7 +1140,7 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 ### Fixed
 
 - Dashboard card: right after starting the app, the card could show "Custom element doesn't exist: neonplan3d-card" until the sidebar page was opened. The card's script is now also kept in the dashboard resources (storage mode), so dashboards wait for it; an older copy of the script there is pointed to the current one (#252 by TheRev-ha, RobertSorgenfrei).
-- Installing a Pro add-on from the shop: NeonPlan 3D now also sends its version in the request, so the shop can answer an installation that is too old with a readable "please update first" message.
+- Installing a Pro add-on from the shop: HomePlan 3D now also sends its version in the request, so the shop can answer an installation that is too old with a readable "please update first" message.
 - Energy Pro in a house with a single floor: the plant cards (solar, balance) show in the 3D view and the card, not only in the editor (#255 by Kohhal).
 - Energy Pro: a grid connection mounted on a wall – the grid cable starts at its height instead of on the ground, and its pin sits there too (#256 by Kohhal).
 - Solar fields moved to another roof face (e.g. after replacing a flat roof) keep their modules – rows, columns, format and tilt – instead of starting again from a proposal (#258 by rolandarends).
@@ -1163,7 +1163,7 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 
 - A roof section whose eaves lie below a floor's ceiling now cuts that floor's walls, even when its wall top is set to the ceiling height (discussion #147 by twynne and wouter-b).
 - A house with a single floor shows its roof in 3D; an extra attic floor is no longer needed (discussion #208 by Kohhal).
-- Installing a Pro add-on that is newer than the installed NeonPlan 3D now says "please update NeonPlan 3D first" instead of a cryptic error (#218 by twynne).
+- Installing a Pro add-on that is newer than the installed HomePlan 3D now says "please update HomePlan 3D first" instead of a cryptic error (#218 by twynne).
 - Camera Cockpit: the camera wall fits any number of cameras – the grid picks the columns that give the largest tiles, nothing overlaps, and with very many cameras the wall scrolls (#217 by denisb88).
 - Solar fields: the inverter choice shows each inverter's own name (or its entity's name), and an inverter shows which strings feed it (#213 by rolandarends).
 - Garden solar fields stand on the ground floor, no longer on a cellar below it (#192 by denisb88).
@@ -1406,7 +1406,7 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 ### New
 
 - **New in the shop** on the Extensions page (with a shop key) and a dot on the tab.
-- **Loyalty discount** code for further purchases, shown in NeonPlan 3D.
+- **Loyalty discount** code for further purchases, shown in HomePlan 3D.
 - The Extensions page shows once what a pack update brought.
 - Screens and status lights of pack furniture can link a light (glow in its colour) or a switch.
 

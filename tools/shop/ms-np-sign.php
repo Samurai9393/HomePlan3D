@@ -1,6 +1,6 @@
 <?php
 /**
- * NeonPlan 3D – personalised pack downloads for WooCommerce.
+ * HomePlan 3D – personalised pack downloads for WooCommerce.
  *
  * Every purchased furniture pack is signed with the buyer's name at download time, so the file the
  * buyer gets says "licensed to <name>" when it is imported. The integration accepts the shop key

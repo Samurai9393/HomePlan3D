@@ -92,7 +92,7 @@ for (const source of sources) {
         for (let y = 0; y <= H; y += 40) g.strokeRect(0, y, W, 0);
         g.fillStyle = "#37e0ff";
         g.font = "600 22px Figtree";
-        g.fillText("NEONPLAN 3D · MÖBEL-PACK", 70, 86);
+        g.fillText("HomePlan 3D · MÖBEL-PACK", 70, 86);
         g.fillStyle = "#f2f5ff";
         g.font = "800 64px 'Bricolage Grotesque'";
         g.fillText(pack.name, 68, 150);

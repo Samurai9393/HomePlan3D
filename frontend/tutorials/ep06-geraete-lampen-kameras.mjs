@@ -21,7 +21,7 @@ import { helpers } from "./ep02-common.mjs";
 const out = process.argv[2] ?? "tutorial-ep06";
 const PART = process.argv[3] === "b" ? "b" : "a";
 const FAST = !!process.env.EP06_FAST;
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit NeonPlan 3D ${appVersion()}</span>`;
+const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D ${appVersion()}</span>`;
 
 const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "de" });
 const N = narration(R, process.argv.slice(4));
@@ -349,7 +349,7 @@ if (PART === "a") {
     const b = { theta: -0.2, phi: 0.7, radius: 10, y: 0.3 };
     await cam("eg", 4.0, 2.3, a);
     await R.sleep(1500);
-    await R.title("Geräte, Lampen und Kameras", `NeonPlan 3D · Folge 6 · Teil 1${VERSION}`);
+    await R.title("Geräte, Lampen und Kameras", `HomePlan 3D · Folge 6 · Teil 1${VERSION}`);
     const l1 = "Lampen, die in 3D genau so leuchten wie bei dir, Sensoren mit ihren Werten und Kameras mit ihrem Blickfeld.";
     const l2 = "Wie deine Geräte aus Home Assistant in den Plan kommen, zeige ich dir in dieser Folge.";
     const total = N.length(l1) + N.length(l2);
@@ -699,11 +699,11 @@ if (PART === "a") {
     const end = await line(l1);
     await glide("eg", 5.5, 3.5, a, b, end - R.time);
   }
-  await R.title("Teil 2: Lampen und Kameras", `NeonPlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+  await R.title("Teil 2: Lampen und Kameras", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
   {
     let end = await line("In Teil 2 geht es um Lampen und Kameras.");
     await live(end);
-    end = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und NeonPlan 3D läuft auch auf alten Wandtablets. Bis gleich in Teil 2!");
+    end = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und HomePlan 3D läuft auch auf alten Wandtablets. Bis gleich in Teil 2!");
     await live(end + 0.6);
   }
 }
@@ -748,7 +748,7 @@ if (PART === "b") {
     const b = { theta: -0.35, phi: 0.68, radius: 10.5, y: 0.3 };
     await cam("eg", 5.5, 2.3, a);
     await R.sleep(1500);
-    await R.title("Geräte, Lampen und Kameras", `NeonPlan 3D · Folge 6 · Teil 2${VERSION}`);
+    await R.title("Geräte, Lampen und Kameras", `HomePlan 3D · Folge 6 · Teil 2${VERSION}`);
     const l1 = "Lampen, die in Farbe und Helligkeit genau wie bei dir leuchten, und Kameras mit ihrem Blickfeld im Raum.";
     const l2 = "Das ist Teil 2 von Folge 6: Lampen und Kameras.";
     const total = N.length(l1) + N.length(l2);
@@ -1087,11 +1087,11 @@ if (PART === "b") {
     const end = await line("Kurz zusammengefasst: Leuchten sind Möbel mit einem Licht, mit Form, Höhe und Leuchtstärke. Kameras zeigen mit ihrem Kegel, was sie sehen.");
     await glide("eg", 5.5, 3.5, a, b, end - R.time);
   }
-  await R.title("Nächste Folge: Dächer, Teil 1", `NeonPlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+  await R.title("Nächste Folge: Dächer, Teil 1", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
   {
     let end = await line("In der nächsten Folge geht es um Dächer: Satteldach, Walmdach und Co.");
     await live(end);
-    end = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und NeonPlan 3D läuft auch auf alten Wandtablets. Bis zum nächsten Mal!");
+    end = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und HomePlan 3D läuft auch auf alten Wandtablets. Bis zum nächsten Mal!");
     await live(end + 0.6);
   }
 }

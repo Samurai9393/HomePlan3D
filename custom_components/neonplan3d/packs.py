@@ -182,7 +182,7 @@ ITEM_SCHEMA = vol.Schema(
     }
 )
 
-# Pro features this version knows; a pack with a newer one needs a newer NeonPlan 3D
+# Pro features this version knows; a pack with a newer one needs a newer HomePlan 3D
 KNOWN_FEATURES = [
     "camera_cockpit",
     "weather",

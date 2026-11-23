@@ -4376,7 +4376,7 @@ export class Fp3dView3d extends LitElement {
         },
       });
     } catch (err) {
-      console.error("NeonPlan 3D: the pets failed to load", err);
+      console.error("HomePlan 3D: the pets failed to load", err);
     } finally {
       this.petsLoading = false;
     }
@@ -4407,7 +4407,7 @@ export class Fp3dView3d extends LitElement {
         night: () => this.hass?.states["sun.sun"]?.state === "below_horizon",
       });
     } catch (err) {
-      console.error("NeonPlan 3D: the ghost failed to load", err);
+      console.error("HomePlan 3D: the ghost failed to load", err);
     } finally {
       this.ghostLoading = false;
     }
@@ -5710,7 +5710,7 @@ export class Fp3dView3d extends LitElement {
       try {
         await job();
       } catch (err) {
-        console.warn("NeonPlan 3D: module sheet failed", err);
+        console.warn("HomePlan 3D: module sheet failed", err);
       }
     };
     const send = () => {

@@ -2,12 +2,12 @@
   "config": {
     "step": {
       "user": {
-        "title": "NeonPlan 3D",
+        "title": "HomePlan 3D",
         "description": "Pridá bočný panel, kde si môžeš nakresliť svoj domov a zobraziť ho v 3D."
       }
     },
     "abort": {
-      "single_instance_allowed": "NeonPlan 3D už je nastavený."
+      "single_instance_allowed": "HomePlan 3D už je nastavený."
     }
   }
 }

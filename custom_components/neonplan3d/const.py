@@ -1,4 +1,4 @@
-"""Constants for NeonPlan 3D."""
+"""Constants for HomePlan 3D."""
 
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ MAIN_BUNDLE = "neonplan3d.js"
 PANEL_URL_PATH = "neonplan3d"
 PANEL_COMPONENT = "neonplan3d-panel"
 PANEL_ICON = "mdi:floor-plan"
-PANEL_TITLE = "NeonPlan 3D"
+PANEL_TITLE = "HomePlan 3D"
 
 # a plan was saved (its revision and id), and the list of plans changed
 SIGNAL_BUILDING_UPDATED = f"{DOMAIN}_building_updated"

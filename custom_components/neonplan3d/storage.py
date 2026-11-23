@@ -1,4 +1,4 @@
-"""Persistence for NeonPlan 3D.
+"""Persistence for HomePlan 3D.
 
 The building (rooms, walls, furniture, placements) and the background images live in separate
 stores so frequent saves from the editor never rewrite the large image data.

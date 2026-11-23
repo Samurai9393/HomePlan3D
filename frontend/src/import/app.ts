@@ -11,7 +11,7 @@ import type { LayerRole } from "./dxf.ts";
 const DE = {
   title: "Plan importieren",
   beta: "Beta – noch im Test. Klappt etwas nicht, schick uns die Datei gern mit einer kurzen Beschreibung auf GitHub (Issues) oder Discord.",
-  lead: "Bring deinen Grundriss aus einem anderen Programm in NeonPlan 3D – Räume, Wände, Türen, Fenster und Möbel. Die Datei bleibt auf deinem Computer: alles läuft hier im Browser.",
+  lead: "Bring deinen Grundriss aus einem anderen Programm in HomePlan 3D – Räume, Wände, Türen, Fenster und Möbel. Die Datei bleibt auf deinem Computer: alles läuft hier im Browser.",
   drop: "Datei hierher ziehen oder klicken",
   formats: "Sweet Home 3D (.sh3d) · iPhone-/iPad-Scan mit RoomPlan (.json) · CAD (.dxf) · 3D-Modell aus Blender, SketchUp & Co. (.glb, .gltf, .obj, .stl) · Floorplanner (.json) · Valetudo-Saugroboterkarte (.json) · NeonPlan-Importformat oder ein NeonPlan-Plan von einer KI (.json)",
   how: "So exportierst du aus …",
@@ -83,7 +83,7 @@ const DE = {
 const EN: typeof DE = {
   title: "Import a plan",
   beta: "Beta – still being tested. If something goes wrong, please send us the file with a short note on GitHub (issues) or Discord.",
-  lead: "Bring your floor plan from another program into NeonPlan 3D – rooms, walls, doors, windows and furniture. The file stays on your computer: everything runs here in the browser.",
+  lead: "Bring your floor plan from another program into HomePlan 3D – rooms, walls, doors, windows and furniture. The file stays on your computer: everything runs here in the browser.",
   drop: "Drop a file here or click",
   formats: "Sweet Home 3D (.sh3d) · iPhone/iPad scan with RoomPlan (.json) · CAD (.dxf) · 3D model from Blender, SketchUp & co. (.glb, .gltf, .obj, .stl) · Floorplanner (.json) · Valetudo robot vacuum map (.json) · NeonPlan import format or a NeonPlan plan written by an AI (.json)",
   how: "How to export from …",
@@ -343,13 +343,13 @@ function render(): void {
   const t = T();
   const root = document.getElementById("app")!;
   document.documentElement.lang = lang;
-  document.title = `NeonPlan 3D – ${t.title}`;
+  document.title = `HomePlan 3D – ${t.title}`;
   const b = state.building;
   const s = b ? stats(b) : null;
   const warns = [...(state.read?.warnings ?? []), ...(state.result?.warnings ?? [])];
   root.innerHTML = `
     <header>
-      <a class="brand" href="../">NeonPlan 3D</a>
+      <a class="brand" href="../">HomePlan 3D</a>
       <h1>${esc(t.title)} <span class="beta">Beta</span></h1>
       <button class="lang" data-lang="${lang === "de" ? "en" : "de"}">${lang === "de" ? "English" : "Deutsch"}</button>
     </header>

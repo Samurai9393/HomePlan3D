@@ -19,7 +19,7 @@ const out = process.argv[2] ?? "tutorial-ep05";
 const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "de" });
 const N = narration(R, process.argv.slice(3));
 const { say, sayOver, chapter, catchUp } = N;
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit NeonPlan 3D ${appVersion()}</span>`;
+const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D ${appVersion()}</span>`;
 
 // every scene starts from the stored defaults; confirm() of the app (remove a pack, disconnect) is accepted
 await R.page.evaluateOnNewDocument(() => {
@@ -257,9 +257,9 @@ await quiet('button[aria-label="Bedienelemente ausblenden – nur die 3D-Ansicht
   const c = { theta: -0.35, phi: 0.9, radius: 31, target: [6.8, 2.8, 4.6] };
   await cam(a);
   await R.sleep(1500);
-  await R.title("Erweiterungen: Shop verbinden und Möbel-Packs", `NeonPlan 3D · Folge 5${VERSION}`);
+  await R.title("Erweiterungen: Shop verbinden und Möbel-Packs", `HomePlan 3D · Folge 5${VERSION}`);
   await live(R.time + 0.6, a, mix(a, b, 0.05));
-  let end = await line("NeonPlan 3D ist kostenlos – alles aus den bisherigen Folgen gehört dazu, ohne Abo und ohne Konto.");
+  let end = await line("HomePlan 3D ist kostenlos – alles aus den bisherigen Folgen gehört dazu, ohne Abo und ohne Konto.");
   await live(end, mix(a, b, 0.05), b);
   await R.untitle();
   end = await line("Dazu gibt es Erweiterungen: Möbel-Packs mit mehr Möbeln und Pro-Funktionen, zum Beispiel den Regen am Haus.");
@@ -344,7 +344,7 @@ await R.hold(0.6);
 await pointAt("Pro-Erweiterungen", 0.5, { tags: "H3" });
 await R.hold(0.6);
 await pointAt("Möbel-Packs", 0.5, { tags: "H3" });
-await sayOver("Ohne Lizenzschlüssel fragt NeonPlan 3D den Shop übrigens nie – es geht nichts ins Internet.");
+await sayOver("Ohne Lizenzschlüssel fragt HomePlan 3D den Shop übrigens nie – es geht nichts ins Internet.");
 await R.moveTo("input.fp3d-shop-key", 0.6);
 await sayOver("Sechs Pro-Erweiterungen gibt es im Moment: Kamera-Cockpit, Wetter draußen, Bildschirme live, Energie Pro, Klang und Kino und Auto Pro.");
 await scrollPage("Pro-Erweiterungen", 160, 0.8);
@@ -423,7 +423,7 @@ await R.hold(1.4);
 await rowButton("Wohnzimmer", "Aktualisieren", 0.5);
 await R.hold(0.6);
 await clearPackMsg();
-await sayOver("Meist musst du das gar nicht selbst tun: Einmal am Tag schaut NeonPlan 3D nach und installiert neue Käufe und Updates von allein.");
+await sayOver("Meist musst du das gar nicht selbst tun: Einmal am Tag schaut HomePlan 3D nach und installiert neue Käufe und Updates von allein.");
 await pointAt("installiert · v2", 0.5, { tags: "SPAN", nth: 0 });
 await sayOver("„Jetzt prüfen“ fragt sofort nach. Daneben steht, wann zuletzt geprüft wurde.");
 await R.clickOn({ text: "Jetzt prüfen", exact: true }, 0.5);
@@ -580,7 +580,7 @@ await sayOver("Bis zu fünf neue Verbindungen sind pro Jahr möglich. Meldet die
 await pointAt("Installations-Kennung", 0.5, { tags: "SPAN" });
 await sayOver("Ist der Shop gerade ausgelastet, wartest du eine Minute und drückst noch mal „Aktivieren“.");
 await R.moveTo({ text: "Aktivieren", exact: true }, 0.5);
-await sayOver("Braucht eine Erweiterung eine neuere NeonPlan-Version, sagt die Seite das auch: dann zuerst NeonPlan 3D über HACS aktualisieren.");
+await sayOver("Braucht eine Erweiterung eine neuere NeonPlan-Version, sagt die Seite das auch: dann zuerst HomePlan 3D über HACS aktualisieren.");
 await R.move(1160, 560, 1);
 await sayOver("Und beim Komplett-Backup sind deine Packs mit drin, der Schlüssel nicht. Mehr dazu in der Folge über Sicherung und Umzug.");
 await R.move(1300, 700, 1);
@@ -604,11 +604,11 @@ await R.hideCursor();
   end = await line("Was du einmal installiert hast, bleibt – auch ohne Shop und ohne Internet.");
   await live(end, mix(a, b, k), b);
 }
-await R.title("Nächste Folge: Geräte, Lampen und Kameras", `NeonPlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+await R.title("Nächste Folge: Geräte, Lampen und Kameras", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
 {
   let end = await line("In der nächsten Folge geht es um Geräte, Lampen und Kameras.");
   await live(end);
-  end = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und NeonPlan 3D läuft auch auf alten Wandtablets. Bis zum nächsten Mal!");
+  end = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und HomePlan 3D läuft auch auf alten Wandtablets. Bis zum nächsten Mal!");
   await live(end + 0.6);
 }
 

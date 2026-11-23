@@ -13,7 +13,7 @@ const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/cs
 
 /**
  * Copy preview/ and the built app bundles into `dir` (for TUTORIAL_ROOT) and return the app version from the
- * manifest, for the "aufgenommen mit NeonPlan 3D …" line.
+ * manifest, for the "aufgenommen mit HomePlan 3D …" line.
  */
 export function snapshot(dir) {
   const repo = resolve(import.meta.dirname, "..", "..");

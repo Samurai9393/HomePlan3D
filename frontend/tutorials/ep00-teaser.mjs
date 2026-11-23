@@ -1,4 +1,4 @@
-// Tutorial episode 0 – the teaser "Das ist NeonPlan 3D": the first video of the playlist, 2–3 minutes of the full
+// Tutorial episode 0 – the teaser "Das ist HomePlan 3D": the first video of the playlist, 2–3 minutes of the full
 // demo house at its best in short scenes with hard cuts (each scene loads the preview fresh): the flight in, floors,
 // lights and colours, the room panel, blinds, heatmap, sun and evening, weather, warnings, Energy Pro, cameras,
 // search, the dashboard card and the wall tablet, a glimpse of the editor, the extensions, and the way into episode 1.
@@ -17,7 +17,7 @@ const out = process.argv[2] ?? "tutorial-ep00";
 const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "de" });
 const N = narration(R, process.argv.slice(3));
 const { sayOver, chapter } = N;
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit NeonPlan 3D ${appVersion()}</span>`;
+const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D ${appVersion()}</span>`;
 const PLAN = join(import.meta.dirname, "assets", "bauplan-eg.png");
 
 // every scene starts from the stored defaults (the panel remembers the look, hidden bars and more per device)
@@ -136,7 +136,7 @@ const quiet = async (target, wait = 300) => {
 const flash = (on) => R.page.evaluate((on) => (document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-view3d")._flash = on), on);
 
 // ---------------------------------------------------------------- 1. The flight in, title card
-await chapter("Das ist NeonPlan 3D");
+await chapter("Das ist HomePlan 3D");
 await scene("flows");
 await clean();
 {
@@ -145,10 +145,10 @@ await clean();
   const near = { theta: -0.45, phi: 0.88, radius: 30, target: [6.8, 3.0, 4.6] };
   await cam(far);
   await R.sleep(1200);
-  await R.title("NeonPlan 3D", `Dein Zuhause in 3D – live mit Home Assistant${VERSION}`);
+  await R.title("HomePlan 3D", `Dein Zuhause in 3D – live mit Home Assistant${VERSION}`);
   // a moment of picture before the first word
   await live(R.time + 0.8, far, mix(far, mid, 0.08));
-  let end = await line("Das ist NeonPlan 3D: dein Zuhause in 3D – live mit Home Assistant.");
+  let end = await line("Das ist HomePlan 3D: dein Zuhause in 3D – live mit Home Assistant.");
   await live(end, mix(far, mid, 0.08), mid);
   await R.untitle();
   end = await line("Jeder Raum, jedes Licht, jedes Fenster – genau da, wo es bei dir wirklich ist.");
@@ -498,7 +498,7 @@ await clean();
   const b = { theta: 1.5, phi: 1.0, radius: 29, target: [6.8, 3.0, 4.6] };
   await cam(a);
   await R.sleep(1200);
-  const end = await line("NeonPlan 3D ist kostenlos und Open Source.");
+  const end = await line("HomePlan 3D ist kostenlos und Open Source.");
   await live(end, a, b);
 }
 await scene("flows");
@@ -518,7 +518,7 @@ await clean();
   const b = { theta: 2.6, phi: 0.95, radius: 34, target: [6.8, 3.0, 4.6] };
   await cam(a);
   await R.sleep(1200);
-  await R.title("Folge 1: Dein erster Grundriss", `NeonPlan 3D – Tutorials · kostenlos und Open Source${VERSION}`);
+  await R.title("Folge 1: Dein erster Grundriss", `HomePlan 3D – Tutorials · kostenlos und Open Source${VERSION}`);
   const end = await line("In dieser Playlist zeige ich dir Schritt für Schritt, wie du dein eigenes Zuhause baust – los geht's mit Folge 1.");
   await live(end + 1.5, a, b);
 }

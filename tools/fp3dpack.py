@@ -1,4 +1,4 @@
-"""Create the publisher key and sign furniture packs for NeonPlan 3D.
+"""Create the publisher key and sign furniture packs for HomePlan 3D.
 
     python tools/fp3dpack.py keygen KEYFILE
         Creates a new signing key (keep it secret, never commit it) and prints the public key line
@@ -59,7 +59,7 @@ def sign(source: Path, key: Path, licensee: str | None, out: Path | None, instan
     payload = json.loads(source.read_text(encoding="utf-8"))
     # the licensee is always present, so a shop can put a buyer's name into the canonical form later
     payload["licensee"] = licensee
-    # a pack bound to one installation (its fingerprint, shown in NeonPlan 3D under the shop connection)
+    # a pack bound to one installation (its fingerprint, shown in HomePlan 3D under the shop connection)
     payload["instance"] = instance
     packs.validate_payload(payload)
     private = serialization.load_pem_private_key(key.read_bytes(), password=None)

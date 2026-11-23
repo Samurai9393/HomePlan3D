@@ -115,7 +115,7 @@ def async_register_commands(hass: HomeAssistant) -> None:
 def _data(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict) -> FloorplanData | None:
     data: FloorplanData | None = hass.data.get(DOMAIN)
     if data is None:
-        connection.send_error(msg["id"], "not_loaded", "NeonPlan 3D is not set up")
+        connection.send_error(msg["id"], "not_loaded", "HomePlan 3D is not set up")
     return data
 
 
@@ -706,7 +706,7 @@ async def ws_backup_import(
 def _reporter(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict) -> DiagnosticsReporter | None:
     reporter: DiagnosticsReporter | None = hass.data.get(DATA_DIAGNOSTICS)
     if reporter is None:
-        connection.send_error(msg["id"], "not_loaded", "NeonPlan 3D is not set up")
+        connection.send_error(msg["id"], "not_loaded", "HomePlan 3D is not set up")
     return reporter
 
 

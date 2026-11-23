@@ -20,7 +20,7 @@ const out = process.argv[2] ?? "tutorial-ep10";
 const PART = process.argv[3] === "b" ? "b" : "a";
 const FAST = !!process.env.EP10_FAST;
 // the controls side (◧ / ◨) and „Ansicht halten“ (⌖) come with 1.12.7; the bundle recorded already has them
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit NeonPlan 3D 1.12.7</span>`;
+const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D 1.12.7</span>`;
 
 const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "de" });
 const N = narration(R, process.argv.slice(4));
@@ -285,7 +285,7 @@ if (PART === "a") {
     const b = { theta: d.theta + 0.3, phi: d.phi - 0.05, radius: d.radius * 0.92 };
     await cam(null, 0, 0, a);
     await R.sleep(1200);
-    await R.title("Die 3D-Ansicht bedienen", `NeonPlan 3D · Folge 10 · Teil 1${VERSION}`);
+    await R.title("Die 3D-Ansicht bedienen", `HomePlan 3D · Folge 10 · Teil 1${VERSION}`);
     const l1 = "Die 3D-Ansicht ist das, was du jeden Tag benutzt: dein Haus live, zum Anschauen und zum Bedienen.";
     const l2 = "In dieser Folge zeige ich dir jeden Knopf und jeden Schalter darin.";
     const total = N.length(l1) + N.length(l2);
@@ -542,7 +542,7 @@ if (PART === "a") {
     await R.sleep(700);
     const end = await line("Das waren Haus, Etage und Raum und alle Schalter der Ansicht.");
     await glide(null, 0, 0, a, { ...b, theta: 0.5 }, end - R.time);
-    await R.title("Teil 2: Das Haus bedienen", `NeonPlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+    await R.title("Teil 2: Das Haus bedienen", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
     let e2 = await line("In Teil 2 bedienen wir das Haus: Lampen, Rollläden, Raumfenster, Stern, Suche, Warnungen und Startansichten.");
     await glide(null, 0, 0, { ...b, theta: 0.5 }, b, e2 - R.time);
     e2 = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Bis gleich!");
@@ -615,7 +615,7 @@ if (PART === "b") {
     const b = { theta: 0.45, phi: 0.72, radius: 8.5, y: 0.4 };
     await cam("eg", 6.5, 2.4, a);
     await R.sleep(1200);
-    await R.title("Die 3D-Ansicht bedienen", `NeonPlan 3D · Folge 10 · Teil 2${VERSION}`);
+    await R.title("Die 3D-Ansicht bedienen", `HomePlan 3D · Folge 10 · Teil 2${VERSION}`);
     const l1 = "Licht an, Rollladen runter, eine Szene starten – alles direkt im 3D-Haus.";
     const l2 = "In Teil 2 zeige ich dir, wie du dein Zuhause in der 3D-Ansicht bedienst.";
     const total = N.length(l1) + N.length(l2);
@@ -1001,11 +1001,11 @@ if (PART === "b") {
     const end = await line("Kurz zusammengefasst: antippen schaltet, wischen dimmt, lange drücken öffnet das Schnellmenü. Dazu Raumfenster, Stern, Suche und Warnungen.");
     await glide(null, 0, 0, a, b, end - R.time);
   }
-  await R.title("Nächste Folge: Dashboard-Karte und Wandtablet", `NeonPlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+  await R.title("Nächste Folge: Dashboard-Karte und Wandtablet", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
   {
     let end = await line("In der nächsten Folge bringen wir die 3D-Ansicht als Karte ins Dashboard und aufs Wandtablet.");
     await live(end);
-    end = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und NeonPlan 3D läuft auch auf alten Wandtablets. Bis zum nächsten Mal!");
+    end = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und HomePlan 3D läuft auch auf alten Wandtablets. Bis zum nächsten Mal!");
     await live(end + 0.6);
   }
 }

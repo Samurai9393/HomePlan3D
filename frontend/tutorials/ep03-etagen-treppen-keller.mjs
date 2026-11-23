@@ -18,7 +18,7 @@ import { appVersion, narration, startRecorder } from "./recorder.mjs";
 
 const out = process.argv[2] ?? "tutorial-ep03";
 const PART = process.argv[3] === "b" ? "b" : "a";
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit NeonPlan 3D ${appVersion()}</span>`;
+const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D ${appVersion()}</span>`;
 const STAIR_PACK = "pack:mastershort.stairs";
 
 // ---------------------------------------------------------------- states (invented demo house, ep01 style)
@@ -285,7 +285,7 @@ const teaser = async (title, line1, line2) => {
   const C = { theta: 2.6, phi: 0.75, radius: 29 };
   await R.view(A);
   await R.sleep(900);
-  await R.title(title, `NeonPlan 3D · Folge 3 · ${PART === "a" ? "Teil 1" : "Teil 2"}${VERSION}`);
+  await R.title(title, `HomePlan 3D · Folge 3 · ${PART === "a" ? "Teil 1" : "Teil 2"}${VERSION}`);
   await sayOver(line1);
   await R.glide(A, B, 5);
   await R.untitle();
@@ -517,7 +517,7 @@ if (PART === "a") {
 
   // ---------------------------------------------------------------- outro
   await chapter("Wie geht es weiter");
-  await R.title("Teil 2: Treppen und Bodenöffnungen", `NeonPlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+  await R.title("Teil 2: Treppen und Bodenöffnungen", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
   await say("Das waren die Etagen: anlegen, Höhe, Raumhöhe, Keller, verschieben, drehen und die Startansicht. Im zweiten Teil verbinden wir sie mit Treppen.");
   await say("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. NeonPlan läuft übrigens auch auf alten Wandtablets. Bis gleich in Teil zwei!");
   await R.hold(0.6);
@@ -743,7 +743,7 @@ if (PART === "a") {
 
   // ---------------------------------------------------------------- outro
   await chapter("Wie geht es weiter");
-  await R.title("Nächste Folge: Möbel", `NeonPlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+  await R.title("Nächste Folge: Möbel", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
   await say("Das waren Treppen und Bodenöffnungen. In der nächsten Folge richten wir das Haus mit Möbeln ein – alles mit den kostenlosen Möbeln.");
   await say("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und NeonPlan läuft auch auf alten Wandtablets. Bis zum nächsten Mal!");
   await R.hold(0.6);

@@ -165,7 +165,7 @@ async def test_unload_removes_service_and_intent(hass: HomeAssistant) -> None:
 
 
 # a file an early version wrote with its own, shorter set of sentences (seen on a real installation)
-_EARLY_FILE = """# Written by NeonPlan 3D: the sentences Assist hands to the open NeonPlan views (the first one that
+_EARLY_FILE = """# Written by HomePlan 3D: the sentences Assist hands to the open NeonPlan views (the first one that
 # understands answers). Rewritten on every start: put your own sentences for NeonPlanAsk into another file.
 language: "de"
 intents:
@@ -217,7 +217,7 @@ def test_an_older_file_with_fewer_sentences_is_still_ours(tmp_path: Path) -> Non
     de = tmp_path / "custom_sentences" / "de" / "neonplan3d.yaml"
     de.parent.mkdir(parents=True)
     de.write_text(
-        "# Written by NeonPlan 3D: the sentences Assist hands to the open NeonPlan views (the first one that\n"
+        "# Written by HomePlan 3D: the sentences Assist hands to the open NeonPlan views (the first one that\n"
         "# understands answers). Rewritten on every start: put your own sentences for NeonPlanAsk into another file.\n"
         'language: "de"\nintents:\n  NeonPlanAsk:\n    data:\n      - sentences:\n'
         '          - "zeig[e] [mir] [mal] [bitte] {text}"\n          - "wo (ist|sind|steht|stehen) {text}"\n'

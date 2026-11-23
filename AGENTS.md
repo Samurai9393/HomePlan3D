@@ -2,7 +2,7 @@
 
 ## Project status
 
-- NeonPlan 3D is a Home Assistant custom integration (`custom_components/neonplan3d`, domain `neonplan3d`, min HA 2025.1) with a Lit 3 + TypeScript frontend in `frontend/`; three.js is a separate lazy bundle.
+- HomePlan 3D is a Home Assistant custom integration (`custom_components/neonplan3d`, domain `neonplan3d`, min HA 2025.1) with a Lit 3 + TypeScript frontend in `frontend/`; three.js is a separate lazy bundle.
 - One-time copy from `https://github.com/Mastershort/neonplan3d` at `1cc184f5f774805af88cbf0198bc19c37bc28f67` (2026-11-22). No sync: do not fetch, pull, push, or open PRs there.
 - Local `origin` is `https://github.com/Samurai9393/HomePlan3D-main.git`. Do not push or change remotes without explicit instruction.
 - Local git history is just the import commit `b63d2ca` ("import prompt", 2026-11-22), not upstream history; do not infer upstream intent from it.
@@ -10,6 +10,7 @@
 ## Working preferences
 
 - Always create a plan for me to review before you start any work.
+- For any prompt that changes code, create a descriptively named branch from `main` before any code is changed; do not merge it — the user merges it to `main`.
 - Give direct feedback (no hedging, no gentle suggestions).
 - Use bullet points for summaries.
 - Ask clarifying questions one at a time.

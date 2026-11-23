@@ -2,12 +2,12 @@
   "config": {
     "step": {
       "user": {
-        "title": "NeonPlan 3D",
+        "title": "HomePlan 3D",
         "description": "Voegt een pagina in de zijbalk toe waar je je woning tekent en in 3D ziet."
       }
     },
     "abort": {
-      "single_instance_allowed": "NeonPlan 3D is al ingesteld."
+      "single_instance_allowed": "HomePlan 3D is al ingesteld."
     }
   }
 }

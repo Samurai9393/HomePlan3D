@@ -1,1 +1,1 @@
-"""Tests for NeonPlan 3D."""
+"""Tests for HomePlan 3D."""

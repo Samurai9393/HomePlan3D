@@ -24,7 +24,7 @@ const out = process.argv[2] ?? "tutorial-ep11";
 const PART = process.argv[3] === "b" ? "b" : "a";
 const FAST = !!process.env.EP11_FAST;
 // controls_side and keep_view (shown in part 2) come with 1.12.7
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit NeonPlan 3D 1.12.7</span>`;
+const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D 1.12.7</span>`;
 
 // ---------------------------------------------------------------- recorder
 const R = await startRecorder({ outDir: out, width: 1536, height: 864, lang: "de" });
@@ -551,8 +551,8 @@ if (PART === "a") {
   {
     await setCam({ theta: -0.9, phi: 0.95, radius: 34 });
     await R.frame(0.2, 900);
-    await R.title("Dashboard-Karte und Wandtablet", `NeonPlan 3D · Folge 11 · Teil 1${VERSION}`);
-    const l1 = "NeonPlan 3D als Karte auf deinem Dashboard – und an der Wand, auf einem alten Tablet, den ganzen Tag.";
+    await R.title("Dashboard-Karte und Wandtablet", `HomePlan 3D · Folge 11 · Teil 1${VERSION}`);
+    const l1 = "HomePlan 3D als Karte auf deinem Dashboard – und an der Wand, auf einem alten Tablet, den ganzen Tag.";
     await sayOver(l1);
     await orbit(0.7, 0.92, N.length(l1));
     await R.untitle();
@@ -806,7 +806,7 @@ if (PART === "a") {
   await R.hideCursor();
   await tablet({ ...BASE, floor: undefined, controls: true, fullscreen_button: true });
   await setCam({ theta: -0.6, phi: 0.95, radius: 32 });
-  await R.title("Teil 2: YAML, Kiosk und alte Wandtablets", `NeonPlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+  await R.title("Teil 2: YAML, Kiosk und alte Wandtablets", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
   await sayOver("Das war Teil eins: die Karte anlegen und jede Option im Editor, von der Etage bis zu den Funktionen.");
   await orbit(0.5, 0.95, N.length("Das war Teil eins: die Karte anlegen und jede Option im Editor, von der Etage bis zu den Funktionen."));
   await sayOver("In Teil zwei geht es ums Wandtablet: Kiosk, Nachtdimmung, Bildschirmschoner, YAML und die Einstellungen für alte Tablets.");
@@ -824,7 +824,7 @@ if (PART === "b") {
   await tablet({ ...BASE, floor: undefined, controls_hidden: true, idle_return: 1, idle_orbit: true });
   {
     await setCam({ theta: -0.9, phi: 0.95, radius: 34 });
-    await R.title("Dashboard-Karte und Wandtablet", `NeonPlan 3D · Folge 11 · Teil 2${VERSION}`);
+    await R.title("Dashboard-Karte und Wandtablet", `HomePlan 3D · Folge 11 · Teil 2${VERSION}`);
     const l1 = "Ein altes Tablet an der Wand: Die Karte kehrt von selbst zurück, dreht sich langsam und dimmt nachts.";
     await sayOver(l1);
     await orbit(0.6, 0.95, N.length(l1) * 0.55);
@@ -1061,7 +1061,7 @@ if (PART === "b") {
   await chapter("Wie geht es weiter");
   await tablet({ ...BASE, floor: undefined, controls: true, fullscreen_button: true });
   await setCam({ theta: -0.6, phi: 0.95, radius: 32 });
-  await R.title("Nächste Folge: Einstellungen, Sicherung und Umzug", `NeonPlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+  await R.title("Nächste Folge: Einstellungen, Sicherung und Umzug", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
   {
     const l1 = "Das war Folge elf: die Dashboard-Karte mit allen Optionen, der Kiosk-Bereich, YAML und das Wandtablet.";
     await sayOver(l1);

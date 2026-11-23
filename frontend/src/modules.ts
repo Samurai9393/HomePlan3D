@@ -630,7 +630,7 @@ export async function syncModules(hass: HomeAssistant, packs: readonly ModulePac
       if (!job) {
         job = load(hass, p)
           .catch((err) => {
-            console.warn(`NeonPlan 3D: module ${p.id} did not load`, err);
+            console.warn(`HomePlan 3D: module ${p.id} did not load`, err);
             return null;
           })
           .finally(() => loading.delete(p.id));
@@ -667,7 +667,7 @@ export async function moduleVoice(sentence: string, host: ModuleHost): Promise<V
       const answer = await m.module.voice(sentence, host);
       if (answer) return answer;
     } catch (err) {
-      console.warn(`NeonPlan 3D: module ${m.id} failed on "${sentence}"`, err);
+      console.warn(`HomePlan 3D: module ${m.id} failed on "${sentence}"`, err);
     }
   }
   return null;
@@ -726,7 +726,7 @@ export function moduleSettings(packId: string, host: ModuleHost): ModuleField[] 
   try {
     return m.module.settings(host) ?? [];
   } catch (err) {
-    console.warn(`NeonPlan 3D: module ${m.id} failed`, err);
+    console.warn(`HomePlan 3D: module ${m.id} failed`, err);
     return [];
   }
 }
@@ -752,7 +752,7 @@ function collect<T>(pick: (m: NeonModule) => T[] | undefined | null): T[] {
     try {
       out.push(...(pick(m.module) ?? []));
     } catch (err) {
-      console.warn(`NeonPlan 3D: module ${m.id} failed`, err);
+      console.warn(`HomePlan 3D: module ${m.id} failed`, err);
     }
   }
   return out;

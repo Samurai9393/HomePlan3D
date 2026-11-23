@@ -30,7 +30,7 @@ jobs:
           if len(body) > 3500:
               body = body[:3500].rsplit("\n", 1)[0] + "\n…"
           payload = {
-              "content": "<@&1557398674689232997> NeonPlan 3D **" + os.environ["TAG"] + "** is out – update via HACS.",
+              "content": "<@&1557398674689232997> HomePlan 3D **" + os.environ["TAG"] + "** is out – update via HACS.",
               "embeds": [{
                   "title": os.environ["NAME"] or os.environ["TAG"],
                   "url": os.environ["URL"],

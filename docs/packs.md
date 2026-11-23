@@ -1,6 +1,6 @@
 # Möbel-Packs
 
-Möbel-Packs bringen zusätzliche Möbel in NeonPlan 3D. Sie werden wie die eingebauten Möbel aus
+Möbel-Packs bringen zusätzliche Möbel in HomePlan 3D. Sie werden wie die eingebauten Möbel aus
 Quadern und Zylindern gebaut und laufen deshalb genauso flüssig auf schwachen Tablets.
 
 Nur Packs, die mit dem Herausgeber-Schlüssel unterschrieben sind, lassen sich importieren. Der
@@ -142,7 +142,7 @@ Pack erneut importiert wird.
 ## Lizenzschlüssel, Gerätebindung und Updates
 
 Jeder Kunde bekommt mit dem ersten Pack-Kauf **einen Schlüssel** (`NP-XXXX-XXXX-XXXX-XXXX`), der in
-der Bestell-Mail, auf der Danke-Seite und im Kundenkonto steht. In NeonPlan 3D wird er einmal unter
+der Bestell-Mail, auf der Danke-Seite und im Kundenkonto steht. In HomePlan 3D wird er einmal unter
 *Erweiterungen › Shop-Verbindung* eingetragen. Danach:
 
 - listet die Integration die gekauften Packs (Knopf „Installieren“ beziehungsweise „Aktualisieren“),

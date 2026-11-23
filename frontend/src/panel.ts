@@ -842,7 +842,7 @@ export class Floorplan3dPanel extends LitElement {
         ${this._micProbe && this.hass ? html`<fp3d-mic-probe .hass=${this.hass} .building=${b} @close=${() => ((this._micProbe = false), micProbeDone())}></fp3d-mic-probe>` : nothing}
         ${(this._clean || this.phoneOn) && this._mode === "view" ? nothing : html`<header class="fp3d-header">
           <ha-menu-button .hass=${this.hass} .narrow=${this.narrow}></ha-menu-button>
-          <h1>NeonPlan 3D</h1>
+          <h1>HomePlan 3D</h1>
           ${this.data.plans.length > 1 || (this.isAdmin && this.data.plans.length > 0)
             ? html`<fp3d-plan-picker
                 .hass=${this.hass}

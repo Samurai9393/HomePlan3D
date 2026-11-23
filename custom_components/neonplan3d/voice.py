@@ -182,7 +182,7 @@ def sentences_yaml(language: str, mode: str = DEFAULT_SENTENCE_MODE, names: list
     """The custom sentences file of a language (written by hand: the file stays readable for the user); `names`
     are the people and things locating knows ("Wo ist Frauke?")."""
     lines = [
-        "# Written by NeonPlan 3D: the sentences Assist hands to the open NeonPlan views (the first one that",
+        "# Written by HomePlan 3D: the sentences Assist hands to the open NeonPlan views (the first one that",
         "# understands answers). Put your own sentences for NeonPlanAsk into another file.",
         "# Which sentences stand here is set in the editor: ⚙ Settings → Voice control → Sentences for Assist.",
         "# Changed by hand, the file is never overwritten; removing the integration removes it.",
@@ -215,7 +215,7 @@ def _ours(text: str) -> bool:
     """A file NeonPlan wrote (in any mode, by any version): the user has not changed it."""
     return (
         any(text == sentences_yaml(language, mode) for language in _DISTINCT for mode in ("distinct", "all"))
-        or (text.startswith("# Written by NeonPlan 3D") and text in _old_files())
+        or (text.startswith("# Written by HomePlan 3D") and text in _old_files())
         or _only_our_sentences(text)
     )
 
@@ -223,7 +223,7 @@ def _ours(text: str) -> bool:
 def _only_our_sentences(text: str) -> bool:
     """NeonPlan's header and nothing but sentences NeonPlan writes: an older version's file (it had fewer
     sentences, the names of other people), never one the user added a sentence or an intent to."""
-    if not text.startswith("# Written by NeonPlan 3D"):
+    if not text.startswith("# Written by HomePlan 3D"):
         return False
     try:
         data = parse_yaml(text)
@@ -489,7 +489,7 @@ class AskIntentHandler(intent.IntentHandler):
     """Assist's "show me the living room" and the questions the modules answer."""
 
     intent_type = INTENT_ASK
-    description = "Shows a place or device in NeonPlan 3D or asks the house a question (the open NeonPlan views answer)"
+    description = "Shows a place or device in HomePlan 3D or asks the house a question (the open NeonPlan views answer)"
     slot_schema: ClassVar[dict] = {vol.Optional("text"): cv.string, vol.Optional(WHO_LIST): cv.string}
 
     def __init__(self, broker: AskBroker) -> None:

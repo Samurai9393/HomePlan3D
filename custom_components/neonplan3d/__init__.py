@@ -1,4 +1,4 @@
-"""NeonPlan 3D: draw your home in Home Assistant and control it in 3D."""
+"""HomePlan 3D: draw your home in Home Assistant and control it in 3D."""
 
 from __future__ import annotations
 

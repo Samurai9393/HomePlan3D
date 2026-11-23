@@ -25,7 +25,7 @@ import { appVersion, FPS, narration, startRecorder } from "./recorder.mjs";
 const out = resolve(process.argv[2] ?? "tutorial-ep12");
 const PART = process.argv[3] === "b" ? "b" : "a";
 const FAST = !!process.env.EP12_FAST;
-const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit NeonPlan 3D ${appVersion()}</span>`;
+const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D ${appVersion()}</span>`;
 const DL = join(out, "downloads");
 mkdirSync(DL, { recursive: true });
 
@@ -420,8 +420,8 @@ if (PART === "a") {
     const b = { theta: d.theta + 0.35, phi: d.phi - 0.04, radius: d.radius * 0.92 };
     await camOf("main", null, 0, 0, a);
     await R.sleep(1200);
-    await R.title("Einstellungen, Sicherung und Umzug", `NeonPlan 3D · Folge 12 · Teil 1${VERSION}`);
-    const l1 = "Wandstärke, Nordrichtung, Wetter, Favoriten und eigene Knöpfe: Mit den Einstellungen passt du NeonPlan 3D an dein Zuhause an.";
+    await R.title("Einstellungen, Sicherung und Umzug", `HomePlan 3D · Folge 12 · Teil 1${VERSION}`);
+    const l1 = "Wandstärke, Nordrichtung, Wetter, Favoriten und eigene Knöpfe: Mit den Einstellungen passt du HomePlan 3D an dein Zuhause an.";
     const l2 = "In dieser Folge gehe ich jede Einstellung mit dir durch.";
     const total = N.length(l1) + N.length(l2);
     const t0 = R.time;
@@ -784,11 +784,11 @@ if (PART === "a") {
     const end = await line("Kurz zusammengefasst: Wände, Raster, Nordrichtung, Dach, Wetter, Startansicht, Favoriten und eigene Knöpfe – alles unten in der Seitenleiste des Editors.");
     await glide("main", null, 0, 0, a, b, end - R.time);
   }
-  await R.title("Teil 2: Sicherung, Umzug und Datenschutz", `NeonPlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+  await R.title("Teil 2: Sicherung, Umzug und Datenschutz", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
   {
     let end = await line("In Teil 2 sicherst du deinen Plan und ziehst damit auf ein neues Home Assistant um.");
     await live(end);
-    end = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und NeonPlan 3D läuft auch auf alten Wandtablets. Bis gleich in Teil 2!");
+    end = await line("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und HomePlan 3D läuft auch auf alten Wandtablets. Bis gleich in Teil 2!");
     await live(end + 0.6);
   }
 }
@@ -851,7 +851,7 @@ if (PART === "b") {
     const b = { theta: d.theta - 0.4, phi: d.phi - 0.03, radius: d.radius * 0.9 };
     await camOf("main", null, 0, 0, a);
     await R.sleep(1200);
-    await R.title("Einstellungen, Sicherung und Umzug", `NeonPlan 3D · Folge 12 · Teil 2${VERSION}`);
+    await R.title("Einstellungen, Sicherung und Umzug", `HomePlan 3D · Folge 12 · Teil 2${VERSION}`);
     const l1 = "Ein Klick zu viel, ein neues Home Assistant oder neue Hardware – dein Plan geht nicht verloren.";
     const l2 = "In Teil 2 zeige ich dir Sicherung, Import und Umzug.";
     const total = N.length(l1) + N.length(l2);
@@ -1032,26 +1032,26 @@ if (PART === "b") {
   await R.hold(0.6);
   await sayOver("Jedes Pack wird dabei neu geprüft. Packs, die für eine andere Installation signiert sind, werden übersprungen – die holst du dort über den Shop neu.");
   await R.hold(0.8);
-  await sayOver("Übrigens: Das normale Backup von Home Assistant sichert NeonPlan 3D ebenfalls vollständig mit.");
+  await sayOver("Übrigens: Das normale Backup von Home Assistant sichert HomePlan 3D ebenfalls vollständig mit.");
   await R.hold(0.6);
 
   // ---------------------------------------------------------------- 8. Moving
   await chapter("Umzug auf ein neues Home Assistant");
   const STEPS = [
     "Altes System: „Alles sichern“",
-    "Neues System: NeonPlan 3D über HACS installieren, Integration hinzufügen, Bereiche anlegen",
+    "Neues System: HomePlan 3D über HACS installieren, Integration hinzufügen, Bereiche anlegen",
     "Editor › Sicherung › „Komplett-Backup wiederherstellen …“",
     "Erweiterungen: Schlüssel eintragen, „Aktivieren“, Packs „Installieren“",
   ];
   await sayOver("Jetzt der Umzug, zum Beispiel auf einen neuen Mini-PC. Am einfachsten spielst du das Backup von Home Assistant auf der neuen Hardware ein – dann ist NeonPlan mit allem da.");
-  await card("Weg 1: das Backup von Home Assistant", ["Auf der neuen Hardware einspielen – NeonPlan 3D ist mit Plan, Bildern, Packs und Shop-Verbindung da"], 0);
+  await card("Weg 1: das Backup von Home Assistant", ["Auf der neuen Hardware einspielen – HomePlan 3D ist mit Plan, Bildern, Packs und Shop-Verbindung da"], 0);
   await R.move(1100, 560, 1.2);
   await R.hold(0.6);
   await sayOver("Fängst du neu an, geht es in vier Schritten. Erstens: auf dem alten System „Alles sichern“.");
   await card("Weg 2: neu anfangen", STEPS, 0);
   await R.moveTo({ text: "Alles sichern (Plan, Bilder, Packs)", exact: true }, 0.6);
   await R.hold(0.6);
-  await sayOver("Zweitens: Auf dem neuen System installierst du NeonPlan 3D über HACS, fügst die Integration hinzu und legst deine Bereiche an.");
+  await sayOver("Zweitens: Auf dem neuen System installierst du HomePlan 3D über HACS, fügst die Integration hinzu und legst deine Bereiche an.");
   await card("Weg 2: neu anfangen", STEPS, 1);
   await R.hold(0.8);
   await sayOver("Drittens: Im Editor unter „Sicherung“ das Komplett-Backup wiederherstellen.");
@@ -1159,10 +1159,10 @@ if (PART === "b") {
     const b = { theta: d.theta + 0.2, phi: d.phi - 0.03, radius: d.radius * 1.0 };
     await camOf("main", null, 0, 0, a);
     await R.sleep(700);
-    const l1 = "Das war die letzte Folge der Reihe. Vom ersten Raum bis zum Umzug kennst du jetzt jeden Knopf in NeonPlan 3D.";
-    const l2 = "Danke, dass du dabei warst! Alle Folgen findest du in der Playlist „NeonPlan 3D – Tutorials“.";
+    const l1 = "Das war die letzte Folge der Reihe. Vom ersten Raum bis zum Umzug kennst du jetzt jeden Knopf in HomePlan 3D.";
+    const l2 = "Danke, dass du dabei warst! Alle Folgen findest du in der Playlist „HomePlan 3D – Tutorials“.";
     const l3 = "Links zur Online-Demo, zur Anleitung, zu GitHub für Fehlermeldungen und zu unserer Discord-Community stehen in der Beschreibung.";
-    const l4 = "Und denk dran: NeonPlan 3D läuft auch auf alten Wandtablets. Bis bald!";
+    const l4 = "Und denk dran: HomePlan 3D läuft auch auf alten Wandtablets. Bis bald!";
     const total = N.length(l1) + N.length(l2) + N.length(l3) + N.length(l4) + 0.6;
     const t0 = R.time;
     const step = async (end) => {
@@ -1175,11 +1175,11 @@ if (PART === "b") {
       }
     };
     await step(await line(l1));
-    await R.title("Danke fürs Zuschauen!", `Playlist „NeonPlan 3D – Tutorials“`);
+    await R.title("Danke fürs Zuschauen!", `Playlist „HomePlan 3D – Tutorials“`);
     await step(await line(l2));
     await R.title("Demo · Anleitung · GitHub · Discord", `Links in der Beschreibung`);
     await step(await line(l3));
-    await R.title("NeonPlan 3D", `läuft auch auf alten Wandtablets${VERSION}`);
+    await R.title("HomePlan 3D", `läuft auch auf alten Wandtablets${VERSION}`);
     await step((await line(l4)) + 0.6);
   }
 }

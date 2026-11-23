@@ -11,7 +11,7 @@ export const PLAN = join(import.meta.dirname, "assets", "bauplan-l.png");
 export const PTS = JSON.parse(readFileSync(join(import.meta.dirname, "assets", "bauplan-l.json"), "utf-8"));
 /** The picture's true width in the plan (17.5 m at 100 px per metre) and its turn. */
 export const PLAN_WIDTH = 17.5;
-export const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit NeonPlan 3D ${appVersion()}</span>`;
+export const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D ${appVersion()}</span>`;
 
 /** The traced rooms (plan metres; the house corner at 0/0). */
 export const ROOMS = {

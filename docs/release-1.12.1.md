@@ -14,7 +14,7 @@
 
 ### How to update
 
-Settings → System → Updates. If NeonPlan 3D is missing there: HACS → NeonPlan 3D → ⋮ → **Update information** → **Download**. Then restart Home Assistant and reload the page (Ctrl+F5).
+Settings → System → Updates. If HomePlan 3D is missing there: HACS → HomePlan 3D → ⋮ → **Update information** → **Download**. Then restart Home Assistant and reload the page (Ctrl+F5).
 
 
 ---
@@ -35,4 +35,4 @@ Settings → System → Updates. If NeonPlan 3D is missing there: HACS → NeonP
 
 ### So bekommst du das Update
 
-Einstellungen → System → Updates. Fehlt NeonPlan 3D dort: HACS → NeonPlan 3D → ⋮ → **Informationen aktualisieren** → **Herunterladen**. Danach Home Assistant neu starten und die Seite neu laden (Strg+F5).
+Einstellungen → System → Updates. Fehlt HomePlan 3D dort: HACS → HomePlan 3D → ⋮ → **Informationen aktualisieren** → **Herunterladen**. Danach Home Assistant neu starten und die Seite neu laden (Strg+F5).
