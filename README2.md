@@ -7,7 +7,7 @@
 **Draw your home right inside Home Assistant – and live in it as a glowing neon house, or in any style you like.**<br>
 Lights glow in their colours, blinds move, doors open, cameras watch, energy flows through the walls – and you can simply talk to it.
 
-[![Open your Home Assistant instance and open the HomePlan 3D repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
+[![Open your Home Assistant instance and open the HomePlan 3D repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=homeplan3d&category=integration)
 
 [![Latest release](https://img.shields.io/github/v/release/Mastershort/neonplan3d?label=release&color=00e5ff)](https://github.com/Mastershort/neonplan3d/releases)
 [![Home Assistant Marketplace](https://img.shields.io/badge/Marketplace-default-41BDF5?logo=homeassistant&logoColor=white)](https://www.home-assistant.io/integrations/marketplace/)
@@ -15,7 +15,7 @@ Lights glow in their colours, blinds move, doors open, cameras watch, energy flo
 [![Runs locally](https://img.shields.io/badge/cloud-none%20needed-8a2be2)](#privacy)
 [![Discord](https://img.shields.io/badge/Discord-community-5865F2?logo=discord&logoColor=white)](https://discord.gg/SSdVVFsev7)
 
-**[▶️ Try the online demo](https://neonplan3d.mastershort.de/)** · **[📖 Manual](https://mastershort.de/en/neonplan3d/manual/?lang=en)** · **[📖 Anleitung](https://mastershort.de/neonplan3d/anleitung/?lang=de)** · **[💬 Discord](https://discord.gg/SSdVVFsev7)**
+**[▶️ Try the online demo](https://neonplan3d.mastershort.de/)** · **[📖 Manual](https://mastershort.de/en/homeplan3d/manual/?lang=en)** · **[📖 Anleitung](https://mastershort.de/homeplan3d/anleitung/?lang=de)** · **[💬 Discord](https://discord.gg/SSdVVFsev7)**
 
 ## Neon was just the beginning.
 
@@ -65,7 +65,7 @@ You love the neon. But on the living-room wall in the evening, a homely house wi
 - 🎨 **Eleven styles to start with** – Neon, Blueprint, Day, Night / Focus, Synthwave, Homely, Homely evening, Winter evening, Architect's model, Pastel, Warm / Wood & paper. Lights, open windows and running devices keep their signal colours in every style.
 - ✨ **Your own styles** – copy any style and turn every knob: real materials or your own palette, evening mood, floor texture, shadows, background. You see each change live on the house.
 - 🕒 **By time of day** – homely during the day, warm in the evening, calm at night: switched by the sun or by the clock. Every card can have its own evening and night style.
-- 🗣️ **By voice and automation** – "NeonPlan style homely", the action `neonplan3d.set_style`, or a helper entity your automations set.
+- 🗣️ **By voice and automation** – "NeonPlan style homely", the action `homeplan3d.set_style`, or a helper entity your automations set.
 - 📱 **Still runs on old wall tablets** – the styles only colour differently, they cost no extra performance.
 
 Pick a style in the 3D view under **⚙ → 🎨**, build your own under **⚙ Settings → 🎨 Styles** in the editor. [How it all works →](docs/manual.md#512-styles-new-in-31)
@@ -104,7 +104,7 @@ Everything happens in the editor inside Home Assistant, with the 3D house growin
 
 Not drawing at all? The **[import page](https://neonplan3d.mastershort.de/import/)** turns Sweet Home 3D, iPhone LiDAR scans (RoomPlan), CAD (DXF), Blender/SketchUp models (glTF, OBJ, STL), Floorplanner and Valetudo robot maps into a NeonPlan plan – in your browser. Or let an AI write it with [this template](https://github.com/Mastershort/neonplan3d/blob/main/docs/ai-import.md).
 
-**Build once, show it everywhere:** the editor in the sidebar is where you build the house. To show it, add the dashboard card `custom:neonplan3d-card` anywhere – or build a **card template** in the editor and just pick it on the tablet. Change the template later, and every tablet showing it follows.
+**Build once, show it everywhere:** the editor in the sidebar is where you build the house. To show it, add the dashboard card `custom:homeplan3d-card` anywhere – or build a **card template** in the editor and just pick it on the tablet. Change the template later, and every tablet showing it follows.
 
 ---
 
@@ -186,7 +186,7 @@ Plus **Auto** (day while the sun is up, neon after sunset), an accent colour of 
 | 🔌 **Devices** | TVs, washers, dryers, dishwashers, stoves glow while running · radiators and air conditioners · power in watts · robot vacuum that drives its lanes · parking spots with the car while it is home · awnings · waste bins and mailboxes · switches, sockets, Wi-Fi access point, water heater |
 | 📷 **Cameras** | Cameras with their field of view · red on motion · snapshots and live view with a tap · your own camera model |
 | ⚡ **Energy** | Solar fields on roofs, walls and the ground · inverters, batteries, wallboxes, meters with live values · energy balance from HA's energy dashboard · gas and water meters · setup checklist |
-| 🎙️ **Voice** | 🎙 microphone in the panel and the card · "Show the living room", "Where is …" · "here" means the tablet's room · vacuum and everything off by voice · own names for the voice · Assist sentences · service `neonplan3d.ask` |
+| 🎙️ **Voice** | 🎙 microphone in the panel and the card · "Show the living room", "Where is …" · "here" means the tablet's room · vacuum and everything off by voice · own names for the voice · Assist sentences · service `homeplan3d.ask` |
 | 📍 **Live Presence** | Room-level locating of people, phones and key tags · no Bermuda, no ESPresense · setup assistant, 90 s per room · Android phones found by themselves · key helper for iPhones and Apple Watches · glowing figures in 3D · a room sensor per device · "Where is my iPhone?" |
 | 🚨 **Safety** | Smoke, gas, CO, water, alarm, power outage · window open in the rain · contacts gone silent · the room pulses red, a banner with a jump there · **Window watch** module (open in the cold) |
 | 🎈 **Fun packs** | Pets (cat, rabbit, dogs, fish) · Halloween · Winter & Christmas with fairy lights, snow and a New Year firework – free with a customer account |
@@ -202,7 +202,7 @@ Plus **Auto** (day while the sun is up, neon after sunset), an accent colour of 
 
 ## ⭐ Optional extras
 
-For special things only some homes have. Sold once at [mastershort.de](https://mastershort.de/en/neonplan3d/?lang=en) – **no subscription** – and installed from the **Extensions** tab.
+For special things only some homes have. Sold once at [mastershort.de](https://mastershort.de/en/homeplan3d/?lang=en) – **no subscription** – and installed from the **Extensions** tab.
 
 | Pro add-on | What it brings |
 |---|---|
@@ -224,22 +224,22 @@ Bought packs and modules are signed for your installation and update by themselv
 
 ## 📦 Installation
 
-[![Open your Home Assistant instance and open the HomePlan 3D repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
+[![Open your Home Assistant instance and open the HomePlan 3D repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=homeplan3d&category=integration)
 
 1. Click the button above, or open **Settings → Marketplace** and search for **HomePlan 3D** (it is in the default list). On Home Assistant before 2026.11, use HACS the same way.
 2. Install **HomePlan 3D** and restart Home Assistant.
-3. Add the integration: [![Open your Home Assistant instance and start setting up HomePlan 3D.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=neonplan3d) or *Settings → Devices & services → Add integration → HomePlan 3D*.
+3. Add the integration: [![Open your Home Assistant instance and start setting up HomePlan 3D.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=homeplan3d) or *Settings → Devices & services → Add integration → HomePlan 3D*.
 4. Open **HomePlan 3D** in the sidebar, switch to **Editor** and draw your first floor – or import a plan. More buildings: **＋ New floor plan** at the top.
 5. Put it on a dashboard: **Add card** → search "NeonPlan". For one room: select it in the editor → **🖥 Card for this room**.
 
-**Manual install:** copy `custom_components/neonplan3d` into `config/custom_components/` and restart Home Assistant. Requires Home Assistant 2025.1 or newer.
+**Manual install:** copy `custom_components/homeplan3d` into `config/custom_components/` and restart Home Assistant. Requires Home Assistant 2025.1 or newer.
 
 ## 🧩 Dashboard card
 
 All options can be set in the card's visual editor. The most used ones in YAML:
 
 ```yaml
-type: custom:neonplan3d-card
+type: custom:homeplan3d-card
 template: kitchen_fire  # a card template made in the editor (then only it counts)
 plan: pab12cd34ef       # another floor plan (id under ⚙ → Floor plans); site = the whole property
 rooms: [room_ab12cd34]  # only these rooms – the kids' tablet; rooms_lock: false lets it leave them
@@ -272,12 +272,12 @@ cd frontend
 npm install
 npm test            # pure logic
 npm run typecheck
-npm run build       # writes the bundles to custom_components/neonplan3d/frontend (committed) and checks the size budgets
+npm run build       # writes the bundles to custom_components/homeplan3d/frontend (committed) and checks the size budgets
 npm run screenshot  # renders preview/index.html (invented demo data) with a local Chrome or Edge
 ```
 
 - **Preview without Home Assistant:** open `preview/index.html` through any local web server.
-- **Deploy to a test instance:** create `deploy.local.json` with `{"target": "<config>/custom_components/neonplan3d"}` and run `npm run deploy` in `frontend/`.
+- **Deploy to a test instance:** create `deploy.local.json` with `{"target": "<config>/custom_components/homeplan3d"}` and run `npm run deploy` in `frontend/`.
 - **Python tests** run in CI with `pytest-homeassistant-custom-component`.
 - **Furniture pack format:** [docs/packs.md](https://github.com/Mastershort/neonplan3d/blob/main/docs/packs.md) (German).
 
@@ -287,7 +287,7 @@ MIT – see [LICENSE](https://github.com/Mastershort/neonplan3d/blob/main/LICENS
 
 ## ☕ Support
 
-HomePlan 3D is free. If you like it, you can buy me a coffee – or have a look at the packs in the shop: https://mastershort.de/en/neonplan3d/?lang=en<br>
-HomePlan 3D ist kostenlos. Wenn es dir gefällt, freue ich mich über einen Kaffee ☕ – oder schau dir die Packs im Shop an: https://mastershort.de/neonplan3d/
+HomePlan 3D is free. If you like it, you can buy me a coffee – or have a look at the packs in the shop: https://mastershort.de/en/homeplan3d/?lang=en<br>
+HomePlan 3D ist kostenlos. Wenn es dir gefällt, freue ich mich über einen Kaffee ☕ – oder schau dir die Packs im Shop an: https://mastershort.de/homeplan3d/
 
 [![PayPal](https://img.shields.io/badge/PayPal-Spenden-00457C?logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=Z3G2VWKSK5VJL)

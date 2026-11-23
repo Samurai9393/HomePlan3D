@@ -175,7 +175,7 @@ const toFloor = async () => {
 const panePoint = (floorId, x, y, z) =>
   R.page.evaluate(
     (floorId, x, y, z) => {
-      const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+      const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
       const v = e.renderRoot.querySelector("fp3d-view3d");
       const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);
       const fv = viewer.floorMap.get(floorId);
@@ -194,7 +194,7 @@ const panePoint = (floorId, x, y, z) =>
 const setPane = (floorId, x, z, cam, main = false) =>
   R.page.evaluate(
     (floorId, x, z, cam, main) => {
-      const panel = document.querySelector("neonplan3d-panel").shadowRoot;
+      const panel = document.querySelector("homeplan3d-panel").shadowRoot;
       const v = main ? panel.querySelector("fp3d-view3d") : panel.querySelector("fp3d-editor").renderRoot.querySelector("fp3d-view3d");
       const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);
       const fv = viewer.floorMap.get(floorId);
@@ -214,7 +214,7 @@ const setPane = (floorId, x, z, cam, main = false) =>
 /** Glide the editor's 3D pane camera from its current view to another (theta, phi, radius). */
 const panePaneView = () =>
   R.page.evaluate(() => {
-    const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+    const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
     const v = e.renderRoot.querySelector("fp3d-view3d");
     const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);
     const { theta, phi, radius } = viewer.controls.view;

@@ -426,7 +426,7 @@ const glideLine = async (to, line, part = 1) => glide3d(to, Math.max(1, N.length
 /** The main 3D view (3D tab): theta, phi, radius and, if given, the target; returns the view. */
 const setMain = (c) =>
   R.page.evaluate((c) => {
-    const v = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
+    const v = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
     const viewer = Object.values(v).find((x) => x && x.floors && x.floorMap);
     const { target, ...rest } = c;
     Object.assign(viewer.controls.view, rest);

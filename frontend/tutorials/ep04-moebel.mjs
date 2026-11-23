@@ -124,7 +124,7 @@ const freeOnly = () =>
     const p = window.fp3dPanel;
     const hass = p.hass;
     const orig = hass.callWS;
-    hass.callWS = async (m) => (m.type === "neonplan3d/packs/list" ? { packs: [] } : orig(m));
+    hass.callWS = async (m) => (m.type === "homeplan3d/packs/list" ? { packs: [] } : orig(m));
     await p.data.reloadPacks();
   });
 /**
@@ -374,7 +374,7 @@ const search = async (text) => {
 const setPane = (floorId, x, z, cam, main = false) =>
   R.page.evaluate(
     (floorId, x, z, cam, main) => {
-      const panel = document.querySelector("neonplan3d-panel").shadowRoot;
+      const panel = document.querySelector("homeplan3d-panel").shadowRoot;
       const v = main ? panel.querySelector("fp3d-view3d") : panel.querySelector("fp3d-editor").renderRoot.querySelector("fp3d-view3d");
       const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);
       const fv = viewer.floorMap.get(floorId);
@@ -405,7 +405,7 @@ const glidePane = async (floorId, x, z, a, b, seconds, main = false) => {
 const panePoint = (floorId, x, y, z) =>
   R.page.evaluate(
     (floorId, x, y, z) => {
-      const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+      const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
       const v = e.renderRoot.querySelector("fp3d-view3d");
       const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);
       const fv = viewer.floorMap.get(floorId);

@@ -17,6 +17,6 @@ export const DISCORD_URL = "https://discord.gg/SSdVVFsev7";
 /** The supporter page of the shop (with the Supporter-Pass) in the user's language. */
 export function supporterUrl(lang: string | undefined): string {
   return (lang ?? navigator.language).toLowerCase().startsWith("de")
-    ? "https://mastershort.de/neonplan3d/unterstuetzer/?lang=de"
-    : "https://mastershort.de/en/neonplan3d/supporters/?lang=en";
+    ? "https://mastershort.de/homeplan3d/unterstuetzer/?lang=de"
+    : "https://mastershort.de/en/homeplan3d/supporters/?lang=en";
 }

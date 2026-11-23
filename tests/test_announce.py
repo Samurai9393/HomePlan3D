@@ -1,4 +1,4 @@
-"""Announcements from automations: the service `neonplan3d.announce`."""
+"""Announcements from automations: the service `homeplan3d.announce`."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from homeassistant.helpers import entity_registry as er
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_mock_service
 
-from custom_components.neonplan3d.announce import (
+from custom_components.homeplan3d.announce import (
     MODULE_ID,
     is_quiet,
     module_ready,
@@ -21,7 +21,7 @@ from custom_components.neonplan3d.announce import (
     target_rooms,
     zones_of,
 )
-from custom_components.neonplan3d.const import DOMAIN
+from custom_components.homeplan3d.const import DOMAIN
 
 from .test_init import BUILDING, _setup
 
@@ -213,11 +213,11 @@ async def test_echo_of_alexa_devices_announces_through_its_notify_entity(hass: H
 async def test_screens_get_the_announcement(hass: HomeAssistant, hass_ws_client) -> None:
     await _ready(hass, [APPROVED])
     view = await hass_ws_client(hass)
-    await view.send_json({"id": 1, "type": "neonplan3d/voice/subscribe", "announce": True})
+    await view.send_json({"id": 1, "type": "homeplan3d/voice/subscribe", "announce": True})
     assert (await view.receive_json())["success"]
     # an older view (without `announce`) never gets it
     old = await hass_ws_client(hass)
-    await old.send_json({"id": 1, "type": "neonplan3d/voice/subscribe"})
+    await old.send_json({"id": 1, "type": "homeplan3d/voice/subscribe"})
     assert (await old.receive_json())["success"]
     speak = async_mock_service(hass, "tts", "speak")
 

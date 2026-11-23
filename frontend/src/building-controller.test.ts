@@ -18,8 +18,8 @@ test("a plan that is gone (in the bin, a card of a deleted one) shows the main p
   assert.equal(choosePlan(null, plans), "main");
   // an older backend lists no plans: only the main one
   assert.equal(choosePlan("pgarage", []), "main");
-  assert.equal(draftKey("main"), "neonplan3d.unsaved");
-  assert.equal(draftKey("pgarage"), "neonplan3d.unsaved.pgarage");
+  assert.equal(draftKey("main"), "homeplan3d.unsaved");
+  assert.equal(draftKey("pgarage"), "homeplan3d.unsaved.pgarage");
 });
 
 /** A backend with two plans: what was asked and saved, and the subscriptions per plan. */
@@ -36,13 +36,13 @@ function fakeHass() {
       calls.push(msg);
       const plan = (msg.plan as string) ?? "main";
       switch (msg.type) {
-        case "neonplan3d/plans/list":
+        case "homeplan3d/plans/list":
           return { plans: Object.keys(plans).map((id) => ({ id, name: id, icon: null, site: null })), trash: [], locate_plan: "main" };
-        case "neonplan3d/packs/list":
+        case "homeplan3d/packs/list":
           return { packs: [] };
-        case "neonplan3d/building/get":
+        case "homeplan3d/building/get":
           return { building: plans[plan].building, revision: plans[plan].revision, plan };
-        case "neonplan3d/building/save":
+        case "homeplan3d/building/save":
           if (typeof msg.base_revision === "number" && msg.base_revision !== plans[plan].revision) throw { code: "stale_plan", message: "saved elsewhere" };
           plans[plan] = { building: msg.building as Building, revision: plans[plan].revision + 1 };
           return { revision: plans[plan].revision };
@@ -87,11 +87,11 @@ test("switching plans saves the open edits to their own plan first, then follows
   assert.equal(plans.main.building.floors[0].name, "Haus");
   assert.equal(c.building?.floors[0].name, "Haus");
   // the main plan is asked for without naming it (an older backend does not know the field)
-  const save = calls.find((m) => m.type === "neonplan3d/building/save")!;
+  const save = calls.find((m) => m.type === "homeplan3d/building/save")!;
   assert.equal(save.plan, "pgarage");
-  assert.ok(calls.filter((m) => m.type === "neonplan3d/building/get").some((m) => !("plan" in m)));
+  assert.ok(calls.filter((m) => m.type === "homeplan3d/building/get").some((m) => !("plan" in m)));
   // one building subscription, the new plan's
-  const followed = subs.filter((s) => s.msg.type === "neonplan3d/building/subscribe");
+  const followed = subs.filter((s) => s.msg.type === "homeplan3d/building/subscribe");
   assert.equal(followed.length, 1);
   assert.equal(followed[0].msg.plan, undefined);
   c.hostDisconnected();
@@ -119,7 +119,7 @@ test("an edit made on an older plan does not overwrite one saved elsewhere meanw
   assert.equal(c.draft?.conflict, true);
   assert.equal(c.draft?.building.floors[0].name, "Alter Stand geändert");
   assert.equal(c.saveState, "idle");
-  assert.equal(calls.filter((m) => m.type === "neonplan3d/building/save")[0].base_revision, 1);
+  assert.equal(calls.filter((m) => m.type === "homeplan3d/building/save")[0].base_revision, 1);
   // taken over on purpose: saved over the newer plan
   c.restoreDraft();
   await c.flush();

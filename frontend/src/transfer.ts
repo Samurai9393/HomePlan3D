@@ -3,7 +3,7 @@
 
 import { normalizeBuilding, type Building, type Floor } from "./model.ts";
 
-export const EXPORT_FORMAT = "neonplan3d";
+export const EXPORT_FORMAT = "homeplan3d";
 
 export interface ExportFile {
   format: typeof EXPORT_FORMAT;

@@ -9,7 +9,7 @@
  * day for updates and new purchases. A key can be bound to a few installations (a move to new
  * hardware is fine, handing it around is not).
  *
- * REST API (used by the integration, custom_components/neonplan3d/license.py):
+ * REST API (used by the integration, custom_components/homeplan3d/license.py):
  *   POST /wp-json/neonplan/v1/catalog  {key, instance}        -> {licensee, packs: [{id, name, release, url}],
  *                                                                 offers: [{id, name, teaser, image, url, kind, price, new}],
  *                                                                 loyalty: {code, percent} | null}
@@ -46,7 +46,7 @@ const MS_NP_RATE_LIMIT = 300;
 const MS_NP_RATE_LIMIT_IP = 3000;
 /** Addresses of reverse proxies in front of the site (none today); only behind one of them X-Forwarded-For is believed. */
 const MS_NP_TRUSTED_PROXIES = [];
-const MS_NP_SHOP_PAGE = 'https://mastershort.de/neonplan3d/';
+const MS_NP_SHOP_PAGE = 'https://mastershort.de/homeplan3d/';
 /** Loyalty discount in percent on further purchases, and the meta key of the customer's coupon code. */
 const MS_NP_LOYALTY_PERCENT = 10;
 const MS_NP_COUPON_META = '_ms_np_coupon';

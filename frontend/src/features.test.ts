@@ -15,17 +15,17 @@ test("features come from installed packs that list them; unknown names are ignor
 test("time travel is a Pro add-on of its own with its section in the manual", () => {
   assert.equal(hasFeature("time_travel", [{ features: ["time_travel"] }]), true);
   assert.equal(hasFeature("time_travel", [{ features: ["energy_pro"] }]), false);
-  assert.equal(manualUrl("de", "time_travel"), "https://mastershort.de/neonplan3d/anleitung/pro-erweiterungen/?lang=de#67-zeitreise");
-  assert.equal(manualUrl("en", "time_travel"), "https://mastershort.de/en/neonplan3d/manual/pro-add-ons/?lang=en#67-time-travel");
+  assert.equal(manualUrl("de", "time_travel"), "https://mastershort.de/homeplan3d/anleitung/pro-erweiterungen/?lang=de#67-zeitreise");
+  assert.equal(manualUrl("en", "time_travel"), "https://mastershort.de/en/homeplan3d/manual/pro-add-ons/?lang=en#67-time-travel");
 });
 
 test("manual and shop links follow the language and point Pro add-ons at their section", () => {
-  assert.equal(manualUrl("de"), "https://mastershort.de/neonplan3d/anleitung/?lang=de");
-  assert.equal(manualUrl("en-GB"), "https://mastershort.de/en/neonplan3d/manual/?lang=en");
-  assert.equal(manualUrl("de", "weather"), "https://mastershort.de/neonplan3d/anleitung/pro-erweiterungen/?lang=de#62-wetter-drau%C3%9Fen");
-  assert.equal(manualUrl("fr", "camera_cockpit"), "https://mastershort.de/en/neonplan3d/manual/pro-add-ons/?lang=en#61-camera-cockpit");
-  assert.equal(shopUrl("de-AT"), "https://mastershort.de/neonplan3d/?lang=de");
-  assert.equal(shopUrl("nl"), "https://mastershort.de/en/neonplan3d/?lang=en");
+  assert.equal(manualUrl("de"), "https://mastershort.de/homeplan3d/anleitung/?lang=de");
+  assert.equal(manualUrl("en-GB"), "https://mastershort.de/en/homeplan3d/manual/?lang=en");
+  assert.equal(manualUrl("de", "weather"), "https://mastershort.de/homeplan3d/anleitung/pro-erweiterungen/?lang=de#62-wetter-drau%C3%9Fen");
+  assert.equal(manualUrl("fr", "camera_cockpit"), "https://mastershort.de/en/homeplan3d/manual/pro-add-ons/?lang=en#61-camera-cockpit");
+  assert.equal(shopUrl("de-AT"), "https://mastershort.de/homeplan3d/?lang=de");
+  assert.equal(shopUrl("nl"), "https://mastershort.de/en/homeplan3d/?lang=en");
 });
 
 test("an unreleased add-on shows only to whoever has its pack", async () => {

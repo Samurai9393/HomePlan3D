@@ -827,7 +827,7 @@ export class Fp3dEditor extends LitElement {
     this._cardJoin = null;
     this._wallView3d = (() => {
       try {
-        return localStorage.getItem("neonplan3d.wall3d") !== "0";
+        return localStorage.getItem("homeplan3d.wall3d") !== "0";
       } catch {
         return true;
       }
@@ -847,21 +847,21 @@ export class Fp3dEditor extends LitElement {
     this._diagInvite = false;
     this._mapStartOff = false;
     try {
-      this._phoneHint = localStorage.getItem("neonplan3d.phoneHint") !== "0";
-      this._mapStartOff = localStorage.getItem("neonplan3d.mapStart") === "0";
+      this._phoneHint = localStorage.getItem("homeplan3d.phoneHint") !== "0";
+      this._mapStartOff = localStorage.getItem("homeplan3d.mapStart") === "0";
     } catch {
       // no storage: shown until closed
     }
     let split = false;
     try {
-      split = localStorage.getItem("neonplan3d.editor3d") === "1";
+      split = localStorage.getItem("homeplan3d.editor3d") === "1";
     } catch {
       // no storage
     }
     this._split = split;
     this._splitRatio = 0.55;
     try {
-      const saved = Number(localStorage.getItem("neonplan3d.editorSplit"));
+      const saved = Number(localStorage.getItem("homeplan3d.editorSplit"));
       if (saved >= 20 && saved <= 80) this._splitRatio = saved / 100;
     } catch {
       /* no storage */
@@ -873,10 +873,10 @@ export class Fp3dEditor extends LitElement {
     this._style3d = "neon";
     this._names3d = true;
     try {
-      if (localStorage.getItem("neonplan3d.walls3d") === "auto") this._wall3d = "auto";
-      this._fx3d = localStorage.getItem("neonplan3d.editor_fx") !== "0";
-      this._names3d = localStorage.getItem("neonplan3d.editor_names") !== "0";
-      const st = localStorage.getItem("neonplan3d.editor_style");
+      if (localStorage.getItem("homeplan3d.walls3d") === "auto") this._wall3d = "auto";
+      this._fx3d = localStorage.getItem("homeplan3d.editor_fx") !== "0";
+      this._names3d = localStorage.getItem("homeplan3d.editor_names") !== "0";
+      const st = localStorage.getItem("homeplan3d.editor_style");
       this._style3d = isStyleChoice(st) ? st : "neon";
     } catch {
       // no storage: the default
@@ -885,14 +885,14 @@ export class Fp3dEditor extends LitElement {
     this._sideOpen = false;
     let pinned = true;
     try {
-      pinned = localStorage.getItem("neonplan3d.sidePinned") !== "0";
+      pinned = localStorage.getItem("homeplan3d.sidePinned") !== "0";
     } catch {
       // no storage
     }
     this._sidePinned = pinned;
     let min = false;
     try {
-      min = localStorage.getItem("neonplan3d.sideMin") === "1";
+      min = localStorage.getItem("homeplan3d.sideMin") === "1";
     } catch {
       // no storage
     }
@@ -905,7 +905,7 @@ export class Fp3dEditor extends LitElement {
     this._toolMenu = null;
     let width = 320;
     try {
-      width = Number(localStorage.getItem("neonplan3d.sideWidth")) || 320;
+      width = Number(localStorage.getItem("homeplan3d.sideWidth")) || 320;
     } catch {
       // no storage: the default width
     }
@@ -1022,7 +1022,7 @@ export class Fp3dEditor extends LitElement {
       handle.removeEventListener("pointerup", up);
       handle.removeEventListener("pointercancel", up);
       try {
-        localStorage.setItem("neonplan3d.editorSplit", String(Math.round(this._splitRatio * 100)));
+        localStorage.setItem("homeplan3d.editorSplit", String(Math.round(this._splitRatio * 100)));
       } catch {
         /* no storage */
       }
@@ -1036,7 +1036,7 @@ export class Fp3dEditor extends LitElement {
   private toggleSplit(): void {
     this._split = !this._split;
     try {
-      localStorage.setItem("neonplan3d.editor3d", this._split ? "1" : "0");
+      localStorage.setItem("homeplan3d.editor3d", this._split ? "1" : "0");
     } catch {
       // no storage: the choice lasts for this page
     }
@@ -1254,7 +1254,7 @@ export class Fp3dEditor extends LitElement {
   private setStyle3d(style: string): void {
     this._style3d = style;
     try {
-      localStorage.setItem("neonplan3d.editor_style", style);
+      localStorage.setItem("homeplan3d.editor_style", style);
     } catch {
       /* no storage */
     }
@@ -1263,7 +1263,7 @@ export class Fp3dEditor extends LitElement {
   private setNames3d(on: boolean): void {
     this._names3d = on;
     try {
-      localStorage.setItem("neonplan3d.editor_names", on ? "1" : "0");
+      localStorage.setItem("homeplan3d.editor_names", on ? "1" : "0");
     } catch {
       /* no storage */
     }
@@ -1272,7 +1272,7 @@ export class Fp3dEditor extends LitElement {
   private setFx3d(on: boolean): void {
     this._fx3d = on;
     try {
-      localStorage.setItem("neonplan3d.editor_fx", on ? "1" : "0");
+      localStorage.setItem("homeplan3d.editor_fx", on ? "1" : "0");
     } catch {
       /* no storage */
     }
@@ -1352,7 +1352,7 @@ export class Fp3dEditor extends LitElement {
   private setWall3d(mode: WallMode): void {
     this._wall3d = mode;
     try {
-      localStorage.setItem("neonplan3d.walls3d", mode);
+      localStorage.setItem("homeplan3d.walls3d", mode);
     } catch {
       // no storage: not remembered
     }
@@ -1363,7 +1363,7 @@ export class Fp3dEditor extends LitElement {
     if (this.diagInviteChecked || !this.hass || !this.isAdmin || !released("diagnostics")) return;
     this.diagInviteChecked = true;
     try {
-      if (localStorage.getItem("neonplan3d.diagInvite") === "0") return;
+      if (localStorage.getItem("homeplan3d.diagInvite") === "0") return;
     } catch {
       return;
     }
@@ -1375,7 +1375,7 @@ export class Fp3dEditor extends LitElement {
   private closeDiagInvite(): void {
     this._diagInvite = false;
     try {
-      localStorage.setItem("neonplan3d.diagInvite", "0");
+      localStorage.setItem("homeplan3d.diagInvite", "0");
     } catch {
       // no storage: gone for this visit
     }
@@ -5763,7 +5763,7 @@ export class Fp3dEditor extends LitElement {
     const item = news.find((n) => {
       if (UNRELEASED.includes(n.feature) || hasFeature(n.feature) || !customer) return false;
       try {
-        return localStorage.getItem(`neonplan3d.news.${n.id}`) !== "never";
+        return localStorage.getItem(`homeplan3d.news.${n.id}`) !== "never";
       } catch {
         return true;
       }
@@ -5771,7 +5771,7 @@ export class Fp3dEditor extends LitElement {
     if (!item) return nothing;
     const never = () => {
       try {
-        localStorage.setItem(`neonplan3d.news.${item.id}`, "never");
+        localStorage.setItem(`homeplan3d.news.${item.id}`, "never");
       } catch {
         // a private window: it only stays away for this visit
       }
@@ -6273,7 +6273,7 @@ export class Fp3dEditor extends LitElement {
                     @click=${() => {
                       this._phoneHint = false;
                       try {
-                        localStorage.setItem("neonplan3d.phoneHint", "0");
+                        localStorage.setItem("homeplan3d.phoneHint", "0");
                       } catch {
                         // no storage: gone for this visit
                       }
@@ -6383,7 +6383,7 @@ export class Fp3dEditor extends LitElement {
     const off = () => {
       this._mapStartOff = true;
       try {
-        localStorage.setItem("neonplan3d.mapStart", "0");
+        localStorage.setItem("homeplan3d.mapStart", "0");
       } catch {
         // no storage: gone for this visit
       }
@@ -7305,7 +7305,7 @@ export class Fp3dEditor extends LitElement {
     this._wallView3d = on;
     this.wall3dKey = "";
     try {
-      localStorage.setItem("neonplan3d.wall3d", on ? "1" : "0");
+      localStorage.setItem("homeplan3d.wall3d", on ? "1" : "0");
     } catch {
       // not remembered
     }
@@ -8376,8 +8376,8 @@ export class Fp3dEditor extends LitElement {
 
   private rememberWallType(type: string): void {
     try {
-      const list = JSON.parse(localStorage.getItem("neonplan3d.wallRecent") ?? "[]") as string[];
-      localStorage.setItem("neonplan3d.wallRecent", JSON.stringify([type, ...list.filter((t) => t !== type)].slice(0, 6)));
+      const list = JSON.parse(localStorage.getItem("homeplan3d.wallRecent") ?? "[]") as string[];
+      localStorage.setItem("homeplan3d.wallRecent", JSON.stringify([type, ...list.filter((t) => t !== type)].slice(0, 6)));
     } catch {
       // no storage
     }
@@ -8385,7 +8385,7 @@ export class Fp3dEditor extends LitElement {
 
   private wallRecent(): string[] {
     try {
-      const list = JSON.parse(localStorage.getItem("neonplan3d.wallRecent") ?? "[]");
+      const list = JSON.parse(localStorage.getItem("homeplan3d.wallRecent") ?? "[]");
       return Array.isArray(list) ? list.filter((t): t is string => typeof t === "string" && (FURNITURE_TYPES.includes(t as never) || !!packItem(t))) : [];
     } catch {
       return [];
@@ -11122,7 +11122,7 @@ export class Fp3dEditor extends LitElement {
     this._sidePinned = pinned;
     this._sideOpen = false;
     try {
-      localStorage.setItem("neonplan3d.sidePinned", pinned ? "1" : "0");
+      localStorage.setItem("homeplan3d.sidePinned", pinned ? "1" : "0");
     } catch {
       // no storage
     }
@@ -11136,7 +11136,7 @@ export class Fp3dEditor extends LitElement {
     }
     this._sideMin = folded;
     try {
-      localStorage.setItem("neonplan3d.sideMin", folded ? "1" : "0");
+      localStorage.setItem("homeplan3d.sideMin", folded ? "1" : "0");
     } catch {
       // no storage
     }
@@ -11158,7 +11158,7 @@ export class Fp3dEditor extends LitElement {
       this.sideDrag = null;
       (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
       try {
-        localStorage.setItem("neonplan3d.sideWidth", String(this._sideWidth));
+        localStorage.setItem("homeplan3d.sideWidth", String(this._sideWidth));
       } catch {
         // no storage: the width lasts for this visit
       }
@@ -14124,7 +14124,7 @@ export class Fp3dEditor extends LitElement {
     try {
       this._diag = action === "delete" ? await deleteDiagnostics(this.hass) : await setDiagnostics(this.hass, action === "on");
       if (action === "delete") this._diagNote = this.t("diag_deleted");
-      window.dispatchEvent(new CustomEvent("neonplan3d-diagnostics", { detail: { enabled: this._diag.enabled } }));
+      window.dispatchEvent(new CustomEvent("homeplan3d-diagnostics", { detail: { enabled: this._diag.enabled } }));
     } catch {
       this._diagNote = this.t(action === "delete" ? "diag_delete_failed" : "save_error");
     }
@@ -14223,7 +14223,7 @@ export class Fp3dEditor extends LitElement {
         }
       }
       const day = new Date().toISOString().slice(0, 10);
-      download(`neonplan3d-${this.t("export_name_full")}-${day}.json`, JSON.stringify({ ...base, exported_at: new Date().toISOString(), images }));
+      download(`homeplan3d-${this.t("export_name_full")}-${day}.json`, JSON.stringify({ ...base, exported_at: new Date().toISOString(), images }));
     } catch (err) {
       alert(this.t("backup_import_error", { error: String((err as { message?: string })?.message ?? err) }));
     } finally {
@@ -14243,7 +14243,7 @@ export class Fp3dEditor extends LitElement {
       alert(this.t("import_error_not_json"));
       return;
     }
-    if (data?.format !== "neonplan3d-backup" || !data.building) {
+    if (data?.format !== "homeplan3d-backup" || !data.building) {
       alert(this.t("backup_full_not_backup"));
       return;
     }
@@ -14281,7 +14281,7 @@ export class Fp3dEditor extends LitElement {
 
   private exportPlan(shareable: boolean): void {
     const day = new Date().toISOString().slice(0, 10);
-    download(`neonplan3d-${this.t(shareable ? "export_name_template" : "export_name_backup")}-${day}.json`, JSON.stringify(exportFile(this._doc, shareable), null, 2));
+    download(`homeplan3d-${this.t(shareable ? "export_name_template" : "export_name_backup")}-${day}.json`, JSON.stringify(exportFile(this._doc, shareable), null, 2));
   }
 
   private async importPlan(e: Event): Promise<void> {

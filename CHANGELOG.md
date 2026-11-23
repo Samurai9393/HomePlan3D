@@ -32,7 +32,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 - **The room panel on a phone** opens folded (name, temperature, its buttons), so the room stays in sight; "Show devices" unfolds it.
 - **Phone view in the dashboard card:** `phone: true`. The card form asks what the card is for – a tablet / large screen or a phone – and shows the options that fit.
 - **Design the bar yourself:** leave the rooms, the blinds or the favourites out (`phone_hide`), open with the list (`phone_start: now`), a room on its own (`phone_solo`), and up to two **places of your own** (`phone_places`): all lamps or all thermostats by floor, a scene or script, or a page of a dashboard.
-- **From a notification straight to the place:** `/neonplan3d?view=now`, `?room=…` and `?show=<entity>` open NeonPlan at the list, a room or a device.
+- **From a notification straight to the place:** `/homeplan3d?view=now`, `?room=…` and `?show=<entity>` open NeonPlan at the list, a room or a device.
 - **Card option `surroundings: false`:** this card draws the house without the surroundings from the map.
 - **Card templates as a management page:** the templates on the left by screens and phones, the form in tabs, the preview on the right – on a phone for a phone template. The preview turns, zooms and opens rooms like the card and switches nothing.
 - **⚙ Settings tidied up:** one dialog instead of a list of sixteen entries – the topics in five groups on the left (house & plan, look, screens, extensions, system), the chosen topic on the right. Every topic's content is unchanged.
@@ -241,7 +241,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 - **Own styles:** **⚙ Settings → 🎨 Styles** shows the house large in the style chosen and every style as a tile; **＋ Make an own style from it** copies any style with all its settings (real materials or an own palette, evening mood, floor texture, light by direction, room corners, shadows, background). Own styles appear in every style list and answer to their name by voice.
 - **Times of day:** the house plan sets a style for the day, the evening and the night, switched by the sun or by the clock; screens set to *House plan* follow it. Dashboard cards can have their own evening and night style (`theme_evening`, `theme_night`), card templates included.
 - **Wall colours:** the room's **Wall settings** (formerly *Wall heights*) colour all walls at once or each wall on its own; the outer walls get a **Facade** colour. The homely styles show them; the editor's 3D pane switches to *Homely* while you colour.
-- **Switching styles by voice and automation:** "NeonPlan style homely", "House to synthwave", "Style back" – also through Assist. New action `neonplan3d.set_style` (style, screens, minutes) and an optional helper entity (`style_entity`) whose state names the style. The newest setting wins: choosing a style for a screen again ends one set by voice or an action.
+- **Switching styles by voice and automation:** "NeonPlan style homely", "House to synthwave", "Style back" – also through Assist. New action `homeplan3d.set_style` (style, screens, minutes) and an optional helper entity (`style_entity`) whose state names the style. The newest setting wins: choosing a style for a screen again ends one set by voice or an action.
 
 ### Changed
 - The view options' look buttons became one **🎨 style list**; `theme:` in the card takes every style id (`neon`, `blueprint`, `day`, `focus`, `synth`, `cozy`, `evening`, `winter`, `model`, `pastel`, `warm`, own `my_…`), `auto` and `house`. Neon stays the default; nothing changes until you pick a style.
@@ -354,7 +354,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 ### New
 
 - **Dashboard cards built in the editor – card templates:** ⚙ Settings → 🖥 Card templates sets up a dashboard card once, with a live preview on the screen it is for (a 10″ or 7″ Fire tablet, a tablet upright, a phone). On the wall tablet you only pick the template in the card dialog (`template: kitchen_tablet`); every change in the editor reaches every tablet with that template within a second, without a reload. "Where does the tablet hang?" sets its room for "here", the template's name is its screen name and the card dialog links back to the editor. A card with a template shows the template with only its size of its own (fill, height, full-screen button); other options left on it from before no longer apply (the dialog tidies them up).
-- **Reload the screens:** "Reload screens with this template", "Reload all screens" and the action `neonplan3d.reload_screens` let the open wall tablets load their page again – after an update, without a ladder. The tablets say "Reloading …" and come back a few seconds apart.
+- **Reload the screens:** "Reload screens with this template", "Reload all screens" and the action `homeplan3d.reload_screens` let the open wall tablets load their page again – after an update, without a ladder. The tablets say "Reloading …" and come back a few seconds apart.
 - **Open screens:** the card templates list every device NeonPlan is open on – the device ("Fire HD 10 · Fully Kiosk"), what it shows, since when, its version (an old one is marked) – each with a reload of its own.
 - **Vacuum and everything off per room:** a room's form takes the script or button that sends the robot vacuum there; its panel then has 🧹 Vacuum, and ⏻ Everything off switches off its lights, fans and TV and pauses playing speakers (switched sockets only where a lamp hangs on them). By voice: "vacuum here", "vacuum the kitchen", "everything off there".
 - **"there" in voice control:** with a room tapped open, "turn off the lights there" or "TV there on" mean that room; "here" stays the tablet's own.
@@ -435,7 +435,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 
 ### New
 
-- **Announcements from automations:** the action **HomePlan 3D: Announcement** (`neonplan3d.announce`) says a message on the rooms' speakers with the Announcements module's settings (speaker per room, quiet time, text-to-speech), also with no NeonPlan page open – to every room, to rooms by name or area, or to one floor. **On NeonPlan screens** every open NeonPlan screen speaks it itself with a chime and shows it big – an old wall tablet becomes a speaker. Needs the Announcements module.
+- **Announcements from automations:** the action **HomePlan 3D: Announcement** (`homeplan3d.announce`) says a message on the rooms' speakers with the Announcements module's settings (speaker per room, quiet time, text-to-speech), also with no NeonPlan page open – to every room, to rooms by name or area, or to one floor. **On NeonPlan screens** every open NeonPlan screen speaks it itself with a chime and shows it big – an old wall tablet becomes a speaker. Needs the Announcements module.
 
 ## 2.0.8
 
@@ -675,7 +675,7 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 ### Changed
 
 - **Modules run only after an administrator approved their code.** A module installed from the shop or from a file waits under Extensions → Modules until an admin opens **View code & approve** (publisher, version, size, fingerprint and the whole code) and approves it. A new release of a module never replaces the running code by itself: it waits beside it until it is approved too. Modules installed before 1.24 ask for this approval once. Furniture and feature packs without code are unchanged.
-- **Assist sentence files only on request.** NeonPlan no longer writes `custom_sentences/…/neonplan3d.yaml` on start: the file is written only when an admin picks sentences under ⚙ Settings → 🎙 Voice control (default: none). A file you changed yourself is never overwritten or deleted, and removing the integration removes NeonPlan's files. Files written by 1.22–1.23 stay as they are and are recognised as NeonPlan's.
+- **Assist sentence files only on request.** NeonPlan no longer writes `custom_sentences/…/homeplan3d.yaml` on start: the file is written only when an admin picks sentences under ⚙ Settings → 🎙 Voice control (default: none). A file you changed yourself is never overwritten or deleted, and removing the integration removes NeonPlan's files. Files written by 1.22–1.23 stay as they are and are recognised as NeonPlan's.
 
 ## 1.23.1
 
@@ -693,7 +693,7 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 
 ### Changed
 
-- **Card loader:** the dashboard card's loader is served from NeonPlan's own path (`/neonplan3d_static/`); nothing is written into the user's `www` folder any more. A copy older versions left in `www/neonplan3d/` is removed and the dashboard resource is moved by itself.
+- **Card loader:** the dashboard card's loader is served from NeonPlan's own path (`/homeplan3d_static/`); nothing is written into the user's `www` folder any more. A copy older versions left in `www/neonplan3d/` is removed and the dashboard resource is moved by itself.
 
 ## 1.22.1
 
@@ -711,7 +711,7 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 
 - **⚙ Settings menu in the editor:** everything that belongs to the whole plan – house (walls, grid, units, north), weather & warnings, live director, voice control, favourites, background, ground, backup and modules – sits in one menu in the toolbar; each topic opens as a dialog over the plan, also while something is selected. The side bar without a selection keeps the rooms, the floor-plan picture and help. The roof's shape, ridge, pitch and overhang moved to the roof tool; the start view is remembered in the 3D view's settings (📌).
 - **Modules:** NeonPlan can load code the shop delivers as a signed pack ("Modul von …" on the extensions page). The first module answers spoken questions ("Was ist offen?", "Wo ist es kalt?", "Läuft die Waschmaschine?", "Was zieht Strom?") in the house and out loud through the Assist pipeline's text-to-speech. Modules are checked and bound to the installation like furniture packs.
-- **Ask through Assist:** everything voice control understands can be said to a voice satellite, the Assist dialog or the app – the sentences (`custom_sentences/de|en/neonplan3d.yaml`, written on start) hand "Zeig das Wohnzimmer" or "Was ist offen?" to every open NeonPlan view; the first answer goes back to Assist, which speaks it where it was asked. The service `neonplan3d.ask` (text, screen, speak) does the same from automations and returns the answer. Views can carry a **screen name** (voice settings, card option `screen`) so a sentence reaches one tablet only.
+- **Ask through Assist:** everything voice control understands can be said to a voice satellite, the Assist dialog or the app – the sentences (`custom_sentences/de|en/homeplan3d.yaml`, written on start) hand "Zeig das Wohnzimmer" or "Was ist offen?" to every open NeonPlan view; the first answer goes back to Assist, which speaks it where it was asked. The service `homeplan3d.ask` (text, screen, speak) does the same from automations and returns the answer. Views can carry a **screen name** (voice settings, card option `screen`) so a sentence reaches one tablet only.
 - **Further names** for rooms, furniture and placed devices ("Smart TV Pro" also as "Wohnzimmerfernseher" or "Glotze"), for voice control and the search.
 - Modules have their own home: **⚙ Settings → 🧩 Module** lists them and imports a module file; the extensions page gets a **Module** section of its own next to the furniture packs.
 - **Modules may draw:** a module adds water, pipe flows and device glows to the 3D stage, glass cards, warnings and fields in the editor's outdoor form, and lends the pipe tools their rules – the host draws, the module knows (`scene`, `cards`, `alerts`, `areaFields`, `pipes`, `watched`, `pools`; module kind `stage`).
@@ -1139,7 +1139,7 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 
 ### Fixed
 
-- Dashboard card: right after starting the app, the card could show "Custom element doesn't exist: neonplan3d-card" until the sidebar page was opened. The card's script is now also kept in the dashboard resources (storage mode), so dashboards wait for it; an older copy of the script there is pointed to the current one (#252 by TheRev-ha, RobertSorgenfrei).
+- Dashboard card: right after starting the app, the card could show "Custom element doesn't exist: homeplan3d-card" until the sidebar page was opened. The card's script is now also kept in the dashboard resources (storage mode), so dashboards wait for it; an older copy of the script there is pointed to the current one (#252 by TheRev-ha, RobertSorgenfrei).
 - Installing a Pro add-on from the shop: HomePlan 3D now also sends its version in the request, so the shop can answer an installation that is too old with a readable "please update first" message.
 - Energy Pro in a house with a single floor: the plant cards (solar, balance) show in the 3D view and the card, not only in the editor (#255 by Kohhal).
 - Energy Pro: a grid connection mounted on a wall – the grid cable starts at its height instead of on the ground, and its pin sits there too (#256 by Kohhal).

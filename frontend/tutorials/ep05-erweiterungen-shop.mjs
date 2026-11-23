@@ -84,7 +84,7 @@ const scene = async (query = "", cursor = true) => {
 /** Set the 3D camera, with an optional target point [x, y, z]. */
 const cam = (c) =>
   R.page.evaluate((c) => {
-    const v = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
+    const v = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
     const viewer = Object.values(v).find((x) => x && x.floors && x.floorMap);
     const { target, ...rest } = c;
     if (target) viewer.controls.view.target.set(target[0], target[1], target[2]);
@@ -204,7 +204,7 @@ const poufPoint = async () => {
 /** The Extensions element (to clear a stale import message of the preview's install call). */
 const clearPackMsg = () =>
   R.page.evaluate(() => {
-    const x = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-extensions");
+    const x = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-extensions");
     if (x) x._packMsg = null;
   });
 
@@ -218,18 +218,18 @@ const shopScene = async () => {
     const p = window.fp3dPanel;
     const h = p.hass;
     const orig = h.callWS;
-    await orig({ type: "neonplan3d/license/remove" });
-    await orig({ type: "neonplan3d/packs/remove", pack_id: "demo.pro" });
+    await orig({ type: "homeplan3d/license/remove" });
+    await orig({ type: "homeplan3d/packs/remove", pack_id: "demo.pro" });
     let weather = null;
     h.callWS = async (m) => {
-      if (m.type === "neonplan3d/packs/install" && m.pack_id === "mastershort.pro_weather") {
+      if (m.type === "homeplan3d/packs/install" && m.pack_id === "mastershort.pro_weather") {
         const payload = { format: "fp3dpack", version: 1, id: "demo.pro_weather", name: "Wetter draußen", publisher: "Demo", licensee: "Demo Kunde", features: ["weather"], items: [] };
-        await orig({ type: "neonplan3d/packs/import", pack: JSON.stringify({ payload, signature: "demo" }) });
+        await orig({ type: "homeplan3d/packs/import", pack: JSON.stringify({ payload, signature: "demo" }) });
         weather = 1;
         return { id: payload.id, name: payload.name, publisher: "Demo", licensee: "Demo Kunde", release: 1, items: 0 };
       }
       const r = await orig(m);
-      if (m.type.startsWith("neonplan3d/license/") && r) {
+      if (m.type.startsWith("homeplan3d/license/") && r) {
         return {
           ...r,
           offers: (r.offers ?? []).filter((o) => o.id !== "pro_weather").map((o) => ({ ...o, price: null })),

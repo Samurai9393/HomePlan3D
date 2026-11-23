@@ -37,7 +37,7 @@ Diese Anleitung beschreibt alle Funktionen der aktuellen Version. Was sich in we
 
 ### Über den Marketplace
 
-[![HomePlan 3D im Marketplace öffnen](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
+[![HomePlan 3D im Marketplace öffnen](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=homeplan3d&category=integration)
 
 Seit Home Assistant 2026.11 ist HACS als **Marketplace** fest eingebaut. Der Knopf öffnet HomePlan 3D direkt im Marketplace deiner Installation. HomePlan 3D steht in der offiziellen Liste, über einen Link hinzufügen musst du es nicht. Von Hand geht es so:
 
@@ -45,17 +45,17 @@ Seit Home Assistant 2026.11 ist HACS als **Marketplace** fest eingebaut. Der Kno
 2. **HomePlan 3D** suchen, **Installieren** wählen und Home Assistant neu starten.
 3. **Einstellungen → Geräte & Dienste → Integration hinzufügen → HomePlan 3D**, oder direkt über diesen Knopf:
 
-   [![HomePlan 3D einrichten](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=neonplan3d)
+   [![HomePlan 3D einrichten](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=homeplan3d)
 
 Danach steht **HomePlan 3D** in der Seitenleiste. Die Dashboard-Karte ist ebenfalls sofort verfügbar, eine Ressource musst du nicht eintragen.
 
-**Home Assistant vor 2026.11:** Dort geht es genauso über **HACS**: HACS öffnen, **HomePlan 3D** suchen, herunterladen und neu starten, oder [direkt in HACS öffnen](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=neonplan3d&category=integration).
+**Home Assistant vor 2026.11:** Dort geht es genauso über **HACS**: HACS öffnen, **HomePlan 3D** suchen, herunterladen und neu starten, oder [direkt in HACS öffnen](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=homeplan3d&category=integration).
 
 Hast du HomePlan 3D früher über HACS installiert, auch als benutzerdefiniertes Repository, musst du nichts tun: Beim Update auf Home Assistant 2026.11 übernimmt der Marketplace es, und Updates kommen weiter wie gewohnt.
 
 ### Von Hand
 
-Den Ordner `custom_components/neonplan3d` aus dem Repository nach `config/custom_components/` kopieren, Home Assistant neu starten und die Integration wie oben hinzufügen.
+Den Ordner `custom_components/homeplan3d` aus dem Repository nach `config/custom_components/` kopieren, Home Assistant neu starten und die Integration wie oben hinzufügen.
 
 ### Updates
 
@@ -825,12 +825,12 @@ Befehle („Mach das Licht an“, „Stell die Heizung auf 22 Grad“) gehen wei
    - im Browser beim ersten Antippen „Zulassen“;
    - in **Fully Kiosk**: Einstellungen → Web Content Settings → Mikrofonzugriff einschalten (Plus-Lizenz), dazu in Android die Mikrofon-Berechtigung für Fully.
 
-**Über Assist fragen – ohne Mikrofon am Tablet.** Alles, was NeonPlan versteht, kannst du auch Assist sagen: einem Voice-Satelliten (Home Assistant Voice, ESPHome), dem Assist-Dialog oder der App. Dafür braucht Assist eine Satzdatei: NeonPlan legt `custom_sentences/de/neonplan3d.yaml` und `…/en/…` in deinem Konfigurationsordner **erst an, wenn du unter Sätze für Assist eine Auswahl triffst** (seit 1.24 – vorher geschah das beim Start). Sagst du Assist „Zeig das Wohnzimmer“ oder „Was ist offen?“, geht der Satz an **jede offene NeonPlan-Ansicht** – das Wandtablet zeigt den Raum oder die offenen Fenster, und Assist spricht die Antwort dort, wo du gefragt hast. Das Tablet selbst bleibt dabei still. Welche Sätze dort stehen, wählst du unter **⚙ Einstellungen → 🎙 Sprachsteuerung → Sätze für Assist**: **Nur eindeutige** („zeig …“, „geh …“, „frag das Haus …“, „NeonPlan, …“, „Guten Morgen“, „Gute Nacht“ – nichts davon sagt man Home Assistant selbst), **Alle Fragen** (dazu „welche Fenster sind offen“, „wo ist …“, „läuft die Waschmaschine“ – Vorsicht, einige davon beantwortet Home Assistant sonst selbst) oder **Keine** (Standard: keine Datei; eine vorhandene Datei von NeonPlan wird entfernt). Hast du die Datei selbst geändert, überschreibt oder löscht NeonPlan sie nie – der Dialog sagt dir dann, welche Sprache er in Ruhe gelassen hat. Entfernst du die Integration, verschwinden NeonPlans Satzdateien mit ihr. Mit „Frag das Haus, welche Fenster offen sind“ erreichst du NeonPlan in jedem Modus. Eigene Sätze legst du in einer weiteren Datei unter `custom_sentences` für den Intent `NeonPlanAsk` an.
+**Über Assist fragen – ohne Mikrofon am Tablet.** Alles, was NeonPlan versteht, kannst du auch Assist sagen: einem Voice-Satelliten (Home Assistant Voice, ESPHome), dem Assist-Dialog oder der App. Dafür braucht Assist eine Satzdatei: NeonPlan legt `custom_sentences/de/homeplan3d.yaml` und `…/en/…` in deinem Konfigurationsordner **erst an, wenn du unter Sätze für Assist eine Auswahl triffst** (seit 1.24 – vorher geschah das beim Start). Sagst du Assist „Zeig das Wohnzimmer“ oder „Was ist offen?“, geht der Satz an **jede offene NeonPlan-Ansicht** – das Wandtablet zeigt den Raum oder die offenen Fenster, und Assist spricht die Antwort dort, wo du gefragt hast. Das Tablet selbst bleibt dabei still. Welche Sätze dort stehen, wählst du unter **⚙ Einstellungen → 🎙 Sprachsteuerung → Sätze für Assist**: **Nur eindeutige** („zeig …“, „geh …“, „frag das Haus …“, „NeonPlan, …“, „Guten Morgen“, „Gute Nacht“ – nichts davon sagt man Home Assistant selbst), **Alle Fragen** (dazu „welche Fenster sind offen“, „wo ist …“, „läuft die Waschmaschine“ – Vorsicht, einige davon beantwortet Home Assistant sonst selbst) oder **Keine** (Standard: keine Datei; eine vorhandene Datei von NeonPlan wird entfernt). Hast du die Datei selbst geändert, überschreibt oder löscht NeonPlan sie nie – der Dialog sagt dir dann, welche Sprache er in Ruhe gelassen hat. Entfernst du die Integration, verschwinden NeonPlans Satzdateien mit ihr. Mit „Frag das Haus, welche Fenster offen sind“ erreichst du NeonPlan in jedem Modus. Eigene Sätze legst du in einer weiteren Datei unter `custom_sentences` für den Intent `NeonPlanAsk` an.
 
-**Der Dienst `neonplan3d.ask`.** Für Automationen und Skripte: Felder **Satz** (`text`), **Bildschirm** (`screen`, optional) und **Sprechen** (`speak`, Standard aus). Der Dienst liefert die Antwort zurück (`answer`, `answered`, `screen_open`), zum Beispiel für eine Benachrichtigung. Mit `speak: true` spricht die Ansicht die Antwort selbst über die Sprachausgabe ihrer Assist-Pipeline. Beispiel – jeden Abend um 22 Uhr der Nacht-Check am Wandtablet:
+**Der Dienst `homeplan3d.ask`.** Für Automationen und Skripte: Felder **Satz** (`text`), **Bildschirm** (`screen`, optional) und **Sprechen** (`speak`, Standard aus). Der Dienst liefert die Antwort zurück (`answer`, `answered`, `screen_open`), zum Beispiel für eine Benachrichtigung. Mit `speak: true` spricht die Ansicht die Antwort selbst über die Sprachausgabe ihrer Assist-Pipeline. Beispiel – jeden Abend um 22 Uhr der Nacht-Check am Wandtablet:
 
 ```yaml
-action: neonplan3d.ask
+action: homeplan3d.ask
 data:
   text: "Gute Nacht"
   screen: "Flur"
@@ -963,10 +963,10 @@ Lichter, offene Fenster und aktive Geräte behalten in jedem Stil ihre Signalfar
 
 **Per Sprache.** „NeonPlan Stil Wohnlich“, „Haus auf Synthwave“, „Stil Winterabend“ – der Stil gilt sofort auf dem Bildschirm, auf dem du sprichst. „Stil zurück“ (oder „Stil normal“) holt den eingestellten Stil zurück. Über Assist geht das mit dem Satzanfang „NeonPlan …“ oder „Haus …“.
 
-**Aus Automationen.** Die Aktion **HomePlan 3D: Stil setzen** (`neonplan3d.set_style`) schaltet die offenen NeonPlan-Bildschirme um:
+**Aus Automationen.** Die Aktion **HomePlan 3D: Stil setzen** (`homeplan3d.set_style`) schaltet die offenen NeonPlan-Bildschirme um:
 
 ```yaml
-action: neonplan3d.set_style
+action: homeplan3d.set_style
 data:
   style: evening        # neon, blueprint, day, focus, synth, cozy, evening, winter, model, pastel, warm – oder der Name
   screens: [kueche]     # optional: nur diese Bildschirmnamen; leer = alle
@@ -990,7 +990,7 @@ NeonPlan ist für Wandtablet und PC gebaut. Am Handy will man zwei Dinge: schnel
 **In der Dashboard-Karte:** Mit `phone: true` läuft die Karte in der Handy-Ansicht – am besten zusammen mit `fill: true` auf einer eigenen Ansicht des Dashboards:
 
 ```yaml
-type: custom:neonplan3d-card
+type: custom:homeplan3d-card
 phone: true
 fill: true
 ```
@@ -1046,7 +1046,7 @@ Ein **eigener Platz** ist eines von vier Dingen, jeweils mit eigenem Wort (`name
 | `link` | öffnet eine Seite eines Dashboards | `path` |
 
 ```yaml
-type: custom:neonplan3d-card
+type: custom:homeplan3d-card
 phone: true
 fill: true
 phone_hide: [covers]        # ein Haus ohne Rollläden
@@ -1063,9 +1063,9 @@ Die Leiste hat höchstens fünf Plätze. Wird es mehr, teilen sich zuerst zwei E
 
 | Adresse | Öffnet |
 | --- | --- |
-| `/neonplan3d?view=now` | die Liste „Was ist los?“ |
-| `/neonplan3d?room=Bad` | den Raum (Name oder ID) |
-| `/neonplan3d?show=binary_sensor.fenster_bad` | fliegt zu diesem Gerät, Fenster oder dieser Tür |
+| `/homeplan3d?view=now` | die Liste „Was ist los?“ |
+| `/homeplan3d?room=Bad` | den Raum (Name oder ID) |
+| `/homeplan3d?show=binary_sensor.fenster_bad` | fliegt zu diesem Gerät, Fenster oder dieser Tür |
 
 So sieht das in einer Automation für die Companion-App aus – ein Tipp auf die Meldung zeigt das Fenster im Haus:
 
@@ -1075,8 +1075,8 @@ data:
   title: Fenster offen
   message: Das Fenster im Bad ist seit 30 Minuten offen.
   data:
-    clickAction: /neonplan3d?show=binary_sensor.fenster_bad   # Android
-    url: /neonplan3d?show=binary_sensor.fenster_bad           # iPhone
+    clickAction: /homeplan3d?show=binary_sensor.fenster_bad   # Android
+    url: /homeplan3d?show=binary_sensor.fenster_bad           # iPhone
 ```
 
 ## 6. Pro-Erweiterungen
@@ -1257,7 +1257,7 @@ Auto Pro hängt am **Stellplatz**, nicht am Fahrzeug-Möbel. Steht dein Auto als
 
 ![Zeitreise: die Etage um 07:42 mit Zeitleiste](images/view-timetravel.jpg)
 
-> **Für alle im Shop:** Seit 1.17 gibt es die Zeitreise einzeln im Shop; mit dem [Supporter-Pass](https://mastershort.de/neonplan3d/unterstuetzer/) ist sie dabei. Danke an alle Supporter, die sie in der Beta getestet haben.
+> **Für alle im Shop:** Seit 1.17 gibt es die Zeitreise einzeln im Shop; mit dem [Supporter-Pass](https://mastershort.de/homeplan3d/unterstuetzer/) ist sie dabei. Danke an alle Supporter, die sie in der Beta getestet haben.
 
 Die Zeitreise spielt die letzten 24 Stunden – auf Wunsch die letzten 7 Tage – im Haus ab, aus dem Verlauf, den Home Assistant ohnehin aufzeichnet (Recorder): Lichter mit Helligkeit und Farbe, Türen und Fenster, Rollläden, Bewegung, Heizung, Fernseher und Lautsprecher, Temperaturen, Leistung, Wetter und Sonnenstand. Alles bleibt in Home Assistant, und **nichts wird geschaltet** – die Zeitreise zeigt nur.
 
@@ -1318,7 +1318,7 @@ Nicht dabei sind Kamerabilder (der Recorder speichert keine) sowie Personen und 
 
 ### 6.8 Haushalt Pro
 
-> Haushalt Pro gibt es im [Shop](https://mastershort.de/neonplan3d/); mit dem [Supporter-Pass](https://mastershort.de/neonplan3d/unterstuetzer/) ist es dabei. Danke an alle, die es in der Beta getestet haben.
+> Haushalt Pro gibt es im [Shop](https://mastershort.de/homeplan3d/); mit dem [Supporter-Pass](https://mastershort.de/homeplan3d/unterstuetzer/) ist es dabei. Danke an alle, die es in der Beta getestet haben.
 
 Haushalt Pro zeigt im Haus, was im Haushalt ansteht – dort, wo es passiert. Die Mülltonnen und Briefkästen selbst gibt es für alle (Kapitel 4.23), ebenso Waschmaschine, Trockner, Spüler, Kühlschrank und Pflanzen – Haushalt Pro braucht kein weiteres Pack; Haushalt Pro bringt sie und andere Geräte zum Leben. Die Felder dazu stehen im Formular des Möbels unter **🏠 Haushalt Pro**.
 
@@ -1338,7 +1338,7 @@ Haushalt Pro zeigt im Haus, was im Haushalt ansteht – dort, wo es passiert. Di
 
 ### 6.9 Digitale Bilderrahmen
 
-> Das Pack **Digitale Bilderrahmen** gibt es im [Shop](https://mastershort.de/neonplan3d/); mit dem [Supporter-Pass](https://mastershort.de/neonplan3d/unterstuetzer/) ist es dabei (seit 3.0.5).
+> Das Pack **Digitale Bilderrahmen** gibt es im [Shop](https://mastershort.de/homeplan3d/); mit dem [Supporter-Pass](https://mastershort.de/homeplan3d/unterstuetzer/) ist es dabei (seit 3.0.5).
 
 Bilderrahmen, die leben: Rahmen fürs Hoch- und Querformat in drei Größen, quadratisch, ein Posterrahmen, digitale Rahmen mit schmalem Rand für Wand und Sideboard und ein Standrahmen aus Holz. Jeder Rahmen hat eine lebende Fläche; der **digitale Bilderrahmen aus dem Deko-Pack** macht mit, sobald das Pack installiert ist. Was die Fläche zeigt, stellst du im Möbelformular unter **🖼️ Bilderrahmen → Zeigt** ein; **ein Tipp auf den Rahmen in 3D öffnet den Inhalt groß** in der Mitte der Ansicht (schließt per Tipp daneben, auf dem Tablet nach einer Minute von selbst).
 
@@ -1470,14 +1470,14 @@ Module heute:
 | Modul | Was es tut | Preis |
 |---|---|---|
 | **Das Haus antwortet** | beantwortet gesprochene Fragen – „Was ist offen?“, „Wie ist das Wetter?“, „Guten Morgen“ … (5.10) | kostenlos |
-| **Durchsagen** (ab NeonPlan 2.0.7) | Raum antippen, **📢 Durchsage**, „Essen ist fertig!“ antippen – und der Lautsprecher in dem Raum sagt es. Fertige Sätze (in ⚙ Einstellungen → Durchsagen: ✕ nimmt einen heraus, unten kommen eigene dazu, „Fertige Sätze zurückholen“ stellt die Vorgaben wieder her), eigener Text oder ins 🎙 Mikrofon gesprochen (braucht HTTPS und eine Sprach-Pipeline mit Spracherkennung, wie die Sprachsteuerung). Aus dem Zentral-Menü an **alle Räume**, an **eine Etage** oder nur dorthin, **wo gerade jemand ist** (Ortung, Präsenz- und Bewegungsmelder). Im Raumformular (Editor) hat jeder Raum eine **🌙 Ruhezeit** (etwa Kinderzimmer ab 20 Uhr bis 7 Uhr): Durchsagen an mehrere Räume lassen ihn dann aus, eine Durchsage nur an diesen Raum geht trotzdem raus. Dort stehen auch **eigene Sätze für den Raum**, die im Raum ganz oben erscheinen. Eigene Texte, die du zuletzt getippt hast, kommen als **↻** zum erneuten Senden. Welcher Lautsprecher spricht: der im Raumformular unter **📢 Durchsagen über** gewählte, sonst ein Lautsprecher, der im Plan im Raum steht – nur wenn dort keiner steht, einer aus dem Bereich des Raums (Fernseher und nicht erreichbare Geräte nie von selbst), sonst der Standard-Lautsprecher aus ⚙ Einstellungen. Ein **Außenbereich mit Home-Assistant-Bereich** (etwa die Terrasse) zählt seit 2.0.11 wie ein Raum: Der Lautsprecher dort bekommt Durchsagen und seinen 📢-Knopf. Pro Raum spricht ein Lautsprecher – stehen zwei im Raum, wählst du im Raumformular, welcher. Echos (Alexa Media Player oder seit 2.0.11 die Home-Assistant-Integration **Alexa Devices**) und Sprach-Satelliten wie der Home Assistant Voice PE machen eine echte Durchsage mit Gong; andere Lautsprecher sprechen über die Sprachausgabe (TTS) von Home Assistant, mit chime_tts auch mit Gong; Lautsprecher, die Durchsagen können (z. B. Sonos), machen die Musik dafür leiser und spielen danach weiter. Die Lautstärke bleibt, wie sie ist. Der Lautsprecher leuchtet im Plan kurz auf, und in der 3D-Ansicht zeigt **🔊** über ihm, wo es gerade spricht. Mit **📢 auch direkt im Raum zeigen** (⚙ Einstellungen → Durchsagen) leuchtet in der 3D-Ansicht der Etage über dem Lautsprecher jedes Raums ein 📢-Knopf – ein Tipp öffnet sofort die Sätze. **Aus Automationen** (ab NeonPlan 2.0.9): Die Aktion **HomePlan 3D: Durchsage** (`neonplan3d.announce`) sagt eine Nachricht mit denselben Einstellungen – etwa wenn es klingelt –, auch wenn keine NeonPlan-Seite offen ist; ohne Raum an alle Räume, mit **Räume** an die genannten, mit **Etage** an eine Etage; mehrere Räume lassen die mit Ruhezeit aus. Mit **Auf NeonPlan-Bildschirmen** spricht jeder offene NeonPlan-Bildschirm die Nachricht selbst – mit Gong – und zeigt sie groß an; mit **Bildschirme** nur die mit diesen Bildschirmnamen. So wird auch ein altes Wand-Tablet zum Durchsage-Lautsprecher. Dafür braucht Home Assistant eine Sprach-Pipeline mit Sprachausgabe; Browser spielen Ton erst nach dem ersten Tippen auf die Seite – in Fully Kiosk unter Webinhalt-Einstellungen **Autoplay Audio** einschalten. Ein Wand-Tablet mit Fully Kiosk kann selbst Lautsprecher sein: den Media Player der Fully-Kiosk-Integration im Raumformular unter **📢 Durchsagen über** wählen | 3,90 €, im Supporter-Pass |
+| **Durchsagen** (ab NeonPlan 2.0.7) | Raum antippen, **📢 Durchsage**, „Essen ist fertig!“ antippen – und der Lautsprecher in dem Raum sagt es. Fertige Sätze (in ⚙ Einstellungen → Durchsagen: ✕ nimmt einen heraus, unten kommen eigene dazu, „Fertige Sätze zurückholen“ stellt die Vorgaben wieder her), eigener Text oder ins 🎙 Mikrofon gesprochen (braucht HTTPS und eine Sprach-Pipeline mit Spracherkennung, wie die Sprachsteuerung). Aus dem Zentral-Menü an **alle Räume**, an **eine Etage** oder nur dorthin, **wo gerade jemand ist** (Ortung, Präsenz- und Bewegungsmelder). Im Raumformular (Editor) hat jeder Raum eine **🌙 Ruhezeit** (etwa Kinderzimmer ab 20 Uhr bis 7 Uhr): Durchsagen an mehrere Räume lassen ihn dann aus, eine Durchsage nur an diesen Raum geht trotzdem raus. Dort stehen auch **eigene Sätze für den Raum**, die im Raum ganz oben erscheinen. Eigene Texte, die du zuletzt getippt hast, kommen als **↻** zum erneuten Senden. Welcher Lautsprecher spricht: der im Raumformular unter **📢 Durchsagen über** gewählte, sonst ein Lautsprecher, der im Plan im Raum steht – nur wenn dort keiner steht, einer aus dem Bereich des Raums (Fernseher und nicht erreichbare Geräte nie von selbst), sonst der Standard-Lautsprecher aus ⚙ Einstellungen. Ein **Außenbereich mit Home-Assistant-Bereich** (etwa die Terrasse) zählt seit 2.0.11 wie ein Raum: Der Lautsprecher dort bekommt Durchsagen und seinen 📢-Knopf. Pro Raum spricht ein Lautsprecher – stehen zwei im Raum, wählst du im Raumformular, welcher. Echos (Alexa Media Player oder seit 2.0.11 die Home-Assistant-Integration **Alexa Devices**) und Sprach-Satelliten wie der Home Assistant Voice PE machen eine echte Durchsage mit Gong; andere Lautsprecher sprechen über die Sprachausgabe (TTS) von Home Assistant, mit chime_tts auch mit Gong; Lautsprecher, die Durchsagen können (z. B. Sonos), machen die Musik dafür leiser und spielen danach weiter. Die Lautstärke bleibt, wie sie ist. Der Lautsprecher leuchtet im Plan kurz auf, und in der 3D-Ansicht zeigt **🔊** über ihm, wo es gerade spricht. Mit **📢 auch direkt im Raum zeigen** (⚙ Einstellungen → Durchsagen) leuchtet in der 3D-Ansicht der Etage über dem Lautsprecher jedes Raums ein 📢-Knopf – ein Tipp öffnet sofort die Sätze. **Aus Automationen** (ab NeonPlan 2.0.9): Die Aktion **HomePlan 3D: Durchsage** (`homeplan3d.announce`) sagt eine Nachricht mit denselben Einstellungen – etwa wenn es klingelt –, auch wenn keine NeonPlan-Seite offen ist; ohne Raum an alle Räume, mit **Räume** an die genannten, mit **Etage** an eine Etage; mehrere Räume lassen die mit Ruhezeit aus. Mit **Auf NeonPlan-Bildschirmen** spricht jeder offene NeonPlan-Bildschirm die Nachricht selbst – mit Gong – und zeigt sie groß an; mit **Bildschirme** nur die mit diesen Bildschirmnamen. So wird auch ein altes Wand-Tablet zum Durchsage-Lautsprecher. Dafür braucht Home Assistant eine Sprach-Pipeline mit Sprachausgabe; Browser spielen Ton erst nach dem ersten Tippen auf die Seite – in Fully Kiosk unter Webinhalt-Einstellungen **Autoplay Audio** einschalten. Ein Wand-Tablet mit Fully Kiosk kann selbst Lautsprecher sein: den Media Player der Fully-Kiosk-Integration im Raumformular unter **📢 Durchsagen über** wählen | 3,90 €, im Supporter-Pass |
 | **Fenster-Wächter** | warnt, wenn ein Fenster bei Kälte (unter 12 °C draußen) länger als 20 Minuten offen steht oder die Heizung bei offenem Fenster läuft (10 Minuten): Der Raum pulst, die Warnleiste nennt Fenster und Zeit; „Welche Fenster sind zu lange offen?“ fliegt sie ab. Ruhe in der Nacht (ab Release 3): Legst du in Home Assistant einen Helfer (Schalter) `input_boolean.fensterwaechter_ruhe` an, warnt er nicht, solange der an ist – etwa per Automation nachts oder wenn die Rollläden unten sind | kostenlos |
 
 ## 8. Die Dashboard-Karte
 
 ![Karte im Dashboard](images/card-og-dim.jpg)
 
-Die Karte `custom:neonplan3d-card` bringt die 3D-Ansicht in jedes Dashboard. Sie wird automatisch geladen.
+Die Karte `custom:homeplan3d-card` bringt die 3D-Ansicht in jedes Dashboard. Sie wird automatisch geladen.
 
 **Anlegen:** Dashboard bearbeiten, **Karte hinzufügen**, nach „NeonPlan“ suchen. Alle Optionen stellst du im visuellen Editor der Karte ein:
 
@@ -1503,7 +1503,7 @@ Rechts steht die **Vorschau** auf dem gewählten Bildschirm (eine Handy-Vorlage 
 **Auf dem Tablet:** Karte hinzufügen, nach „NeonPlan“ suchen und ganz oben unter **Vorlage** die Vorlage wählen, fertig. Das Formular darunter fällt weg. Im YAML stehen nur zwei Zeilen:
 
 ```yaml
-type: custom:neonplan3d-card
+type: custom:homeplan3d-card
 template: kueche_fire
 ```
 
@@ -1513,7 +1513,7 @@ template: kueche_fire
 - **Wo hängt das Tablet?** Das Feld oben in der Vorlage legt den Raum für „hier“ fest („Mach hier das Licht an“), unabhängig davon, welche Etage oder welchen Start-Raum die Karte zeigt.
 - **Umbenennen:** Die ID im YAML folgt dem neuen Namen. Tablets, die noch mit der alten ID eingerichtet sind, finden die Vorlage weiter.
 - **Bildschirmname:** Der Name der Vorlage ist zugleich der Bildschirmname der Karte (für Durchsagen und „hier“ in der Sprachsteuerung), solange die Vorlage keinen eigenen hat.
-- **Neu laden:** **Bildschirme mit dieser Vorlage neu laden** und **Alle Bildschirme neu laden** lassen die offenen Tablets ihre Seite neu laden, etwa nach einem NeonPlan-Update (neuer Code kommt nur so an). In Automationen gibt es dafür die Aktion `neonplan3d.reload_screens` (ohne `templates` alle Bildschirme).
+- **Neu laden:** **Bildschirme mit dieser Vorlage neu laden** und **Alle Bildschirme neu laden** lassen die offenen Tablets ihre Seite neu laden, etwa nach einem NeonPlan-Update (neuer Code kommt nur so an). In Automationen gibt es dafür die Aktion `homeplan3d.reload_screens` (ohne `templates` alle Bildschirme).
 - **Gelöscht:** Fehlt die Vorlage im Plan, zeigt die Karte einen Hinweis und läuft mit ihren eigenen Einstellungen weiter.
 
 ### 8.2 Alle Optionen in YAML
@@ -1521,7 +1521,7 @@ template: kueche_fire
 In YAML sieht eine Karte so aus. Alle Zeilen außer der ersten sind optional:
 
 ```yaml
-type: custom:neonplan3d-card
+type: custom:homeplan3d-card
 template: kueche_fire   # eine Karten-Vorlage aus dem Editor (dann gilt nur sie, die übrigen Zeilen nicht)
 plan: pab12cd34ef      # ein anderer Grundriss (ID unter ⚙ → Grundrisse; weglassen = der erste); site = das Grundstück
 floor: floor_ab12cd34   # eine Etage zeigen (ID aus dem Editor)

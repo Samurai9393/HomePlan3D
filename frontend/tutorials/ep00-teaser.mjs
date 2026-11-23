@@ -32,13 +32,13 @@ await R.page.evaluateOnNewDocument(() => {
 R.page.on("dialog", (d) => void d.accept());
 
 // ---------------------------------------------------------------- helpers
-const VIEW = `const v = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
+const VIEW = `const v = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
   const viewer = Object.values(v).find((x) => x && x.floors && x.floorMap);`;
 /** Set the 3D camera, with an optional target point [x, y, z]. */
 const cam = (c) =>
   R.page.evaluate(
     (code, c) => {
-      const v = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
+      const v = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
       const viewer = Object.values(v).find((x) => x && x.floors && x.floorMap);
       const { target, ...rest } = c;
       if (target) viewer.controls.view.target.set(target[0], target[1], target[2]);
@@ -133,7 +133,7 @@ const quiet = async (target, wait = 300) => {
   await R.page.mouse.click(b.x, b.y);
   await R.sleep(wait);
 };
-const flash = (on) => R.page.evaluate((on) => (document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-view3d")._flash = on), on);
+const flash = (on) => R.page.evaluate((on) => (document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-view3d")._flash = on), on);
 
 // ---------------------------------------------------------------- 1. The flight in, title card
 await chapter("Das ist HomePlan 3D");
@@ -434,7 +434,7 @@ await R.sleep(1500);
     card.replaceWith(bezel);
     bezel.append(screen);
     screen.append(card);
-    card.setConfig({ type: "custom:neonplan3d-card", quality: "low", floor: "eg", height: 838, flows: false, controls: true, fullscreen_button: false, floor_thumbs: true, idle_return: 1, idle_orbit: true });
+    card.setConfig({ type: "custom:homeplan3d-card", quality: "low", floor: "eg", height: 838, flows: false, controls: true, fullscreen_button: false, floor_thumbs: true, idle_return: 1, idle_orbit: true });
   });
   await R.sleep(2500);
   end = await line("Und es läuft sogar auf alten Wandtablets – mit einer eigenen, sparsamen Stufe dafür.");
@@ -451,7 +451,7 @@ await quiet({ text: "Erdgeschoss", nth: 0 });
 await R.sleep(500);
 {
   const png = "data:image/png;base64," + readFileSync(PLAN).toString("base64");
-  await R.page.evaluate((png) => window.fp3dPanel.hass.callWS({ type: "neonplan3d/image/set", image_id: "img_plan", data: png }), png);
+  await R.page.evaluate((png) => window.fp3dPanel.hass.callWS({ type: "homeplan3d/image/set", image_id: "img_plan", data: png }), png);
   await R.editor(`e.change((doc, f) => { f.background = { image_id: "img_plan", width: 12, rotation: 0, x: -1.5, z: -1.5, opacity: 0.6 }; }); e.past = []; e._canUndo = false; e.fit();`);
   await R.sleep(800);
   await quiet({ text: "3D daneben", exact: true });

@@ -46,9 +46,9 @@ async def main() -> int:
     tag = latest_tag()
     manifest = json.loads((ROOT / "hacs.json").read_text(encoding="utf-8"))
     paths = {
-        "release zip": f"https://github.com/{REPO}/releases/download/{tag}/neonplan3d.zip",
+        "release zip": f"https://github.com/{REPO}/releases/download/{tag}/homeplan3d.zip",
         "repository archive": f"https://github.com/{REPO}/archive/refs/tags/{tag}.zip",
-        "single files": f"https://raw.githubusercontent.com/{REPO}/{tag}/custom_components/neonplan3d/manifest.json",
+        "single files": f"https://raw.githubusercontent.com/{REPO}/{tag}/custom_components/homeplan3d/manifest.json",
     }
     used = "release zip" if manifest.get("zip_release") else "single files"
     async with aiohttp.ClientSession() as session:

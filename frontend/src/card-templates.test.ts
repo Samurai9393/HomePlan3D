@@ -7,7 +7,7 @@ const plan = (): Building => ({
   ...emptyBuilding(),
   card_templates: [{ id: "kueche_fire", name: "Küche Fire-Tablet", config: { floor: "eg", room_bar: true, height: 600 } }],
 });
-const card = (c: Partial<CardConfig> = {}): CardConfig => ({ type: "custom:neonplan3d-card", ...c });
+const card = (c: Partial<CardConfig> = {}): CardConfig => ({ type: "custom:homeplan3d-card", ...c });
 
 test("card templates: a card naming a template shows the template, with only its size of its own", () => {
   const c = effectiveConfig(card({ template: "kueche_fire", height: 800, plain: true, screen: "Flur" }), plan());
@@ -15,7 +15,7 @@ test("card templates: a card naming a template shows the template, with only its
   assert.equal(c.room_bar, true);
   assert.equal(c.height, 800, "the card's size is its own (it belongs to the dashboard)");
   assert.equal(c.plain, undefined, "an old card's floor plan only does not hide the furniture");
-  assert.equal(c.type, "custom:neonplan3d-card");
+  assert.equal(c.type, "custom:homeplan3d-card");
   assert.equal(c.screen, "Küche Fire-Tablet", "the template's name is the screen name");
 });
 

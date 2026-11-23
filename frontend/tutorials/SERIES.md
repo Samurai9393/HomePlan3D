@@ -20,7 +20,7 @@ idle pauses are not.
 4. **Explain the why:** what a setting is good for, a typical case from a real home ("ein Anbau mit Pultdach",
    "die Dachschräge im Kinderzimmer"), and the common mistake.
 5. **Version:** the title card's small line and the outro card name the version from
-   `custom_components/neonplan3d/manifest.json` ("aufgenommen mit HomePlan 3D 1.12.5"); the YouTube description
+   `custom_components/homeplan3d/manifest.json` ("aufgenommen mit HomePlan 3D 1.12.5"); the YouTube description
    draft repeats it and says newer versions may have more options.
 6. **Length: at most 7–8 minutes** (Torsten). Topics that belong together stay in one episode. If the checklist does not fit into 8 minutes at a snappy pace, split the episode into „Teil 1“ / „Teil 2“ – never drop a checklist item and never slow down.
 
@@ -43,7 +43,7 @@ sentence, at most once or twice per episode, never a sales pitch, no prices.
 ## Recording while the app is being developed
 
 The main session keeps building the app. Record from a **snapshot**: copy `preview/` and
-`custom_components/neonplan3d/frontend/` into a folder in your scratch directory (same relative layout), and
+`custom_components/homeplan3d/frontend/` into a folder in your scratch directory (same relative layout), and
 start the recorder with `TUTORIAL_ROOT=<that folder>` (the recorder serves files from there when the variable is
 set – add this to `recorder.mjs` if it is not there yet). Then a rebuild during your recording cannot break it.
 Several agents may work at the same time: keep episode-specific helpers in your own episode file; change

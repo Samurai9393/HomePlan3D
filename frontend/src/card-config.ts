@@ -136,7 +136,7 @@ export interface CardConfig {
   director?: boolean;
   /** Voice control: a microphone button – "Show the living room" shows it, other sentences go to Assist (default off). */
   voice?: boolean;
-  /** This card's screen name for Assist and the service `neonplan3d.ask`: a sentence that names a screen is only for it. */
+  /** This card's screen name for Assist and the service `homeplan3d.ask`: a sentence that names a screen is only for it. */
   screen?: string;
   /** The Home Assistant area this card's tablet hangs in: sentences without a room ("Lights on") apply there; else the device's setting. */
   voice_area?: string;

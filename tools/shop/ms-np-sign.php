@@ -4,11 +4,11 @@
  *
  * Every purchased furniture pack is signed with the buyer's name at download time, so the file the
  * buyer gets says "licensed to <name>" when it is imported. The integration accepts the shop key
- * (PACK_PUBLIC_KEYS in custom_components/neonplan3d/packs.py) next to the publisher's master key.
+ * (PACK_PUBLIC_KEYS in custom_components/homeplan3d/packs.py) next to the publisher's master key.
  *
  * Setup:
  *   1. wp-config.php: define('MS_NP_SIGNING_SEED', '<base64 seed>');   (from: python tools/fp3dpack.py seed shop-signing-key.pem)
- *   2. Next to each <pack>.fp3dpack in wp-content/uploads/woocommerce_uploads/neonplan3d/ put the
+ *   2. Next to each <pack>.fp3dpack in wp-content/uploads/woocommerce_uploads/homeplan3d/ put the
  *      template <pack>.canonical.json (from: python tools/fp3dpack.py canonical <pack>.json).
  *   3. Products carry the meta _ms_np_key = pack key (living, kitchen, …). The bundle lists the packs.
  *   4. Drop this file into wp-content/novamira-sandbox/ (auto-loaded) or a plugin.
@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) {
 }
 
 const MS_NP_KEY_ID = '867371cc70e6';
-const MS_NP_UPLOAD_DIR = 'woocommerce_uploads/neonplan3d';
+const MS_NP_UPLOAD_DIR = 'woocommerce_uploads/homeplan3d';
 
 add_action('woocommerce_download_product', 'ms_np_sign_download', 10, 6);
 

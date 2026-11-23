@@ -11,9 +11,9 @@ import type { Building, CardTemplate } from "../model.ts";
 import { controls, tokens } from "../styles.ts";
 import type { HomeAssistant } from "../types.ts";
 
-const CARD_TYPE = "custom:neonplan3d-card";
-const PREVIEW_KEY = "neonplan3d.template_preview";
-const SCREEN_KEY = "neonplan3d.template_screen";
+const CARD_TYPE = "custom:homeplan3d-card";
+const PREVIEW_KEY = "homeplan3d.template_preview";
+const SCREEN_KEY = "homeplan3d.template_screen";
 /** Home Assistant's header above a dashboard: what "fill the screen" leaves of a screen's height. */
 const HEADER = 56;
 
@@ -154,9 +154,9 @@ export class Fp3dCardTemplates extends LitElement {
 
   /** The preview: the real dashboard card with the template's options, at a fixed height (the main bundle defines it). */
   private previewOf(tpl: CardTemplate) {
-    if (!this._preview || !customElements.get("neonplan3d-card")) return nothing;
+    if (!this._preview || !customElements.get("homeplan3d-card")) return nothing;
     if (!this.previewCard) {
-      this.previewCard = document.createElement("neonplan3d-card") as PreviewCard;
+      this.previewCard = document.createElement("homeplan3d-card") as PreviewCard;
       this.previewCard.preview = true;
     }
     // the preview shows what is being edited (with "send later" the changes not sent yet)
@@ -320,7 +320,7 @@ export class Fp3dCardTemplates extends LitElement {
     super.updated(changed);
     if (changed.has("hass") || changed.has("admin")) this.watchOpen();
     const tpl = this.current;
-    const el = this.renderRoot.querySelector("neonplan3d-card-editor") as (HTMLElement & { setConfig?: (c: CardConfig) => void }) | null;
+    const el = this.renderRoot.querySelector("homeplan3d-card-editor") as (HTMLElement & { setConfig?: (c: CardConfig) => void }) | null;
     // the preview's column is measured (the stage itself is only as wide as the shrunk screen)
     const stage = this.renderRoot.querySelector(".fp3d-tpl-stage")?.parentElement;
     if (stage && !this.stageObserver) {
@@ -551,14 +551,14 @@ export class Fp3dCardTemplates extends LitElement {
           ${this.previewOf(tpl)}
         </div>
         ${this._ready
-          ? html`<neonplan3d-card-editor
+          ? html`<homeplan3d-card-editor
               class="fp3d-tpl-form"
               embedded
               ?inert=${!admin}
               .hass=${this.hass}
               .building=${this.building}
               @config-changed=${(e: CustomEvent<{ config: CardConfig }>) => this.changed(tpl, e)}
-            ></neonplan3d-card-editor>`
+            ></homeplan3d-card-editor>`
           : html`<p class="fp3d-sub">${this.t("loading")}</p>`}
       </div>
     </div>`;
@@ -773,7 +773,7 @@ export class Fp3dCardTemplates extends LitElement {
         color: #ffcf8a;
         font-size: 13px;
       }
-      .fp3d-tpl-screen neonplan3d-card {
+      .fp3d-tpl-screen homeplan3d-card {
         display: block;
         height: 100%;
       }

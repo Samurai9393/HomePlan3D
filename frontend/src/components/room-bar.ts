@@ -10,7 +10,7 @@ import { favoriteTiles, lightCall, roomTiles, type RoomTile } from "../room-bar.
 import { controls, tokens } from "../styles.ts";
 import type { HomeAssistant } from "../types.ts";
 
-const MIN_KEY = "neonplan3d.roombar_min";
+const MIN_KEY = "homeplan3d.roombar_min";
 
 /** A window (the line icons have none of their own) and a play triangle, drawn like the line icons. */
 const WINDOW = "M5 4h14v16H5zM12 4v16M5 12h14";

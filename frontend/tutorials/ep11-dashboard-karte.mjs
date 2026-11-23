@@ -106,9 +106,9 @@ const setCfg = (cfg) =>
   R.page.evaluate((cfg) => {
     window.fp3dCard._roomId = null;
     window.fp3dCard.setConfig(cfg);
-    document.querySelector("neonplan3d-card-editor").setConfig(cfg);
+    document.querySelector("homeplan3d-card-editor").setConfig(cfg);
   }, cfg);
-const getCfg = () => R.page.evaluate(() => ({ ...document.querySelector("neonplan3d-card-editor")._config }));
+const getCfg = () => R.page.evaluate(() => ({ ...document.querySelector("homeplan3d-card-editor")._config }));
 /** A state of the mock Home Assistant (invented entities only), for the card and the editor. */
 const setState = (id, state, attributes) =>
   R.page.evaluate(
@@ -118,7 +118,7 @@ const setState = (id, state, attributes) =>
       const old = hass.states[id];
       const states = { ...hass.states, [id]: { entity_id: id, ...(old ?? {}), state, attributes: { ...(old?.attributes ?? {}), ...(attributes ?? {}) } } };
       card.hass = { ...hass, states };
-      document.querySelector("neonplan3d-card-editor").hass = card.hass;
+      document.querySelector("homeplan3d-card-editor").hass = card.hass;
     },
     id,
     state,
@@ -331,7 +331,7 @@ const showList = async (label, option, seconds) => {
 /** Click a toggle (checkbox label) of the editor by its text. */
 const toggle = async (text, seconds = 0.5) => {
   const b = await R.page.evaluate((text) => {
-    const ed = document.querySelector("neonplan3d-card-editor").shadowRoot;
+    const ed = document.querySelector("homeplan3d-card-editor").shadowRoot;
     const l = [...ed.querySelectorAll("label.toggle, label.chip")].find((l) => l.textContent.replace(/\s+/g, " ").trim().startsWith(text));
     if (!l) return null;
     const r = l.querySelector("input").getBoundingClientRect();
@@ -388,7 +388,7 @@ const park = () => R.page.mouse.move(250, 40);
 
 // ---------------------------------------------------------------- the page
 /** The preview's card mode at 125 %: the editor left (scrolls with the page), the card right (stays). */
-const start = async (cfg = { type: "custom:neonplan3d-card" }) => {
+const start = async (cfg = { type: "custom:homeplan3d-card" }) => {
   await R.open("card");
   await R.page.evaluate((cfg) => {
     const card = window.fp3dCard;
@@ -462,7 +462,7 @@ const toYaml = (cfg) => {
 const yamlShow = (lines) =>
   R.page.evaluate(
     (lines, style) => {
-      const ed = document.querySelector("neonplan3d-card-editor");
+      const ed = document.querySelector("homeplan3d-card-editor");
       const box = ed.parentElement;
       box.style.display = "none";
       if (!document.getElementById("tut-yaml-style")) {
@@ -539,7 +539,7 @@ const KUECHE = ["eg", 8, 2.3];
 const BAD = ["eg", 5.6, 6.3];
 const KIND = ["og", 2.2, 2.1];
 /** The usual config of the card from the middle of part 1 on. */
-const BASE = { type: "custom:neonplan3d-card", floor: "eg", height: 760 };
+const BASE = { type: "custom:homeplan3d-card", floor: "eg", height: 760 };
 
 // ================================================================ PART 1: the card and every option of its editor
 if (PART === "a") {
@@ -547,7 +547,7 @@ if (PART === "a") {
   await chapter("Teaser");
   await start();
   await R.hideCursor();
-  await tablet({ type: "custom:neonplan3d-card", controls: true, fullscreen_button: true });
+  await tablet({ type: "custom:homeplan3d-card", controls: true, fullscreen_button: true });
   {
     await setCam({ theta: -0.9, phi: 0.95, radius: 34 });
     await R.frame(0.2, 900);
@@ -606,13 +606,13 @@ if (PART === "a") {
   await sayOver("Mit der „Akzentfarbe“ bekommen Linien, Knöpfe und Pins deine Farbe. „Zurück zu Cyan“ setzt sie zurück.");
   {
     const b = await R.page.evaluate(() => {
-      const r = document.querySelector("neonplan3d-card-editor").shadowRoot.querySelector('input[type="color"]').getBoundingClientRect();
+      const r = document.querySelector("homeplan3d-card-editor").shadowRoot.querySelector('input[type="color"]').getBoundingClientRect();
       return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     });
     await R.move(b.x, b.y, 0.5);
     await ring(b.x, b.y);
     await R.page.evaluate(() => {
-      const i = document.querySelector("neonplan3d-card-editor").shadowRoot.querySelector('input[type="color"]');
+      const i = document.querySelector("homeplan3d-card-editor").shadowRoot.querySelector('input[type="color"]');
       i.value = "#ff8a00";
       i.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
     });

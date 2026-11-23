@@ -14,10 +14,10 @@ import { fitText, type HintKey } from "../fit-hints.ts";
 const RECENT_MAX = 10;
 const PAGE = 24;
 const THUMB_PX = 96;
-const STORE_OPEN = "neonplan3d.lib.open";
-const STORE_FAV = "neonplan3d.lib.fav";
-const STORE_RECENT = "neonplan3d.lib.recent";
-const STORE_LOCKED = "neonplan3d.lib.locked";
+const STORE_OPEN = "homeplan3d.lib.open";
+const STORE_FAV = "homeplan3d.lib.fav";
+const STORE_RECENT = "homeplan3d.lib.recent";
+const STORE_LOCKED = "homeplan3d.lib.locked";
 
 type Translate = (key: string, vars?: Record<string, string | number>) => string;
 

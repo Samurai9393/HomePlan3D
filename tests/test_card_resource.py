@@ -5,7 +5,7 @@ from __future__ import annotations
 from types import SimpleNamespace
 from typing import Any
 
-from custom_components.neonplan3d.card_resource import (
+from custom_components.homeplan3d.card_resource import (
     LOADER_URL,
     async_ensure_card_resource,
     async_remove_card_resource,
@@ -40,7 +40,7 @@ class FakeResources:
         self.items = [i for i in self.items if i["id"] != item_id]
 
 
-URL = "/neonplan3d_static/neonplan3d.js?v=1.12.4-abc"
+URL = "/homeplan3d_static/homeplan3d.js?v=1.12.4-abc"
 
 
 async def test_added_updated_and_removed() -> None:
@@ -51,8 +51,8 @@ async def test_added_updated_and_removed() -> None:
     await async_ensure_card_resource(hass, URL)
     assert [i["url"] for i in res.items] == [other["url"], URL]
     # an update and an old hand-installed copy: both lead to the current bundle, nothing is added twice
-    res.items[1]["url"] = "/neonplan3d_static/neonplan3d.js?v=1.12.3-old"
-    res.items.append({"id": "old", "type": "module", "url": "/local/neonplan3d.js"})
+    res.items[1]["url"] = "/homeplan3d_static/homeplan3d.js?v=1.12.3-old"
+    res.items.append({"id": "old", "type": "module", "url": "/local/homeplan3d.js"})
     await async_ensure_card_resource(hass, URL)
     assert [i["url"] for i in res.items] == [other["url"], URL, URL]
     await async_remove_card_resource(hass)

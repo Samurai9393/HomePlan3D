@@ -13,7 +13,7 @@
     </style>
   </head>
   <body>
-    <neonplan3d-panel></neonplan3d-panel>
+    <homeplan3d-panel></homeplan3d-panel>
     <script type="module">
       // Mock of the Home Assistant frontend object with invented demo data.
       import { DEMO_AREAS, DEMO_BUILDING, DEMO_FLOORS, DEMO_PACK, DEMO_ENTITIES, DEMO_STATES, DEMO_PICTURES, DEMO_PLANS } from "./demo-data.js";
@@ -23,14 +23,14 @@
       const params = new URLSearchParams(location.search);
       // the power flow lines are on with ?flows (and off without, whatever an earlier page stored)
       try {
-        localStorage.setItem("neonplan3d.flows", params.has("flows") ? "1" : "0");
+        localStorage.setItem("homeplan3d.flows", params.has("flows") ? "1" : "0");
       } catch {}
       // the demo always opens in Neon, whatever style a visitor picked last time (?style=<id> opens another one)
       const DEMO_STYLES = ["neon", "blueprint", "day", "focus", "synth", "cozy", "evening", "winter", "model", "pastel", "warm"];
       try {
         const wanted = params.get("style");
-        localStorage.setItem("neonplan3d.theme", DEMO_STYLES.includes(wanted) ? wanted : "neon");
-        localStorage.removeItem("neonplan3d.zoom_style");
+        localStorage.setItem("homeplan3d.theme", DEMO_STYLES.includes(wanted) ? wanted : "neon");
+        localStorage.removeItem("homeplan3d.zoom_style");
       } catch {}
       // the shop connection of the demo: connected when ?shop is given, with one pack to install and one update;
       // ?supporter alone: a connected Supporter-Pass holder with nothing waiting (the NeonPlan Print dot shows on the tab)
@@ -42,23 +42,23 @@
         licensee: params.has("shop") || supporterOnly ? "Demo Kunde" : null,
         checked_at: params.has("shop") || supporterOnly ? Date.now() / 1000 - 3600 : null,
         error: null,
-        shop_url: "https://mastershort.de/neonplan3d/",
+        shop_url: "https://mastershort.de/homeplan3d/",
         packs: [
-          { id: "mastershort.living", name: "Wohnzimmer", release: 2, url: "https://mastershort.de/neonplan3d/", installed: 1 },
-          { id: "mastershort.kitchen", name: "Küche", release: 1, url: "https://mastershort.de/neonplan3d/", installed: 1 },
-          ...(supporterOnly ? [] : [{ id: "mastershort.vehicles", name: "Fahrzeuge", release: 1, url: "https://mastershort.de/neonplan3d/", installed: null }]),
+          { id: "mastershort.living", name: "Wohnzimmer", release: 2, url: "https://mastershort.de/homeplan3d/", installed: 1 },
+          { id: "mastershort.kitchen", name: "Küche", release: 1, url: "https://mastershort.de/homeplan3d/", installed: 1 },
+          ...(supporterOnly ? [] : [{ id: "mastershort.vehicles", name: "Fahrzeuge", release: 1, url: "https://mastershort.de/homeplan3d/", installed: null }]),
         ],
         // invented offers of the demo shop and a loyalty code
         offers: params.has("shop")
           ? [
-              { id: "kino", name: "Heimkino & Hi-Fi", teaser: "Leinwand, Beamer, Lautsprecher, Subwoofer – verknüpfbar", image: null, url: "https://mastershort.de/neonplan3d/", kind: "pack", price: "5,90 €", new: true },
-              { id: "tiere", name: "Haustiere", teaser: "Kratzbaum, Hundekorb, Aquarium mit Licht", image: null, url: "https://mastershort.de/neonplan3d/", kind: "pack", price: "3,90 €", new: true },
-              { id: "pro_weather", name: "Wetter draußen", teaser: "Regen, Schnee und Gewitter live am Haus", image: null, url: "https://mastershort.de/neonplan3d/", kind: "pro", price: "3,90 €", new: false },
+              { id: "kino", name: "Heimkino & Hi-Fi", teaser: "Leinwand, Beamer, Lautsprecher, Subwoofer – verknüpfbar", image: null, url: "https://mastershort.de/homeplan3d/", kind: "pack", price: "5,90 €", new: true },
+              { id: "tiere", name: "Haustiere", teaser: "Kratzbaum, Hundekorb, Aquarium mit Licht", image: null, url: "https://mastershort.de/homeplan3d/", kind: "pack", price: "3,90 €", new: true },
+              { id: "pro_weather", name: "Wetter draußen", teaser: "Regen, Schnee und Gewitter live am Haus", image: null, url: "https://mastershort.de/homeplan3d/", kind: "pro", price: "3,90 €", new: false },
             ]
           : [],
         loyalty: params.has("shop") ? { code: "NP-TREUE-DEMO42", percent: 10 } : null,
         supporter: params.has("shop") || supporterOnly ? { code: "NPS-DEMO-7KQ4", until: "2027-12-31" } : null,
-        newsletter: params.has("shop") ? { url: "https://mastershort.de/neonplan3d/newsletter/" } : null,
+        newsletter: params.has("shop") ? { url: "https://mastershort.de/homeplan3d/newsletter/" } : null,
         updates: params.has("shop") ? [{ id: "mastershort.kitchen", name: "Küche", release: 2, added: 10, at: Date.now() / 1000 - 600 }] : [],
       };
       let building = params.has("empty") ? { version: 1, floors: [], settings: { wall_exterior: 0.24, wall_interior: 0.12, grid: 0.05 } } : DEMO_BUILDING;
@@ -95,10 +95,10 @@
       });
       const planOf = (id) => plans.find((pl) => pl.id === id);
       const notifyPlans = () => {
-        for (const [cb, m] of listeners) if (m?.type === "neonplan3d/plans/subscribe") cb(planList());
+        for (const [cb, m] of listeners) if (m?.type === "homeplan3d/plans/subscribe") cb(planList());
       };
       const notifyBuilding = (plan, rev) => {
-        for (const [cb, m] of listeners) if (m?.type !== "neonplan3d/plans/subscribe" && ((m?.plan ?? "main") === plan || m?.plan === "*")) cb({ revision: rev, plan });
+        for (const [cb, m] of listeners) if (m?.type !== "homeplan3d/plans/subscribe" && ((m?.plan ?? "main") === plan || m?.plan === "*")) cb({ revision: rev, plan });
       };
       // off like on a fresh installation; the screenshots switch it on through the editor
       const diag = { enabled: false };
@@ -209,11 +209,11 @@
         async callWS(msg) {
           switch (msg.type) {
             // a local module's code (see previewPacks)
-            case "neonplan3d/modules/code":
+            case "homeplan3d/modules/code":
               if (moduleCode[msg.pack_id]) return moduleCode[msg.pack_id];
               throw new Error("no such module in the demo");
             // the card templates' overview of the open screens (invented devices)
-            case "neonplan3d/screens/list": {
+            case "homeplan3d/screens/list": {
               const t = Date.now() / 1000;
               return {
                 screens: [
@@ -223,9 +223,9 @@
                 ],
               };
             }
-            case "neonplan3d/screens/reload":
+            case "homeplan3d/screens/reload":
               return { sent: true };
-            case "neonplan3d/building/get": {
+            case "homeplan3d/building/get": {
               if (msg.plan && msg.plan !== "main") {
                 const pl = planOf(msg.plan);
                 if (!pl) throw { code: "not_found", message: "Floor plan not found" };
@@ -238,7 +238,7 @@
               for (const f of shown.floors) f.furniture = f.furniture.filter((m) => !m.type.startsWith("pack:") || known.has(m.type));
               return { building: shown, revision };
             }
-            case "neonplan3d/building/save":
+            case "homeplan3d/building/save":
               // ?savefail simulates a backend that still runs an older version
               if (params.has("savefail")) throw { code: "invalid_format", message: "extra keys not allowed @ data['building']['floors'][0]['furniture'][0]['entity']" };
               if (msg.plan && msg.plan !== "main") {
@@ -252,35 +252,35 @@
               revision += 1;
               notifyBuilding("main", revision);
               return { revision };
-            case "neonplan3d/plans/list":
+            case "homeplan3d/plans/list":
               return planList();
-            case "neonplan3d/plans/create": {
+            case "homeplan3d/plans/create": {
               const id = `p${Math.random().toString(36).slice(2, 10)}`;
               const from = msg.copy_of ? (msg.copy_of === "main" ? building : planOf(msg.copy_of).building) : msg.building;
               plans.push({ id, name: msg.name, icon: msg.icon ?? null, site: null, created: Date.now() / 1000, revision: 1, building: structuredClone(from ?? { version: 1, floors: [], settings: { wall_exterior: 0.24, wall_interior: 0.12, grid: 0.05 } }) });
               notifyPlans();
               return { plan: id };
             }
-            case "neonplan3d/plans/update": {
+            case "homeplan3d/plans/update": {
               const entry = msg.plan === "main" ? mainEntry : planOf(msg.plan);
               for (const k of ["name", "icon", "site"]) if (k in msg) entry[k] = msg[k];
               notifyPlans();
               return null;
             }
-            case "neonplan3d/plans/order": {
+            case "homeplan3d/plans/order": {
               const rank = new Map(msg.plans.map((id, i) => [id, i]));
               plans.sort((a, b) => (rank.get(a.id) ?? 99) - (rank.get(b.id) ?? 99));
               notifyPlans();
               return null;
             }
-            case "neonplan3d/plans/delete": {
+            case "homeplan3d/plans/delete": {
               const i = plans.findIndex((pl) => pl.id === msg.plan);
               planTrash.push({ ...plans[i], deleted_at: Date.now() / 1000 });
               plans.splice(i, 1);
               notifyPlans();
               return null;
             }
-            case "neonplan3d/plans/restore": {
+            case "homeplan3d/plans/restore": {
               const i = planTrash.findIndex((pl) => pl.id === msg.plan);
               const { deleted_at, ...pl } = planTrash[i];
               plans.push(pl);
@@ -288,18 +288,18 @@
               notifyPlans();
               return null;
             }
-            case "neonplan3d/plans/locate":
+            case "homeplan3d/plans/locate":
               locatePlan = msg.plan;
               notifyPlans();
               return null;
             // the opt-in reports (only shown with the lab switch): a made-up status and preview
-            case "neonplan3d/diagnostics/client":
+            case "homeplan3d/diagnostics/client":
               return { enabled: diag.enabled };
-            case "neonplan3d/diagnostics/get":
-            case "neonplan3d/diagnostics/set":
-            case "neonplan3d/diagnostics/delete": {
-              if (msg.type === "neonplan3d/diagnostics/set") diag.enabled = msg.enabled;
-              if (msg.type === "neonplan3d/diagnostics/delete") diag.enabled = false;
+            case "homeplan3d/diagnostics/get":
+            case "homeplan3d/diagnostics/set":
+            case "homeplan3d/diagnostics/delete": {
+              if (msg.type === "homeplan3d/diagnostics/set") diag.enabled = msg.enabled;
+              if (msg.type === "homeplan3d/diagnostics/delete") diag.enabled = false;
               return {
                 enabled: diag.enabled,
                 last_daily: null,
@@ -314,55 +314,55 @@
                 },
               };
             }
-            case "neonplan3d/history/list":
+            case "homeplan3d/history/list":
               return { snapshots: history.map(({ building: b, ...rest }) => ({ ...rest, floors: b.floors.length, rooms: b.floors.reduce((n, f) => n + f.rooms.length, 0), furniture: b.floors.reduce((n, f) => n + f.furniture.length, 0) })).reverse() };
-            case "neonplan3d/history/snapshot":
+            case "homeplan3d/history/snapshot":
               history.push({ id: `s${history.length + 1}`, revision, saved_at: Date.now() / 1000, building: structuredClone(building) });
               return null;
-            case "neonplan3d/history/restore": {
+            case "homeplan3d/history/restore": {
               const snap = history.find((h) => h.id === msg.snapshot_id);
               building = structuredClone(snap.building);
               revision += 1;
               notifyBuilding("main", revision);
               return { revision };
             }
-            case "neonplan3d/image/get":
+            case "homeplan3d/image/get":
               if (!images[msg.image_id]) throw { code: "not_found", message: "Image not found" };
               return { data: images[msg.image_id] };
-            case "neonplan3d/image/set":
+            case "homeplan3d/image/set":
               images[msg.image_id] = msg.data;
               return null;
-            case "neonplan3d/packs/list":
+            case "homeplan3d/packs/list":
               return { packs: await previewPacks() };
-            case "neonplan3d/packs/import": {
+            case "homeplan3d/packs/import": {
               // the preview cannot check signatures: a file with a payload counts as valid
               const data = JSON.parse(msg.pack);
               if (!data.payload || !data.signature) throw { code: "unsigned", message: "unsigned" };
               importedPacks = [...importedPacks.filter((p) => p.id !== data.payload.id), data.payload];
               return { id: data.payload.id, name: data.payload.name, publisher: data.payload.publisher, licensee: data.payload.licensee ?? null, items: data.payload.items.length };
             }
-            case "neonplan3d/packs/remove":
+            case "homeplan3d/packs/remove":
               importedPacks = importedPacks.filter((p) => p.id !== msg.pack_id);
               return null;
-            case "neonplan3d/previews/get": {
+            case "homeplan3d/previews/get": {
               // the shop's furniture previews: a local copy next to the preview if there is one, else none
               const res = await fetch("./np-previews/index.json").catch(() => null);
               if (!res?.ok) return { base: null, packs: [], items: [], bundle: null };
               return { ...(await res.json()), base: new URL("./np-previews/", location.href).href };
             }
-            case "neonplan3d/license/get":
+            case "homeplan3d/license/get":
               return license;
-            case "neonplan3d/license/activate":
+            case "homeplan3d/license/activate":
               if (!/^NP(-[A-Z0-9]{4}){4}$/i.test(msg.key)) throw { code: "invalid_key", message: "unknown" };
               license = { ...license, active: true, key_hint: "…" + msg.key.slice(-4), licensee: "Demo Kunde", checked_at: Date.now() / 1000 };
               return license;
-            case "neonplan3d/license/remove":
+            case "homeplan3d/license/remove":
               license = { ...license, active: false, key_hint: null, licensee: null, checked_at: null };
               return license;
-            case "neonplan3d/license/refresh":
+            case "homeplan3d/license/refresh":
               license = { ...license, checked_at: Date.now() / 1000 };
               return license;
-            case "neonplan3d/packs/install":
+            case "homeplan3d/packs/install":
               license.packs = license.packs.map((p) => (p.id === msg.pack_id ? { ...p, installed: p.release } : p));
               return { id: msg.pack_id, name: msg.pack_id, publisher: "Mastershort", licensee: "Demo Kunde", release: 1, items: 0 };
             case "recorder/statistics_during_period": {
@@ -384,7 +384,7 @@
               });
               return Object.fromEntries((msg.statistic_ids ?? []).map((id) => [id, curve]));
             }
-            case "neonplan3d/timetravel/history":
+            case "homeplan3d/timetravel/history":
               // the time travel: an invented week of the demo household (?tt=07:42 or ?tt=-3h opens it there)
               if (params.has("nopro")) throw { code: "not_unlocked", message: "Time travel is a Pro add-on" };
               return demoHistory(msg, hass.states);
@@ -420,7 +420,7 @@
         hass.states["weather.zuhause"].state = "rainy";
       }
       let current = hass;
-      await import("../custom_components/neonplan3d/frontend/neonplan3d.js");
+      await import("../custom_components/homeplan3d/frontend/homeplan3d.js");
       if (params.has("site")) {
         // ?site: the public online demo says what it is and where to get HomePlan 3D
         const de = hass.language === "de";
@@ -436,8 +436,8 @@
           `<a href="https://github.com/Mastershort/neonplan3d#installation" target="_blank" rel="noopener" style="background:#00e5ff;color:#06101c;font-weight:700;text-decoration:none;padding:5px 12px;border-radius:999px">${text}</a>`;
         const github = link("https://github.com/Mastershort/neonplan3d", "★ GitHub");
         bar.innerHTML = de
-          ? `<span>${narrow ? "Demo" : "Demo mit erfundenen Daten – probier alles aus"}</span>${install(narrow ? "Installieren" : "Jetzt installieren")}${github}${narrow ? "" : link("https://mastershort.de/neonplan3d/anleitung/?lang=de", "Anleitung")}${link("?site&lang=en", narrow ? "EN" : "English")}`
-          : `<span>${narrow ? "Demo" : "Demo with invented data – try everything"}</span>${install(narrow ? "Install" : "Install now")}${github}${narrow ? "" : link("https://mastershort.de/en/neonplan3d/manual/?lang=en", "Manual")}${link("?site&lang=de", narrow ? "DE" : "Deutsch")}`;
+          ? `<span>${narrow ? "Demo" : "Demo mit erfundenen Daten – probier alles aus"}</span>${install(narrow ? "Installieren" : "Jetzt installieren")}${github}${narrow ? "" : link("https://mastershort.de/homeplan3d/anleitung/?lang=de", "Anleitung")}${link("?site&lang=en", narrow ? "EN" : "English")}`
+          : `<span>${narrow ? "Demo" : "Demo with invented data – try everything"}</span>${install(narrow ? "Install" : "Install now")}${github}${narrow ? "" : link("https://mastershort.de/en/homeplan3d/manual/?lang=en", "Manual")}${link("?site&lang=de", narrow ? "DE" : "Deutsch")}`;
         const close = document.createElement("button");
         close.textContent = "×";
         close.setAttribute("aria-label", de ? "Schließen" : "Close");
@@ -467,7 +467,7 @@
           head.innerHTML = `<b style="font-size:16px">${title} ${open ? "▾" : "▸"}</b>${open && !narrow ? `<span style="font-size:12px;opacity:.8">${sub}</span>` : ""}`;
         };
         head.onclick = () => fold(row.style.display === "none");
-        const panel = document.querySelector("neonplan3d-panel");
+        const panel = document.querySelector("homeplan3d-panel");
         const chips = DEMO_STYLES.map((id) => {
           const b = document.createElement("button");
           b.textContent = names[id];
@@ -487,7 +487,7 @@
             panel.requestUpdate?.();
           }
           try {
-            localStorage.setItem("neonplan3d.theme", id);
+            localStorage.setItem("homeplan3d.theme", id);
           } catch {}
           paint(id);
         };
@@ -500,7 +500,7 @@
         // made for and offer the clean view (only the house) or the way to a PC
         let seen = false;
         try {
-          seen = sessionStorage.getItem("neonplan3d.demoPhoneHint") === "1";
+          seen = sessionStorage.getItem("homeplan3d.demoPhoneHint") === "1";
         } catch {
           /* no storage: show it */
         }
@@ -526,7 +526,7 @@
           const done = () => {
             veil.remove();
             try {
-              sessionStorage.setItem("neonplan3d.demoPhoneHint", "1");
+              sessionStorage.setItem("homeplan3d.demoPhoneHint", "1");
             } catch {
               /* no storage: it may show again on reload */
             }
@@ -534,7 +534,7 @@
           clean.onclick = () => {
             done();
             // the eye of the 3D view: hides every bar so only the house remains (tap the eye again for the buttons)
-            const v = document.querySelector("neonplan3d-panel")?.shadowRoot?.querySelector("fp3d-view3d");
+            const v = document.querySelector("homeplan3d-panel")?.shadowRoot?.querySelector("fp3d-view3d");
             v?.dispatchEvent(new CustomEvent("clean-toggle", { bubbles: true, composed: true }));
           };
           all.onclick = done;
@@ -544,16 +544,16 @@
       }
       if (params.has("card")) {
         // ?card: the dashboard card next to its visual editor (like Home Assistant's card dialog)
-        document.querySelector("neonplan3d-panel").remove();
-        const CardClass = customElements.get("neonplan3d-card");
+        document.querySelector("homeplan3d-panel").remove();
+        const CardClass = customElements.get("homeplan3d-card");
         const wrap = document.createElement("div");
         wrap.style.cssText = "display:grid;grid-template-columns:420px 1fr;gap:24px;padding:24px;font-family:Figtree,Roboto,sans-serif;--primary-text-color:#e1e1e1;--secondary-text-color:#9b9b9b;--card-background-color:#1c1c1c;--primary-color:#03a9f4;--divider-color:rgba(225,225,225,.2)";
         const editorBox = document.createElement("div");
         editorBox.style.cssText = "background:#1c1c1c;border-radius:12px;padding:20px";
         const editor = await CardClass.getConfigElement();
-        const card = document.createElement("neonplan3d-card");
+        const card = document.createElement("homeplan3d-card");
         let config = {
-          type: "custom:neonplan3d-card",
+          type: "custom:homeplan3d-card",
           quality: "low",
           floor: params.get("floor") || "eg",
           flows: false,
@@ -573,7 +573,7 @@
         // ?tpl: the card only names a card template made in the editor (the room bar and the upper floor come from it)
         if (params.has("tpl")) {
           building.card_templates = [{ id: "kitchen_tablet", name: params.get("lang") === "en" ? "Kitchen tablet" : "Küchen-Tablet", config: { floor: "og", controls: ["walls"], quality: "low" } }];
-          config = { type: "custom:neonplan3d-card", template: "kitchen_tablet" };
+          config = { type: "custom:homeplan3d-card", template: "kitchen_tablet" };
         }
         card.setConfig(config);
         editor.setConfig(config);
@@ -589,7 +589,7 @@
         document.body.append(wrap);
         window.fp3dCard = card;
       } else {
-        const panel = document.querySelector("neonplan3d-panel");
+        const panel = document.querySelector("homeplan3d-panel");
         panel.hass = hass;
         window.addEventListener("hass-more-info", (e) => console.log("more-info", e.detail.entityId));
         panel.narrow = window.innerWidth < 870;

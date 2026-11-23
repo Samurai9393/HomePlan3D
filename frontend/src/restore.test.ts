@@ -9,7 +9,7 @@ function fakeHass(fail: string[] = []) {
   const hass = {
     callWS: async (msg: Record<string, unknown>) => {
       sent.push(msg);
-      if (msg.type === "neonplan3d/backup/import") return { revision: 2, building: msg.building, packs: (msg.packs as unknown[]).length, skipped: [] };
+      if (msg.type === "homeplan3d/backup/import") return { revision: 2, building: msg.building, packs: (msg.packs as unknown[]).length, skipped: [] };
       const id = (JSON.parse(msg.pack as string) as { payload: { id: string } }).payload.id;
       if (fail.includes(id)) throw { code: "wrong_instance" };
       return { id };
@@ -31,7 +31,7 @@ test("a backup too large for one message sends the plan first and every pack on 
   const { hass, sent } = fakeHass(["b"]);
   const big = Math.ceil(RESTORE_WHOLE_MAX / 2);
   const res = await restoreBackup(hass, { building: emptyBuilding(), packs: [pack("a", big), pack("b", big), pack("c", big), { id: "bare", name: "bare" } as never] });
-  assert.deepEqual(sent.map((m) => m.type), ["neonplan3d/backup/import", "neonplan3d/packs/import", "neonplan3d/packs/import", "neonplan3d/packs/import"]);
+  assert.deepEqual(sent.map((m) => m.type), ["homeplan3d/backup/import", "homeplan3d/packs/import", "homeplan3d/packs/import", "homeplan3d/packs/import"]);
   assert.deepEqual(sent[0].packs, []);
   assert.ok(sent.every((m) => JSON.stringify(m).length <= RESTORE_WHOLE_MAX));
   assert.equal(res.packs, 2);

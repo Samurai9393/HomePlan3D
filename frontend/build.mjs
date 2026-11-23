@@ -1,10 +1,10 @@
-// Builds the two bundles into custom_components/neonplan3d/frontend and checks the size budgets.
+// Builds the two bundles into custom_components/homeplan3d/frontend and checks the size budgets.
 
 import { build, context } from "esbuild";
 import { createHash } from "node:crypto";
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync } from "node:fs";
 
-const out = "../custom_components/neonplan3d/frontend";
+const out = "../custom_components/homeplan3d/frontend";
 const watch = process.argv.includes("--watch");
 
 const common = {
@@ -19,7 +19,7 @@ const common = {
   logLevel: "info",
 };
 
-const viewerConfig = { ...common, entryPoints: ["src/viewer/viewer3d.ts"], outfile: `${out}/neonplan3d-3d.js` };
+const viewerConfig = { ...common, entryPoints: ["src/viewer/viewer3d.ts"], outfile: `${out}/homeplan3d-3d.js` };
 // the card's visual editor only loads in the dashboard's card dialog
 // the language files (lang/*.json) are fetched with a hash of their content, so a new text is never stale
 const LANGS = ["fr", "es", "nl", "it", "hu", "da", "sv", "nb", "nn", "fi", "cs", "pl", "ro", "sl", "sk", "zh", "pt", "tr"];
@@ -28,14 +28,14 @@ const langHash = createHash("sha256")
   .update(LANGS.map((l) => (existsSync(`lang/${l}.json`) ? readFileSync(`lang/${l}.json`, "utf8").replace(/\r\n/g, "\n") : "")).join("\n"))
   .digest("hex")
   .slice(0, 12);
-const cardEditorConfig = { ...common, entryPoints: ["src/card-editor.ts"], outfile: `${out}/neonplan3d-card-editor.js`, define: { __FP3D_LANG_HASH__: JSON.stringify(langHash) } };
-const version = JSON.parse(readFileSync("../custom_components/neonplan3d/manifest.json", "utf8")).version;
+const cardEditorConfig = { ...common, entryPoints: ["src/card-editor.ts"], outfile: `${out}/homeplan3d-card-editor.js`, define: { __FP3D_LANG_HASH__: JSON.stringify(langHash) } };
+const version = JSON.parse(readFileSync("../custom_components/homeplan3d/manifest.json", "utf8")).version;
 // the editor is only needed by admins who open it, so it is a bundle of its own as well
 // (it draws furniture previews with the 3D bundle, so it knows that bundle's hash too; card templates use the card editor)
 const editorConfig = (viewerHash, locateHash, cardEditorHash, osmHash) => ({
   ...common,
   entryPoints: ["src/components/editor.ts"],
-  outfile: `${out}/neonplan3d-editor.js`,
+  outfile: `${out}/homeplan3d-editor.js`,
   define: {
     __FP3D_VIEWER_HASH__: JSON.stringify(viewerHash),
     __FP3D_LANG_HASH__: JSON.stringify(langHash),
@@ -47,15 +47,15 @@ const editorConfig = (viewerHash, locateHash, cardEditorHash, osmHash) => ({
   },
 });
 // the time travel (Pro) only loads when it starts; its texts come from the main bundle
-const timeTravelConfig = { ...common, entryPoints: ["src/timetravel/entry.ts"], outfile: `${out}/neonplan3d-timetravel.js` };
+const timeTravelConfig = { ...common, entryPoints: ["src/timetravel/entry.ts"], outfile: `${out}/homeplan3d-timetravel.js` };
 // the fun packs (pets …) only load when one is unlocked and switched on; three.js is lent by the 3D bundle
-const funConfig = { ...common, entryPoints: ["src/fun/entry.ts"], outfile: `${out}/neonplan3d-fun.js` };
+const funConfig = { ...common, entryPoints: ["src/fun/entry.ts"], outfile: `${out}/homeplan3d-fun.js` };
 // voice (the microphone probe for now) only loads when it is asked for
-const voiceConfig = { ...common, entryPoints: ["src/voice/entry.ts"], outfile: `${out}/neonplan3d-voice.js` };
+const voiceConfig = { ...common, entryPoints: ["src/voice/entry.ts"], outfile: `${out}/homeplan3d-voice.js` };
 // the locating setup assistant only loads when an admin opens it
-const locateConfig = { ...common, entryPoints: ["src/locate/entry.ts"], outfile: `${out}/neonplan3d-locate.js` };
+const locateConfig = { ...common, entryPoints: ["src/locate/entry.ts"], outfile: `${out}/homeplan3d-locate.js` };
 // fetching the neighbourhood from OpenStreetMap only loads when an admin fetches the map
-const osmConfig = { ...common, entryPoints: ["src/surround-fetch.ts"], outfile: `${out}/neonplan3d-osm.js` };
+const osmConfig = { ...common, entryPoints: ["src/surround-fetch.ts"], outfile: `${out}/homeplan3d-osm.js` };
 // the import page of the website (other programs' plans to NeonPlan, in the browser): not part of the integration
 const importConfig = { ...common, entryPoints: ["src/import/app.ts"], outfile: "../site/import/neonplan-import.js" };
 // The main bundle loads the 3D bundle with a hash of its content in the URL, so a new 3D bundle is
@@ -64,7 +64,7 @@ const importConfig = { ...common, entryPoints: ["src/import/app.ts"], outfile: "
 const mainConfig = (viewerHash, editorHash, cardEditorHash, timeTravelHash, funHash, voiceHash, locateHash) => ({
   ...common,
   entryPoints: ["src/main.ts"],
-  outfile: `${out}/neonplan3d.js`,
+  outfile: `${out}/homeplan3d.js`,
   define: {
     __FP3D_VIEWER_HASH__: JSON.stringify(viewerHash),
     __FP3D_EDITOR_HASH__: JSON.stringify(editorHash),
@@ -179,7 +179,7 @@ function copyFonts() {
 // 3D 926 KB on 2026-11-18: walls facing their own way (#1189), the sky's horizon beyond the map's far edge (#1203)
 // editor 1160 KB on 2026-11-19: the card form asks what a card is for (tablet / phone) and holds the phone bar's options and own places
 // 3D 928 KB on 2026-11-21: a finger or the mouse on a pin, a name or a glass card turns and zooms the house (#1248, #1271)
-const BUDGET = { "neonplan3d.js": 870 * 1024, "neonplan3d-fun.js": 40 * 1024, "neonplan3d-voice.js": 60 * 1024, "neonplan3d-locate.js": 160 * 1024, "neonplan3d-osm.js": 20 * 1024, "neonplan3d-timetravel.js": 120 * 1024, "neonplan3d-3d.js": 928 * 1024, "neonplan3d-editor.js": 1160 * 1024, "neonplan3d-card-editor.js": 340 * 1024 };
+const BUDGET = { "homeplan3d.js": 870 * 1024, "homeplan3d-fun.js": 40 * 1024, "homeplan3d-voice.js": 60 * 1024, "homeplan3d-locate.js": 160 * 1024, "homeplan3d-osm.js": 20 * 1024, "homeplan3d-timetravel.js": 120 * 1024, "homeplan3d-3d.js": 928 * 1024, "homeplan3d-editor.js": 1160 * 1024, "homeplan3d-card-editor.js": 340 * 1024 };
 
 copyFonts();
 if (watch) {

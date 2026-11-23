@@ -19,7 +19,7 @@ export type Gated = Feature | FreeFeature;
 
 /**
  * Pro add-ons (and free features) built but not released yet: they show nowhere (extensions page, teasers) unless they are
- * unlocked (the tester has the pack) or the lab switch is on (localStorage "neonplan3d.lab" = "1").
+ * unlocked (the tester has the pack) or the lab switch is on (localStorage "homeplan3d.lab" = "1").
  * A release takes a feature off this list.
  */
 export const UNRELEASED: readonly Gated[] = ["pool", "room_bar"];
@@ -28,9 +28,9 @@ export function labOn(): boolean {
   try {
     // "?fp3d_lab=1" in the address bar switches it on (and "=0" off) – easier than the browser console on a tablet
     const flag = new URLSearchParams(location.search).get("fp3d_lab");
-    if (flag === "1") localStorage.setItem("neonplan3d.lab", "1");
-    else if (flag === "0") localStorage.removeItem("neonplan3d.lab");
-    return localStorage.getItem("neonplan3d.lab") === "1";
+    if (flag === "1") localStorage.setItem("homeplan3d.lab", "1");
+    else if (flag === "0") localStorage.removeItem("homeplan3d.lab");
+    return localStorage.getItem("homeplan3d.lab") === "1";
   } catch {
     return false;
   }
@@ -40,9 +40,9 @@ export function labOn(): boolean {
 export function projectionOn(): boolean {
   try {
     const flag = new URLSearchParams(location.search).get("fp3d_projection");
-    if (flag === "1") localStorage.setItem("neonplan3d.projection", "1");
-    else if (flag === "0") localStorage.removeItem("neonplan3d.projection");
-    return localStorage.getItem("neonplan3d.projection") === "1";
+    if (flag === "1") localStorage.setItem("homeplan3d.projection", "1");
+    else if (flag === "0") localStorage.removeItem("homeplan3d.projection");
+    return localStorage.getItem("homeplan3d.projection") === "1";
   } catch {
     return false;
   }
@@ -73,7 +73,7 @@ export function knownFeature(key: string): boolean {
 }
 
 /** The shop page where the Pro pack is sold (German; see shopUrl for the user's language). */
-export const PRO_URL = "https://mastershort.de/neonplan3d/";
+export const PRO_URL = "https://mastershort.de/homeplan3d/";
 
 const isGerman = (lang: string | undefined) => (lang ?? navigator.language).toLowerCase().startsWith("de");
 
@@ -87,7 +87,7 @@ export function registerUrl(lang: string | undefined): string {
 }
 
 export function shopUrl(lang: string | undefined): string {
-  return isGerman(lang) ? "https://mastershort.de/neonplan3d/?lang=de" : "https://mastershort.de/en/neonplan3d/?lang=en";
+  return isGerman(lang) ? "https://mastershort.de/homeplan3d/?lang=de" : "https://mastershort.de/en/homeplan3d/?lang=en";
 }
 
 /** Where each Pro add-on is described in chapter 6 of the manual: German and English slug and anchor. */
@@ -107,7 +107,7 @@ const MANUAL_FEATURE: Record<string, { de: string; en: string }> = {
 /** The online manual in the user's language, optionally at a Pro add-on's section or the extensions chapter. */
 export function manualUrl(lang: string | undefined, topic?: Feature | "extensions"): string {
   const de = isGerman(lang);
-  const base = de ? "https://mastershort.de/neonplan3d/anleitung/" : "https://mastershort.de/en/neonplan3d/manual/";
+  const base = de ? "https://mastershort.de/homeplan3d/anleitung/" : "https://mastershort.de/en/homeplan3d/manual/";
   const target = topic ? MANUAL_FEATURE[topic] : undefined;
   const path = target ? (de ? target.de : target.en) : "";
   const [page, anchor] = path.split("#");

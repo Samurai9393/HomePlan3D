@@ -37,7 +37,7 @@ This manual describes every feature of the current version. What changed in whic
 
 ### With the Marketplace
 
-[![Open your Home Assistant instance and open the HomePlan 3D repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
+[![Open your Home Assistant instance and open the HomePlan 3D repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=homeplan3d&category=integration)
 
 Since Home Assistant 2026.11, HACS is built in as the **Marketplace**. The button opens HomePlan 3D straight in the Marketplace of your installation. HomePlan 3D is in the official list, no need to add it from a link. By hand:
 
@@ -45,17 +45,17 @@ Since Home Assistant 2026.11, HACS is built in as the **Marketplace**. The butto
 2. Search for **HomePlan 3D**, select **Install** and restart Home Assistant.
 3. **Settings → Devices & services → Add integration → HomePlan 3D**, or straight with this button:
 
-   [![Open your Home Assistant instance and start setting up HomePlan 3D.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=neonplan3d)
+   [![Open your Home Assistant instance and start setting up HomePlan 3D.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=homeplan3d)
 
 **HomePlan 3D** now appears in the sidebar. The dashboard card is available right away, no resource needed.
 
-**Home Assistant before 2026.11:** it works the same with **HACS**: open HACS, search for **HomePlan 3D**, download it and restart, or [open it straight in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=neonplan3d&category=integration).
+**Home Assistant before 2026.11:** it works the same with **HACS**: open HACS, search for **HomePlan 3D**, download it and restart, or [open it straight in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=homeplan3d&category=integration).
 
 If you installed HomePlan 3D with HACS before, also as a custom repository, there is nothing to do: when you update to Home Assistant 2026.11 the Marketplace takes it over, and updates keep coming as usual.
 
 ### By hand
 
-Copy the folder `custom_components/neonplan3d` from the repository into `config/custom_components/`, restart Home Assistant and add the integration as above.
+Copy the folder `custom_components/homeplan3d` from the repository into `config/custom_components/`, restart Home Assistant and add the integration as above.
 
 ### Updates
 
@@ -825,12 +825,12 @@ Commands ("turn on the light", "set the heating to 22 degrees") still go to Assi
    - in the browser, "Allow" on the first tap;
    - in **Fully Kiosk**: Settings → Web Content Settings → enable microphone access (Plus licence), plus Fully's microphone permission in Android.
 
-**Asking through Assist – without a microphone on the tablet.** Everything NeonPlan understands you can also say to Assist: a voice satellite (Home Assistant Voice, ESPHome), the Assist dialog or the app. Assist needs a sentence file for that: NeonPlan writes `custom_sentences/en/neonplan3d.yaml` and `…/de/…` into your configuration folder **only once you make a choice under Sentences for Assist** (since 1.24 – before, this happened on start). Say "Show the living room" or "What is open?" to Assist and the sentence goes to **every open NeonPlan view** – the wall tablet shows the room or the open windows, and Assist speaks the answer where you asked. The tablet itself stays quiet. Which sentences stand there you choose under **⚙ Settings → 🎙 Voice control → Sentences for Assist**: **Only distinct ones** ("show …", "go to …", "ask the house …", "NeonPlan, …", "good morning", "good night" – nobody says those to Home Assistant itself), **All questions** (adds "which windows are open", "where is …", "is the washer running" – careful, some of these Home Assistant answers itself otherwise) or **None** (default: no file; a file NeonPlan wrote is removed). A file you changed yourself is never overwritten or deleted by NeonPlan – the dialog tells you which language it left alone. Removing the integration takes NeonPlan's sentence files with it. "Ask the house which windows are open" reaches NeonPlan in every mode. Your own sentences go into a further file under `custom_sentences` for the intent `NeonPlanAsk`.
+**Asking through Assist – without a microphone on the tablet.** Everything NeonPlan understands you can also say to Assist: a voice satellite (Home Assistant Voice, ESPHome), the Assist dialog or the app. Assist needs a sentence file for that: NeonPlan writes `custom_sentences/en/homeplan3d.yaml` and `…/de/…` into your configuration folder **only once you make a choice under Sentences for Assist** (since 1.24 – before, this happened on start). Say "Show the living room" or "What is open?" to Assist and the sentence goes to **every open NeonPlan view** – the wall tablet shows the room or the open windows, and Assist speaks the answer where you asked. The tablet itself stays quiet. Which sentences stand there you choose under **⚙ Settings → 🎙 Voice control → Sentences for Assist**: **Only distinct ones** ("show …", "go to …", "ask the house …", "NeonPlan, …", "good morning", "good night" – nobody says those to Home Assistant itself), **All questions** (adds "which windows are open", "where is …", "is the washer running" – careful, some of these Home Assistant answers itself otherwise) or **None** (default: no file; a file NeonPlan wrote is removed). A file you changed yourself is never overwritten or deleted by NeonPlan – the dialog tells you which language it left alone. Removing the integration takes NeonPlan's sentence files with it. "Ask the house which windows are open" reaches NeonPlan in every mode. Your own sentences go into a further file under `custom_sentences` for the intent `NeonPlanAsk`.
 
-**The service `neonplan3d.ask`.** For automations and scripts: fields **Sentence** (`text`), **Screen** (`screen`, optional) and **Speak** (`speak`, off by default). The service returns the answer (`answer`, `answered`, `screen_open`), e.g. for a notification. With `speak: true` the view speaks the answer itself through its Assist pipeline's text-to-speech. Example – the night check on the wall tablet every evening at 10 pm:
+**The service `homeplan3d.ask`.** For automations and scripts: fields **Sentence** (`text`), **Screen** (`screen`, optional) and **Speak** (`speak`, off by default). The service returns the answer (`answer`, `answered`, `screen_open`), e.g. for a notification. With `speak: true` the view speaks the answer itself through its Assist pipeline's text-to-speech. Example – the night check on the wall tablet every evening at 10 pm:
 
 ```yaml
-action: neonplan3d.ask
+action: homeplan3d.ask
 data:
   text: "Good night"
   screen: "Hall"
@@ -963,10 +963,10 @@ Lights, open windows and active devices keep their signal colour in every style,
 
 **By voice.** "NeonPlan style homely", "House to synthwave", "Style winter evening" – the style applies at once on the screen you speak to. "Style back" (or "style normal") brings the set style back. Through Assist this works with the sentence starting "NeonPlan …" or "House …".
 
-**From automations.** The action **HomePlan 3D: Set style** (`neonplan3d.set_style`) switches the open NeonPlan screens:
+**From automations.** The action **HomePlan 3D: Set style** (`homeplan3d.set_style`) switches the open NeonPlan screens:
 
 ```yaml
-action: neonplan3d.set_style
+action: homeplan3d.set_style
 data:
   style: evening        # neon, blueprint, day, focus, synth, cozy, evening, winter, model, pastel, warm – or the name
   screens: [kitchen]    # optional: only these screen names; empty = all
@@ -990,7 +990,7 @@ NeonPlan is made for wall tablets and PCs. On a phone you want two things: see a
 **In the dashboard card:** with `phone: true` the card runs in the phone view – best together with `fill: true` on a dashboard view of its own:
 
 ```yaml
-type: custom:neonplan3d-card
+type: custom:homeplan3d-card
 phone: true
 fill: true
 ```
@@ -1046,7 +1046,7 @@ An **own place** is one of four things, each with a word (`name`) and a symbol (
 | `link` | opens a page of a dashboard | `path` |
 
 ```yaml
-type: custom:neonplan3d-card
+type: custom:homeplan3d-card
 phone: true
 fill: true
 phone_hide: [covers]        # a house without blinds
@@ -1063,9 +1063,9 @@ The bar holds at most five places. With more, two floors first share the place *
 
 | Address | Opens |
 | --- | --- |
-| `/neonplan3d?view=now` | the list "What's going on?" |
-| `/neonplan3d?room=Bath` | the room (name or id) |
-| `/neonplan3d?show=binary_sensor.window_bath` | flies to this device, window or door |
+| `/homeplan3d?view=now` | the list "What's going on?" |
+| `/homeplan3d?room=Bath` | the room (name or id) |
+| `/homeplan3d?show=binary_sensor.window_bath` | flies to this device, window or door |
 
 In an automation for the Companion app it looks like this – a tap on the message shows the window in the house:
 
@@ -1075,8 +1075,8 @@ data:
   title: Window open
   message: The bathroom window has been open for 30 minutes.
   data:
-    clickAction: /neonplan3d?show=binary_sensor.window_bath   # Android
-    url: /neonplan3d?show=binary_sensor.window_bath           # iPhone
+    clickAction: /homeplan3d?show=binary_sensor.window_bath   # Android
+    url: /homeplan3d?show=binary_sensor.window_bath           # iPhone
 ```
 
 ## 6. Pro add-ons
@@ -1257,7 +1257,7 @@ Car Pro lives on the **parking spot**, not on the vehicle furniture. If your car
 
 ![Time travel: the floor at 07:42 with the time bar](images/view-timetravel.jpg)
 
-> **For everyone in the shop:** since 1.17, time travel is sold on its own in the shop; the [Supporter Pass](https://mastershort.de/en/neonplan3d/supporters/) includes it. Thanks to all supporters who tested it in the beta.
+> **For everyone in the shop:** since 1.17, time travel is sold on its own in the shop; the [Supporter Pass](https://mastershort.de/en/homeplan3d/supporters/) includes it. Thanks to all supporters who tested it in the beta.
 
 Time travel replays the last 24 hours – or, if you like, the last 7 days – in the house, from the history Home Assistant records anyway (the recorder): lights with brightness and colour, doors and windows, blinds, motion, heating, TV and speakers, temperatures, power, weather and the sun's position. Everything stays in Home Assistant, and **nothing is switched** – time travel only shows.
 
@@ -1318,7 +1318,7 @@ Not included are camera pictures (the recorder keeps none) and people and their 
 
 ### 6.8 Household Pro
 
-> Household Pro is in the [shop](https://mastershort.de/en/neonplan3d/); it comes with the [Supporter Pass](https://mastershort.de/en/neonplan3d/supporters/). Thanks to everyone who tested it in the beta.
+> Household Pro is in the [shop](https://mastershort.de/en/homeplan3d/); it comes with the [Supporter Pass](https://mastershort.de/en/homeplan3d/supporters/). Thanks to everyone who tested it in the beta.
 
 Household Pro shows what is due in the household, right where it happens. The waste bins and mailboxes themselves are for everyone (chapter 4.23), and so are washers, dryers, dishwashers, fridges and plants – Household Pro needs no other pack; Household Pro brings them and other appliances to life. Its fields are in the item's form under **🏠 Household Pro**.
 
@@ -1338,7 +1338,7 @@ Household Pro shows what is due in the household, right where it happens. The wa
 
 ### 6.9 Digital picture frames
 
-> The **Digital Picture Frames** pack is sold in the [shop](https://mastershort.de/neonplan3d/?lang=en); the [Supporter Pass](https://mastershort.de/neonplan3d/unterstuetzer/?lang=en) includes it (since 3.0.5).
+> The **Digital Picture Frames** pack is sold in the [shop](https://mastershort.de/homeplan3d/?lang=en); the [Supporter Pass](https://mastershort.de/homeplan3d/unterstuetzer/?lang=en) includes it (since 3.0.5).
 
 Picture frames that live: portrait and landscape frames in three sizes, a square one, a poster frame, slim digital frames for the wall and the sideboard and a standing wooden frame. Every frame has a living face; the **digital frame of the Deco pack** joins in once the pack is installed. What the face shows is set in the furniture form under **🖼️ Picture frame → Shows**; **a tap on the frame in 3D opens the content large** in the middle of the view (closes on a tap beside it, on a tablet by itself after a minute).
 
@@ -1470,14 +1470,14 @@ Modules today:
 | Module | What it does | Price |
 |---|---|---|
 | **The house answers** | answers spoken questions – "What is open?", "What is the weather like?", "Good morning" … (5.10) | free |
-| **Announcements** (from NeonPlan 2.0.7) | Tap a room, **📢 Announcement**, tap "Dinner is ready!" – and the speaker in that room says it. Ready sentences (in ⚙ Settings → Announcements: ✕ takes one out, your own are added below, "Bring back the ready sentences" restores them), your own words, or spoken into the 🎙 microphone (needs HTTPS and a voice pipeline with speech-to-text, like the voice control). From the central menu to **all rooms**, to **one floor** or only **where someone is** (locating, presence and motion sensors). In the room's form (editor) every room has a **🌙 quiet time** (a kids' room from 8 pm until 7 am, for example): announcements to several rooms then leave it out, an announcement to this room alone still goes out. There are also **the room's own sentences**, shown first in that room. Words you typed lately come back as **↻** to send again. Which speaker talks: the one chosen in the room's form under **📢 Announcements through**, else a speaker placed in the room on the plan – only when none is placed there, one of the room's area (never a TV or an unreachable device on its own), else the default speaker from ⚙ Settings. An **outdoor area with a Home Assistant area** (a terrace, say) counts as a room since 2.0.11: its speaker gets announcements and its 📢 button. One speaker talks per room – with two in a room, choose which one in the room's form. Echos (Alexa Media Player, or since 2.0.11 Home Assistant's own **Alexa Devices** integration) and voice satellites like the Home Assistant Voice PE make a real announcement with a chime; other speakers talk through Home Assistant's text-to-speech (TTS), with chime_tts with a chime too; speakers that can announce (Sonos, for example) lower their music for it and play on after. The volume stays as it is. The speaker lights up in the plan for a moment, and in the 3D view **🔊** over it shows where it is talking. With **Also show 📢 right in the room** (⚙ Settings → Announcements) a 📢 button floats over every room's speaker in the floor's 3D view – a tap opens the sentences at once. **From automations** (from NeonPlan 2.0.9): the action **HomePlan 3D: Announcement** (`neonplan3d.announce`) says a message with the same settings – when the doorbell rings, say –, also with no NeonPlan page open; without a room to every room, with **Rooms** to those named, with **Floor** to one floor; several rooms leave out those in their quiet time. With **On NeonPlan screens** every open NeonPlan screen speaks the message itself – with a chime – and shows it big; with **Screens** only those with these screen names. So an old wall tablet becomes an announcement speaker too. This needs a voice pipeline with text-to-speech in Home Assistant; browsers play sound only after a first tap on the page – in Fully Kiosk switch on **Autoplay Audio** under Web Content Settings. A wall tablet with Fully Kiosk can be a speaker itself: choose the Fully Kiosk integration's media player in the room form under **📢 Announcements through** | 3.90 €, in the Supporter Pass |
+| **Announcements** (from NeonPlan 2.0.7) | Tap a room, **📢 Announcement**, tap "Dinner is ready!" – and the speaker in that room says it. Ready sentences (in ⚙ Settings → Announcements: ✕ takes one out, your own are added below, "Bring back the ready sentences" restores them), your own words, or spoken into the 🎙 microphone (needs HTTPS and a voice pipeline with speech-to-text, like the voice control). From the central menu to **all rooms**, to **one floor** or only **where someone is** (locating, presence and motion sensors). In the room's form (editor) every room has a **🌙 quiet time** (a kids' room from 8 pm until 7 am, for example): announcements to several rooms then leave it out, an announcement to this room alone still goes out. There are also **the room's own sentences**, shown first in that room. Words you typed lately come back as **↻** to send again. Which speaker talks: the one chosen in the room's form under **📢 Announcements through**, else a speaker placed in the room on the plan – only when none is placed there, one of the room's area (never a TV or an unreachable device on its own), else the default speaker from ⚙ Settings. An **outdoor area with a Home Assistant area** (a terrace, say) counts as a room since 2.0.11: its speaker gets announcements and its 📢 button. One speaker talks per room – with two in a room, choose which one in the room's form. Echos (Alexa Media Player, or since 2.0.11 Home Assistant's own **Alexa Devices** integration) and voice satellites like the Home Assistant Voice PE make a real announcement with a chime; other speakers talk through Home Assistant's text-to-speech (TTS), with chime_tts with a chime too; speakers that can announce (Sonos, for example) lower their music for it and play on after. The volume stays as it is. The speaker lights up in the plan for a moment, and in the 3D view **🔊** over it shows where it is talking. With **Also show 📢 right in the room** (⚙ Settings → Announcements) a 📢 button floats over every room's speaker in the floor's 3D view – a tap opens the sentences at once. **From automations** (from NeonPlan 2.0.9): the action **HomePlan 3D: Announcement** (`homeplan3d.announce`) says a message with the same settings – when the doorbell rings, say –, also with no NeonPlan page open; without a room to every room, with **Rooms** to those named, with **Floor** to one floor; several rooms leave out those in their quiet time. With **On NeonPlan screens** every open NeonPlan screen speaks the message itself – with a chime – and shows it big; with **Screens** only those with these screen names. So an old wall tablet becomes an announcement speaker too. This needs a voice pipeline with text-to-speech in Home Assistant; browsers play sound only after a first tap on the page – in Fully Kiosk switch on **Autoplay Audio** under Web Content Settings. A wall tablet with Fully Kiosk can be a speaker itself: choose the Fully Kiosk integration's media player in the room form under **📢 Announcements through** | 3.90 €, in the Supporter Pass |
 | **Window watch** | warns when a window has been open in the cold (below 12 °C outside) for more than 20 minutes or the heating runs with a window open (10 minutes): the room pulses, the warning bar names the window and the time; "Which windows have been open too long?" visits them. Quiet at night (from release 3): create a helper (toggle) `input_boolean.window_watch_quiet` in Home Assistant, and it does not warn while that is on – turned on by an automation at night or when the blinds are down | free |
 
 ## 8. The dashboard card
 
 ![The card in a dashboard](images/card-og-dim.jpg)
 
-The card `custom:neonplan3d-card` brings the 3D view into any dashboard. It loads automatically.
+The card `custom:homeplan3d-card` brings the 3D view into any dashboard. It loads automatically.
 
 **Adding it:** Edit the dashboard, **Add card**, search for "NeonPlan". Set every option in the card's visual editor:
 
@@ -1503,7 +1503,7 @@ On the right stands the **preview** on the chosen screen (a phone template on a 
 **On the tablet:** add a card, search for "NeonPlan" and pick the template under **Template** at the very top, done. The form below goes away. The YAML has two lines only:
 
 ```yaml
-type: custom:neonplan3d-card
+type: custom:homeplan3d-card
 template: kitchen_fire
 ```
 
@@ -1513,7 +1513,7 @@ template: kitchen_fire
 - **Where does the tablet hang?** The field at the top of the template sets the room for "here" ("Turn on the lights here"), whatever floor or start room the card shows.
 - **Renaming:** the id in the YAML follows the new name. Tablets still set up with the old id keep finding the template.
 - **Screen name:** the template's name is also the card's screen name (for announcements and "here" in voice control), as long as the template has none of its own.
-- **Reload:** **Reload screens with this template** and **Reload all screens** make the open tablets load their page again, e.g. after a NeonPlan update (new code only arrives that way). Automations have the action `neonplan3d.reload_screens` for it (without `templates`: every screen).
+- **Reload:** **Reload screens with this template** and **Reload all screens** make the open tablets load their page again, e.g. after a NeonPlan update (new code only arrives that way). Automations have the action `homeplan3d.reload_screens` for it (without `templates`: every screen).
 - **Deleted:** when the template is missing from the plan, the card shows a note and carries on with its own settings.
 
 ### 8.2 All options in YAML
@@ -1521,7 +1521,7 @@ template: kitchen_fire
 In YAML a card looks like this. Every line except the first is optional:
 
 ```yaml
-type: custom:neonplan3d-card
+type: custom:homeplan3d-card
 template: kitchen_fire  # a card template from the editor (then only it counts, not the other lines)
 plan: pab12cd34ef      # another floor plan (id under ⚙ → Floor plans; left out = the first); site = the property
 floor: floor_ab12cd34   # show one floor (id from the editor)

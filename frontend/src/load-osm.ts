@@ -8,7 +8,7 @@ declare const __FP3D_OSM_HASH__: string;
 let loading: Promise<typeof OsmBundle> | undefined;
 
 export function loadOsm(): Promise<typeof OsmBundle> {
-  const url = new URL(`./neonplan3d-osm.js?v=${__FP3D_OSM_HASH__}`, new URL(import.meta.url)).href;
+  const url = new URL(`./homeplan3d-osm.js?v=${__FP3D_OSM_HASH__}`, new URL(import.meta.url)).href;
   loading ??= (import(/* @vite-ignore */ url) as Promise<typeof OsmBundle>).catch((err) => {
     loading = undefined;
     throw err;

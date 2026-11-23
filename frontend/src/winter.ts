@@ -39,7 +39,7 @@ export function roofLightsOn(hass: HomeAssistant, b: Building, now = new Date())
 // ------------------------------------------------------------------ snow
 
 const SNOWING = new Set(["snowy", "snowy-rainy"]);
-const LAST_SNOW = "neonplan3d.winter_last_snow";
+const LAST_SNOW = "homeplan3d.winter_last_snow";
 
 /** The outside temperature in °C from a weather entity, null without one. */
 function outsideC(hass: HomeAssistant, id: string | null): number | null {

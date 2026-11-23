@@ -7,7 +7,7 @@
 export const PRINT_URL = "https://print.mastershort.de/";
 
 /** Set once a supporter has opened the extensions page: the "new" dot on its tab goes away. */
-const PRINT_SEEN = "neonplan3d.print_seen";
+const PRINT_SEEN = "homeplan3d.print_seen";
 
 /** The "new" dot on the extensions tab: supporters only, until they have opened the page once. */
 export function printDot(supporter: boolean, seen: boolean): boolean {

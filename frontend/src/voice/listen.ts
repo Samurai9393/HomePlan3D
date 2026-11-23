@@ -243,7 +243,7 @@ type Conversed = { response?: { speech?: { plain?: { speech?: string } } } };
 export async function converse(hass: HomeAssistant, text: string, area: string | null = null): Promise<string> {
   if (area) {
     try {
-      const res = await hass.callWS<Conversed>({ type: "neonplan3d/voice/converse", text: withoutHere(text, hass.language), area_id: area, language: hass.language });
+      const res = await hass.callWS<Conversed>({ type: "homeplan3d/voice/converse", text: withoutHere(text, hass.language), area_id: area, language: hass.language });
       return res.response?.speech?.plain?.speech ?? "";
     } catch {
       // an older NeonPlan on the server (or Assist off): the sentence goes to Assist as it was said

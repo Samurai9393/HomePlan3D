@@ -30,7 +30,7 @@ type HeatMode = NonNullable<CardConfig["heatmap"]>;
 
 function savedWalls(): WallMode | null {
   try {
-    const v = localStorage.getItem("neonplan3d.card_walls");
+    const v = localStorage.getItem("homeplan3d.card_walls");
     return v === "auto" || v === "cut" ? v : null;
   } catch {
     return null;
@@ -126,7 +126,7 @@ export class Floorplan3dCard extends LitElement {
     this._walking = false;
     this._phoneMode = "bar";
     // null: this device has not chosen – the card's own default counts (`phone_solo`)
-    const solo = localStorage.getItem("neonplan3d.phone_solo");
+    const solo = localStorage.getItem("homeplan3d.phone_solo");
     this._solo = solo === null ? null : solo === "1";
     this._floorId = undefined;
     this._walls = savedWalls();
@@ -295,18 +295,18 @@ clearTimeout(this.cleanTimer);
   /** Visual editor in the dashboard (no YAML needed). */
   static async getConfigElement(): Promise<HTMLElement> {
     await loadCardEditor();
-    return document.createElement("neonplan3d-card-editor");
+    return document.createElement("homeplan3d-card-editor");
   }
 
   static getStubConfig(): CardConfig {
-    return { type: "custom:neonplan3d-card" };
+    return { type: "custom:homeplan3d-card" };
   }
 
   /** A wall view picked on the card stays for the next visit on this device (#309). */
   private setWalls(mode: WallMode): void {
     this._walls = mode;
     try {
-      localStorage.setItem("neonplan3d.card_walls", mode);
+      localStorage.setItem("homeplan3d.card_walls", mode);
     } catch {
       // no storage: not remembered
     }
@@ -570,7 +570,7 @@ clearTimeout(this.cleanTimer);
               .template=${c?.template?.trim() || null}
               .viewKind=${this.preview ? "preview" : "card"}
               .voiceArea=${c?.voice_area?.trim() || roomArea}
-              @open-extensions=${() => this.openDashboard("/neonplan3d?tab=extensions")}
+              @open-extensions=${() => this.openDashboard("/homeplan3d?tab=extensions")}
               .scenes=${c?.scenes !== false}
               ?trail=${!!c?.motion_trail}
               .cameraWall=${this._cameraWall && !tt}
@@ -674,7 +674,7 @@ clearTimeout(this.cleanTimer);
               @phone-solo=${(e: CustomEvent<boolean>) => {
                 this._solo = e.detail;
                 try {
-                  localStorage.setItem("neonplan3d.phone_solo", this._solo ? "1" : "0");
+                  localStorage.setItem("homeplan3d.phone_solo", this._solo ? "1" : "0");
                 } catch {
                   // not remembered
                 }
@@ -908,12 +908,12 @@ clearTimeout(this.cleanTimer);
   ];
 }
 
-if (!customElements.get("neonplan3d-card")) {
-  customElements.define("neonplan3d-card", Floorplan3dCard);
+if (!customElements.get("homeplan3d-card")) {
+  customElements.define("homeplan3d-card", Floorplan3dCard);
   const w = window as Window & { customCards?: unknown[] };
   w.customCards = w.customCards ?? [];
   w.customCards.push({
-    type: "neonplan3d-card",
+    type: "homeplan3d-card",
     name: translate(undefined, "card_name"),
     description: translate(undefined, "card_description"),
     preview: false,

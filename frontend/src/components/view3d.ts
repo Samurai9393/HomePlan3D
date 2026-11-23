@@ -456,7 +456,7 @@ export class Fp3dView3d extends LitElement {
   declare zoomScope: string | null;
   /** How far the zoom style has come (0 = far look, 1 = near style): the near background's opacity, set directly. */
   private morph = 0;
-  /** A style set from outside for this device (the action `neonplan3d.set_style`, a voice command), until a time. */
+  /** A style set from outside for this device (the action `homeplan3d.set_style`, a voice command), until a time. */
   private declare _styleOverride: { style: string; until: number | null } | null;
   /** Date and time in a corner of the view (D631); null or "off": none. */
   declare clock: ClockPos | null;
@@ -836,7 +836,7 @@ export class Fp3dView3d extends LitElement {
     this._popup = null;
     this.popupValues = {};
     try {
-      this._thumbsCompact = localStorage.getItem("neonplan3d.thumbs_compact") === "1";
+      this._thumbsCompact = localStorage.getItem("homeplan3d.thumbs_compact") === "1";
     } catch {
       this._thumbsCompact = false;
     }
@@ -874,7 +874,7 @@ export class Fp3dView3d extends LitElement {
     this._micProbe = micProbeAsked();
     this._alerts = [];
     this._household = [];
-    this._hhFolded = readFlag("neonplan3d.hhFolded");
+    this._hhFolded = readFlag("homeplan3d.hhFolded");
     this._binInfo = null;
     this._gangMenu = null;
     this.householdCard = true;
@@ -888,8 +888,8 @@ export class Fp3dView3d extends LitElement {
     this._flyIn = null;
     this._spotHint = null;
     try {
-      this._flows = localStorage.getItem("neonplan3d.flows") === "1";
-      this._holoShow = localStorage.getItem("neonplan3d.holos") !== "0";
+      this._flows = localStorage.getItem("homeplan3d.flows") === "1";
+      this._holoShow = localStorage.getItem("homeplan3d.holos") !== "0";
     } catch {
       this._flows = false;
       this._holoShow = true;
@@ -917,7 +917,7 @@ export class Fp3dView3d extends LitElement {
     this.watchAsk();
   }
 
-  /** Listens to the sentences Assist and the service `neonplan3d.ask` hand to the views (once the connection is there). */
+  /** Listens to the sentences Assist and the service `homeplan3d.ask` hand to the views (once the connection is there). */
   private watchAsk(): void {
     const hass = this.hass;
     if (this.unsubAsk || !hass?.connection || !this.isConnected) return;
@@ -4101,7 +4101,7 @@ export class Fp3dView3d extends LitElement {
     const fold = () => {
       this._thumbsCompact = !compact;
       try {
-        localStorage.setItem("neonplan3d.thumbs_compact", this._thumbsCompact ? "1" : "0");
+        localStorage.setItem("homeplan3d.thumbs_compact", this._thumbsCompact ? "1" : "0");
       } catch {
         // private mode: the choice lasts for this page only
       }
@@ -4269,7 +4269,7 @@ export class Fp3dView3d extends LitElement {
     if (!this._household.length || !this.householdCard || !hasFeature("household") || this.panelOpen) return nothing;
     const fold = () => {
       this._hhFolded = !this._hhFolded;
-      writeFlag("neonplan3d.hhFolded", this._hhFolded);
+      writeFlag("homeplan3d.hhFolded", this._hhFolded);
     };
     return html`<div class="fp3d-hh ${this._hhFolded ? "fp3d-hh-folded" : ""}">
       <button class="fp3d-hh-head" aria-expanded=${!this._hhFolded} @click=${fold}>🏠 ${translate(this.hass, "hh_title")} <b>${this._household.length}</b></button>
@@ -5022,7 +5022,7 @@ export class Fp3dView3d extends LitElement {
       }
       // who and what is where: locating answers first (the same answer Assist gets) and flies there
       const located = await hass
-        .callWS<{ text: string; rooms: string[]; admins_only: boolean } | null>({ type: "neonplan3d/locate/ask", text, language: hass.language })
+        .callWS<{ text: string; rooms: string[]; admins_only: boolean } | null>({ type: "homeplan3d/locate/ask", text, language: hass.language })
         .catch(() => null);
       if (located) {
         say("done", `“${text}” – ${located.text}`);
@@ -5320,7 +5320,7 @@ export class Fp3dView3d extends LitElement {
         const next = structuredClone(cur);
         mutate(next);
         this.building = next;
-        saveBuilding(this.hass, next, this.planId ?? undefined).catch((err) => this.serviceFailed("neonplan3d/building/save", err));
+        saveBuilding(this.hass, next, this.planId ?? undefined).catch((err) => this.serviceFailed("homeplan3d/building/save", err));
       },
       callService: (domain, service, data) => (this.hass ? this.hass.callService(domain, service, data) : Promise.resolve()),
       newId: (prefix) => uid(prefix),
@@ -5777,7 +5777,7 @@ export class Fp3dView3d extends LitElement {
     const next = structuredClone(cur);
     Object.assign(next.settings, patch);
     this.building = next;
-    saveBuilding(this.hass, next, this.planId ?? undefined).catch((err) => this.serviceFailed("neonplan3d/building/save", err));
+    saveBuilding(this.hass, next, this.planId ?? undefined).catch((err) => this.serviceFailed("homeplan3d/building/save", err));
   }
 
   /**
@@ -6420,7 +6420,7 @@ export class Fp3dView3d extends LitElement {
     return id;
   }
 
-  /** The action `neonplan3d.set_style` for the open screens: this view when it is named, or when none is. */
+  /** The action `homeplan3d.set_style` for the open screens: this view when it is named, or when none is. */
   private onStyle(st: ScreenStyle): void {
     const mine = (this.screen ?? "").trim().toLowerCase();
     if (st.screens.length && !st.screens.some((x) => x.trim().toLowerCase() === mine)) return;
@@ -6473,7 +6473,7 @@ export class Fp3dView3d extends LitElement {
   private toggleHolos(): void {
     this._holoShow = !this._holoShow;
     try {
-      localStorage.setItem("neonplan3d.holos", this._holoShow ? "1" : "0");
+      localStorage.setItem("homeplan3d.holos", this._holoShow ? "1" : "0");
     } catch {
       // private mode: the choice lasts for this page only
     }
@@ -6491,7 +6491,7 @@ export class Fp3dView3d extends LitElement {
   private toggleFlows(): void {
     this._flows = !this._flows;
     try {
-      localStorage.setItem("neonplan3d.flows", this._flows ? "1" : "0");
+      localStorage.setItem("homeplan3d.flows", this._flows ? "1" : "0");
     } catch {
       // private mode: the choice lasts for this page only
     }
@@ -9283,9 +9283,9 @@ function markerHeight(f: Furniture): number {
 }
 
 /** Where a style set from outside (an action, a voice command) is kept on this device. */
-const STYLE_OVERRIDE_KEY = "neonplan3d.style_override";
+const STYLE_OVERRIDE_KEY = "homeplan3d.style_override";
 
-const MODULE_FULL_KEY = "neonplan3d.module_full";
+const MODULE_FULL_KEY = "homeplan3d.module_full";
 
 function readModuleFull(): string[] {
   try {

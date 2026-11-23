@@ -1,6 +1,6 @@
 # Project provenance
 
-## 2026-11-22 — Workspace is a one-time copy of upstream neonplan3d
+## 2026-11-22 — Workspace is a one-time copy of upstream homeplan3d
 - What: 706 files copied from `https://github.com/Mastershort/neonplan3d` at commit `1cc184f5f774805af88cbf0198bc19c37bc28f67`; no sync relationship.
 - Why: User requires a fully separate project; never push, open PRs, or otherwise change that GitHub repo.
 

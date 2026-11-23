@@ -276,7 +276,7 @@ const service = (domain, name, data) => R.page.evaluate((d, s, data) => window.f
 const cam = (floorId, x, z, c) =>
   R.page.evaluate(
     (floorId, x, z, c) => {
-      const v = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
+      const v = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
       const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);
       const fv = viewer.floorMap.get(floorId);
       const t = fv.group.position.clone().set(x, c.y ?? 0, z);
@@ -304,7 +304,7 @@ const glide = async (floorId, x, z, a, b, seconds) => {
 const point3d = (floorId, x, y, z) =>
   R.page.evaluate(
     (floorId, x, y, z) => {
-      const v = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
+      const v = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
       const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);
       const fv = viewer.floorMap.get(floorId);
       const p = fv.group.position.clone().set(x, y, z);
@@ -714,7 +714,7 @@ if (PART === "b") {
   const pane = (floorId, x, z, c) =>
     R.page.evaluate(
       (floorId, x, z, c) => {
-        const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+        const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
         const v = e.renderRoot.querySelector("fp3d-view3d");
         const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);
         const fv = viewer.floorMap.get(floorId);
@@ -732,7 +732,7 @@ if (PART === "b") {
     );
   const paneCentre = () =>
     R.page.evaluate(() => {
-      const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+      const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
       const r = e.renderRoot.querySelector("fp3d-view3d").getBoundingClientRect();
       return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     });

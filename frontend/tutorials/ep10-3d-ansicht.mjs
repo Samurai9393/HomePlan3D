@@ -82,7 +82,7 @@ const EYE_BACK = 'button[aria-label="Bedienelemente wieder einblenden"]';
 const STAR = 'button[aria-label="Zentral: alle Lichter, Rollläden und Favoriten"]';
 const FIND = 'button[aria-label="Suchen"]';
 /** The main 3D view's viewer object. */
-const VIEWER = `const v = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-view3d"); const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);`;
+const VIEWER = `const v = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-view3d"); const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);`;
 /** Set the main 3D view's camera around a plan point of a floor (or the house when floorId is null). */
 const cam = (floorId, x, z, c) =>
   R.page.evaluate(
@@ -555,7 +555,7 @@ if (PART === "b") {
   /** Range inputs of the room panel (brightness, colour temperature, position …) as screen boxes, top to bottom. */
   const panelSliders = () =>
     R.page.evaluate(() => {
-      const panel = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-room-panel");
+      const panel = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-room-panel");
       const root = panel.shadowRoot ?? panel.renderRoot;
       return [...root.querySelectorAll('input[type="range"]')]
         .map((el) => el.getBoundingClientRect())
@@ -576,7 +576,7 @@ if (PART === "b") {
       panel.hass = { ...hass, states: { ...hass.states } };
     });
   /** The editor's 3D pane: its centre, its camera, and setting its camera around a plan point. */
-  const PANE = `const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor"); const v = e.renderRoot.querySelector("fp3d-view3d"); const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);`;
+  const PANE = `const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor"); const v = e.renderRoot.querySelector("fp3d-view3d"); const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);`;
   const paneCentre = () =>
     R.page.evaluate((PANE) => new Function(`${PANE} const r = v.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 };`)(), PANE);
   const paneView = () => R.page.evaluate((PANE) => new Function(`${PANE} const w = viewer.controls.view; return { theta: w.theta, phi: w.phi, radius: w.radius };`)(), PANE);
@@ -957,7 +957,7 @@ if (PART === "b") {
   {
     const fav = () =>
       R.page.evaluate(() => {
-        const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+        const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
         const sm = [...e.renderRoot.querySelectorAll("summary")].find((x) => x.textContent.trim().startsWith("Favoriten"));
         if (!sm) return null;
         const r = sm.getBoundingClientRect();

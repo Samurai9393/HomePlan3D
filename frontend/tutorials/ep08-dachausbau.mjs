@@ -480,7 +480,7 @@ const start = async (floors = HOUSE) => {
 /** The main 3D view (3D tab): theta, phi, radius and, if given, the target; returns the view. */
 const setMain = (cam) =>
   R.page.evaluate((cam) => {
-    const v = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
+    const v = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-view3d");
     const viewer = Object.values(v).find((x) => x && x.floors && x.floorMap);
     const { target, ...rest } = cam;
     Object.assign(viewer.controls.view, rest);

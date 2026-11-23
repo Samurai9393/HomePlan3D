@@ -101,7 +101,7 @@ export class Floorplan3dCardEditor extends LitElement {
 
   constructor() {
     super();
-    this._config = { type: "custom:neonplan3d-card" };
+    this._config = { type: "custom:homeplan3d-card" };
     this._floors = [];
     this._templates = [];
     this._plans = [];
@@ -170,7 +170,7 @@ export class Floorplan3dCardEditor extends LitElement {
     const chosen = tpl?.id ?? id;
     // to NeonPlan's editor (a new tab: this dialog and its unsaved card stay), admins only
     const link = this.hass?.user?.is_admin
-      ? html`<a class="more" href=${`/neonplan3d?settings=cards${this.planOfCard !== MAIN_PLAN ? `&plan=${encodeURIComponent(this.planOfCard)}` : ""}${tpl ? `&template=${encodeURIComponent(tpl.id)}` : ""}`} target="_blank" rel="noopener"
+      ? html`<a class="more" href=${`/homeplan3d?settings=cards${this.planOfCard !== MAIN_PLAN ? `&plan=${encodeURIComponent(this.planOfCard)}` : ""}${tpl ? `&template=${encodeURIComponent(tpl.id)}` : ""}`} target="_blank" rel="noopener"
           >${this.t(tpl ? "card_template_open" : "card_template_make")} ↗</a
         >`
       : nothing;
@@ -1126,4 +1126,4 @@ export class Floorplan3dCardEditor extends LitElement {
   `;
 }
 
-if (!customElements.get("neonplan3d-card-editor")) customElements.define("neonplan3d-card-editor", Floorplan3dCardEditor);
+if (!customElements.get("homeplan3d-card-editor")) customElements.define("homeplan3d-card-editor", Floorplan3dCardEditor);

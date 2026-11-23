@@ -60,7 +60,7 @@ export function slowFrames(ms: readonly number[]): boolean {
 }
 
 /** Where "this device is slow" is remembered (per browser). */
-export const SLOW_KEY = "neonplan3d.slow_device";
+export const SLOW_KEY = "homeplan3d.slow_device";
 
 /** Tablet level: a change of measured values alone (power, temperature …) reaches the 3D view at most this often. */
 export const SENSOR_SYNC_MS = 2000;

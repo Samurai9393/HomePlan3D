@@ -2,7 +2,7 @@
 
     python tools/fp3dpack.py keygen KEYFILE
         Creates a new signing key (keep it secret, never commit it) and prints the public key line
-        for PACK_PUBLIC_KEYS in custom_components/neonplan3d/packs.py.
+        for PACK_PUBLIC_KEYS in custom_components/homeplan3d/packs.py.
 
     python tools/fp3dpack.py sign SOURCE.json --key KEYFILE [--licensee "Name"] [--out PACK.fp3dpack]
     python tools/fp3dpack.py canonical SOURCE.json [--out PACK.canonical.json]   (template for the shop)
@@ -29,7 +29,7 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 ROOT = Path(__file__).resolve().parent.parent
-_spec = importlib.util.spec_from_file_location("fp3d_packs", ROOT / "custom_components" / "neonplan3d" / "packs.py")
+_spec = importlib.util.spec_from_file_location("fp3d_packs", ROOT / "custom_components" / "homeplan3d" / "packs.py")
 assert _spec and _spec.loader
 packs = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(packs)

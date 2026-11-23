@@ -44,7 +44,7 @@ export function helpers(R) {
   const editorEval = (fn, ...args) =>
     R.page.evaluate(
       (src, ...args) => {
-        const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+        const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
         return new Function("e", "args", src)(e, args);
       },
       fn,
@@ -351,7 +351,7 @@ export async function traceHouse(R, { walls = true, openings = false } = {}) {
   await tap(R, { text: "Erdgeschoss", nth: 0 });
   await R.sleep(500);
   const png = "data:image/png;base64," + readFileSync(PLAN).toString("base64");
-  await R.page.evaluate((png) => window.fp3dPanel.hass.callWS({ type: "neonplan3d/image/set", image_id: "img_plan", data: png }), png);
+  await R.page.evaluate((png) => window.fp3dPanel.hass.callWS({ type: "homeplan3d/image/set", image_id: "img_plan", data: png }), png);
   await h.editorEval(
     `const [rooms, walls, openings, W, asp, u, v, a] = args;
      const H = W * asp, r = a * Math.PI / 180, L = [u * W - W / 2, v * H - H / 2];

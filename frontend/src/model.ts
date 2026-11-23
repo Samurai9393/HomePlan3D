@@ -1,4 +1,4 @@
-// Data model shared by editor, 3D view and backend (see custom_components/neonplan3d/schema.py).
+// Data model shared by editor, 3D view and backend (see custom_components/homeplan3d/schema.py).
 // Units are metres; x grows to the right, z grows downwards (as in the 2D editor).
 
 import type { CardConfig } from "./card-config.ts";

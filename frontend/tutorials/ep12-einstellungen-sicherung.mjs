@@ -87,9 +87,9 @@ const quiet = async (target, wait = 400) => {
 const EYE = 'button[aria-label="Bedienelemente ausblenden – nur die 3D-Ansicht bleibt"]';
 const STAR = 'button[aria-label="Zentral: alle Lichter, Rollläden und Favoriten"]';
 /** The main 3D view's viewer object. */
-const VIEWER = `const v = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-view3d"); const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);`;
+const VIEWER = `const v = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-view3d"); const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);`;
 /** The editor's 3D pane. */
-const PANE = `const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor"); const v = e.renderRoot.querySelector("fp3d-view3d"); const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);`;
+const PANE = `const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor"); const v = e.renderRoot.querySelector("fp3d-view3d"); const viewer = Object.values(v).find((o) => o && o.floors && o.floorMap);`;
 /** Set a camera (main view or the editor's pane) around a plan point of a floor (or keep the target: floorId null). */
 const camOf = (which, floorId, x, z, c) =>
   R.page.evaluate(
@@ -362,7 +362,7 @@ const toEditor = async (split = true) => {
 /** Open a side-panel section (a <summary>) if it is closed. */
 const openSection = async (name, seconds = 0.5, retry = false) => {
   const open = await R.page.evaluate((name) => {
-    const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+    const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
     const sm = [...e.renderRoot.querySelectorAll("summary")].find((x) => x.textContent.replace(/\s+/g, " ").trim().startsWith(name));
     return sm ? sm.parentElement.open : null;
   }, name);
@@ -382,7 +382,7 @@ const openSection = async (name, seconds = 0.5, retry = false) => {
 /** Close a side-panel section quietly. */
 const closeSection = (name) =>
   R.page.evaluate((name) => {
-    const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+    const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
     const sm = [...e.renderRoot.querySelectorAll("summary")].find((x) => x.textContent.replace(/\s+/g, " ").trim().startsWith(name));
     if (sm) sm.parentElement.open = false;
   }, name);
@@ -390,7 +390,7 @@ const closeSection = (name) =>
 const toSection = async (name, top = 150, seconds = 0.7) => {
   await R.move(1780, 640, 0.3);
   const y = await R.page.evaluate((name) => {
-    const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+    const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
     const sm = [...e.renderRoot.querySelectorAll("summary")].find((x) => x.textContent.replace(/\s+/g, " ").trim().startsWith(name));
     return sm ? sm.getBoundingClientRect().top : null;
   }, name);
@@ -603,7 +603,7 @@ if (PART === "a") {
     // the buttons of the newest favourite row
     const favBtn = (txt) =>
       R.page.evaluate((txt) => {
-        const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+        const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
         const sm = [...e.renderRoot.querySelectorAll("summary")].find((x) => x.textContent.trim().startsWith("Favoriten"));
         const rows = [...sm.parentElement.querySelectorAll(":scope > .fp3d-dev-row")];
         const el = [...rows[rows.length - 1].querySelectorAll("button")].find((b) => b.textContent.trim() === txt);
@@ -630,7 +630,7 @@ if (PART === "a") {
   {
     // the new button's form is the last one
     const lbl = await R.page.evaluate(() => {
-      const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+      const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
       const forms = [...e.renderRoot.querySelectorAll(".fp3d-own-button")].filter((f) => f.querySelector("select"));
       const f = forms[forms.length - 1];
       const r = f.querySelector('input[type="text"]').getBoundingClientRect();
@@ -670,7 +670,7 @@ if (PART === "a") {
   await R.key("Tab");
   {
     const icons = await R.page.evaluate(() => {
-      const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+      const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
       const forms = [...e.renderRoot.querySelectorAll(".fp3d-own-button")].filter((f) => f.querySelector("select"));
       const f = forms[forms.length - 1];
       const r = f.querySelector(".fp3d-icon-row input").getBoundingClientRect();
@@ -686,7 +686,7 @@ if (PART === "a") {
   {
     const btn = async (txt) => {
       const b = await R.page.evaluate((txt) => {
-        const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+        const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
         const forms = [...e.renderRoot.querySelectorAll(".fp3d-own-button")].filter((f) => f.querySelector("select"));
         const f = forms[forms.length - 1];
         const el = [...f.querySelectorAll("button")].find((x) => x.textContent.trim() === txt);
@@ -798,7 +798,7 @@ if (PART === "b") {
   /** The editor's notice line (restored, imported) as a screen point, or null. */
   const noticeBox = () =>
     R.page.evaluate(() => {
-      const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+      const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
       const n = e.renderRoot.querySelector(".fp3d-notice");
       if (!n) return null;
       const r = n.getBoundingClientRect();
@@ -814,19 +814,19 @@ if (PART === "b") {
       const p = window.fp3dPanel;
       const h = p.hass;
       const orig = h.callWS;
-      await orig({ type: "neonplan3d/license/remove" });
+      await orig({ type: "homeplan3d/license/remove" });
       h.callWS = async (m) => {
-        if (m.type === "neonplan3d/backup/export") {
-          const { building } = await orig({ type: "neonplan3d/building/get" });
-          return { format: "neonplan3d-backup", version: 1, building, packs: [{ id: "mastershort.living" }, { id: "mastershort.kitchen" }, { id: "demo.pack" }] };
+        if (m.type === "homeplan3d/backup/export") {
+          const { building } = await orig({ type: "homeplan3d/building/get" });
+          return { format: "homeplan3d-backup", version: 1, building, packs: [{ id: "mastershort.living" }, { id: "mastershort.kitchen" }, { id: "demo.pack" }] };
         }
-        if (m.type === "neonplan3d/backup/import") {
-          await orig({ type: "neonplan3d/history/snapshot" });
-          await orig({ type: "neonplan3d/building/save", building: m.building });
+        if (m.type === "homeplan3d/backup/import") {
+          await orig({ type: "homeplan3d/history/snapshot" });
+          await orig({ type: "homeplan3d/building/save", building: m.building });
           return { building: m.building, packs: 2, skipped: [{ id: "mastershort.living" }] };
         }
         const r = await orig(m);
-        if (m.type.startsWith("neonplan3d/license/") && r) return { ...r, offers: (r.offers ?? []).map((o) => ({ ...o, price: null })) };
+        if (m.type.startsWith("homeplan3d/license/") && r) return { ...r, offers: (r.offers ?? []).map((o) => ({ ...o, price: null })) };
         return r;
       };
     });
@@ -929,7 +929,7 @@ if (PART === "b") {
   await pointAt("Datei", 0.5, { tags: "H4" });
   await R.clickOn({ text: "Exportieren", exact: true }, 0.5);
   await R.sleep(500);
-  await downloadChip(basename(await downloaded("neonplan3d-sicherung")));
+  await downloadChip(basename(await downloaded("homeplan3d-sicherung")));
   await R.hold(1.0);
   await sayOver("Bilder sind nicht drin, das steht auch darunter. Für die Bilder gibt es gleich das Komplett-Backup.");
   await noChip();
@@ -938,7 +938,7 @@ if (PART === "b") {
   await sayOver("„Als Vorlage teilen“ lässt alles weg, was zu deinem Home Assistant gehört: Bereiche, Geräte, Sensoren und Bilder.");
   await R.clickOn({ text: "Als Vorlage teilen", exact: true }, 0.5);
   await R.sleep(500);
-  const template = await downloaded("neonplan3d-vorlage");
+  const template = await downloaded("homeplan3d-vorlage");
   await downloadChip(basename(template));
   await R.hold(0.8);
   await sayOver("Das ist die Datei für einen Freund, fürs Forum oder für einen Fehlerbericht – ohne deine Geräte.");
@@ -960,7 +960,7 @@ if (PART === "b") {
     const [chooser] = await Promise.all([
       R.page.waitForFileChooser(),
       R.page.evaluate(() => {
-        const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+        const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
         const label = [...e.renderRoot.querySelectorAll("label.fp3d-upload")].find((l) => l.textContent.trim().startsWith("Importieren"));
         label.querySelector("input").click();
       }),
@@ -971,7 +971,7 @@ if (PART === "b") {
   await sayOver("So sieht eine Vorlage aus: Räume, Wände, Türen und Möbel sind da – aber keine Geräte und keine Verknüpfungen.");
   {
     const c = await R.page.evaluate(() => {
-      const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+      const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
       const r = e.renderRoot.querySelector("svg").getBoundingClientRect();
       return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     });
@@ -1002,7 +1002,7 @@ if (PART === "b") {
   {
     // the newest point is the one taken right before the import; its time as the row shows it
     const time = await R.page.evaluate(() => {
-      const e = document.querySelector("neonplan3d-panel").shadowRoot.querySelector("fp3d-editor");
+      const e = document.querySelector("homeplan3d-panel").shadowRoot.querySelector("fp3d-editor");
       const row = [...e.renderRoot.querySelectorAll(".fp3d-dev-row")].find((r) => r.textContent.includes("Wiederherstellen"));
       return row ? row.querySelector("span").textContent.split("·")[0].trim() : "";
     });
@@ -1020,7 +1020,7 @@ if (PART === "b") {
   await openSection("Sicherung", 0.3);
   await pointAt("Komplett-Backup", 0.5, { tags: "H4" });
   await R.clickOn({ text: "Alles sichern (Plan, Bilder, Packs)", exact: true }, 0.5);
-  const full = await downloaded("neonplan3d-komplett");
+  const full = await downloaded("homeplan3d-komplett");
   await downloadChip(basename(full));
   await R.hold(0.8);
   await sayOver("Der Lizenzschlüssel ist bewusst nicht in der Datei.");

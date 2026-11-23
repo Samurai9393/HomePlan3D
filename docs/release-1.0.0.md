@@ -15,11 +15,11 @@ Draw your home right inside Home Assistant and control it in a neon 3D view. No 
 
 ### Optional extras
 
-Furniture packs and the Pro add-ons *Camera cockpit*, *Weather outside* and *Live screens* are available at [mastershort.de](https://mastershort.de/neonplan3d/) and install from the new **Extensions** tab with a licence key. Everything in this repository stays free and open source.
+Furniture packs and the Pro add-ons *Camera cockpit*, *Weather outside* and *Live screens* are available at [mastershort.de](https://mastershort.de/homeplan3d/) and install from the new **Extensions** tab with a licence key. Everything in this repository stays free and open source.
 
 ### Installation
 
-[![Open your Home Assistant instance and open the HomePlan 3D repository inside HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=neonplan3d&category=integration)
+[![Open your Home Assistant instance and open the HomePlan 3D repository inside HACS.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=homeplan3d&category=integration)
 
 HACS → Custom repositories → `https://github.com/Mastershort/neonplan3d` (Integration) → install → restart → add the integration *HomePlan 3D*.
 
