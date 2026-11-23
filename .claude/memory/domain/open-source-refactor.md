@@ -12,10 +12,14 @@
 - What: Removed the vendor telemetry endpoint and all network sending from `diagnostics_report.py`. Opt-in diagnostics now collect local aggregates and a local preview in `.storage`; the editor can clear them. `homeplan3d/diagnostics/get` no longer returns `endpoint`, and `delete` clears local data instead of calling a server.
 - Why: Remote telemetry to api.mastershort.de is a vendor URL and contradicts full de-commercialisation.
 
-## 2026-11-23 — Refactor branch
-- What: Code changes for this refactor live on `refactor/open-source-config`, created from `main`; the agent does not merge.
-- Why: Keeps `main` user-controlled, as with every code-changing prompt.
+## 2026-11-23 — Refactor branch and final commit
+- What: All refactor work is on `refactor/open-source-config` from `main`; final commit is `bacc759` (`refactor: finish open-source de-commercialisation`) on top of `8f2b6a5`. Working tree is clean; not merged or pushed.
+- Why: Keeps `main` user-controlled; the user merges at their own pace.
 
-## 2026-11-23 — Frontend test blocker (pre-existing)
-- What: `npm test` on Node 24.1.0 fails 6 suites with `ERR_IMPORT_ATTRIBUTE_MISSING` for `open-source-config.json` imported by untouched `frontend/src/features.ts`; `sun-path.test.ts` also fails a date assertion. `features.ts`, `features.test.ts` and `tsconfig.json` are off-limits for this prompt, so the agent leaves the blocker unchanged and reports it.
-- Why: Recorded so future runs do not mistake these failures for refactor regressions.
+## 2026-11-23 — Frontend import blocker resolved
+- What: `features.ts` now imports `open-source-config.json` with `with { type: "json" }`, `tsconfig.json` supports it, and `frontend/src/sun-path.test.ts` was adjusted. `npm test` passes 713/713.
+- Why: The earlier `ERR_IMPORT_ATTRIBUTE_MISSING` and sun-path date failure were a temporary state, not a lasting constraint.
+
+## 2026-11-23 — Verification baseline after refactor
+- What: Frontend typecheck, 713 tests and build budgets pass; Python ruff/format pass and pytest passes 159/159 with `ha_sockets_plugin`. `mypy` still reports 126 pre-existing errors in 8 files, down from 134; generated bundles are idempotent (33 files).
+- Why: Future runs need a baseline; do not chase the remaining mypy errors as refactor regressions.

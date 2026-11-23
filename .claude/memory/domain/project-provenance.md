@@ -8,6 +8,6 @@
 - What: `origin` is `https://github.com/Samurai9393/HomePlan3D-main.git`; do not push or change remotes without explicit instruction.
 - Why: Earlier note named `Neoplan3d2.git`; that was stale.
 
-## 2026-11-22 — Local git history is the import commit (verified 2026-11-22)
-- What: HEAD is `b63d2ca6333bc5a2d82ede288b3fa37bdb12bfcc` ("import prompt", 2026-11-22); local history is not upstream history.
-- Why: Earlier note claimed HEAD mismatched the working tree; that was stale. Verify code against working-tree config and scripts, not upstream history.
+## 2026-11-23 — Local git history started with the import commit
+- What: History began with `b63d2ca6333bc5a2d82ede288b3fa37bdb12bfcc` ("import prompt", 2026-11-22). Current branch `refactor/open-source-config` has the refactor commits `8f2b6a5` and `bacc759` on top; local history is not upstream history.
+- Why: An earlier note named `b63d2ca` as current HEAD; that is stale. Verify code against working-tree config and scripts, not upstream history.
