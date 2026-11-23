@@ -29,7 +29,7 @@ BUILDING = {
     ]
 }
 PACKS = [
-    {"id": "mastershort.pro_energy", "features": ["energy_pro"], "licensee": "Anna Example"},
+    {"id": "mastershort.pro_energy", "features": ["energy_pro"]},
     {"id": "mastershort.pro_time", "features": ["time_travel", "teleport"]},
     {"id": "studio.anna-sofa", "features": []},
 ]

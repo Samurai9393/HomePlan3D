@@ -2,9 +2,9 @@
 
 *Deutsch weiter unten.*
 
-Many people already ask ChatGPT, Claude or Gemini to turn their floor plan into HomePlan 3D. This works best with the template below: the AI writes the simple [import format](plan-format.md), and the **import page** (<https://neonplan3d.mastershort.de/import/>) checks it, places doors and windows on their walls, fixes small mistakes and gives you the NeonPlan file for **Editor → Backup → Import …**.
+Many people already ask ChatGPT, Claude or Gemini to turn their floor plan into HomePlan 3D. This works best with the template below: the AI writes the simple [import format](plan-format.md). Save the result as a JSON file and load it under **Editor → Backup → Import …**.
 
-Tip: for a Sweet Home 3D file, a CAD drawing, an iPhone scan or a 3D model you do not need an AI – drop the file on the import page directly.
+Tip: for a Sweet Home 3D file, a CAD drawing, an iPhone scan or a 3D model you do not need an AI – use the editor's own import options directly.
 
 ## Template (copy it into the chat, then attach your plan)
 
@@ -41,15 +41,15 @@ Rules:
 Here is my floor plan:
 ```
 
-Then save the AI's answer as a `.json` file and drop it on the import page. Check the preview: rooms, doors and windows should sit where they are in your plan. If something is off, tell the AI what to change ("the kitchen is 4.2 m wide, not 3.8") and try again.
+Then save the AI's answer as a `.json` file and load it under **Editor → Backup → Import …**. Check the plan: rooms, doors and windows should sit where they are in your floor plan. If something is off, tell the AI what to change ("the kitchen is 4.2 m wide, not 3.8") and try again.
 
 ---
 
 # Den Plan von einer KI schreiben lassen
 
-Viele lassen sich ihren Grundriss schon von ChatGPT, Claude oder Gemini für HomePlan 3D umbauen. Am besten klappt das mit der Vorlage unten: Die KI schreibt das einfache [Importformat](plan-format.md), und die **Import-Seite** (<https://neonplan3d.mastershort.de/import/>) prüft es, setzt Türen und Fenster auf ihre Wände, repariert kleine Fehler und gibt dir die NeonPlan-Datei für **Editor → Sicherung → Importieren …**.
+Viele lassen sich ihren Grundriss schon von ChatGPT, Claude oder Gemini für HomePlan 3D umbauen. Am besten klappt das mit der Vorlage unten: Die KI schreibt das einfache [Importformat](plan-format.md). Speichere das Ergebnis als JSON-Datei und lade sie unter **Editor → Sicherung → Importieren …**.
 
-Tipp: Für eine Sweet-Home-3D-Datei, eine CAD-Zeichnung, einen iPhone-Scan oder ein 3D-Modell brauchst du keine KI – die Datei einfach direkt auf die Import-Seite ziehen.
+Tipp: Für eine Sweet-Home-3D-Datei, eine CAD-Zeichnung, einen iPhone-Scan oder ein 3D-Modell brauchst du keine KI – nutze die Import-Optionen des Editors direkt.
 
 ## Vorlage (in den Chat kopieren, dann den Grundriss anhängen)
 
@@ -86,4 +86,4 @@ Regeln:
 Hier ist mein Grundriss:
 ```
 
-Die Antwort der KI als `.json`-Datei speichern und auf die Import-Seite ziehen. In der Vorschau prüfen: Räume, Türen und Fenster sollten so sitzen wie in deinem Plan. Passt etwas nicht, der KI sagen, was sie ändern soll („die Küche ist 4,2 m breit, nicht 3,8“), und noch einmal versuchen.
+Die Antwort der KI als `.json`-Datei speichern und unter **Editor → Sicherung → Importieren …** laden. Im Plan prüfen: Räume, Türen und Fenster sollten so sitzen wie in deinem Grundriss. Passt etwas nicht, der KI sagen, was sie ändern soll („die Küche ist 4,2 m breit, nicht 3,8“), und noch einmal versuchen.

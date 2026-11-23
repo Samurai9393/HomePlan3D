@@ -86,7 +86,7 @@ const FONTS = [
 ];
 function copyFonts() {
   mkdirSync(`${out}/fonts`, { recursive: true });
-  // pictures shown in the app (a preview of a coming Pro add-on)
+  // pictures shown in the app (the solar preview is now an ordinary free feature)
   mkdirSync(`${out}/images`, { recursive: true });
   copyFileSync("assets/solar-pro.jpg", `${out}/images/solar-pro.jpg`);
   // further languages, fetched by the bundles only when Home Assistant runs in them

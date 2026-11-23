@@ -4,7 +4,7 @@
 
 HomePlan 3D draws your home right inside Home Assistant and shows it as a 3D model in a neon look. Lights glow in their colours, blinds move, windows tilt, doors swing open, cameras look into the room and the TV shows what is playing. Everything runs locally in Home Assistant, without a cloud or external programs, and it is built for wall tablets.
 
-This manual describes every feature of the current version. What changed in which version is in the [changelog](../CHANGELOG.md) and on the [releases page](https://github.com/Mastershort/neonplan3d/releases). The pictures come from the demo with invented data. The app follows the language of your Home Assistant user (profile → language); the labels below are the English ones. German and English are built in; French, Spanish, Dutch, Italian, Hungarian, Danish, Swedish, Norwegian (Bokmål and Nynorsk), Finnish, Czech, Polish, Romanian, Slovenian, Slovak, Portuguese, Turkish and Chinese (Simplified) are fetched when needed, so the bundles stay small for wall tablets. A text missing in a language shows in English.
+This manual describes every feature of the current version. HomePlan 3D is fully MIT open source: every feature, including all Pro add-ons, is free and enabled by default in `custom_components/homeplan3d/open-source-config.json`. No account or licence key is needed. What changed in which version is in the [changelog](../CHANGELOG.md) and in the release archive under `docs/`. The pictures come from the demo with invented data. The app follows the language of your Home Assistant user (profile → language); the labels below are the English ones. German and English are built in; French, Spanish, Dutch, Italian, Hungarian, Danish, Swedish, Norwegian (Bokmål and Nynorsk), Finnish, Czech, Polish, Romanian, Slovenian, Slovak, Portuguese, Turkish and Chinese (Simplified) are fetched when needed, so the bundles stay small for wall tablets. A text missing in a language shows in English.
 
 ![The house in the 3D view](images/view-house.jpg)
 
@@ -18,7 +18,7 @@ This manual describes every feature of the current version. What changed in whic
 4. [The editor](#4-the-editor)
 5. [The 3D view](#5-the-3d-view)
 6. [Pro add-ons](#6-pro-add-ons)
-7. [Extensions, shop and furniture packs](#7-extensions-shop-and-furniture-packs)
+7. [Extensions, packs and modules](#7-extensions-packs-and-modules)
 8. [The dashboard card](#8-the-dashboard-card)
 9. [HomePlan 3D on a wall tablet](#9-neonplan-3d-on-a-wall-tablet)
 10. [Backup and moving](#10-backup-and-moving)
@@ -37,9 +37,7 @@ This manual describes every feature of the current version. What changed in whic
 
 ### With the Marketplace
 
-[![Open your Home Assistant instance and open the HomePlan 3D repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)](https://my.home-assistant.io/redirect/marketplace_repository/?owner=Mastershort&repository=homeplan3d&category=integration)
-
-Since Home Assistant 2026.11, HACS is built in as the **Marketplace**. The button opens HomePlan 3D straight in the Marketplace of your installation. HomePlan 3D is in the official list, no need to add it from a link. By hand:
+Since Home Assistant 2026.11, HACS is built in as the **Marketplace**. Open **Settings → Marketplace** and search for HomePlan 3D. By hand:
 
 1. Open **Settings → Marketplace**. The first time, accept the note about community content.
 2. Search for **HomePlan 3D**, select **Install** and restart Home Assistant.
@@ -85,7 +83,7 @@ There are three tabs at the top:
 |---|---|---|
 | **3D** | Look at the house and control it | everyone |
 | **Editor** | Draw the floor plan, place furniture and devices | administrators |
-| **✦ Extensions** | Shop connection, Pro add-ons, furniture packs | administrators |
+| **✦ Extensions** | Local packs, Pro add-ons, modules | administrators |
 
 The dashboard card brings the same 3D view into any dashboard. See [chapter 8](#8-the-dashboard-card).
 
@@ -203,7 +201,7 @@ Everything that belongs to the whole plan rather than to a floor, a room or an i
 | | **Favourites** | the central menu of the 3D view (below) |
 | **Screens** | **Card templates** | ready-made dashboard cards for wall tablets and phones, see [8.1](#81-card-templates) |
 | | **Live director** | see [6.1](#61-camera-cockpit) |
-| **Extensions** | **Modules** | the modules installed (code from the shop, e.g. "The house answers") and **Import a module …** for the .fp3dpack file |
+| **Extensions** | **Modules** | imported modules (e.g. "The house answers") and **Import a module …** for a local pack file |
 | | **Fun packs** | pets and the packs of the seasons |
 | | **Voice control** | see [5.10](#510-voice-control-new) |
 | | **Locating** | see [5.11](#511-locating-new) |
@@ -282,7 +280,7 @@ The **Furniture** tool opens the library: the 80 built-in models and everything 
 - **★ Favourites** and **🕘 Recently used** stand at the top as soon as there are any – the star on every card marks them, both stay in the browser.
 - The **search field** finds English and German names, the pack name and everyday words ("lamp" finds all lights, "cabinet" all cabinets), several words in any order ("corner sofa"); Escape clears it. While searching, every section is open.
 - Long sections show 24 cards first and **"Show … more"** below.
-- **🔒 From packs** (new in 3.4): after your own furniture come the items of packs you don't have yet, with a lock – the search finds them too. A tap shows the picture large with the pack, its price and **See in the shop**. It is only a picture; the item comes with the pack and is then placed like any other. NeonPlan loads the list from the shop at most once a day when you open the library; nothing about you is sent. The **🔒 From packs** chip hides them (remembered in this browser).
+- **🖼️ From packs** (new in 3.4): after your own furniture come the items supplied by packs; the search finds them too. A tap shows the large picture and the pack name. It is only a picture; the item is placed like any other. The **From packs** chip hides them (remembered in this browser).
 
 The **Worktop** (Kitchen) is a free top without a base, for gaps in the kitchen or a self-built desk; its **height** is the top edge, 91 cm by default. Under Sofas, next to the sofa, there are a **Corner sofa (L-shaped)** and a **U-shaped sofa**; **Mirror** puts the corner sofa's side section on the other side. On devices that show the cards without pictures, hovering shows the bigger 3D preview as before.
 
@@ -777,7 +775,7 @@ Talk to your house. A **microphone button** 🎙️ appears at the bottom left o
 | "Show the washing machine", "Where is the floor lamp?", "Show the TV", "Where is the dryer?" | The view flies to the device or piece of furniture and it flashes. Furniture answers to its kind ("dryer", "pool pump"), its own name and everyday words ("TV", "telly", "heating", "car") – with or without a linked entity. If the sensor is called "Washing machine power" in the plan, "washing machine" is enough. With several of a kind, name the room too ("the heating in the living room"). |
 | "Show the front door camera", "Show the camera in the garden" | The view looks through the camera (with the Camera Cockpit). |
 | "Show the cameras" | The camera wall opens (with the Camera Cockpit). |
-| "What is open?", "Where is it cold?", "Is the washing machine running?", "What is drawing power?", "Who is home?", "What is the weather like?", "Is everything OK?", "What is on today?", "Good morning", "Good night" … | With the module **The house answers** (free in the shop, see below): the answer shows as a speech bubble, is spoken through Assist's text-to-speech, and the house shows it – open windows flash, the coldest room opens, the view flies to the washing machine. The full list is below. |
+| "What is open?", "Where is it cold?", "Is the washing machine running?", "What is drawing power?", "Who is home?", "What is the weather like?", "Is everything OK?", "What is on today?", "Good morning", "Good night" … | With the module **The house answers** (included, see below): the answer shows as a speech bubble, is spoken through Assist's text-to-speech, and the house shows it – open windows flash, the coldest room opens, the view flies to the washing machine. The full list is below. |
 | "NeonPlan style homely", "House to synthwave", "Style back" | The screen changes its style, see [5.12](#512-styles-new-in-31). |
 | "Turn on the hall light", "Lower the blinds" | Commands go to Home Assistant's **Assist**. The answer shows as a speech bubble. |
 
@@ -810,7 +808,7 @@ NeonPlan knows the names from **your plan**: rooms, outdoor areas, floors, devic
 
 Commands ("turn on the light", "set the heating to 22 degrees") still go to Assist. The answers come in your user's language (German or English).
 
-**Modules.** Some abilities come as a **module** from the shop: a signed pack that carries code NeonPlan loads – checked and bound to your installation like a furniture pack. The first module is **The house answers** (free with a customer account). You import the .fp3dpack file under **⚙ Settings → 🧩 Modules → Import a module …** (or on the Extensions page in the **Modules** section); it is then listed there as "Module by Mastershort", and its sentences show under 🎙 Voice control. Speaking needs text-to-speech in the Assist pipeline (Settings → Voice assistants → Text-to-speech); without it the speech bubble stays.
+**Modules.** Some abilities come as a **module** in a local JSON pack that carries code. The first module is **The house answers** (included). Import the pack under **⚙ Settings → 🧩 Modules → Import a module …** (or on the Extensions page in the **Modules** section); its sentences then show under 🎙 Voice control. Module code runs only after an administrator has reviewed and approved it. Speaking needs text-to-speech in the Assist pipeline (Settings → Voice assistants → Text-to-speech); without it the speech bubble stays.
 
 **Switching it on.** Voice control is off by default. You switch it on where you want to speak:
 
@@ -823,7 +821,7 @@ Commands ("turn on the light", "set the heating to 22 degrees") still go to Assi
 2. **https:** browsers only give out the microphone on secure pages. It does not work over `http://192.168…`, but it does over Nabu Casa, your own certificate or a reverse proxy.
 3. **The microphone allowed:**
    - in the browser, "Allow" on the first tap;
-   - in **Fully Kiosk**: Settings → Web Content Settings → enable microphone access (Plus licence), plus Fully's microphone permission in Android.
+   - in **Fully Kiosk**: Settings → Web Content Settings → enable microphone access, plus Fully's microphone permission in Android.
 
 **Asking through Assist – without a microphone on the tablet.** Everything NeonPlan understands you can also say to Assist: a voice satellite (Home Assistant Voice, ESPHome), the Assist dialog or the app. Assist needs a sentence file for that: NeonPlan writes `custom_sentences/en/homeplan3d.yaml` and `…/de/…` into your configuration folder **only once you make a choice under Sentences for Assist** (since 1.24 – before, this happened on start). Say "Show the living room" or "What is open?" to Assist and the sentence goes to **every open NeonPlan view** – the wall tablet shows the room or the open windows, and Assist speaks the answer where you asked. The tablet itself stays quiet. Which sentences stand there you choose under **⚙ Settings → 🎙 Voice control → Sentences for Assist**: **Only distinct ones** ("show …", "go to …", "ask the house …", "NeonPlan, …", "good morning", "good night" – nobody says those to Home Assistant itself), **All questions** (adds "which windows are open", "where is …", "is the washer running" – careful, some of these Home Assistant answers itself otherwise) or **None** (default: no file; a file NeonPlan wrote is removed). A file you changed yourself is never overwritten or deleted by NeonPlan – the dialog tells you which language it left alone. Removing the integration takes NeonPlan's sentence files with it. "Ask the house which windows are open" reaches NeonPlan in every mode. Your own sentences go into a further file under `custom_sentences` for the intent `NeonPlanAsk`.
 
@@ -924,7 +922,7 @@ actions:
 
 **Getting the key (IRK) of an iPhone or Apple Watch:** the easiest way is the **NeonPlan key helper** – no Mac needed, the Apple Watch too:
 
-1. Plug an **ESP32** (ESP32, ESP32-C3 or ESP32-S3, about 5 €) into the computer and click **Install** on [neonplan3d.mastershort.de/keys](https://neonplan3d.mastershort.de/keys/) with Chrome or Edge. Then enter your Wi-Fi.
+1. Plug an **ESP32** (ESP32, ESP32-C3 or ESP32-S3, about 5 €) into the computer and flash it with a local Bluetooth-key helper in Chrome or Edge. Then enter your Wi-Fi.
 2. Home Assistant finds **NeonPlan Key** as an ESPHome device: **Settings → Devices & services → Discovered → Add**.
 3. In the assistant under **Devices → 🔑 Key helper** pick "For an Apple Watch" or "For an iPhone" and pair: on the watch tap "NeonPlan Key" under **Settings → Bluetooth → Health devices**, on the phone under **Settings → Bluetooth**. The key appears at once – tap **Add**. Afterwards remove "NeonPlan Key" from the Bluetooth settings again.
 4. **More devices:** tap **🔄 Next device** first – the helper gets a new Bluetooth identity, so the device paired before does not connect in between.
@@ -1081,9 +1079,7 @@ data:
 
 ## 6. Pro add-ons
 
-Pro add-ons are paid extra features, sold singly in the shop. Without an add-on, the switches show a 🔒 and a hint leads to the shop. How to install them is in [chapter 7](#7-extensions-shop-and-furniture-packs).
-
-![A locked Pro feature](images/view-pro-locked.jpg)
+Every Pro add-on in this chapter is part of the MIT repository and enabled by default in `custom_components/homeplan3d/open-source-config.json`. No account, licence key or separate installation is involved; the switches are ready to use.
 
 ### 6.1 Camera cockpit
 
@@ -1115,7 +1111,7 @@ Pro add-ons are paid extra features, sold singly in the shop. Without an add-on,
 
 Someone using the tablet is only interrupted by the doorbell and by warnings. If you touch the screen while the director shows something, the view stays where it is. Part of the camera cockpit.
 
-**People from cameras (release 2, since NeonPlan 3.5.0):** when a camera sees a person, a car or an animal, a figure stands on the plot – a person as a neon silhouette, a car and an animal as a symbol. With **Frigate** (the Frigate integration) right where it is, and the figure moves along: NeonPlan turns the foot point of Frigate's detection into a spot on the ground using the camera in the plan (place, height, turn, tilt, angle) – set these as exactly as you can. With other cameras (Reolink, UniFi Protect …) the figure stands in the camera's view while its person, vehicle or animal sensor reports. A tap on the figure opens the camera. Switch it off under **⚙ Settings** in the section **People from cameras**. The update comes over the shop connection; the module has to be approved once under **Extensions → Modules**.
+**People from cameras (release 2, since NeonPlan 3.5.0):** when a camera sees a person, a car or an animal, a figure stands on the plot – a person as a neon silhouette, a car and an animal as a symbol. With **Frigate** (the Frigate integration) right where it is, and the figure moves along: NeonPlan turns the foot point of Frigate's detection into a spot on the ground using the camera in the plan (place, height, turn, tilt, angle) – set these as exactly as you can. With other cameras (Reolink, UniFi Protect …) the figure stands in the camera's view while its person, vehicle or animal sensor reports. A tap on the figure opens the camera. Switch it off under **⚙ Settings** in the section **People from cameras**. It is included in this build; module code still needs one administrator approval under **Extensions → Modules**.
 
 ### 6.2 Weather outside
 
@@ -1159,7 +1155,7 @@ Without this add-on a TV only glows while it is on. With it:
 
 ### 6.4 Energy Pro
 
-Energy Pro turns the Energy tool into a living picture of your plant: power visibly flows through the house, the solar modules live with the sun, and a glass hologram shows the balance. Everything you set up for it is free and described in [4.20](#420-energy-solar-fields); Pro unlocks the display. Since 1.14.0 gas and water show on the house card with today's use (gas in m³, water in litres); heat follows as an update of the same pack.
+Energy Pro turns the Energy tool into a living picture of your plant: power visibly flows through the house, the solar modules live with the sun, and a glass hologram shows the balance. Everything you set up for it is included and described in [4.20](#420-energy-solar-fields); the Pro display is enabled by default. Since 1.14.0 gas and water show on the house card with today's use (gas in m³, water in litres); heat follows as an update of the same pack.
 
 **Set up in five minutes**
 
@@ -1257,7 +1253,7 @@ Car Pro lives on the **parking spot**, not on the vehicle furniture. If your car
 
 ![Time travel: the floor at 07:42 with the time bar](images/view-timetravel.jpg)
 
-> **For everyone in the shop:** since 1.17, time travel is sold on its own in the shop; the [Supporter Pass](https://mastershort.de/en/homeplan3d/supporters/) includes it. Thanks to all supporters who tested it in the beta.
+> Time travel is included and enabled by default. Thanks to everyone who tested it in the beta.
 
 Time travel replays the last 24 hours – or, if you like, the last 7 days – in the house, from the history Home Assistant records anyway (the recorder): lights with brightness and colour, doors and windows, blinds, motion, heating, TV and speakers, temperatures, power, weather and the sun's position. Everything stays in Home Assistant, and **nothing is switched** – time travel only shows.
 
@@ -1318,7 +1314,7 @@ Not included are camera pictures (the recorder keeps none) and people and their 
 
 ### 6.8 Household Pro
 
-> Household Pro is in the [shop](https://mastershort.de/en/homeplan3d/); it comes with the [Supporter Pass](https://mastershort.de/en/homeplan3d/supporters/). Thanks to everyone who tested it in the beta.
+> Household Pro is included and enabled by default. Thanks to everyone who tested it in the beta.
 
 Household Pro shows what is due in the household, right where it happens. The waste bins and mailboxes themselves are for everyone (chapter 4.23), and so are washers, dryers, dishwashers, fridges and plants – Household Pro needs no other pack; Household Pro brings them and other appliances to life. Its fields are in the item's form under **🏠 Household Pro**.
 
@@ -1338,7 +1334,7 @@ Household Pro shows what is due in the household, right where it happens. The wa
 
 ### 6.9 Digital picture frames
 
-> The **Digital Picture Frames** pack is sold in the [shop](https://mastershort.de/homeplan3d/?lang=en); the [Supporter Pass](https://mastershort.de/homeplan3d/unterstuetzer/?lang=en) includes it (since 3.0.5).
+> The **Digital Picture Frames** pack is included with this repository (since 3.0.5).
 
 Picture frames that live: portrait and landscape frames in three sizes, a square one, a poster frame, slim digital frames for the wall and the sideboard and a standing wooden frame. Every frame has a living face; the **digital frame of the Deco pack** joins in once the pack is installed. What the face shows is set in the furniture form under **🖼️ Picture frame → Shows**; **a tap on the frame in 3D opens the content large** in the middle of the view (closes on a tap beside it, on a tablet by itself after a minute).
 
@@ -1354,39 +1350,26 @@ Picture frames that live: portrait and landscape frames in three sizes, a square
 
 The faces follow the look: pale in the Day look, dark in Neon and Blueprint.
 
-## 7. Extensions, shop and furniture packs
+## 7. Extensions, packs and modules
 
 ![Extensions](images/extensions.jpg)
 
-The **✦ Extensions** tab gathers everything you can add to HomePlan 3D.
+The **✦ Extensions** tab gathers everything you can add to HomePlan 3D. All Pro add-ons are already included and enabled by default in `custom_components/homeplan3d/open-source-config.json`.
 
-### 7.1 Shop connection
+### 7.1 Local packs
 
-With your first purchase at mastershort.de you get a **licence key** in the form `NP-XXXX-XXXX-XXXX-XXXX`. It is in the order e-mail and in your customer account.
+Furniture and module packs are local JSON files. Import them under **Import furniture packs …** or **Import a module …**; several files can be selected at once. No account, licence key, signature or server connection is needed.
 
-1. Open **Extensions**.
-2. Enter the key under **Shop connection** and press **Activate**.
-3. Your purchases appear with **Install**. A tap fetches the pack from the shop, signed for exactly this installation.
-
-After that:
-
-- **Updates come by themselves.** Once a day HomePlan 3D asks whether there are new purchases or newer versions and installs them. **Check now** asks right away.
-- **Everything keeps working offline.** Installed packs are checked locally, the shop is never needed for that.
-- **Disconnect** removes the key. Installed packs stay.
-- **Pack updates:** When a bought pack grows, the page shows once what was added.
-- **New in the shop:** With a shop connection the page shows the packs and Pro add-ons you do not have yet at the top, with **NEW** for fresh ones. A badge on the **✦ Extensions** tab shows what is waiting: **"2 ready"** for bought or given packs that can be installed or updated, **"3 new"** for new offers in the shop (only once you have bought something; the offers are always here anyway). When a pack newly belongs to you (bought or a gift), Home Assistant also announces it once under **Notifications** (several packs at once in one notice); it is dismissed when the pack is installed. Without a key HomePlan 3D never contacts the shop.
-- **Loyalty discount:** With your first purchase you get a personal discount code for every further pack and Pro add-on (not for bundles). It is in the order e-mail, in your account and at the top under **New in the shop**; tapping an offer puts it straight into the cart.
-- **4 furniture packs as a gift:** With a shop connection, if you have not subscribed to the NeonPlan newsletter yet, a small box shows here. After signing up and confirming by mail, the taster packs living room, kitchen, bedroom and bathroom (4 items each) appear under Extensions by themselves – at the next daily check at the latest, at once with **Check now**. **Don't show again** hides the box on this device.
-
-**Several installations:** A key is connected to at most three installations at a time. If you move to new hardware, simply connect the new installation, the oldest one then drops out. Up to five new connections are possible per year. The **Installation id** at the top is an anonymous fingerprint of your installation.
+- Imported packs stay installed and work offline.
+- A newer version of a pack replaces the old one without losing anything in the plan.
+- If you remove a pack, its furniture stays in the plan as plain boxes; import it again to restore it.
+- Module code is never run until an administrator has reviewed and approved it. A new release waits for approval too.
 
 ### 7.2 Pro add-ons
 
-The middle row of tiles shows the Pro add-ons. Active ones carry a ✓, locked ones a 🔒 and the link "See in the shop" – with a shop connection with the price.
+The middle row of tiles shows the Pro add-ons. Every add-on is included and enabled by default; there are no locked entries.
 
-**Fits your home** (new in 3.4): add-ons that fit your Home Assistant come first with a small sign – Camera Cockpit with cameras ("📷 3"), Energy Pro with a solar or grid sensor, Sound & Cinema with media players, Car Pro with a wallbox or a parking spot, Weather Outside with a weather entity, Household Pro with waste collection sensors. Only your browser checks this; nothing is sent.
-
-**Without a licence key** the page shows at the top what a **free customer account** brings (the fun packs, the free modules and, with the newsletter, four taster packs), with a button to create one. You don't have to buy anything.
+**Fits your home** (new in 3.4): add-ons that fit your Home Assistant come first with a small sign – Camera Cockpit with cameras ("📷 3"), Energy Pro with a solar or grid sensor, Sound & Cinema with media players, Car Pro with a wallbox or a parking spot, Weather Outside with a weather entity, Household Pro with waste collection sensors. Only your browser checks this; nothing is sent. Pool Pro and the room bar are included as well.
 
 ### 7.3 Furniture packs
 
@@ -1408,20 +1391,20 @@ The middle row of tiles shows the Pro add-ons. Active ones carry a ✓, locked o
 
 Devices in packs have a small glowing part (display, status LED): linked to a media player, a switch or a light it lights up while the device runs; an aquarium glows in its light's colour.
 
-At the bottom of the page a **bar** sums up your installed packs (furniture packs with their number of items, and add-ons); **Show the list** opens the list with **Remove**. The shop connection sums up your purchases the same way – installed, updates, not installed yet – with **Install/update all**. Below is **Import furniture packs …** for pack files: free sampler packs from the newsletter, downloads from the website or installations without internet. You can pick several files at once. The **Modules** section below lists the installed modules (code from the shop, see 5.10) with **Import a module …** and **Remove**.
+At the bottom of the page a **bar** sums up your installed packs (furniture packs with their number of items, and add-ons); **Show the list** opens the list with **Remove**. Below is **Import furniture packs …** for local JSON pack files. You can pick several files at once. The **Modules** section below lists imported modules (see 5.10) with **Import a module …** and **Remove**.
 
 **Good to know:**
 
-- Packs are digitally signed. Only packs from the publisher can be imported, changed files are refused.
+- Local JSON packs can be imported and used unsigned.
 - If you remove a pack, its furniture stays in the plan as plain boxes. Import it again and it is back, with all its links.
 - A newer version of a pack replaces the old one without losing anything in the plan.
 
 ### 7.4 Fun packs
 
-**Fun packs** are free extras just for fun – for everyone with a customer account at mastershort.de. No purchase is needed:
+**Fun packs** are included extras just for fun. They are enabled by default and need no account or key:
 
-- **With a shop connection** they are already in your account. Under **Extensions** they are among your packs with **Install**; Home Assistant also announces new fun packs once under Notifications.
-- **Without an account** you create one for free: **🎁 Create a free customer account** in the editor under **⚙ Settings → 🎈 Fun packs** (or in the notice in the 3D view), confirm your e-mail, paste the licence key from the mail under **Shop connection**. Then the fun packs show up under **Extensions** to install – and from then on new packs too, right in the app.
+- Under **Extensions** they are among your packs; Home Assistant may announce a new fun pack once under Notifications.
+- You switch them on and off in the editor under **⚙ Settings → 🎈 Fun packs** (or from the notice in the 3D view).
 
 The fun packs are set in the editor under **⚙ Settings → 🎈 Fun packs** (new; they used to be under Extensions). There you switch them on and off and set up the pets, for instance; under Extensions a button **Open the fun pack settings** leads straight there.
 
@@ -1448,30 +1431,22 @@ All of it runs on old wall tablets too: the fairy lights and the snow cost next 
 
 ### 7.5 Modules
 
-A **module** is a pack that carries code: NeonPlan loads it and runs it in the house – checked, signed and bound to your installation like a furniture pack. Modules come only from the shop (with a customer account, many of them free); their code is not in the public repository.
+A **module** is a local pack that carries code: NeonPlan loads it and can run it in the house. Modules are imported as JSON packs; no signature or account is needed. Their code runs only after an administrator has reviewed and approved it.
 
 **How a module works – step by step:**
 
-1. **Get it:** put the module into the shop's basket (free ones too), order, done. It then lies in your customer account like every pack.
-2. **Install it:** with NeonPlan connected to the shop (7.1) it stands under Extensions → **Install/update all** – one tap. Without the connection download the `.fp3dpack` file from the account and import it: **⚙ Settings → 🧩 Modules → Import a module …** or here in the **Modules** section.
-3. **Approve it (since 1.24):** a module runs only once an administrator has seen and approved its code. The **Modules** section then says "waits for your approval" – **View code & approve** shows the publisher, version, size, fingerprint and the whole code; **Approve** starts exactly this code, without a restart.
-4. **See it:** the module stands in both lists as "Module by Mastershort · v2". What it does is in its shop description; the sentences of a voice module show at once under **🎙 Voice control → What NeonPlan understands**, a module's warnings in the warning bar, its cards over the house.
-5. **Updates:** a new release is fetched by the daily shop check by itself; without the connection import the new file. **New code never runs by itself:** the update waits beside the running release ("Update to v4 waits for your approval") until you confirm it with **View update & approve**. Until then the old release keeps running. Since 2.0.6 the shop list shows such a waiting update with the **View update & approve** button too, instead of offering it for updating again. Furniture and feature packs without code update as before.
+1. **Get it:** obtain the local `.json` module pack.
+2. **Install it:** import it under **⚙ Settings → 🧩 Modules → Import a module …** or in the **Modules** section on the Extensions page.
+3. **Approve it:** a module runs only once an administrator has seen and approved its code. **View code & approve** shows the publisher, version, size, fingerprint and the whole code; **Approve** starts exactly this code, without a restart.
+4. **See it:** the module appears in both lists with its name and version. Voice-module sentences show under **🎙 Voice control → What NeonPlan understands**, warnings in the warning bar, its cards over the house.
+5. **Updates:** import the new pack file. **New code never runs by itself:** the update waits beside the running release ("Update to v4 waits for your approval") until you confirm it with **View update & approve**. Until then the old release keeps running.
 6. **Remove:** **Remove** in the list, like a pack. Your plan stays untouched.
 
-Security: a module runs only with a valid signature and on the installation it was bought for. You can read the code in the file (it is not obfuscated) but not pass it on – the Elastic License 2.0 applies.
+Security: module code is never executed before administrator approval, and the whole project is MIT licensed. You can read the code in the file.
 
-**Why modules?** The Pro add-ons move over to this form one by one (on the extensions page they already stand under Modules, "becomes a module"). Nothing changes in how you use them. A lot changes in how they are built: each extension gets its updates through the shop without waiting for the next NeonPlan release; several extensions can be built and tested at once, each with its own supporter beta; and the core stays small and fast – a wall tablet only loads what it uses.
+**Why modules?** Modules keep the core small and fast – a wall tablet only loads what it uses. Every module is loaded locally and stays under your control.
 
-> **The house answers** is free for everyone with a customer account: pick it up in the shop, then **Install all** or import the file (step 2). Then open **⚙ Settings → 🎙 Voice control**: under "What NeonPlan understands" every question is listed. Try "What is open?", "Good morning", "Good night", "What is the weather like?" – at the microphone or in the Assist dialog. Speaking needs text-to-speech in the Assist pipeline (Settings → Voice assistants → Text-to-speech).
-
-Modules today:
-
-| Module | What it does | Price |
-|---|---|---|
-| **The house answers** | answers spoken questions – "What is open?", "What is the weather like?", "Good morning" … (5.10) | free |
-| **Announcements** (from NeonPlan 2.0.7) | Tap a room, **📢 Announcement**, tap "Dinner is ready!" – and the speaker in that room says it. Ready sentences (in ⚙ Settings → Announcements: ✕ takes one out, your own are added below, "Bring back the ready sentences" restores them), your own words, or spoken into the 🎙 microphone (needs HTTPS and a voice pipeline with speech-to-text, like the voice control). From the central menu to **all rooms**, to **one floor** or only **where someone is** (locating, presence and motion sensors). In the room's form (editor) every room has a **🌙 quiet time** (a kids' room from 8 pm until 7 am, for example): announcements to several rooms then leave it out, an announcement to this room alone still goes out. There are also **the room's own sentences**, shown first in that room. Words you typed lately come back as **↻** to send again. Which speaker talks: the one chosen in the room's form under **📢 Announcements through**, else a speaker placed in the room on the plan – only when none is placed there, one of the room's area (never a TV or an unreachable device on its own), else the default speaker from ⚙ Settings. An **outdoor area with a Home Assistant area** (a terrace, say) counts as a room since 2.0.11: its speaker gets announcements and its 📢 button. One speaker talks per room – with two in a room, choose which one in the room's form. Echos (Alexa Media Player, or since 2.0.11 Home Assistant's own **Alexa Devices** integration) and voice satellites like the Home Assistant Voice PE make a real announcement with a chime; other speakers talk through Home Assistant's text-to-speech (TTS), with chime_tts with a chime too; speakers that can announce (Sonos, for example) lower their music for it and play on after. The volume stays as it is. The speaker lights up in the plan for a moment, and in the 3D view **🔊** over it shows where it is talking. With **Also show 📢 right in the room** (⚙ Settings → Announcements) a 📢 button floats over every room's speaker in the floor's 3D view – a tap opens the sentences at once. **From automations** (from NeonPlan 2.0.9): the action **HomePlan 3D: Announcement** (`homeplan3d.announce`) says a message with the same settings – when the doorbell rings, say –, also with no NeonPlan page open; without a room to every room, with **Rooms** to those named, with **Floor** to one floor; several rooms leave out those in their quiet time. With **On NeonPlan screens** every open NeonPlan screen speaks the message itself – with a chime – and shows it big; with **Screens** only those with these screen names. So an old wall tablet becomes an announcement speaker too. This needs a voice pipeline with text-to-speech in Home Assistant; browsers play sound only after a first tap on the page – in Fully Kiosk switch on **Autoplay Audio** under Web Content Settings. A wall tablet with Fully Kiosk can be a speaker itself: choose the Fully Kiosk integration's media player in the room form under **📢 Announcements through** | 3.90 €, in the Supporter Pass |
-| **Window watch** | warns when a window has been open in the cold (below 12 °C outside) for more than 20 minutes or the heating runs with a window open (10 minutes): the room pulses, the warning bar names the window and the time; "Which windows have been open too long?" visits them. Quiet at night (from release 3): create a helper (toggle) `input_boolean.window_watch_quiet` in Home Assistant, and it does not warn while that is on – turned on by an automation at night or when the blinds are down | free |
+> **The house answers** is included. Open **⚙ Settings → 🎙 Voice control**: under "What NeonPlan understands" every question is listed. Try "What is open?", "Good morning", "Good night", "What is the weather like?" – at the microphone or in the Assist dialog. Speaking needs text-to-speech in the Assist pipeline (Settings → Voice assistants → Text-to-speech).
 
 ## 8. The dashboard card
 
@@ -1628,33 +1603,33 @@ Under **Backup** in the editor:
 - **Restore points** are kept at most every 10 minutes while you edit, the last 20 stay – with several floor plans, each its own. **Restore** brings back a state, the current one is kept as a restore point itself.
 - **Export** saves the plan as a file, **Import …** loads such a file.
 - **Share as template** exports without areas, devices, sensors and pictures. Good for passing a floor plan on.
-- **🖨 Print in 3D** (since 2.2, for Supporter-Pass holders): downloads the plan like **Export** and opens [NeonPlan Print](https://print.mastershort.de/) – upload the file there and get your house as 3D-print files: floors you lift off, the roof as a lid, a base plate with your name. Unlock it with your supporter code (under **Extensions**, where **Open NeonPlan Print** copies it for you). Free during the beta until 30 November 2026, for private, non-commercial use with your own homes. A small "New" dot on **Extensions** points supporters to it once.
-- **Full backup:** **Back up everything (plan, pictures, packs)** saves one file with every floor plan, every background and screen picture and the installed packs. **Restore a full backup …** brings it back into the same or another installation. Every pack is checked again. Packs signed for another installation are fetched there again through the shop connection. The licence key is not in the file.
+- **🖨 Print in 3D** (since 2.2): downloads the plan like **Export** for a local 3D-print workflow: floors you lift off, the roof as a lid, a base plate with your name. Included for everyone, for private, non-commercial use with your own homes.
+- **Full backup:** **Back up everything (plan, pictures, packs)** saves one file with every floor plan, every background and screen picture and the installed packs. **Restore a full backup …** brings it back into the same or another installation. Local JSON packs are imported again from the backup.
 - **Two devices, one plan** (since 3.1.1): every save knows which state of the plan it was made on. If another device saved meanwhile – the PC, say, while the phone slept in the background overnight – NeonPlan does not write the old state over it: you see the newer plan, and your change waits at the top with **Restore and save** or **Discard**. An app coming back from the background loads the plan again.
 
 Home Assistant's own backup includes HomePlan 3D completely as well.
 
-**From other programs:** the **import page** (<https://neonplan3d.mastershort.de/import/>, also under **Backup → To the import page**) turns plans of other programs into a NeonPlan file: Sweet Home 3D (`.sh3d`), iPhone/iPad LiDAR scans (RoomPlan JSON), CAD drawings (`.dxf`), 3D models from Blender, SketchUp & co. (`.glb`, `.gltf`, `.obj`, `.stl`), Floorplanner and Valetudo robot vacuum maps. It shows a preview with rooms, doors, windows and furniture, lets you rename rooms and, depending on the format, set the unit, the layers or the floor levels; the file stays on your computer. Load the downloaded file here with **Import …**. If you would rather let an AI write the plan, the template is in [docs/ai-import.md](https://github.com/Mastershort/neonplan3d/blob/main/docs/ai-import.md); the import page checks and repairs the result.
+**From other programs:** the editor's import turns plans of other programs into a NeonPlan file: Sweet Home 3D (`.sh3d`), iPhone/iPad LiDAR scans (RoomPlan JSON), CAD drawings (`.dxf`), 3D models from Blender, SketchUp & co. (`.glb`, `.gltf`, `.obj`, `.stl`), Floorplanner and Valetudo robot vacuum maps. It shows a preview with rooms, doors, windows and furniture, lets you rename rooms and, depending on the format, set the unit, the layers or the floor levels; the file stays on your computer. Load the file here with **Import …**. If you would rather let an AI write the plan, the template is in [docs/ai-import.md](ai-import.md).
 
 ---
 
 ## 11. Data and privacy
 
 - The plan, pictures and packs are stored in Home Assistant under `.storage`. None of it leaves your installation.
-- HomePlan 3D only connects to the internet if you enter a licence key. Then it asks mastershort.de once a day for updates and sends the key and the anonymous installation id.
+- HomePlan 3D has no licence or update service to contact. No key, account or installation id is sent anywhere.
 - Camera pictures, history and states stay in Home Assistant and are only shown in the browser.
 - Time travel reads the history from Home Assistant's recorder, only for the devices of the plan. It never reads people or their trackers.
 - **Locating** evaluates the Bluetooth signals only in Home Assistant. Nothing about who is where leaves your house.
-- **Help make NeonPlan better (voluntary, off by default):** under **⚙ Settings → 🛟 Help improve** you can switch on anonymous usage and error reports. An admin who has not switched them on sees one invitation in the editor; **Have a look** opens the setting, **Not now** hides it for good on that device. Then at most one report a day (and at most one batch of error messages an hour) goes to api.mastershort.de.
+- **Help make NeonPlan better (voluntary, off by default):** under **⚙ Settings → 🛟 Help improve** you can switch on anonymous usage and error reports. An admin who has not switched them on sees one invitation in the editor; **Have a look** opens the setting, **Not now** hides it for good on that device. Reports are sent only after this opt-in.
   - **Sent:** a random id (not Home Assistant's, made when you switch it on), the versions of NeonPlan, Home Assistant and Python, the language, the installed packs and Pro add-ons, counts from the plan (floors, rooms, furniture, linked devices, cameras), device type, browser and system of the screens with frame rate and graphics class, how often each view was opened, and NeonPlan's error messages without names and addresses.
-  - **Never sent:** names, entities, areas, the shape of your floor plan, IP addresses, your Home Assistant installation's id, user names, your licence key – and nothing from locating.
+  - **Never sent:** names, entities, areas, the shape of your floor plan, IP addresses, your Home Assistant installation's id, user names, account details – and nothing from locating.
   - **"View report"** shows exactly the next report before it is sent. **"Delete data"** removes everything already sent. Switching off forgets the id.
 
 ---
 
 ## 12. FAQ and troubleshooting
 
-**Help and feedback:** report a bug as an [issue on GitHub](https://github.com/Mastershort/neonplan3d/issues/new/choose) and an idea as a [discussion](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas). Nothing gets lost, everyone sees the state, and you are credited in the release notes once it is built. The two buttons for it are also at the bottom of the editor's sidebar and on the Extensions page.
+**Help and feedback:** report a bug as an issue and an idea as a discussion in this repository. Nothing gets lost, everyone sees the state, and you are credited in the release notes once it is built. The two buttons for it are also at the bottom of the editor's sidebar and on the Extensions page.
 
 **How do I get the latest update?**
 Settings → System → Updates. The Marketplace only looks for new versions every few hours, so a fresh update may not show there yet; then look again a little later. With HACS (Home Assistant before 2026.11) it works right away: HACS → HomePlan 3D → ⋮ → **Update information** → **Download**. Then restart Home Assistant and reload the page (Ctrl+F5; in the Companion app: Settings → Companion app → reset frontend cache).
@@ -1678,7 +1653,7 @@ The room needs an area, and the device must belong to that area, either the devi
 Tap its wedge on the floor, it counts like the camera.
 
 **Furniture shows as grey boxes.**
-The pack it comes from is not installed. Import it again or install it through the shop connection.
+The pack it comes from is not installed. Import the local JSON pack again.
 
 **Dragging in 3D, an item does not pass through the wall.**
 That is on purpose: in the 3D view furniture and devices stay in their room while dragged and slide along the wall. Move them into another room in the floor plan, where they move freely.
@@ -1698,20 +1673,17 @@ Some older graphics chips fail on the sun's arc, the house shadow or the window 
 **Sunlight falls through the wrong windows.**
 Check **North** under Settings: degrees clockwise from "up" in the plan.
 
-**The shop connection reports "limit reached".**
-The key was connected to more than five new installations in the last twelve months. Contact us, we will help.
-
-**Activation says "The shop is busy right now" or "HTTP 429".**
-The shop's web host throttles too many requests from one address. Since 1.9.1 NeonPlan retries twice with a pause by itself; if it still fails, wait a minute and click **Activate** again. Versions before 1.9.1 were turned away by the host because of their user agent – there only the update helps.
+**A pack import is throttled.**
+A transfer endpoint may limit repeated requests. Wait a minute and import the file again.
 
 **The notice "This page still shows HomePlan 3D x.y, Home Assistant already has …" stays.**
-The browser or the companion app still holds an old NeonPlan bundle. Tap **Reload**; in the companion app go to Settings → Companion app → **Reset frontend cache**, then close the app completely and open it again. Restarting Home Assistant does not help here. The same applies when a bought Pro add-on says "needs a newer NeonPlan version" under the packs.
+The browser or the companion app still holds an old NeonPlan bundle. Tap **Reload**; in the companion app go to Settings → Companion app → **Reset frontend cache**, then close the app completely and open it again. Restarting Home Assistant does not help here. The same applies when an installed Pro add-on says "needs a newer NeonPlan version" under the packs.
 
 **Two holograms hang on the roof (Energy Pro).**
 That is intended: the big one is the **house balance** (Solar & Energy), the smaller one the **plant card** of the inverter whose field that is – with several plants each has its own. Too much? In the **Hologram** section hang the house balance **Free in the plan** (handle ◈), or untick **Show the plant card** in the inverter form. A small card that seems to stick to the roof is often the device hologram of a device in the room below – turn the camera a little.
 
-**The shop cannot be reached.**
-Installed packs and Pro add-ons keep working. Updates arrive as soon as the shop answers again.
+**A pack file cannot be read.**
+Installed packs and Pro add-ons keep working. Export the pack again or use the current JSON file.
 
 **Where do I report bugs?**
-In the issue tracker on GitHub: https://github.com/Mastershort/neonplan3d/issues
+In the issue tracker on GitHub: 

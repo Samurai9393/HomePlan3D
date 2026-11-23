@@ -79,7 +79,6 @@ test("the GPU is reported as a rough class only", () => {
 });
 
 test("the reports are released (2.0.1): the switch shows for admins, off until they turn it on", async () => {
-  const { released, UNRELEASED } = await import("./features.ts");
-  assert.ok(!UNRELEASED.includes("diagnostics"));
+  const { released } = await import("./features.ts");
   assert.equal(released("diagnostics"), true);
 });

@@ -6,7 +6,6 @@ import { styleOptions } from "./style-select.ts";
 import { setCustomStyles } from "./looks.ts";
 import { css, html, LitElement, nothing, svg } from "lit";
 import { fetchBuilding, listPlans, MAIN_PLAN, type PlanEntry } from "./api.ts";
-import { labOn, UNRELEASED } from "./features.ts";
 import { CARD_CONTROLS, CARD_OWN, cardTemplate, type CardConfig, type CardControl } from "./card-config.ts";
 import { languageReady, loadLanguage, translate, type I18nKey } from "./i18n.ts";
 import type { Building } from "./model.ts";
@@ -559,18 +558,14 @@ export class Floorplan3dCardEditor extends LitElement {
         <input type="checkbox" .checked=${v.central} @change=${(e: Event) => this.set("central", (e.target as HTMLInputElement).checked ? undefined : false)} />
         <span>${this.t("card_central")}<small>${this.t("card_central_hint")}</small></span>
       </label>
-      ${!UNRELEASED.includes("fun_pets") || labOn()
-        ? html`<label class="toggle">
-            <input type="checkbox" .checked=${v.pets} @change=${(e: Event) => this.set("pets", (e.target as HTMLInputElement).checked ? undefined : false)} />
-            <span>${this.t("card_pets")}<small>${this.t("card_pets_hint")}</small></span>
-          </label>`
-        : nothing}
-      ${!UNRELEASED.includes("fun_halloween") || labOn()
-        ? html`<label class="toggle">
-            <input type="checkbox" .checked=${v.ghost} @change=${(e: Event) => this.set("ghost", (e.target as HTMLInputElement).checked ? undefined : false)} />
-            <span>${this.t("card_ghost")}<small>${this.t("card_ghost_hint")}</small></span>
-          </label>`
-        : nothing}
+      <label class="toggle">
+        <input type="checkbox" .checked=${v.pets} @change=${(e: Event) => this.set("pets", (e.target as HTMLInputElement).checked ? undefined : false)} />
+        <span>${this.t("card_pets")}<small>${this.t("card_pets_hint")}</small></span>
+      </label>
+      <label class="toggle">
+        <input type="checkbox" .checked=${v.ghost} @change=${(e: Event) => this.set("ghost", (e.target as HTMLInputElement).checked ? undefined : false)} />
+        <span>${this.t("card_ghost")}<small>${this.t("card_ghost_hint")}</small></span>
+      </label>
       <label class="toggle">
         <input type="checkbox" .checked=${v.marker_names} @change=${(e: Event) => this.set("marker_names", (e.target as HTMLInputElement).checked ? true : undefined)} />
         <span>${this.t("card_marker_names")}<small>${this.t("card_marker_names_hint")}</small></span>
@@ -684,7 +679,7 @@ export class Floorplan3dCardEditor extends LitElement {
       ${this.toggle("motion_trail", "card_motion_trail", "card_motion_trail_hint")} ${this.toggle("camera_wall", "card_camera_wall", "card_camera_wall_hint")}
       ${this.toggle("time_travel", "card_time_travel", "card_time_travel_hint")}
       ${v.time_travel ? this.renderTimeTravel() : nothing}
-      ${!UNRELEASED.includes("household") || labOn() ? this.toggle("household_card", "card_household", "card_household_hint") : nothing}
+      ${this.toggle("household_card", "card_household", "card_household_hint")}
       ${this.toggle("weather", "card_weather", "card_weather_hint")}
       ${v.weather !== false
         ? html`<div class="grid">
@@ -840,8 +835,8 @@ export class Floorplan3dCardEditor extends LitElement {
       ${this.toggle("energy", "card_energy")} ${this.toggle("room_panel", "card_room_panel", "card_room_panel_hint")}
       ${this.toggle("fullscreen_button", "card_fullscreen_button", "card_fullscreen_button_hint")}
       ${this.toggle("explode", "card_explode")} ${this.toggle("roof", "card_roof", "card_roof_hint")} ${this.toggle("roof_fade", "card_roof_fade", "card_roof_fade_hint")} ${this.toggle("plain", "card_plain", "plain_hint")}
-      ${!UNRELEASED.includes("room_bar") || labOn() ? this.toggle("room_bar", "card_room_bar", "room_bar_hint") : nothing}
-      ${this.value.room_bar && (!UNRELEASED.includes("room_bar") || labOn()) ? this.toggle("room_bar_favorites", "card_room_bar_favorites", "card_room_bar_favorites_hint") : nothing} ${this.toggle("stats", "card_stats", "card_stats_hint")}
+      ${this.toggle("room_bar", "card_room_bar", "room_bar_hint")}
+      ${this.value.room_bar ? this.toggle("room_bar_favorites", "card_room_bar_favorites", "card_room_bar_favorites_hint") : nothing} ${this.toggle("stats", "card_stats", "card_stats_hint")}
       </section>
       <section ?hidden=${!on("features")}>${this.renderFeatures()}</section>
       <section ?hidden=${!on("kiosk")}>${this.renderKiosk()}</section>

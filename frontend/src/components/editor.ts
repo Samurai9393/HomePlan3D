@@ -9,7 +9,7 @@ import { css, html, LitElement, nothing, svg, type PropertyValues, type Template
 import { linesField } from "./lines-field.ts";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { ref } from "lit/directives/ref.js";
-import { fetchImage, getLicense, importPack, listHistory, restoreSnapshot, storeImage, takeSnapshot, type Snapshot, getVoiceSettings, setVoiceSentences, type SentenceMode } from "../api.ts";
+import { fetchImage, importPack, listHistory, restoreSnapshot, storeImage, takeSnapshot, type Snapshot, getVoiceSettings, setVoiceSentences, type SentenceMode } from "../api.ts";
 import { copyFloor, download, exportFile, parseExport } from "../transfer.ts";
 import { carEntities, type CarEntities, areaEntities, autoPlace, hiddenInHa, CLIMATE_CLASSES, defaultHeight, entityName, entityAreaId, furnitureEntities, groupByDevice, hasScreen, isMediaFurniture, isPlaceable, isRoomClimateSensor, kindOf, openingEntities, otherAreaEntities, pictureRuleMatches, roomClimateSensors, roomPanelEntities, unassignedEntities, windowPosition, type ClimateKey } from "../devices.ts";
 import { furnitureSymbol } from "./furniture2d.ts";
@@ -25,13 +25,11 @@ import { turnedBackground } from "../geometry/background.ts";
 import { weatherEntity, isRainSource } from "../weather.ts";
 import { isOutageSource } from "../outage.ts";
 import { SHOW_PRESENCE } from "../flags.ts";
-import { hasFeature, labOn, manualUrl, registerUrl, released, shopUrl, UNRELEASED } from "../features.ts";
+import { hasFeature } from "../features.ts";
 import { fitText, type HintKey } from "../fit-hints.ts";
 import { FINISH_ROLES, FINISH_SWATCHES, finishHex, finishRolesOf, type FinishRole } from "../finishes.ts";
 import { hasLiveParts, type PackSlot } from "../live-parts.ts";
 import { loadLocate } from "../load-locate.ts";
-import { isBeta, supporterUrl } from "../beta.ts";
-import { openPrint } from "../print.ts";
 import { applianceOf, BIN_SHAPES, BIN_SIZE, binColors, binShape, householdCountry, isPackPlant, MAILBOX_SHAPES, MAILBOX_SIZE, mailboxShape, WASTE_KINDS, wasteColors } from "../household.ts";
 import { cameraMotionSensors, cameraOwnSensors, detectionKind, setCameraSensors } from "../markers.ts";
 import { backdropImage } from "../backdrop.ts";
@@ -170,8 +168,7 @@ import { planLabel } from "./plan-picker.ts";
 import { deleteDiagnostics, getDiagnostics, setDiagnostics, type DiagnosticsStatus } from "../api.ts";
 import { load3d } from "../load3d.ts";
 import "./library.ts";
-import { basicTypes, buildIndex, roomKindOf, shopText, type LibraryEntry, type Previews } from "../library-index.ts";
-import { getPreviews } from "../api.ts";
+import { basicTypes, buildIndex, roomKindOf, type LibraryEntry } from "../library-index.ts";
 import { packsVersion as libPacksVersion } from "../packs.ts";
 import type { WallMode } from "../viewer/viewer3d.ts";
 import { furnitureName } from "../furniture-names.ts";
@@ -408,7 +405,6 @@ export class Fp3dEditor extends LitElement {
     _split: { state: true },
     _splitRatio: { state: true },
     _backupBusy: { state: true },
-    _supporter: { state: true },
     _wall3d: { state: true },
     _fx3d: { state: true },
     _names3d: { state: true },
@@ -526,9 +522,6 @@ export class Fp3dEditor extends LitElement {
   /** Share of the width the plan takes next to the 3D pane (0.2 … 0.8). */
   private declare _splitRatio: number;
   private declare _backupBusy: boolean;
-  /** A Supporter-Pass holder (asked from the shop connection when the backup section opens): NeonPlan Print is offered. */
-  private declare _supporter: boolean;
-  private supporterChecked = false;
   /** Walls in the 3D pane: full height ("auto") or cut at the cut height (shows wall units and shelves). */
   private declare _wall3d: WallMode;
   /** Weather, sun, pets and ghost in the 3D pane beside the plan (off: a quiet pane for drawing, #1033). */
@@ -867,7 +860,6 @@ export class Fp3dEditor extends LitElement {
       /* no storage */
     }
     this._backupBusy = false;
-    this._supporter = false;
     // the 3D pane's wall view stays as it was last set on this device (#309)
     this._wall3d = "cut";
     this._style3d = "neon";
@@ -1360,7 +1352,7 @@ export class Fp3dEditor extends LitElement {
 
   /** Once per page: an admin with the usage reports off (and the invitation never closed) is invited. */
   private checkDiagInvite(): void {
-    if (this.diagInviteChecked || !this.hass || !this.isAdmin || !released("diagnostics")) return;
+    if (this.diagInviteChecked || !this.hass || !this.isAdmin) return;
     this.diagInviteChecked = true;
     try {
       if (localStorage.getItem("homeplan3d.diagInvite") === "0") return;
@@ -4463,8 +4455,7 @@ export class Fp3dEditor extends LitElement {
     const hub = hubPoint(doc) ? doc.energy.meter : null;
     const inverterOk = !!doc.energy.solar || (inverters.length > 0 && inverters.every((x) => this.devicePower(x.m, links)));
     const batteryOk = batteries.every((x) => this.devicePower(x.m, links) && x.m.soc && x.m.soc !== "none") || !!doc.energy.battery;
-    const pro = hasFeature("energy_pro");
-    type Row = { state: "ok" | "todo" | "opt"; label: string; action?: () => void; href?: string };
+    type Row = { state: "ok" | "todo" | "opt"; label: string; action?: () => void };
     const rows: Row[] = [
       { state: fields.length ? "ok" : "todo", label: this.t(fields.length ? "chk_solar" : "chk_solar_add"), action: fields.length ? () => (this._solarId = fields[0].id) : () => this.addSolarField() },
       meters.length
@@ -4480,16 +4471,14 @@ export class Fp3dEditor extends LitElement {
         ? { state: batteryOk ? "ok" : "todo", label: this.t(batteryOk ? "chk_battery" : "chk_battery_sensor"), action: () => goTo(batteries[0]) }
         : { state: "opt", label: this.t("chk_battery_opt"), action: () => this.addEnergyDevice("home_battery") },
       grid.length ? { state: "ok", label: this.t("chk_grid"), action: () => goTo(grid[0]) } : { state: "opt", label: this.t("chk_grid_opt"), action: () => this.addEnergyDevice("grid_point") },
-      pro ? { state: "ok", label: this.t("chk_pro_active") } : { state: "opt", label: this.t("chk_pro_get"), href: shopUrl(this.hass?.language) },
+      { state: "ok", label: this.t("chk_pro_active") },
     ];
     const done = rows.filter((r) => r.state === "ok").length;
     return html`<section class="fp3d-checklist">
       <h3>☑ ${this.t("chk_title")} <span class="fp3d-sub">${done}/${rows.length}</span></h3>
       <p class="fp3d-sub">${this.t("chk_hint")}</p>
-      ${rows.map((r) =>
-        r.href
-          ? html`<a class="fp3d-chk fp3d-chk-${r.state}" href=${r.href} target="_blank" rel="noopener"><span>${r.state === "ok" ? "✓" : r.state === "todo" ? "○" : "·"}</span>${r.label}</a>`
-          : html`<button class="fp3d-chk fp3d-chk-${r.state}" ?disabled=${!this.isAdmin && !!r.action && r.state !== "ok"} @click=${r.action}><span>${r.state === "ok" ? "✓" : r.state === "todo" ? "○" : "·"}</span>${r.label}</button>`,
+      ${rows.map(
+        (r) => html`<button class="fp3d-chk fp3d-chk-${r.state}" ?disabled=${!this.isAdmin && !!r.action && r.state !== "ok"} @click=${r.action}><span>${r.state === "ok" ? "✓" : r.state === "todo" ? "○" : "·"}</span>${r.label}</button>`,
       )}
     </section>`;
   }
@@ -4507,28 +4496,11 @@ export class Fp3dEditor extends LitElement {
     </section>`;
   }
 
-  /** The Pro add-on: active (with the manual), or what it brings and where to get it. */
+  /** The energy add-on is enabled by the open-source configuration. */
   private renderProCard() {
-    const lang = this.hass?.language;
-    if (hasFeature("energy_pro")) {
-      return html`<section class="fp3d-teaser fp3d-teaser-on">
-        <div class="fp3d-teaser-head"><b>✓ ${this.t("energy_pro_active")}</b></div>
-        <p class="fp3d-sub">${this.t("energy_pro_active_hint")}</p>
-        <div class="fp3d-actions"><a class="fp3d-btn" href=${manualUrl(lang, "energy_pro")} target="_blank" rel="noopener">📖 ${this.t("manual")}</a></div>
-      </section>`;
-    }
-    const picture = new URL("./images/solar-pro.jpg", import.meta.url).href;
-    return html`<section class="fp3d-teaser">
-      <div class="fp3d-teaser-head"><b>⚡ ${this.t("pro_name_energy_pro")}</b><a class="fp3d-btn fp3d-primary" href=${shopUrl(lang)} target="_blank" rel="noopener">${this.t("pro_unlock")}</a></div>
-      <img src=${picture} alt=${this.t("solar_pro_title")} loading="lazy" />
-      <ul>
-        <li>${this.t("solar_pro_1")}</li>
-        <li>${this.t("solar_pro_2")}</li>
-        <li>${this.t("solar_pro_3")}</li>
-        <li>${this.t("solar_pro_4")}</li>
-      </ul>
-      <p class="fp3d-sub">${this.t("solar_pro_free")}</p>
-      <div class="fp3d-actions"><a class="fp3d-btn" href=${manualUrl(lang, "energy_pro")} target="_blank" rel="noopener">📖 ${this.t("manual")}</a></div>
+    return html`<section class="fp3d-teaser fp3d-teaser-on">
+      <div class="fp3d-teaser-head"><b>✓ ${this.t("energy_pro_active")}</b></div>
+      <p class="fp3d-sub">${this.t("energy_pro_active_hint")}</p>
     </section>`;
   }
 
@@ -5748,50 +5720,6 @@ export class Fp3dEditor extends LitElement {
 
   // ------------------------------------------------------------------ rendering
 
-  /** "Later" on the news: gone for this visit of the editor, back the next time. */
-  private newsLater = false;
-
-  /**
-   * News from the shop after an update, once per announcement: a new fun pack to pick up (the pets, a present for the
-   * customers). Shown to admins who bought something and do not have it yet, until "don't show again".
-   */
-  private renderNews() {
-    // the pets' notice went with the gift notice of the panel (both fun packs free with a customer account)
-    const news: { id: string; feature: "fun_pets" }[] = [];
-    if (this.newsLater || !this.isAdmin) return nothing;
-    const customer = (this.packs ?? []).some((p) => p.licensee);
-    const item = news.find((n) => {
-      if (UNRELEASED.includes(n.feature) || hasFeature(n.feature) || !customer) return false;
-      try {
-        return localStorage.getItem(`homeplan3d.news.${n.id}`) !== "never";
-      } catch {
-        return true;
-      }
-    });
-    if (!item) return nothing;
-    const never = () => {
-      try {
-        localStorage.setItem(`homeplan3d.news.${item.id}`, "never");
-      } catch {
-        // a private window: it only stays away for this visit
-      }
-      this.newsLater = true;
-      this.requestUpdate();
-    };
-    return html`<div class="fp3d-news-veil" @click=${(e: Event) => onVeil(e) && ((this.newsLater = true), this.requestUpdate())}>
-      <div class="fp3d-news" role="dialog" aria-label=${this.t("news_pets_title")}>
-        <div class="fp3d-news-pic">🐱 🐶 🐰 🐟</div>
-        <h3>${this.t("news_pets_title")}</h3>
-        <p>${this.t("news_pets_text")}</p>
-        <div class="fp3d-news-actions">
-          <a class="fp3d-btn fp3d-primary" href=${shopUrl(this.hass?.language)} target="_blank" rel="noopener" @click=${() => ((this.newsLater = true), this.requestUpdate())}>🎁 ${this.t("news_to_shop")}</a>
-          <button class="fp3d-btn" @click=${() => ((this.newsLater = true), this.requestUpdate())}>${this.t("news_later")}</button>
-          <button class="fp3d-btn" @click=${never}>${this.t("news_never")}</button>
-        </div>
-      </div>
-    </div>`;
-  }
-
   /** Work on another floor (from the floor menu of the toolbar). */
   private selectFloor(id: string): void {
     this._floorId = id;
@@ -6046,9 +5974,9 @@ export class Fp3dEditor extends LitElement {
       { label: this.t("settings_group_screens"), topics: [topic("cards", this.t("card_templates")), topic("director", this.t("card_director"))] },
       {
         label: this.t("settings_group_extensions"),
-        topics: [topic("modules", this.t("settings_modules")), topic("fun", this.t("fun_title")), topic("voice", this.t("voice"), false), ...(released("locate") ? [topic("locate", this.t("locate"))] : [])],
+        topics: [topic("modules", this.t("settings_modules")), topic("fun", this.t("fun_title")), topic("voice", this.t("voice"), false), topic("locate", this.t("locate"))],
       },
-      { label: this.t("settings_group_system"), topics: [topic("backup", this.t("backup")), ...(released("diagnostics") ? [topic("diagnostics", this.t("diag_menu"))] : [])] },
+      { label: this.t("settings_group_system"), topics: [topic("backup", this.t("backup")), topic("diagnostics", this.t("diag_menu"))] },
     ];
     return groups.map((g) => ({ label: g.label, topics: g.topics.filter((t) => admin || !t.needsAdmin) })).filter((g) => g.topics.length);
   }
@@ -6254,7 +6182,7 @@ export class Fp3dEditor extends LitElement {
     const floor = this.floor;
     const walls = floor ? generateWalls(floor.rooms, { exterior: this._doc.settings.wall_exterior, interior: this._doc.settings.wall_interior }, floor.walls ?? []) : null;
     return html`
-      ${this.renderPreview()} ${this.renderWallView()} ${this.renderPartCard()} ${this.renderDiagnosticsView()} ${this.renderNews()} ${this.renderSettingsDialog()}
+      ${this.renderPreview()} ${this.renderWallView()} ${this.renderPartCard()} ${this.renderDiagnosticsView()} ${this.renderSettingsDialog()}
       <div class="fp3d-editor ${this.narrow ? "fp3d-narrow" : ""}" style=${`--fp3d-side-w:${this._sideWidth}px`}>
         <div class="fp3d-main">
           <div class="fp3d-toolbar">
@@ -6327,7 +6255,7 @@ export class Fp3dEditor extends LitElement {
               ${this._tool === "roof" ? svg`${this.renderRoofSections()}${this.renderRoofWindows()}` : this._tool === "energy" ? svg`${this.renderRoofSections()}${this.renderSolarFields()}${this.renderCables()}${this.renderEnergyMarkers()}` : this._tool === "pool" && floor && this.pipeRules ? this.renderPoolPlan(floor) : nothing} ${this.renderDraft()} ${this.renderGuides()}
             </svg>
             ${this.renderContext()}
-            <p class="fp3d-hint ${this._fixedHint ? "fp3d-hint-fixed" : ""}">${!floor ? this.t("hint_empty") : this._bgMap ? this.t(`bg_map_${this._bgMap.length + 1}` as I18nKey) : this._wallPick ? this.t("hint_wall_pick") : this._fixedHint ? this.t("fixed_drag_hint") : this._tool === "outdoor" && this._outdoorFree ? this.t("hint_outdoor_free") : this._tool === "pool" && this._jointPlace ? this.t("hint_joint_place") : this._tool === "pool" && this._pipeMode ? this.t(!this.poolArea ? "hint_pipe_pool" : this._pipeDraft ? "hint_pipe_next" : "hint_pipe_start") : this._tool === "pool" && released("pool") ? this.t("hint_pool_tech") : this.t(`hint_${this._tool}` as I18nKey)}</p>
+            <p class="fp3d-hint ${this._fixedHint ? "fp3d-hint-fixed" : ""}">${!floor ? this.t("hint_empty") : this._bgMap ? this.t(`bg_map_${this._bgMap.length + 1}` as I18nKey) : this._wallPick ? this.t("hint_wall_pick") : this._fixedHint ? this.t("fixed_drag_hint") : this._tool === "outdoor" && this._outdoorFree ? this.t("hint_outdoor_free") : this._tool === "pool" && this._jointPlace ? this.t("hint_joint_place") : this._tool === "pool" && this._pipeMode ? this.t(!this.poolArea ? "hint_pipe_pool" : this._pipeDraft ? "hint_pipe_next" : "hint_pipe_start") : this._tool === "pool" ? this.t("hint_pool_tech") : this.t(`hint_${this._tool}` as I18nKey)}</p>
           </div>
           ${this._split && !this.narrow
             ? html`<div class="fp3d-split-handle" title=${this.t("split_handle_hint")} @pointerdown=${this.onSplitDown}></div>`
@@ -6377,9 +6305,6 @@ export class Fp3dEditor extends LitElement {
   private renderMapStart(floor: Floor | undefined) {
     if (!this.isAdmin || !floor || floor.rooms.length || floor.id !== surroundFloorId(this._doc) || this._mapStartOff || this._diagInvite) return nothing;
     const ready = !!ownOutline(this._doc);
-    // the very first start of a plan: one line on the free customer account, unless packs from the shop are here
-    // (they come with a key) – it goes with this note, never to come back
-    const account = (this.packs ?? []).some((p) => !!p.instance || !!p.licensee);
     const off = () => {
       this._mapStartOff = true;
       try {
@@ -6389,11 +6314,9 @@ export class Fp3dEditor extends LitElement {
       }
     };
     return html`<div class="fp3d-diag-invite" role="note">
-      <span><b>🗺 ${this.t("map_start_title")}</b> ${this.t(ready ? "map_start_ready" : "map_start_text")}
-        ${account ? nothing : html`<br />🎁 ${fitText(this.hass?.language, "start_gift")}`}</span>
+      <span><b>🗺 ${this.t("map_start_title")}</b> ${this.t(ready ? "map_start_ready" : "map_start_text")}</span>
       <span class="fp3d-diag-invite-buttons">
         ${ready ? nothing : html`<button class="fp3d-btn primary" @click=${() => (this._settingsDialog = "surroundings")}>${this.t("map_start_load")}</button>`}
-        ${account ? nothing : html`<a class="fp3d-btn" style="text-decoration:none" href=${registerUrl(this.hass?.language)} target="_blank" rel="noopener">${fitText(this.hass?.language, "account_button")}</a>`}
         <button class="fp3d-btn" @click=${off}>${this.t(ready ? "map_start_ok" : "diag_invite_later")}</button>
       </span>
     </div>`;
@@ -8515,9 +8438,9 @@ export class Fp3dEditor extends LitElement {
     return this.poolArea ?? this.floor?.outdoor.find((o) => o.type === "pool" && o.points.length >= 3);
   }
 
-  /** The pipe tools of the wall view: "Technik zeichnen" (Pool Pro) switched on, or the lab switch. */
+  /** The pipe tools of the wall view: "Technik zeichnen" switched on. */
   private get canLayRuns(): boolean {
-    return (labOn() || this._techMode) && !!this.runPool;
+    return this._techMode && !!this.runPool;
   }
 
   private runFrame(key: string): WallFrame | null {
@@ -12777,23 +12700,10 @@ export class Fp3dEditor extends LitElement {
     </div>`;
   }
 
-  /**
-   * Waste bin and mailbox: shape and colours for everyone; the waste calendar and the post sensors with Haushalt Pro
-   * (a teaser while it is locked).
-   */
+  /** Waste bin and mailbox: shape and colours, plus the waste calendar and the post sensors. */
   private renderHouseholdForm(f: Furniture) {
     const admin = this.isAdmin;
-    const lang = this.hass?.language;
     const pro = hasFeature("household");
-    const teaser = !pro && released("household")
-      ? html`<section class="fp3d-teaser fp3d-wide">
-          <div class="fp3d-teaser-head">
-            <b>🏠 ${this.t("pro_name_household")}</b>
-            <a class="fp3d-btn fp3d-primary" href=${isBeta("household") ? supporterUrl(lang) : shopUrl(lang)} target="_blank" rel="noopener">${this.t(isBeta("household") ? "beta_become" : "pro_unlock")}</a>
-          </div>
-          <p class="fp3d-sub">${this.t(f.type === "waste_bin" ? "household_teaser_bin" : "household_teaser_mail")}</p>
-        </section>`
-      : nothing;
     const select = <T extends string>(label: string, value: T, options: readonly T[], key: (o: T) => I18nKey, onChange: (v: T) => void) =>
       html`<label class="fp3d-field fp3d-wide"
         >${label}
@@ -12848,7 +12758,7 @@ export class Fp3dEditor extends LitElement {
                   }}
               /></label>
               <p class="fp3d-sub fp3d-wide">${this.t("bin_tags_hint")}</p>`
-          : teaser}
+          : nothing}
       </div>`;
     }
     const shape = mailboxShape(f);
@@ -12863,14 +12773,10 @@ export class Fp3dEditor extends LitElement {
         ? html`${this.entitySelect(this.t("mailbox_entity"), typeof f.entity === "string" && f.entity !== "none" ? f.entity : null, undefined, flags, (v) => this.updateFurniture({ entity: v ?? "none" }))}
             ${this.entitySelect(this.t("mailbox_door"), f.mailbox_door ?? null, undefined, doors, (v) => this.updateFurniture({ mailbox_door: v === "none" ? null : v }))}
             <p class="fp3d-sub fp3d-wide">${this.t("mailbox_hint")}</p>`
-        : teaser}
+        : nothing}
     </div>`;
   }
 
-  /**
-   * Haushalt Pro on other items: a plant's moisture, a washer's time left and door, a fridge's door warning, and a
-   * consumable or service for every electric item. A teaser on plants, appliances and fridges while it is locked.
-   */
   /** A stored picture's URL for a thumbnail, fetched once. */
   private wantImage(id: string): void {
     if (this._images[id] || this.wantedImages.has(id) || !this.hass) return;
@@ -13590,40 +13496,12 @@ export class Fp3dEditor extends LitElement {
   }
 
   private libIndex: { key: string; entries: LibraryEntry[] } | null = null;
-  /** The shop's furniture previews (asked once when the library is first shown; null until then or without the shop). */
-  private libPreviews: Previews | null = null;
-  private libPreviewsAsked = false;
-
-  private askPreviews(): void {
-    if (this.libPreviewsAsked || !this.hass || !this.isAdmin) return;
-    this.libPreviewsAsked = true;
-    getPreviews(this.hass)
-      .then((p) => {
-        if (!p.items.length) return;
-        this.libPreviews = p;
-        this.libIndex = null;
-        this.requestUpdate();
-      })
-      .catch(() => {
-        // an older integration or no shop: the library stays as it is
-      });
-  }
-
-  /** The shop's bundle for the locked cards (name, price, page in the viewer's language). */
-  private libBundle(lang: string): { name: string; price: string; url: string } | null {
-    const b = this.libPreviews?.bundle;
-    if (!b) return null;
-    const name = shopText(b.name, lang);
-    const price = shopText(b.price, lang);
-    const url = shopText(b.url, lang);
-    return name && price && url ? { name, price, url } : null;
-  }
 
   /** The library's index, built once per language and pack state. */
   private libraryEntries(lang: string): LibraryEntry[] {
     // the smart fridge is exclusive: an installed pack with the feature "fridge_smart", or Haushalt Pro, offers it
     const extra = hasFeature("fridge_smart") || hasFeature("household") ? ["fridge_smart"] : [];
-    const key = `${lang}|${libPacksVersion()}|${this.packs?.length ?? 0}|${extra.length}|${this.libPreviews?.items.length ?? 0}`;
+    const key = `${lang}|${libPacksVersion()}|${this.packs?.length ?? 0}|${extra.length}`;
     if (this.libIndex?.key === key) return this.libIndex.entries;
     const entries = buildIndex({
       packs: this.packs ?? [],
@@ -13633,7 +13511,6 @@ export class Fp3dEditor extends LitElement {
       basicNameEn: (t) => translate(EN_HASS, `furn_${t}` as I18nKey),
       kindName: (k) => this.t(`lib_kind_${k}` as I18nKey),
       size: furnitureSize,
-      previews: this.libPreviews,
     });
     this.libIndex = { key, entries };
     return entries;
@@ -13649,7 +13526,6 @@ export class Fp3dEditor extends LitElement {
   private renderFurnitureLibrary() {
     const room = this.room;
     const lang = this.hass?.language ?? "en";
-    this.askPreviews();
     return html`<section>
       <h3>${this.t("furniture_add")}</h3>
       <p class="fp3d-sub">${room ? this.t("furniture_into", { room: room.name }) : this.t("furniture_pick_room")}</p>
@@ -13660,7 +13536,6 @@ export class Fp3dEditor extends LitElement {
         .admin=${this.isAdmin}
         .t=${(k: string, v?: Record<string, string | number>) => this.t(k as I18nKey, v)}
         .thumb=${this.libraryThumb}
-        .bundle=${this.libBundle(lang)}
         @library-add=${(e: CustomEvent<{ type: string; mirror?: boolean }>) => this.addFurniture(e.detail.type, !!e.detail.mirror)}
         @library-preview=${(e: CustomEvent<{ type: string | null; element: HTMLElement | null }>) => {
           if (e.detail.type && e.detail.element) void this.showPreview(e.detail.type, e.detail.element);

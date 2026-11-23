@@ -1,8 +1,12 @@
 # Changelog
 
-All notable changes to HomePlan 3D. The full notes in German and English are on the
-[releases page](https://github.com/Mastershort/neonplan3d/releases). Ideas and votes:
-[Discussions → Ideas](https://github.com/Mastershort/neonplan3d/discussions/categories/ideas).
+All notable changes to HomePlan 3D. Full release notes in German and English are kept in the
+historical archive under `docs/release-*.md`. Ideas and bugs are tracked in this repository.
+
+> **Current state:** HomePlan 3D is fully MIT open source. Every feature is free and enabled by
+> default in `custom_components/homeplan3d/open-source-config.json`, including all Pro features,
+> Pool Pro and the room bar. No account, licence key, signature or cloud service is required.
+> Older entries below describe the original project history.
 
 ## 4.0.1
 
@@ -10,7 +14,7 @@ A fix round after 4.0: the phone's list no longer calls a closed garage door ope
 
 ### Fixed
 - **A closed garage door counted as open** in the phone's list "What is going on?" – its reading says how far the door is *down*, and it was read the other way round, so every closed garage door stood in the list and an open one did not (#1261, #1276, reported by Atomiiik, beta-j, Skeletitor and murilokasper).
-- **A view of a second plan flooded the Home Assistant log**: the view tells which plan it shows, the subscription did not know that field and turned it away ("invalid_format" at `view.plan`) – thousands of lines a day, and no announcements or voice answers on that screen (#1242, reported by Habi01H).
+- **A view of a second plan flooded the Home Assistant log**: the view tells which plan it shows, the event subscription did not know that field and turned it away ("invalid_format" at `view.plan`) – thousands of lines a day, and no announcements or voice answers on that screen (#1242, reported by Habi01H).
 - **Socket, light switch and sensors on the wall stood 5 cm out of it** in 3D while the plan and the selection showed them thin: models are no longer widened to 5 cm, so a socket is its 1.4 cm and a sensor can be made thinner by hand (#1236, reported by daene85).
 - **The content of a standing digital frame sat on its back**, beside the strut, instead of on the front (#1264, reported by blitzwurst) – in the pack "Digitale Bilderrahmen".
 - **A hedge, fence or pergola on falling ground** showed its underside: the block now reaches down into the lawn below it (#1262, reported by erwinsnl).
@@ -144,11 +148,11 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 ## 3.4.0
 
 ### Added
-- **The shop's furniture in the library:** the items of packs you don't have yet stand after your own with a lock – the search finds them too; a tap shows the picture large with the pack, its price and the way to the shop. Pictures only, loaded from the shop at most once a day when the library opens; a chip hides them.
+- **Furniture from packs in the library:** items from packs stand after your own furniture; the search finds them too; a tap shows the large picture and the pack name. Pictures are drawn locally when the library opens; a chip hides them.
 - **Finishes:** own colours for wood, fabric and fronts of every item in the homely styles – built-in and pack furniture – as swatches in the furniture form, also for all the same items in the plan at once.
 - **Live parts of pack items:** parts move or light with an entity – doors and flaps open, drawers slide out, prints grow with their progress, tanks and batteries fill, status lights show green, off or a pulsing red, fans turn, parts glow. An entity per part in the furniture form; without one everything stands as drawn. First packs with live parts: the new "Homelab & Workshop" pack; every cabinet, wardrobe and kitchen unit of the room packs opens its doors with a door contact (drawers slide out, oven and dishwasher doors fold down, fridge and freezer doors open apart), also in the free kitchen and bedroom taster packs; the server rack, 3D printers, NAS, heat pumps, boiler, tanks, batteries and network gear of Office & Gaming, Smart Home & Tech and Utility & Building Services live too. An item's own entity only stands in for a part of a fitting kind (an oven's power switch does not open its door).
-- **Smaller main bundle:** the texts only the editor needs come with the editor – every wall tablet and card loads about 160 KB less.
-- **Extensions page:** the Pro add-ons that fit your home (cameras, a solar or grid sensor, media players, a wallbox, weather, waste collection – checked in the browser only) come first with a small sign; locked add-ons show their price with a shop connection; without a key the page says what a free customer account brings.
+- **Smaller main script:** the texts only the editor needs come with the editor – every wall tablet and card loads about 160 KB less.
+- **Extensions page:** the Pro add-ons that fit your home (cameras, a solar or grid sensor, media players, a wallbox, weather, waste collection – checked in the browser only) come first with a small sign; every add-on is included and enabled by default.
 
 ### Fixed
 - **The picture frames' card on the extensions page** showed raw text keys instead of its name and description.
@@ -262,13 +266,13 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 - **Import page: a RoomPlan scan of a whole home** whose walls are listed only per room was not recognised; it is now read like any other scan.
 
 ### Changed
-- **The frames pack brings its own module:** the living faces of the "Digital Picture Frames" pack (calendar, lists, board, people, camera, cover, person, photos, weather) and their pop-ups now come with the pack (release 2) as a signed module, like Heat Pro; NeonPlan itself only provides the stage. Settings made with 3.0.5 are read as they are. Until an administrator has approved the module under Extensions (the usual review), the frames show a dark pane.
+- **The frames pack brings its own module:** the living faces of the "Digital Picture Frames" pack (calendar, lists, board, people, camera, cover, person, photos, weather) and their pop-ups now come with the pack (release 2) as a module, like Heat Pro; NeonPlan itself only provides the stage. Settings made with 3.0.5 are read as they are. Until an administrator has approved the module under Extensions (the usual review), the frames show a dark pane.
 - **Module API:** a module may lay a picture on the screen face of a piece of furniture (`screen` piece), open a pop-up of plain sections over the view (`popups`, `host.openPopup`), and ask the editor for uploaded pictures (`images` field); the host tells a module where people stand, which look is on and whether the tablet level runs.
 
 ## 3.0.5
 
 ### Added
-- **Pack "Digital Picture Frames" (shop):** frames whose face lives – a calendar with the next days (what runs now, birthdays, a reminder before an event, new events from the pop-up), a shopping or to-do list you tick off, a family board (calendar, who is home, bins, weather), people, a camera that pops up large when the doorbell rings, the cover of what plays, a person, a photo slideshow, the weather with a three-day forecast and a rain warning. A tap on a frame opens its content large in the middle of the view. The Deco pack's digital frame joins in once the pack is installed.
+- **Pack "Digital Picture Frames":** frames whose face lives – a calendar with the next days (what runs now, birthdays, a reminder before an event, new events from the pop-up), a shopping or to-do list you tick off, a family board (calendar, who is home, bins, weather), people, a camera that pops up large when the doorbell rings, the cover of what plays, a person, a photo slideshow, the weather with a three-day forecast and a rain warning. A tap on a frame opens its content large in the middle of the view. The Deco pack's digital frame joins in once the pack is installed.
 
 ### Fixed
 - **Window light at night as the lamp's cone:** the patch in front of a window is now the lamp's light through the opening – shifted away from the lamp, fainter with the distance, and nothing from a lamp around the corner that a wall hides from the window. A dining-room lamp no longer lit the terrace in front of the bedroom (#954, thanks rolandarends).
@@ -375,7 +379,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 
 ### New
 
-- **NeonPlan Print for supporters (beta):** your house as a 3D print – floors you lift off, the roof as a lid, a base plate with your name. Supporter-Pass holders find it under Extensions ("Open NeonPlan Print" copies their supporter code) and in the editor's backup section ("🖨 Print in 3D" exports the plan and opens [print.mastershort.de](https://print.mastershort.de/)); a small "New" dot on Extensions points to it once. The Supporter Pass offer under Extensions says it includes NeonPlan Print. Free during the beta until 30 November 2026, private and non-commercial use only.
+- **3D print export (beta):** your house as a 3D print – floors you lift off, the roof as a lid, a base plate with your name. Export the plan under **Backup → 🖨 Print in 3D** and hand the file to your local 3D-print workflow. Included for everyone; private and non-commercial use only.
 - **Gates in fences (#818):** a fence's form has "+ Gate in the fence": a gap in one of its sides, cut like a door in a wall, with a garden gate (one leaf), a double gate or a sliding gate. With a motor or switch (cover, switch, input_boolean, lock) and/or a contact the gate opens in 3D – a sliding gate runs along the fence at its run time – and a tap on it switches it. Thanks to @fammastrodaiuto for the wish, and to ProvUK's fork for the idea of the cut.
 - **Floor plan only:** "Show" → "Floor plan only" (remembered on this device) draws walls, doors, windows and stairs without furniture; the devices and their pins stay. On a dashboard: card → "Floor plan only", or `plain: true`. Thanks to SteveBloX's fork for the push.
 - **Right click goes one step back** (⭐ → ⚙ Settings → Controls, off by default): a short right click in the 3D view closes the room or goes from the floor back to the house, like a double tap on empty space. Idea from ProvUK's fork.
@@ -441,7 +445,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 
 ### Fixed
 
-- **Extensions in English (#825):** the newer packs, Pro add-ons and modules (Announcements, Heat Pro, Household Pro, Window watch, The house answers, the new furniture packs) have English names outside German, and NeonPlan tells the shop the language, so its offers come in it. Thanks to @twynne!
+- **Extensions in English (#825):** the newer packs, Pro add-ons and modules (Announcements, Heat Pro, Household Pro, Window watch, The house answers, the new furniture packs) have English names outside German, and NeonPlan follows the user's language. Thanks to @twynne!
 - **Devices a room shows that could not be hidden (#815):** what a room's panel shows through a piece of furniture, a window or a pin – a dryer's status text, a PC's internet switch, an inverter's state – is listed in the editor's devices of the room too, so 👁 hides it. Thanks to @frops83!
 - **3D view crashing on older graphics chips (#827):** if the 3D view loses its graphics right after it starts (older AMD chips in Chrome on a Mac failed on the new sun effects), the browser remembers it and starts without the sun's arc, the house shadow and the window glow at night; ⚙ Settings says so. Every new version tries them again once. Thanks to @Wolk9!
 - **Plant tag in a room (#817):** a thirsty plant's tag (Household Pro) also shows with its room opened, like bins and post. Thanks to @frops83!
@@ -459,7 +463,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 - **Sun path and house shadow:** a glowing arc around the house shows the sun's way today with sunrise and sunset, the house's shadow lies on the ground and wanders with the sun, a compass ring with N E S W. On by default, switch off in ⚙ Settings.
 - **Windows glow outside at night:** lit rooms throw their light out of the ground floor's windows onto the lawn, in the room's light colour.
 - **⚙ Settings in the 3D view:** the ⭐ central menu opens sun & night, window light, sun patches and the warnings without the editor; every module with settings gets a section there, under its own heading or the module's name.
-- **Modules in rooms and the ⭐ menu:** modules can offer a sheet in a room's panel and in the ⭐ menu, fields in a room's form, the microphone and the rooms someone is in – used by the new **Announcements** module (beta, Supporter Pass first).
+- **Modules in rooms and the ⭐ menu:** modules can offer a sheet in a room's panel and in the ⭐ menu, fields in a room's form, the microphone and the rooms someone is in – used by the new **Announcements** module (included).
 - **Modules: lists and markers in rooms:** a module's list (the announcement sentences) is edited entry by entry – ✕ takes one out, a field adds one; a module's marker may stand in a room and open its sheet there (📢 over the rooms' speakers – modules learn where the plan's speakers stand, a marker may show an emoji); a module's sheet has a link to ⚙ Settings for administrators.
 - **Detection sensors per camera (#815):** a camera's form lets you choose the sensors that count, also another device's (Frigate for a Reolink camera). Thanks to @frops83!
 
@@ -483,7 +487,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 
 ### Fixed
 
-- **Module updates that wait for approval (#805, #707):** the shop list showed a fetched module update as "Update available" again, and the button only fetched it once more. It now says the update waits for your approval and opens **View update & approve**. Thanks to @Luft86 and @underthewheel!
+- **Module updates that wait for approval (#805, #707):** the extension list showed a fetched module update as "Update available" again, and the button only fetched it once more. It now says the update waits for your approval and opens **View update & approve**. Thanks to @Luft86 and @underthewheel!
 - **Pictures on small smart displays (#799):** the cover or picture on a screen fills the screen with a small frame instead of a thick border on small displays. Thanks to @tomv79!
 - **Stretching cabinets with drawers (#801):** drawers, doors and shelves of a stretched item grow evenly instead of only the top or bottom one. Thanks to @daene85!
 - **Doors in split inner walls:** a door wider than its piece of an inner wall reaches into the next piece when the wall carries straight on, instead of being squeezed.
@@ -565,7 +569,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 
 ### New
 
-- **Help make NeonPlan better (opt-in, off by default):** under ⚙ Settings → 🛟 Help improve, anonymous usage counts and scrubbed error messages can be switched on – at most one report a day. No names, entities, areas, floor plan shapes, IP addresses or licence keys, nothing from locating; "View report" shows the exact next report, "Delete data" removes what was sent.
+- **Help make NeonPlan better (opt-in, off by default):** under ⚙ Settings → 🛟 Help improve, anonymous usage counts and scrubbed error messages can be switched on – at most one report a day. No names, entities, areas, floor plan shapes, IP addresses or account details, nothing from locating; "View report" shows the exact next report, "Delete data" removes what was sent.
 
 ### Live Presence
 
@@ -586,7 +590,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 - **In 3D:** people stand as a glowing figure in their own colour and glide from room to room; things are small symbols. People in 3D (assistant, Live step): figure, pin or off. The room panel shows who is here; an option shows people to admins only.
 - **A sensor per device** (`sensor.<device>_room`, state = room name, attributes `room_id`, `area_id`, `floor`, `probability`, `since`, `last_seen`) for automations.
 - **Voice:** "Where is my iPhone?", "Where is Torsten?", "Who is home?", "Ring my iPhone" (a loud notification through the Home Assistant app) – answered by Home Assistant itself, no screen needed. Picked Assist sentence files get new sentences after an update by themselves (a file you changed stays as it is).
-- **Key helper for iPhone and Apple Watch, no Mac needed:** an ESP32 (about 5 €) flashed right from the browser ([neonplan3d.mastershort.de/keys](https://neonplan3d.mastershort.de/keys/)) reads the Bluetooth key while the watch or phone pairs with it; the assistant shows the key and adds it with one tap. Keys can also be pasted (hex or Base64). Built on irk-capture by Derek Seaman (MIT) – thank you!
+- **Key helper for iPhone and Apple Watch, no Mac needed:** an ESP32 (about 5 €) flashed from the browser reads the Bluetooth key while the watch or phone pairs with it; the assistant shows the key and adds it with one tap. Keys can also be pasted (hex or Base64). Built on irk-capture by Derek Seaman (MIT) – thank you!
 - Everything is evaluated in Home Assistant; nothing leaves the house.
 
 ## 1.26.0
@@ -610,7 +614,7 @@ NeonPlan on the phone: a view made for the thumb, with a bar at the bottom, a li
 
 ### Haushalt Pro
 
-- **Out of beta:** Household Pro is now in the shop for everyone (it stays in the Supporter Pass).
+- **Out of beta:** Household Pro is now included for everyone and enabled by default.
 
 Polished with the wishes of the beta testers on Discord – thanks to MacGywer, Frops, Obaid, Pol3cat and Michael M.
 
@@ -674,7 +678,7 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 
 ### Changed
 
-- **Modules run only after an administrator approved their code.** A module installed from the shop or from a file waits under Extensions → Modules until an admin opens **View code & approve** (publisher, version, size, fingerprint and the whole code) and approves it. A new release of a module never replaces the running code by itself: it waits beside it until it is approved too. Modules installed before 1.24 ask for this approval once. Furniture and feature packs without code are unchanged.
+- **Modules run only after an administrator approved their code.** A module imported from a local file waits under Extensions → Modules until an admin opens **View code & approve** (publisher, version, size, fingerprint and the whole code) and approves it. A new release of a module never replaces the running code by itself: it waits beside it until it is approved too. Modules installed before 1.24 ask for this approval once. Furniture and feature packs without code are unchanged.
 - **Assist sentence files only on request.** NeonPlan no longer writes `custom_sentences/…/homeplan3d.yaml` on start: the file is written only when an admin picks sentences under ⚙ Settings → 🎙 Voice control (default: none). A file you changed yourself is never overwritten or deleted, and removing the integration removes NeonPlan's files. Files written by 1.22–1.23 stay as they are and are recognised as NeonPlan's.
 
 ## 1.23.1
@@ -710,13 +714,13 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 ### New
 
 - **⚙ Settings menu in the editor:** everything that belongs to the whole plan – house (walls, grid, units, north), weather & warnings, live director, voice control, favourites, background, ground, backup and modules – sits in one menu in the toolbar; each topic opens as a dialog over the plan, also while something is selected. The side bar without a selection keeps the rooms, the floor-plan picture and help. The roof's shape, ridge, pitch and overhang moved to the roof tool; the start view is remembered in the 3D view's settings (📌).
-- **Modules:** NeonPlan can load code the shop delivers as a signed pack ("Modul von …" on the extensions page). The first module answers spoken questions ("Was ist offen?", "Wo ist es kalt?", "Läuft die Waschmaschine?", "Was zieht Strom?") in the house and out loud through the Assist pipeline's text-to-speech. Modules are checked and bound to the installation like furniture packs.
+- **Modules:** NeonPlan can load code from local packs ("Modul von …" on the extensions page). The first module answers spoken questions ("Was ist offen?", "Wo ist es kalt?", "Läuft die Waschmaschine?", "Was zieht Strom?") in the house and out loud through the Assist pipeline's text-to-speech. Module code is reviewed and approved by an administrator before it runs.
 - **Ask through Assist:** everything voice control understands can be said to a voice satellite, the Assist dialog or the app – the sentences (`custom_sentences/de|en/homeplan3d.yaml`, written on start) hand "Zeig das Wohnzimmer" or "Was ist offen?" to every open NeonPlan view; the first answer goes back to Assist, which speaks it where it was asked. The service `homeplan3d.ask` (text, screen, speak) does the same from automations and returns the answer. Views can carry a **screen name** (voice settings, card option `screen`) so a sentence reaches one tablet only.
 - **Further names** for rooms, furniture and placed devices ("Smart TV Pro" also as "Wohnzimmerfernseher" or "Glotze"), for voice control and the search.
 - Modules have their own home: **⚙ Settings → 🧩 Module** lists them and imports a module file; the extensions page gets a **Module** section of its own next to the furniture packs.
 - **Modules may draw:** a module adds water, pipe flows and device glows to the 3D stage, glass cards, warnings and fields in the editor's outdoor form, and lends the pipe tools their rules – the host draws, the module knows (`scene`, `cards`, `alerts`, `areaFields`, `pipes`, `watched`, `pools`; module kind `stage`).
 - **No restart for the frontend:** the bundles, languages and pictures are served with `Cache-Control: no-cache` – after an update of the files a reload of the page is enough (Home Assistant still restarts for its Python side); a 304 answers unchanged files.
-- **Second free module in the shop, Fenster-Wächter:** warns when a window stands open in the cold for 20 minutes or the heating runs with a window open (10 minutes); the room pulses, the voice answers "Welche Fenster sind zu lange offen?". Manual 7.5 lists the modules.
+- **Window watch module:** warns when a window stands open in the cold for 20 minutes or the heating runs with a window open (10 minutes); the room pulses, the voice answers "Welche Fenster sind zu lange offen?". Manual 7.5 lists the modules.
 - Module **Das Haus antwortet**, release 2: around forty kinds of questions – open things (also how long), temperatures, humidity and CO₂, thermostats, appliances and their time left (Haushalt Pro), media, energy, lights, blinds, locks, people and motion, warnings, today's household lines, plants, cars (Auto Pro), weather, sun and time, the house's rooms and sizes, the morning report ("Guten Morgen") and the night check ("Gute Nacht"), plus a little small talk. Hosts tell modules more of the house (household, warnings, cars, pools, weather, time left, thirsty plants).
 
 ### Improved
@@ -795,7 +799,7 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 - Waste bins (Household Pro): a bin emptied every two or four weeks showed nothing when its next pickup was more than 10 days away – the calendar is now read six weeks ahead (#585).
 - Waste bins: a sensor whose text holds another number ("Restabfalltonne 2-wöchentlich in 4 Tagen") showed that number instead of the days (D576).
 - Waste bins: across the change to winter time the pickup day shown on a tap was one day early (D576).
-- Extensions: a Supporter-Pass holder whose key does not have a beta add-on yet saw "Become a supporter"; now it says the beta is theirs and to tell us on Discord, and a beta pack waiting on the key says to install it (#583).
+- Extensions: a user whose beta add-on was not yet available saw a misleading notice; now the beta is shown as available, and a waiting beta pack says to install it (#583).
 
 ## 1.20.0
 
@@ -817,12 +821,12 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 ### New
 
 - Motorised curtain: **Opens to** both sides, or only to the left or right (#511, wish of frops83).
-- Extensions: customers with a shop key who have not subscribed to the newsletter see a small box – signing up (double opt-in) brings the four taster packs (living room, kitchen, bedroom, bathroom, 4 items each) to their key; the shop sends the link only while they are not subscribed, "Don't show again" hides it.
+- Extensions: users who had not subscribed to the newsletter saw a small box – signing up (double opt-in) brought the four taster packs (living room, kitchen, bedroom, bathroom, 4 items each) to the installation; "Don't show again" hides it.
 
 ### Improved
 
 - Several packs that turn up at once (e.g. the four taster packs) are announced in one Home Assistant notification instead of one each.
-- The "new" badge on the Extensions tab only shows shop offers to customers who have bought something; gifts (fun and taster packs) do not count.
+- The "new" badge on the Extensions tab only showed new offers to users who had installed a pack before; gifts (fun and taster packs) did not count.
 
 ### Fixed
 
@@ -886,7 +890,7 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 ### New
 
 - **Fun pack Halloween** released: 13 decorations and a ghost floating through the house (switch under Extensions, card option `ghost: false`).
-- **Fun packs free with every customer account** (Halloween and Pets): with a licence key they wait under Extensions to install; without one, a free account brings them. A one-time notice in the 3D view; the pets' old shop notice is gone.
+- **Fun packs** (Halloween and Pets): included under Extensions and enabled by default. A one-time notice in the 3D view introduces them.
 - **Chinese (Simplified) and Portuguese** as app languages (config flow too: zh-Hans, zh-Hant, pt, pt-BR).
 - All 16 extra languages complete with the texts of 1.18.
 
@@ -938,8 +942,8 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 
 ### New
 
-- **Pets (fun pack, a present):** cat, rabbit and five dog breeds walk through the house, take the stairs, rest on sofas and beds, stop at shut doors (contact sensors), sleep at night; fish in the Pets pack's aquariums. Free in the shop for customers; *Extensions → Fun packs*, card option `pets: false`, a one-time note in the editor.
-- **Extensions page:** the shop's packs and the installed packs fold into summary bars (installed, updates, missing) with *Install/update all*.
+- **Pets (fun pack):** cat, rabbit and five dog breeds walk through the house, take the stairs, rest on sofas and beds, stop at shut doors (contact sensors), sleep at night; fish in the Pets pack's aquariums. Included by default; *Extensions → Fun packs*, card option `pets: false`, a one-time note in the editor.
+- **Extensions page:** available packs and installed packs fold into summary bars (installed, updates, missing) with *Install/update all*.
 - **Wall view zoom:** mouse wheel towards the pointer, two fingers, ＋ / − / ⤢ and arrows in *Wall from the front*.
 - **Pools with depth:** basin depth and rim above the lawn; see-through water onto the basin's walls and floor (when the pool lies in a lawn or other area; without ground around it, it stays flat).
 - **Terrace doors** can open outwards (*Reverse opening direction*), sashes swing outside in 3D (#492).
@@ -958,7 +962,7 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 
 - **Furniture blocks:** Shift + click (or *Select several* on a tablet) and Shift + drag (a frame) select several pieces; move, turn about their centre, copy, fix or delete them together, or **join them into a block** – a click on any part then selects the whole kitchen or wall unit, a double click edits one part alone, *Break up block* undoes it. Blocks move together in 3D beside the plan too. Ctrl+D duplicates the selected furniture.
 - **Wall view:** blocks there too (shift-click or a frame, join, drag the whole block along the wall, *Whole block / This part only*); the side bar **Onto the wall** shows a few categories, a search and recently used pieces instead of a long list – tap a free spot on the wall and it offers only what fits that gap, cabinets built to measure taking its width. Pieces can be resized in the wall view: handles left/right (width), top and bottom (height), snapping to neighbours, width and height to type in; picture tiles in the side bar, delete button and Del key, blocks in 3D in the room too. A block with a fixed part stays put everywhere and says so, with *Release all*.
-- **Time travel for everyone:** out of the supporter beta; what a placed camera detects (motion, person, car) is an event day and night.
+- **Time travel for everyone:** out of beta; what a placed camera detects (motion, person, car) is an event day and night.
 
 ### Fixed
 
@@ -1065,9 +1069,8 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 
 ### New
 
-- **⏪ Time travel (Pro, supporter beta):** replay up to 7 days in your house from the history Home Assistant records anyway – lights with brightness and colour, doors, windows, blinds, motion, heating, TV and speakers, energy flows, the car, the robot vacuum's way, weather and the sun. Play it at several speeds right up to the present, jump between events, see **"while you were away"** and a **day summary** per room compared with the day before. View only – nothing is switched, and the places and phones of people are never loaded. Runs on old wall tablets too (they start with 24 hours).
-  - **Supporter beta:** time travel comes with the **Supporter Pass** first. Supporters test it and give feedback on Discord; once it is finished, everyone can buy it on its own. Under *Extensions* it is marked "Beta · supporters first".
-  - Supporters find their **Discord code** under *Extensions*: typed into `/supporter` on Discord, it unlocks the supporter beta channels.
+- **⏪ Time travel:** replay up to 7 days in your house from the history Home Assistant records anyway – lights with brightness and colour, doors, windows, blinds, motion, heating, TV and speakers, energy flows, the car, the robot vacuum's way, weather and the sun. Play it at several speeds right up to the present, jump between events, see **"while you were away"** and a **day summary** per room compared with the day before. View only – nothing is switched, and the places and phones of people are never loaded. Runs on old wall tablets too (they start with 24 hours).
+  - Included and enabled by default in this build.
 - **Free furniture:** corner sofa (L), large U-shaped sofa and a **U-stair with landing** that cuts the opening into the floor above (#61 by daene85).
 - **Hologram settings without solar fields:** mirroring, device cards and size are reachable in Editor → Energy → Hologram even without a solar field (#334 by netrunnercs); every plant card of an inverter can be moved sideways or up (#335 by RobertSorgenfrei).
 - **Free form shows lengths:** while drawing, every edge and the one to the pointer show their length (#351 by Ollywood71).
@@ -1140,7 +1143,7 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 ### Fixed
 
 - Dashboard card: right after starting the app, the card could show "Custom element doesn't exist: homeplan3d-card" until the sidebar page was opened. The card's script is now also kept in the dashboard resources (storage mode), so dashboards wait for it; an older copy of the script there is pointed to the current one (#252 by TheRev-ha, RobertSorgenfrei).
-- Installing a Pro add-on from the shop: HomePlan 3D now also sends its version in the request, so the shop can answer an installation that is too old with a readable "please update first" message.
+- Installing a Pro add-on: HomePlan 3D now also sends its version in the request, so an installation that is too old gets a readable "please update first" message.
 - Energy Pro in a house with a single floor: the plant cards (solar, balance) show in the 3D view and the card, not only in the editor (#255 by Kohhal).
 - Energy Pro: a grid connection mounted on a wall – the grid cable starts at its height instead of on the ground, and its pin sits there too (#256 by Kohhal).
 - Solar fields moved to another roof face (e.g. after replacing a flat roof) keep their modules – rows, columns, format and tilt – instead of starting again from a proposal (#258 by rolandarends).
@@ -1285,13 +1288,13 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 ### Fixed
 
 - A camera mounted just inside an outer wall and looking out had its wedge cut by that wall (20 cm long); the wall the camera hangs on no longer counts (reported by the maintainer's own driveway camera).
-- The version notice now tells which side is behind: an old bundle in the browser or the companion app gets "reload the page" with a Reload button (and the cache hint for the companion app) instead of "restart Home Assistant"; both versions are shown. A pack with a Pro feature this frontend does not know yet says so instead of looking like a furniture pack (support case of a French customer).
+- The version notice now tells which side is behind: an old script in the browser or the companion app gets "reload the page" with a Reload button (and the cache hint for the companion app) instead of "restart Home Assistant"; both versions are shown. A pack with a Pro feature this frontend does not know yet says so instead of looking like a furniture pack (support case from a French user).
 
 ## 1.10.0
 
 ### New
 
-- **Roof slopes with knee walls:** when a roof section's top of walls lies below the ceiling of the floor underneath, that floor's walls end under the roof – knee walls at the eaves, gables up to the ridge, inner walls cut by the slope; windows stay below it. Dashed headroom lines (1.5 m, 2 m) in the plan editor (mindmonk's description in [PR #66](https://github.com/Mastershort/neonplan3d/pull/66), discussions #64, #75).
+- **Roof slopes with knee walls:** when a roof section's top of walls lies below the ceiling of the floor underneath, that floor's walls end under the roof – knee walls at the eaves, gables up to the ridge, inner walls cut by the slope; windows stay below it. Dashed headroom lines (1.5 m, 2 m) in the plan editor (mindmonk's description in PR #66, discussions #64, #75).
 - **Roof stays:** a switch in the view bar (and the card option `roof_fade: false`) keeps the roof on the house while zooming in; in the editor's roof and energy tools it always stays.
 - **Roof windows:** a window motor (Velux, Roto, Fakro as a cover) opens the sash as far as it stands, a name, a warm glow while open or tilted, and a hole in the slope of a roof section so the attic looks out (discussion #47, PR #66 by mindmonk).
 - **Dormers and cross gables:** "+ Dormer" in a section's form puts a dormer on a slope (gable or pent); its depth ends where its ridge meets the slope, the slope opens only where the dormer's roof lies above it (valleys), the cheeks close it, the attic wall rises up to it for the dormer window. A wide dormer with its eaves on the top of walls is a cross gable (a three-gable house). Where sections overlap, the higher roof is the ceiling (discussion #75, PR #66 by mindmonk).
@@ -1318,7 +1321,7 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 - **Doors without a sensor** can be drawn closed ("Show closed without a sensor" in the door form) instead of half open (discussion #86 by robertkrizovnik).
 - **Card:** `start_view` gives a card a start view of its own, e.g. for a small overview on another dashboard; the editor's start view section shows the line to copy (discussion #89 by karli4711).
 - French, Spanish, Dutch and Italian: the 43 texts added since 1.9.0 (energy setup, tilt angle, icons, help) are translated now; they showed in English.
-- **Hungarian** as the fifth extra language (proofread by kopaszsop, [#51](https://github.com/Mastershort/neonplan3d/issues/51)).
+- **Hungarian** as the fifth extra language (proofread by kopaszsop, #51).
 - **Module power (Wp)** per solar field instead of the fixed 400 W, for the kWp of fields and strings and the living modules (#99 by denisb88).
 - **Floors apart** lifts the roof off the top floor as well (#101 by rolandarends).
 - **Energy Pro – device holograms:** every device with a power sensor can carry a small glass card (power now, today's kWh, day curve), in the house view and on its floor; "Hologram over the device" in the furniture form; a **Holograms** button in the energy bar hides all cards (card option `holograms`). The first free update of the pack.
@@ -1327,39 +1330,39 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 
 ### New
 
-- **Own marker symbols:** any Material Design icon (`mdi:…`) for a device or an electric furniture item ([#62](https://github.com/Mastershort/neonplan3d/issues/62)).
-- **Tilt angle sensor** on windows: the sash tilts as far as the sensor reports, with maximum angle, offset and sign ([#15](https://github.com/Mastershort/neonplan3d/issues/15)).
-- **Camera wedge:** can be switched off per camera, and in 3D it ends at the first wall ([discussions #49, #50](https://github.com/Mastershort/neonplan3d/discussions/49)).
-- **Dashboard button** on the card: `dashboard` and `dashboard_label` open another dashboard or view ([discussion #48](https://github.com/Mastershort/neonplan3d/discussions/48)).
-- **Wall heights per part** of a wall that a neighbouring room splits ([#77](https://github.com/Mastershort/neonplan3d/issues/77)).
-- **Light through open walls:** with "No wall" a lamp lights the neighbouring room as if it were one room (idea and fork by Thundras, [discussion #68](https://github.com/Mastershort/neonplan3d/discussions/68)).
+- **Own marker symbols:** any Material Design icon (`mdi:…`) for a device or an electric furniture item (#62).
+- **Tilt angle sensor** on windows: the sash tilts as far as the sensor reports, with maximum angle, offset and sign (#15).
+- **Camera wedge:** can be switched off per camera, and in 3D it ends at the first wall (discussions #49, #50).
+- **Dashboard button** on the card: `dashboard` and `dashboard_label` open another dashboard or view (discussion #48).
+- **Wall heights per part** of a wall that a neighbouring room splits (#77).
+- **Light through open walls:** with "No wall" a lamp lights the neighbouring room as if it were one room (idea and fork by Thundras, discussion #68).
 - **Energy tool, easier to set up:** a setup checklist at the top that jumps to what is missing; "Take over from the energy dashboard" now fills the devices (and creates missing ones); a hint with a one-tap fix when a grid or battery sensor counts the other way round; the hologram also without a solar field (beside the house); the energy bar steps back while the hologram shows; a plain hologram on the tablet level.
 - **Help and feedback:** buttons for a GitHub issue (problem) and a discussion (idea) in the editor's settings and on the Extensions page; manual chapter 6.4 describes Energy Pro.
-- **Shop connection:** activations failed with HTTP 429 for everyone – the shop's web host turns away Home Assistant's default user agent. NeonPlan now sends its own, retries a throttled request twice with a pause (Retry-After respected), spaces out pack downloads, and explains a 429 in plain words.
+- **Extension connection:** activations failed with HTTP 429 for everyone – the web host turned away Home Assistant's default user agent. NeonPlan now sends its own, retries a throttled request twice with a pause (Retry-After respected), spaces out pack downloads, and explains a 429 in plain words.
 - **Energy Pro:** one hologram per plant (a balcony plant with its own inverter gets its own card over its field); home batteries with separate charging and discharging sensors (e.g. Anker Solix) through the new "Charging power" field; meters with separate import and export sensors through "Export power"; the power pickers list every sensor in W or kW, even without a device class.
 
 ### Fixed
 
-- The start view also holds when a floor is opened: the house no longer turns round ([discussion #67](https://github.com/Mastershort/neonplan3d/discussions/67)).
+- The start view also holds when a floor is opened: the house no longer turns round (discussion #67).
 - Two windows one above the other both cut their hole into the wall (reported by Thundras).
-- iPad: the "Add floor" menu stays inside the sidebar ([#85](https://github.com/Mastershort/neonplan3d/issues/85)).
+- iPad: the "Add floor" menu stays inside the sidebar (#85).
 
 ## 1.9.0
 
 ### New
 
-- **Four more languages:** French, Spanish, Dutch and Italian, following the Home Assistant user's language. They come as separate language files fetched only when needed, so the bundles stay small for wall tablets. French was asked for in [#51](https://github.com/Mastershort/neonplan3d/issues/51) (thanks, denisb88).
-- **No wall:** every wall of a room can be left out (button "No wall" in the wall heights), for open floor plans whose rooms are one space but separate areas in Home Assistant ([discussion #68](https://github.com/Mastershort/neonplan3d/discussions/68)).
-- **Start view:** remember the current 3D view in the editor; the 3D view, the card and the kiosk then open the house that way, e.g. from the garden side ([discussion #67](https://github.com/Mastershort/neonplan3d/discussions/67)).
+- **Four more languages:** French, Spanish, Dutch and Italian, following the Home Assistant user's language. They come as separate language files fetched only when needed, so the bundles stay small for wall tablets. French was asked for in #51 (thanks, denisb88).
+- **No wall:** every wall of a room can be left out (button "No wall" in the wall heights), for open floor plans whose rooms are one space but separate areas in Home Assistant (discussion #68).
+- **Start view:** remember the current 3D view in the editor; the 3D view, the card and the kiosk then open the house that way, e.g. from the garden side (discussion #67).
 - **Energy tool:** the **electricity meter** (grid sensor, shows import/export) and the **grid connection** (where the cable to the utility leaves the plot) as energy devices; an **Energy balance** section with the sensors of the house, taken from the devices in the plan or from Home Assistant's energy dashboard; several inverters and batteries with their own sensors; **models** for inverters (wall, slim, hybrid) and batteries (tower, wall, compact). The hidden energy settings and the meter tool are gone in favour of this.
 - **Names:** every piece of furniture and every energy device can carry its own name, shown in lists, forms and on its pin in 3D.
-- Groundwork for the coming Pro add-on **Energy Pro** (power-flow cables, living solar modules, glass hologram): built in and locked until the add-on is released.
+- Groundwork for the Pro add-on **Energy Pro** (power-flow cables, living solar modules, glass hologram): built in and included.
 
 ## 1.8.1
 
 ### Fixed
 
-- Entities without a registry entry (set up in YAML without a unique ID, e.g. USB cameras) can be placed: they show up under "without area" ([#56](https://github.com/Mastershort/neonplan3d/issues/56)).
+- Entities without a registry entry (set up in YAML without a unique ID, e.g. USB cameras) can be placed: they show up under "without area" (#56).
 
 ## 1.8.0
 
@@ -1375,21 +1378,21 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 
 ### New
 
-- **Ask before switching for blinds and garage doors:** open, close and positions ask first in the quick menu and the room panel; a swipe on the marker no longer moves them ([discussion #36](https://github.com/Mastershort/neonplan3d/discussions/36)). Devices that ask first no longer react to a swipe either.
-- **Status sensors on furniture:** a 3D printer's print status (or any enum status sensor) can be linked; the item counts as active while it prints or runs ([#41](https://github.com/Mastershort/neonplan3d/issues/41)).
-- **Worktop:** a free top without a base, its height is the top edge ([discussion #37](https://github.com/Mastershort/neonplan3d/discussions/37)).
+- **Ask before switching for blinds and garage doors:** open, close and positions ask first in the quick menu and the room panel; a swipe on the marker no longer moves them (discussion #36). Devices that ask first no longer react to a swipe either.
+- **Status sensors on furniture:** a 3D printer's print status (or any enum status sensor) can be linked; the item counts as active while it prints or runs (#41).
+- **Worktop:** a free top without a base, its height is the top edge (discussion #37).
 
 ## 1.6.2
 
 ### Fixed
 
-- The 3D view did not load on older iPads (iOS 15 and 16) with "SyntaxError: Unexpected token '{'"; the bundles are now built for Safari 15 and newer ([#42](https://github.com/Mastershort/neonplan3d/issues/42)).
+- The 3D view did not load on older iPads (iOS 15 and 16) with "SyntaxError: Unexpected token '{'"; the bundles are now built for Safari 15 and newer (#42).
 
 ## 1.6.1
 
 ### Fixed
 
-- A table lamp, floor lamp or uplight with a height above the floor set by hand now moves the lamp itself, not only its selection box ([#20](https://github.com/Mastershort/neonplan3d/issues/20)).
+- A table lamp, floor lamp or uplight with a height above the floor set by hand now moves the lamp itself, not only its selection box (#20).
 - Heatmap and room panel with °F: sensors in °F are converted, the legend and values show Home Assistant's unit.
 - Overlapping floor openings are cut as one outline (an L-shaped opening) instead of breaking the floor.
 - A floor opening snapped to the room's edge is cut instead of being reported as outside the room.
@@ -1405,8 +1408,7 @@ Polished with the wishes of the beta testers on Discord – thanks to MacGywer, 
 
 ### New
 
-- **New in the shop** on the Extensions page (with a shop key) and a dot on the tab.
-- **Loyalty discount** code for further purchases, shown in HomePlan 3D.
+- **New extensions** on the Extensions page and a dot on the tab.
 - The Extensions page shows once what a pack update brought.
 - Screens and status lights of pack furniture can link a light (glow in its colour) or a switch.
 

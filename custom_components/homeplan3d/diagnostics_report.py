@@ -32,7 +32,6 @@ from homeassistant.helpers.storage import Store
 from homeassistant.loader import async_get_integration
 
 from .const import DOMAIN, STORAGE_KEY_DIAGNOSTICS, STORAGE_VERSION
-from .license import RETRY_WAITS, user_agent
 from .packs import KNOWN_FEATURES
 
 _LOGGER = logging.getLogger(__name__)
@@ -58,6 +57,22 @@ _WHERE = re.compile(r"^homeplan3d[\w-]*\.js(:\d+){0,2}$")
 _VERSION = re.compile(r"^[0-9A-Za-z.+-]{1,20}$")
 _TIMEOUT = aiohttp.ClientTimeout(total=30)
 _SAVE_DELAY = 120
+# HTTP 429: wait and try again this often, in seconds
+RETRY_WAITS = (5.0, 15.0)
+_user_agent: str | None = None
+
+
+async def user_agent(hass: HomeAssistant) -> str:
+    """Our own User-Agent for the diagnostics server (the host throttles aiohttp's default one)."""
+    global _user_agent
+    if _user_agent is None:
+        try:
+            version = str((await async_get_integration(hass, DOMAIN)).version or "dev")
+        except Exception:
+            version = "dev"
+        _user_agent = f"HomePlan3D/{version} (Home Assistant; +https://github.com/Mastershort/neonplan3d)"
+    return _user_agent
+
 
 # ---------------------------------------------------------------------------- scrubbing
 

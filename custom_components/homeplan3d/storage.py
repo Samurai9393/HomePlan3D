@@ -36,7 +36,6 @@ from .const import (
     STORAGE_KEY_BUILDING,
     STORAGE_KEY_HISTORY,
     STORAGE_KEY_IMAGES,
-    STORAGE_KEY_LICENSE,
     STORAGE_KEY_PACKS,
     STORAGE_KEY_PLANS,
     STORAGE_MINOR_VERSION,
@@ -190,7 +189,7 @@ class PlanData:
 
 
 class FloorplanData:
-    """Floor plans, images, packs and the shop connection of one installation."""
+    """Floor plans, images and packs of one installation."""
 
     def __init__(self, hass: HomeAssistant) -> None:
         """Initialise the stores."""
@@ -198,7 +197,6 @@ class FloorplanData:
         self._image_store: Store[dict[str, Any]] = Store(hass, STORAGE_VERSION, STORAGE_KEY_IMAGES, **_OFF_LOOP)
         self._pack_store: Store[dict[str, Any]] = Store(hass, STORAGE_VERSION, STORAGE_KEY_PACKS)
         self._plans_store: Store[dict[str, Any]] = Store(hass, STORAGE_VERSION, STORAGE_KEY_PLANS)
-        self._license_store: Store[dict[str, Any]] = Store(hass, STORAGE_VERSION, STORAGE_KEY_LICENSE)
         self.main = PlanData(hass, MAIN_PLAN)
         # the plans in their order (the main plan first until the user moves it), and the ones in the bin
         self.index: list[dict[str, Any]] = [_main_entry()]
@@ -208,10 +206,8 @@ class FloorplanData:
         # the plan Live Presence works on (its rooms, doors and scanners)
         self.locate_plan = MAIN_PLAN
         self._images: dict[str, str] = {}
-        # imported furniture packs (checked payloads, see packs.py)
+        # imported furniture packs (validated local JSON payloads, see packs.py)
         self.packs: list[dict[str, Any]] = []
-        # the shop connection (see license.py): key, licensee, catalog of bought packs, last check
-        self.license: dict[str, Any] = {"key": None, "licensee": None, "catalog": [], "checked_at": None, "error": None}
 
     # the main plan, for everything that knows only one (and for older frontends)
     @property
@@ -237,9 +233,6 @@ class FloorplanData:
             await self._load_index(index)
         packs = await self._pack_store.async_load()
         self.packs = list((packs or {}).get("packs", []))
-        stored_license = await self._license_store.async_load()
-        if stored_license:
-            self.license = {**self.license, **stored_license}
         images = await self._image_store.async_load()
         self._images = dict((images or {}).get("images", {}))
         used: set[str] = set()
@@ -379,18 +372,16 @@ class FloorplanData:
         """Building of one of the main plan's restore points."""
         return self.main.snapshot(snapshot_id)
 
-    async def async_add_pack(
-        self, payload: dict[str, Any], signed: tuple[dict[str, Any], dict[str, str]] | None = None
-    ) -> bool:
-        """Keep an imported pack; a newer file of the same pack replaces the old one. The payload as signed
-        and the signature stay with it, so a backup can carry the pack and a restore can check it again.
+    async def async_add_pack(self, payload: dict[str, Any], source: dict[str, Any] | None = None) -> bool:
+        """Keep an imported pack; a newer file of the same pack replaces the old one. The local JSON
+        payload stays with it, so a backup can carry the pack and a restore can validate it again.
 
         Module code runs only once an admin has approved it (`approved` holds the approved code's fingerprint).
         New module code for an installed module does not replace the running one: it waits beside it as
         `pending` until an admin approves it. Returns True when the pack waits for an admin's approval."""
         entry: dict[str, Any] = {**payload, "imported_at": time.time()}
-        if signed:
-            entry["source"], entry["signature"] = signed
+        if source:
+            entry["source"] = source
         old = next((p for p in self.packs if p["id"] == payload["id"]), None)
         sha = module_sha(entry)
         if sha is not None and old is not None and module_sha(old) is not None:
@@ -440,10 +431,6 @@ class FloorplanData:
         await self.main.async_snapshot()
         await self.async_restore_packs(packs)
         return await self.main.async_save_building(building)
-
-    async def async_save_license(self) -> None:
-        """Keep the shop connection."""
-        await self._license_store.async_save(self.license)
 
     async def async_remove_pack(self, pack_id: str) -> bool:
         """Remove a pack (furniture using it stays in the plan as plain boxes)."""

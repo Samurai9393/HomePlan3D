@@ -1,14 +1,11 @@
-"""Furniture packs: signature check, content check and import through the websocket."""
+"""Furniture packs: local unsigned JSON files, content check and import through the websocket."""
 
 from __future__ import annotations
 
-import base64
 import copy
 import json
 from types import SimpleNamespace
 
-from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
 import pytest
@@ -38,105 +35,86 @@ PAYLOAD = {
 }
 
 
-def _key() -> tuple[Ed25519PrivateKey, dict[str, str]]:
-    private = Ed25519PrivateKey.generate()
-    raw = private.public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
-    return private, {packs.key_id(raw): base64.b64encode(raw).decode()}
+def _old_envelope(payload: dict) -> str:
+    """An old signed file: its signature, buyer name and installation binding are ignored."""
+    return json.dumps(
+        {
+            "payload": {**copy.deepcopy(payload), "licensee": "Anna", "instance": "box-1"},
+            "signature": {"key": "any", "sig": "ignored"},
+        }
+    )
 
 
-def _sign(private: Ed25519PrivateKey, keys: dict[str, str], payload: dict) -> str:
-    sig = base64.b64encode(private.sign(packs.canonical(payload))).decode()
-    return json.dumps({"payload": payload, "signature": {"key": next(iter(keys)), "sig": sig}})
+def test_unsigned_pack_is_accepted() -> None:
+    clean, source = packs.read_pack(json.dumps(PAYLOAD))
+    assert clean["id"] == "test.starter"
+    assert clean["items"][0]["parts"][0]["edges"] is False
+    assert source["id"] == "test.starter"
+    assert "licensee" not in clean and "instance" not in clean
 
 
-def test_signed_pack_is_accepted() -> None:
-    private, keys = _key()
-    payload = packs.verify_pack(_sign(private, keys, PAYLOAD), keys)
-    assert payload["items"][0]["parts"][0]["edges"] is False
-    assert payload["licensee"] is None
+def test_old_envelope_is_accepted_but_its_signature_is_ignored() -> None:
+    clean, source = packs.read_pack(_old_envelope(PAYLOAD))
+    assert clean == packs.validate_payload(PAYLOAD)
+    assert "licensee" not in source and "instance" not in source
+    # a changed file with a bogus signature still loads: there is no signature check
+    changed = {**copy.deepcopy(PAYLOAD), "name": "Mine now"}
+    text = json.dumps({"payload": changed, "signature": {"key": "x", "sig": "bad"}})
+    assert packs.read_pack(text)[0]["name"] == "Mine now"
 
 
-def test_changed_or_foreign_packs_are_rejected() -> None:
-    private, keys = _key()
-    text = _sign(private, keys, PAYLOAD)
-    # a changed file breaks the signature
-    changed = json.loads(text)
-    changed["payload"]["name"] = "Mine now"
+def test_bad_json_and_foreign_files_are_rejected() -> None:
     with pytest.raises(packs.PackError) as err:
-        packs.verify_pack(json.dumps(changed), keys)
-    assert err.value.code == "bad_signature"
-    # signed with another key: the publisher is unknown
-    other, other_keys = _key()
-    with pytest.raises(packs.PackError) as err:
-        packs.verify_pack(_sign(other, other_keys, PAYLOAD), keys)
-    assert err.value.code == "unknown_publisher"
-    # another key claiming the known key id
-    forged = json.loads(_sign(other, other_keys, PAYLOAD))
-    forged["signature"]["key"] = next(iter(keys))
-    with pytest.raises(packs.PackError) as err:
-        packs.verify_pack(json.dumps(forged), keys)
-    assert err.value.code == "bad_signature"
-    # without a signature, or not a pack at all
-    with pytest.raises(packs.PackError) as err:
-        packs.verify_pack(json.dumps({"payload": PAYLOAD}), keys)
-    assert err.value.code == "unsigned"
-    with pytest.raises(packs.PackError) as err:
-        packs.verify_pack("{}", keys)
+        packs.read_pack("{")
     assert err.value.code == "not_a_pack"
+    with pytest.raises(packs.PackError) as err:
+        packs.read_pack("{}")
+    assert err.value.code == "not_a_pack"
+    with pytest.raises(packs.PackError) as err:
+        packs.read_pack(json.dumps({"payload": {"format": "other"}}))
+    assert err.value.code == "not_a_pack"
+    with pytest.raises(packs.PackError) as err:
+        packs.read_pack("x" * (packs.MAX_PACK_SIZE + 1))
+    assert err.value.code == "too_large"
+
+
+def test_known_features_come_from_the_open_source_config() -> None:
+    config = json.loads(packs.CONFIG_FILE.read_text(encoding="utf-8"))
+    assert config == packs.OPEN_SOURCE_CONFIG
+    assert [f["id"] for f in config["features"] if f["enabled"]] == packs.KNOWN_FEATURES
+    assert "pool" in packs.KNOWN_FEATURES
+    assert "some_future_addon" not in packs.KNOWN_FEATURES
 
 
 def test_sloped_and_lying_parts_are_accepted() -> None:
-    private, keys = _key()
     shaped = copy.deepcopy(PAYLOAD)
     box = {"x": 0, "z": 0.2, "w": 1, "d": 0.6, "y": 0, "h": 0.5, "color": "body"}
     shaped["items"][0]["parts"] = [
         {"shape": "loft", **box, "tx": 0, "tz": 0.1, "tw": 0.9, "td": 0.2, "edges": "glow"},
         {"shape": "cyl", "axis": "x", **box, "edges": "faint"},
     ]
-    payload = packs.verify_pack(_sign(private, keys, shaped), keys)
-    assert payload["items"][0]["parts"][0]["edges"] == "glow"
-    assert payload["items"][0]["parts"][1]["axis"] == "x"
+    clean = packs.validate_payload(shaped)
+    assert clean["items"][0]["parts"][0]["edges"] == "glow"
+    assert clean["items"][0]["parts"][1]["axis"] == "x"
     bad = copy.deepcopy(shaped)
     bad["items"][0]["parts"][1]["axis"] = "w"
     with pytest.raises(packs.PackError):
-        packs.verify_pack(_sign(private, keys, bad), keys)
-
-
-def test_shop_signing_from_the_canonical_template() -> None:
-    """The shop replaces the last "licensee":null of the canonical template with the buyer's name and
-    signs those bytes (tools/shop/ms-np-sign.php); the result must verify and carry the name."""
-    private, keys = _key()
-    template = packs.canonical({**copy.deepcopy(PAYLOAD), "licensee": None})
-    name = 'Jürgen Müller-Lüdenscheidt "Jü"'
-    marker = b'"licensee":null'
-    at = template.rfind(marker)
-    assert at > 0
-    encoded = json.dumps(name, ensure_ascii=False).encode()
-    signed = template[:at] + b'"licensee":' + encoded + template[at + len(marker) :]
-    sig = base64.b64encode(private.sign(signed)).decode()
-    text = '{"payload":' + signed.decode() + ',"signature":{"key":"' + next(iter(keys)) + '","sig":"' + sig + '"}}'
-    payload = packs.verify_pack(text, keys)
-    assert payload["licensee"] == name
-    # the same bytes, canonicalised again by the integration, are what was signed
-    assert packs.canonical(json.loads(text)["payload"]) == signed
+        packs.validate_payload(bad)
 
 
 def test_pack_content_is_checked() -> None:
-    private, keys = _key()
     heavy = copy.deepcopy(PAYLOAD)
     heavy["items"][0]["parts"] *= 31  # more than 60 parts
     with pytest.raises(packs.PackError) as err:
-        packs.verify_pack(_sign(private, keys, heavy), keys)
+        packs.validate_payload(heavy)
     assert err.value.code == "invalid_content"
     twice = copy.deepcopy(PAYLOAD)
     twice["items"].append(copy.deepcopy(twice["items"][0]))
     with pytest.raises(packs.PackError):
-        packs.verify_pack(_sign(private, keys, twice), keys)
+        packs.validate_payload(twice)
 
 
-async def test_import_list_and_remove(hass: HomeAssistant, hass_ws_client, monkeypatch: pytest.MonkeyPatch) -> None:
-    private, keys = _key()
-    monkeypatch.setattr(packs, "PACK_PUBLIC_KEYS", keys)
+async def test_import_list_and_remove(hass: HomeAssistant, hass_ws_client) -> None:
     await async_setup_component(hass, "http", {})
     entry = MockConfigEntry(domain=DOMAIN, data={})
     entry.add_to_hass(hass)
@@ -145,7 +123,7 @@ async def test_import_list_and_remove(hass: HomeAssistant, hass_ws_client, monke
     client = await hass_ws_client(hass)
 
     await client.send_json_auto_id(
-        {"type": "homeplan3d/packs/import", "pack": _sign(private, keys, {**PAYLOAD, "licensee": "Anna"})}
+        {"type": "homeplan3d/packs/import", "pack": json.dumps({**PAYLOAD, "licensee": "Anna"})}
     )
     result = await client.receive_json()
     assert result["success"]
@@ -153,7 +131,6 @@ async def test_import_list_and_remove(hass: HomeAssistant, hass_ws_client, monke
         "id": "test.starter",
         "name": "Starter",
         "publisher": "Test",
-        "licensee": "Anna",
         "items": 1,
     }
 
@@ -165,6 +142,7 @@ async def test_import_list_and_remove(hass: HomeAssistant, hass_ws_client, monke
     listed = (await client.receive_json())["result"]["packs"]
     assert [p["id"] for p in listed] == ["test.starter"]
     assert listed[0]["items"][0]["name"]["de"] == "Würfelsessel"
+    assert "licensee" not in listed[0]
 
     await client.send_json_auto_id({"type": "homeplan3d/packs/remove", "pack_id": "test.starter"})
     assert (await client.receive_json())["success"]
@@ -172,13 +150,30 @@ async def test_import_list_and_remove(hass: HomeAssistant, hass_ws_client, monke
     assert (await client.receive_json())["result"]["packs"] == []
 
 
-async def test_module_code_runs_only_after_an_admin_approved_it(
-    hass: HomeAssistant, hass_ws_client, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """HACS review: module code is shown and approved by an admin before it runs, and an update never replaces
-    the running code by itself."""
-    private, keys = _key()
-    monkeypatch.setattr(packs, "PACK_PUBLIC_KEYS", keys)
+async def test_shop_and_license_commands_are_gone(hass: HomeAssistant, hass_ws_client) -> None:
+    await async_setup_component(hass, "http", {})
+    entry = MockConfigEntry(domain=DOMAIN, data={})
+    entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+    client = await hass_ws_client(hass)
+
+    for command, extra in (
+        ("homeplan3d/license/get", {}),
+        ("homeplan3d/license/activate", {"code": "abc"}),
+        ("homeplan3d/license/remove", {}),
+        ("homeplan3d/license/refresh", {}),
+        ("homeplan3d/packs/install", {"pack_id": "test.starter"}),
+        ("homeplan3d/previews/get", {}),
+    ):
+        await client.send_json_auto_id({"type": command, **extra})
+        result = await client.receive_json()
+        assert not result["success"], result
+        assert result["error"]["code"] == "unknown_command"
+
+
+async def test_module_code_runs_only_after_an_admin_approved_it(hass: HomeAssistant, hass_ws_client) -> None:
+    """Module code is shown and approved by an admin before it runs; an update never replaces the running code."""
     await async_setup_component(hass, "http", {})
     entry = MockConfigEntry(domain=DOMAIN, data={})
     entry.add_to_hass(hass)
@@ -192,7 +187,7 @@ async def test_module_code_runs_only_after_an_admin_approved_it(
 
     module = {**PAYLOAD, "id": "mastershort.window_watch", "items": [], "release": 1}
     v1 = {**module, "module": {"api": 1, "kind": "stage", "code": "export default { api: 1, id: 'v1' };"}}
-    res = await call(type="homeplan3d/packs/import", pack=_sign(private, keys, v1))
+    res = await call(type="homeplan3d/packs/import", pack=json.dumps(v1))
     assert res["success"] and res["result"]["approval"] is True
     listed = (await call(type="homeplan3d/packs/list"))["result"]["packs"][0]
     assert listed["module"]["approved"] is False and "code" not in listed["module"]
@@ -202,6 +197,7 @@ async def test_module_code_runs_only_after_an_admin_approved_it(
     # the admin reads it, then approves exactly that code
     review = (await call(type="homeplan3d/modules/review", pack_id="mastershort.window_watch"))["result"]
     assert "id: 'v1'" in review["code"]
+    assert "licensee" not in review
     assert not (await call(type="homeplan3d/modules/approve", pack_id="mastershort.window_watch", sha="0" * 64))[
         "success"
     ]
@@ -214,7 +210,7 @@ async def test_module_code_runs_only_after_an_admin_approved_it(
 
     # a new release waits beside the running code
     v2 = {**module, "release": 2, "module": {"api": 1, "kind": "stage", "code": "export default { api: 1, id: 'v2' };"}}
-    assert (await call(type="homeplan3d/packs/import", pack=_sign(private, keys, v2)))["result"]["approval"] is True
+    assert (await call(type="homeplan3d/packs/import", pack=json.dumps(v2)))["result"]["approval"] is True
     listed = (await call(type="homeplan3d/packs/list"))["result"]["packs"][0]
     assert listed["module"]["approved"] is True and listed["release"] == 1
     assert listed["pending"]["release"] == 2
@@ -233,11 +229,12 @@ async def test_module_code_runs_only_after_an_admin_approved_it(
     )
 
 
-def test_publisher_key_is_configured() -> None:
-    # the published integration accepts packs of the publisher's key only
-    assert len(packs.PACK_PUBLIC_KEYS) >= 1
-    for kid, public in packs.PACK_PUBLIC_KEYS.items():
-        assert packs.key_id(base64.b64decode(public)) == kid
+def test_any_publisher_and_id_are_accepted() -> None:
+    """Without publisher keys, any publisher may ship a pack with any valid id."""
+    studio = {**PAYLOAD, "id": "studio.abc123", "publisher": "Anyone"}
+    assert packs.validate_payload(studio)["id"] == "studio.abc123"
+    feature = {**PAYLOAD, "id": "test.other", "items": [], "features": ["camera_cockpit"]}
+    assert packs.validate_payload(feature)["features"] == ["camera_cockpit"]
 
 
 def test_turned_parts_and_stairs_holes_are_accepted() -> None:
@@ -268,33 +265,20 @@ def test_library_fields_are_accepted_and_checked() -> None:
 
 
 def test_feature_packs_need_no_items_but_a_pack_needs_something() -> None:
-    """A feature pack unlocks Pro features without furniture; an empty pack is refused."""
+    """A feature pack unlocks features without furniture; an empty pack is refused."""
     pro = {**PAYLOAD, "id": "test.pro", "items": [], "features": ["camera_cockpit", "weather"]}
     assert packs.validate_payload(pro)["features"] == ["camera_cockpit", "weather"]
     with pytest.raises(packs.PackError):
         packs.validate_payload({**PAYLOAD, "items": []})
-    # a Pro add-on newer than this installation asks for an update (#218)
+    # an add-on newer than this installation asks for an update
     with pytest.raises(packs.PackError) as err:
         packs.validate_payload({**pro, "features": ["some_future_addon"]})
     assert err.value.code == "needs_update"
     assert err.value.detail == "some_future_addon"
 
 
-def test_studio_key_signs_studio_furniture_only(monkeypatch: pytest.MonkeyPatch) -> None:
-    """The Möbel-Studio key may sign "studio.*" furniture packs, never Pro features or other packs."""
-    private, keys = _key()
-    kid = next(iter(keys))
-    monkeypatch.setattr(packs, "STUDIO_KEYS", {kid})
-    studio = {**PAYLOAD, "id": "studio.abc123"}
-    assert packs.verify_pack(_sign(private, keys, studio), keys)["id"] == "studio.abc123"
-    for bad in ({**PAYLOAD, "id": "test.other"}, {**studio, "features": ["camera_cockpit"]}):
-        with pytest.raises(packs.PackError) as err:
-            packs.verify_pack(_sign(private, keys, bad), keys)
-        assert err.value.code == "bad_signature"
-
-
 def test_a_newer_part_shape_asks_for_an_update() -> None:
-    """An unknown value of a newer pack asks for an update (voluptuous and Probatio); other faults stay errors."""
+    """An unknown value of a newer pack asks for an update; other faults stay errors."""
     item = copy.deepcopy(PAYLOAD["items"][0])
     item["parts"][0]["shape"] = "some_future_shape"
     with pytest.raises(packs.PackError) as err:
@@ -331,7 +315,7 @@ def test_probatio_marks_an_unknown_value_by_its_code() -> None:
 
 
 def test_a_module_pack_needs_no_furniture_and_its_code_is_served_apart() -> None:
-    """A module pack (code the shop delivers) passes without items; the studio key may not sign one."""
+    """A module pack passes without items; an admin approves its code before it is served."""
     module = {
         **PAYLOAD,
         "id": "mastershort.voice_answers",

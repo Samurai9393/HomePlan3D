@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Awaitable, Callable
 import contextlib
-import json
 import time
 from typing import Any
 
@@ -15,7 +13,6 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.loader import async_get_integration
 import voluptuous as vol
 
-from . import license as lic
 from .const import (
     DATA_ASK,
     DATA_DIAGNOSTICS,
@@ -32,7 +29,7 @@ from .const import (
 from .diagnostics_report import DiagnosticsError, DiagnosticsReporter
 from .locate.recorder import ws_locate_rec
 from .locate.ws import COMMANDS as LOCATE_COMMANDS
-from .packs import MAX_PACK_SIZE, PackError, module_sha, parts_of, verify_pack
+from .packs import MAX_PACK_SIZE, PackError, module_sha, pack_source, read_pack, validate_payload
 from .schema import BUILDING_SCHEMA, IMAGE_DATA, empty_building
 from .screens import KINDS, screens_of
 from .storage import FloorplanData, PlanData, complete
@@ -82,14 +79,9 @@ def async_register_commands(hass: HomeAssistant) -> None:
         ws_packs_list,
         ws_packs_import,
         ws_packs_remove,
-        ws_packs_install,
         ws_modules_code,
         ws_modules_review,
         ws_modules_approve,
-        ws_license_get,
-        ws_license_activate,
-        ws_license_remove,
-        ws_license_refresh,
         ws_backup_export,
         ws_backup_import,
         ws_timetravel_history,
@@ -105,7 +97,6 @@ def async_register_commands(hass: HomeAssistant) -> None:
         ws_voice_settings_set,
         ws_voice_converse,
         ws_locate_rec,
-        ws_previews_get,
     ):
         websocket_api.async_register_command(hass, command)
     for command in LOCATE_COMMANDS:
@@ -436,7 +427,7 @@ def _without_code(pack: dict[str, Any]) -> dict[str, Any]:
     if isinstance(pending, dict):
         pcode = (pending.get("module") or {}).get("code") or ""
         slim["pending"] = {"release": pending.get("release") or 1, "size": len(pcode), "sha": module_sha(pending)}
-    # the signed source carries the code as well
+    # the source carries the code as well
     if isinstance(slim.get("source"), dict):
         slim["source"] = {**slim["source"], "module": {k: v for k, v in module.items() if k != "code"}}
     return slim
@@ -480,20 +471,19 @@ def ws_modules_code(hass: HomeAssistant, connection: websocket_api.ActiveConnect
 @websocket_api.require_admin
 @websocket_api.async_response
 async def ws_packs_import(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
-    """Check a pack file's signature and content, then keep it."""
+    """Check a local JSON pack's content, then keep it."""
     if (data := _data(hass, connection, msg)) is None:
         return
     try:
-        payload = verify_pack(msg["pack"], instance=await lic.async_instance_fingerprint(hass))
+        payload, source = read_pack(msg["pack"])
     except PackError as err:
         connection.send_error(msg["id"], err.code, err.detail or err.code)
         return
-    waits = await data.async_add_pack(payload, parts_of(msg["pack"]))
+    waits = await data.async_add_pack(payload, source)
     result = {
         "id": payload["id"],
         "name": payload["name"],
         "publisher": payload["publisher"],
-        "licensee": payload["licensee"],
         "items": len(payload["items"]),
     }
     if waits:
@@ -515,86 +505,6 @@ async def ws_packs_remove(hass: HomeAssistant, connection: websocket_api.ActiveC
         connection.send_error(msg["id"], "not_found", "Pack not found")
         return
     connection.send_result(msg["id"])
-
-
-# ---------------------------------------------------------------------------- shop connection
-
-
-async def _license_call(
-    hass: HomeAssistant,
-    connection: websocket_api.ActiveConnection,
-    msg: dict[str, Any],
-    call: Callable[[FloorplanData], Awaitable[dict[str, Any]]],
-) -> None:
-    """Run a shop call and answer with its status, or with the shop's error code."""
-    if (data := _data(hass, connection, msg)) is None:
-        return
-    try:
-        connection.send_result(msg["id"], await call(data))
-    except lic.LicenseError as err:
-        connection.send_error(msg["id"], err.code, err.detail or err.code)
-
-
-@websocket_api.websocket_command({vol.Required("type"): "homeplan3d/license/get"})
-@websocket_api.require_admin
-@websocket_api.async_response
-async def ws_license_get(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
-    """The installation's fingerprint, the key's state and the catalog of bought packs."""
-    if (data := _data(hass, connection, msg)) is None:
-        return
-    connection.send_result(msg["id"], lic.status(data, await lic.async_instance_fingerprint(hass)))
-
-
-@websocket_api.websocket_command(
-    {vol.Required("type"): "homeplan3d/license/activate", vol.Required("key"): vol.All(str, vol.Length(max=40))}
-)
-@websocket_api.require_admin
-@websocket_api.async_response
-async def ws_license_activate(
-    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
-) -> None:
-    """Bind this installation to a customer key at the shop and keep the key."""
-    await _license_call(hass, connection, msg, lambda data: lic.async_activate(hass, data, msg["key"]))
-
-
-@websocket_api.websocket_command({vol.Required("type"): "homeplan3d/license/remove"})
-@websocket_api.require_admin
-@websocket_api.async_response
-async def ws_license_remove(
-    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
-) -> None:
-    """Forget the key (installed packs stay)."""
-    await _license_call(hass, connection, msg, lambda data: lic.async_remove(hass, data))
-
-
-@websocket_api.websocket_command({vol.Required("type"): "homeplan3d/license/refresh"})
-@websocket_api.require_admin
-@websocket_api.async_response
-async def ws_license_refresh(
-    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
-) -> None:
-    """Ask the shop again now (new purchases, updates of installed packs)."""
-    await _license_call(hass, connection, msg, lambda data: lic.async_refresh(hass, data))
-
-
-@websocket_api.websocket_command({vol.Required("type"): "homeplan3d/previews/get"})
-@websocket_api.require_admin
-@websocket_api.async_response
-async def ws_previews_get(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
-    """Pictures and names of the shop's furniture (for the library's locked cards); empty while the shop is away."""
-    connection.send_result(msg["id"], await lic.async_fetch_previews(hass))
-
-
-@websocket_api.websocket_command(
-    {vol.Required("type"): "homeplan3d/packs/install", vol.Required("pack_id"): vol.All(str, vol.Length(max=64))}
-)
-@websocket_api.require_admin
-@websocket_api.async_response
-async def ws_packs_install(
-    hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
-) -> None:
-    """Fetch a bought pack from the shop, signed for this installation, and keep it."""
-    await _license_call(hass, connection, msg, lambda data: lic.async_install(hass, data, msg["pack_id"]))
 
 
 # ---------------------------------------------------------------------------- backup
@@ -641,9 +551,8 @@ def ws_backup_export(hass: HomeAssistant, connection: websocket_api.ActiveConnec
 async def ws_backup_import(
     hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
 ) -> None:
-    """Replace the plan and the packs from a backup. Packs are checked again: only ones whose
-    signature verifies (and that are not bound to another installation) come back; the rest are
-    reported as skipped. The state before becomes a restore point.
+    """Replace the plan and the packs from a backup. Packs are validated again by content: only
+    valid local packs come back; the rest are reported as skipped. The state before becomes a restore point.
 
     A backup with further plans (version 2) brings them back too: the plans there are now go into the bin first
     (nothing is lost), then the backup's plans are added. A version-1 backup touches only the main plan."""
@@ -659,24 +568,25 @@ async def ws_backup_import(
     except vol.Invalid as err:
         connection.send_error(msg["id"], "invalid_format", str(err))
         return
-    instance = await lic.async_instance_fingerprint(hass)
-    packs: list[dict[str, Any]] = []
+    restored: list[dict[str, Any]] = []
     skipped: list[dict[str, str]] = []
     for entry in msg["packs"]:
-        signature = entry.get("signature")
-        source = entry.get("source")
         name = str(entry.get("id") or "?")
-        if not isinstance(signature, dict) or not isinstance(source, dict):
-            skipped.append({"id": name, "reason": "unsigned"})
-            continue
+        source = pack_source(entry)
         try:
-            text = json.dumps({"payload": source, "signature": signature})
-            clean = verify_pack(text, instance=instance)
+            clean = validate_payload(source)
         except (PackError, TypeError, ValueError) as err:
-            skipped.append({"id": name, "reason": getattr(err, "code", "bad_signature")})
+            skipped.append({"id": name, "reason": getattr(err, "code", "invalid_content")})
             continue
-        packs.append({**clean, "source": source, "signature": parts_of(text)[1], "imported_at": time.time()})
-    revision = await data.async_restore(complete(building), packs)
+        if isinstance(entry.get("id"), str) and entry["id"] != clean["id"]:
+            skipped.append({"id": name, "reason": "invalid_content"})
+            continue
+        pack: dict[str, Any] = {**clean, "source": source, "imported_at": time.time()}
+        # an approval carries over only when it names exactly the code restored here
+        if isinstance(entry.get("approved"), str) and entry["approved"] == module_sha(clean) and module_sha(clean):
+            pack["approved"] = entry["approved"]
+        restored.append(pack)
+    revision = await data.async_restore(complete(building), restored)
     if "plans" in msg:
         main = msg.get("main") or {}
         await data.async_update_plan(MAIN_PLAN, {k: main.get(k) for k in ("name", "icon", "site") if k in main})
@@ -694,7 +604,7 @@ async def ws_backup_import(
         {
             "revision": revision,
             "building": data.building,
-            "packs": len(packs),
+            "packs": len(restored),
             "skipped": skipped,
         },
     )
@@ -976,7 +886,6 @@ def ws_modules_review(hass: HomeAssistant, connection: websocket_api.ActiveConne
             "id": target["id"],
             "name": target.get("name"),
             "publisher": target.get("publisher"),
-            "licensee": target.get("licensee"),
             "release": target.get("release") or 1,
             "api": module["api"],
             "kind": module["kind"],

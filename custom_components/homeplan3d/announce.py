@@ -1,8 +1,8 @@
 """Announcements from automations: the service `homeplan3d.announce`.
 
-The Announcements module (a shop module, runs in the browser) speaks when someone taps a sentence. An automation
-(the doorbell rings, the washing machine is done) runs with no NeonPlan page open, so its announcement is made here,
-with the module's settings from the plan: the speaker chosen for a room, else one placed in the room on the plan,
+The Announcements module (from a local JSON pack, runs in the browser) speaks when someone taps a sentence. An
+automation (the doorbell rings, the washing machine is done) runs with no NeonPlan page open, so its announcement is
+made here, with the module's settings from the plan: the speaker chosen for a room, else one placed in that room,
 else one of the room's area, else the house's default speaker; the room's quiet time; the text-to-speech entity.
 The service works only while the Announcements module is installed and approved.
 

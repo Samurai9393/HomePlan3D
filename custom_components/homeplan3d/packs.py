@@ -1,22 +1,17 @@
-"""Furniture packs: signed files with furniture models built from boxes and cylinders.
+"""Furniture packs: local JSON files with furniture models built from boxes and cylinders.
 
-A pack is JSON: the payload (format, id, name, publisher, items) plus a signature. Only packs signed
-with a publisher key listed in PACK_PUBLIC_KEYS are accepted. The signature covers the payload in a
-canonical form (sorted keys, no whitespace, UTF-8), so any change to the file invalidates it.
-
-This module only depends on voluptuous and cryptography, so tools/fp3dpack.py (which signs packs)
-uses the same schema and canonical form.
+A pack is a JSON payload (format, id, name, publisher, items, optional features or module). There is no
+signature, publisher key or licence: a local file is accepted when its content validates here. The
+feature ids this version knows come from the shipped open-source-config.json.
 """
 
 from __future__ import annotations
 
-import base64
 import hashlib
 import json
+from pathlib import Path
 from typing import Any
 
-from cryptography.exceptions import InvalidSignature
-from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 import voluptuous as vol
 
 PACK_FORMAT = "fp3dpack"
@@ -24,18 +19,16 @@ PACK_VERSION = 1
 # largest pack file accepted (characters of JSON)
 MAX_PACK_SIZE = 1_000_000
 
-# Publisher keys whose packs are accepted: key id -> raw Ed25519 public key (base64).
-PACK_PUBLIC_KEYS: dict[str, str] = {
-    # Mastershort (master key, kept offline)
-    "62863e45df5a": "D3sbiEQibaCVm1OWcYUrQc424c2t+pmSQqWg6l6fNSE=",
-    # Mastershort shop (signs purchased packs with the buyer's name; revocable by removing it here)
-    "867371cc70e6": "uP74xZzFJ2yysjdIZVq5q9G/yn5hVX4HJ6wHv7pqqwo=",
-    # Mastershort Möbel-Studio (signs customers' own furniture on api.mastershort.de; limited, see STUDIO_KEYS)
-    "bdac241ae58b": "+oU/fcdvK7sfvpmz/aq63Y1QIymqK5+pKYGrGksrco8=",
-}
-# keys that may only sign furniture of their own: "studio.*" packs without Pro features (a leaked studio key
-# cannot unlock anything)
-STUDIO_KEYS = {"bdac241ae58b"}
+CONFIG_FILE = Path(__file__).with_name("open-source-config.json")
+
+
+def load_open_source_config() -> dict[str, Any]:
+    """The shipped open-source configuration: mode, licence and the enabled features."""
+    data = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
+    return data if isinstance(data, dict) else {}
+
+
+OPEN_SOURCE_CONFIG = load_open_source_config()
 
 _ID = vol.All(str, vol.Match(r"^[a-z0-9][a-z0-9_.-]{0,39}$"))
 _TEXT = vol.All(str, vol.Length(min=1, max=80))
@@ -182,29 +175,17 @@ ITEM_SCHEMA = vol.Schema(
     }
 )
 
-# Pro features this version knows; a pack with a newer one needs a newer HomePlan 3D
-KNOWN_FEATURES = [
-    "camera_cockpit",
-    "weather",
-    "screens",
-    "fridge_smart",
-    "energy_pro",
-    "sound",
-    "auto_pro",
-    "time_travel",
-    "pool",
-    "household",
-    # digital picture frames (a pack with furniture and the "frames" feature)
-    "frames",
-    # fun packs: free extras one picks up in the shop (pets, later seasonal ones)
-    "fun_pets",
-    "fun_halloween",
-    "fun_winter",
+# Features this version knows; a pack with a newer one needs a newer HomePlan 3D. The single source of truth
+# is the shipped configuration, which enables every feature of the open-source build.
+KNOWN_FEATURES: list[str] = [
+    str(f["id"])
+    for f in OPEN_SOURCE_CONFIG.get("features") or []
+    if isinstance(f, dict) and f.get("enabled") and isinstance(f.get("id"), str)
 ]
 
-# A module: code the shop delivers (not part of the public repository), run by NeonPlan's module loader.
-# `api` is the loader interface it was written for, `kind` where it plugs in. Signed and bound like any pack.
-# voice: answers spoken questions; stage: draws in the house (water, cards, warnings, editor fields)
+# A module: code a local JSON pack carries, run by NeonPlan's module loader. `api` is the loader interface it was
+# written for, `kind` where it plugs in. voice: answers spoken questions; stage: draws in the house (water, cards,
+# warnings, editor fields)
 MODULE_KINDS = ["voice", "stage"]
 MODULE_SCHEMA = vol.Schema(
     {
@@ -222,14 +203,10 @@ PAYLOAD_SCHEMA = vol.Schema(
         vol.Required("id"): _ID,
         vol.Required("name"): _TEXT,
         vol.Required("publisher"): _TEXT,
-        # buyer the pack was signed for (shown on import)
-        vol.Optional("licensee", default=None): vol.Any(None, _TEXT),
         # release number of the pack (a newer release of the same id replaces an installed one)
         vol.Optional("release", default=1): vol.All(int, vol.Range(min=1, max=100000)),
-        # fingerprint of the installation the pack is bound to (None = any installation)
-        vol.Optional("instance", default=None): vol.Any(None, vol.Match(r"^[0-9a-f]{16}$")),
         vol.Optional("description", default=""): vol.All(str, vol.Length(max=400)),
-        # Pro features the pack unlocks (a feature pack may carry no furniture at all)
+        # features the pack carries (a feature pack may have no furniture at all)
         vol.Optional("features", default=[]): vol.All(
             [vol.In(KNOWN_FEATURES)],
             vol.Length(max=10),
@@ -251,30 +228,6 @@ class PackError(Exception):
         self.detail = detail
 
 
-def canonical(payload: dict[str, Any]) -> bytes:
-    """Bytes the signature covers."""
-    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
-
-
-def key_id(public_raw: bytes) -> str:
-    """Short name of a public key."""
-    return hashlib.sha256(public_raw).hexdigest()[:12]
-
-
-def fingerprint(instance_id: str) -> str:
-    """An installation's fingerprint, as bound packs carry it: a hash, so the file does not reveal the id."""
-    return hashlib.sha256(f"homeplan3d:{instance_id}".encode()).hexdigest()[:16]
-
-
-def parts_of(text: str) -> tuple[dict[str, Any], dict[str, str]]:
-    """The payload exactly as signed and the signature of a pack file that verify_pack accepted; both are
-    kept with the pack so a backup can carry it and a restore can check it again (the validated payload
-    has defaults filled in, so its bytes no longer match the signature)."""
-    data = json.loads(text)
-    sig = data["signature"]
-    return data["payload"], {"key": sig["key"], "sig": sig["sig"]}
-
-
 def _unknown_value(err: vol.Invalid) -> bool:
     """Whether a value outside a known list failed: voluptuous says so in its message; Probatio, which checks
     schemas since Home Assistant 2026.9, gives it the code "not_in_list" (pointed out by hohoanganh)."""
@@ -289,12 +242,12 @@ def _unknown_value(err: vol.Invalid) -> bool:
 
 
 def validate_payload(payload: Any) -> dict[str, Any]:
-    """Check the content of a pack (without its signature); raises PackError."""
+    """Check a pack's content and fill in defaults; raises PackError."""
     features = payload.get("features") if isinstance(payload, dict) else None
     if isinstance(features, list):
         unknown = [f for f in features if isinstance(f, str) and f not in KNOWN_FEATURES]
         if unknown:
-            # a Pro add-on newer than this installation (#218): ask for an update, not a cryptic error
+            # a feature newer than this installation: ask for an update, not a cryptic error
             raise PackError("needs_update", ", ".join(unknown))
     # a module written for a newer loader: an update, not a broken pack
     module = payload.get("module") if isinstance(payload, dict) else None
@@ -315,48 +268,36 @@ def validate_payload(payload: Any) -> dict[str, Any]:
     return clean
 
 
-def verify_pack(text: str, keys: dict[str, str] | None = None, instance: str | None = None) -> dict[str, Any]:
-    """Parse a pack file, check its signature against the publisher keys and return its payload.
+# bookkeeping fields of a stored pack, not part of its JSON payload
+_BOOKKEEPING = ("source", "signature", "imported_at", "approved", "pending")
+# fields of old signed packs which carried a licence and an installation binding
+_LEGACY_FIELDS = ("licensee", "instance")
 
-    A pack bound to an installation (payload "instance") is only accepted when `instance` is that
-    fingerprint; with instance=None the binding is not checked (tools)."""
-    keys = PACK_PUBLIC_KEYS if keys is None else keys
+
+def read_pack(text: str) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Read a local unsigned JSON pack: (validated payload, raw payload kept as the backup source).
+
+    A bare payload and the older `{"payload": ..., "signature": ...}` envelope are both accepted. A
+    signature is ignored; an old buyer name or installation binding is dropped before validation.
+    """
     if len(text) > MAX_PACK_SIZE:
         raise PackError("too_large")
     try:
         data = json.loads(text)
     except ValueError as err:
         raise PackError("not_a_pack", "not JSON") from err
-    if (
-        not isinstance(data, dict)
-        or not isinstance(data.get("payload"), dict)
-        or data["payload"].get("format") != PACK_FORMAT
-    ):
+    raw = data.get("payload") if isinstance(data, dict) and isinstance(data.get("payload"), dict) else data
+    if not isinstance(raw, dict) or raw.get("format") != PACK_FORMAT:
         raise PackError("not_a_pack")
-    signature = data.get("signature")
-    if (
-        not isinstance(signature, dict)
-        or not isinstance(signature.get("key"), str)
-        or not isinstance(signature.get("sig"), str)
-    ):
-        raise PackError("unsigned")
-    public = keys.get(signature["key"])
-    if public is None:
-        raise PackError("unknown_publisher")
-    try:
-        Ed25519PublicKey.from_public_bytes(base64.b64decode(public)).verify(
-            base64.b64decode(signature["sig"], validate=True), canonical(data["payload"])
-        )
-    except (InvalidSignature, ValueError) as err:
-        raise PackError("bad_signature") from err
-    payload = validate_payload(data["payload"])
-    if signature["key"] in STUDIO_KEYS and (
-        not str(payload["id"]).startswith("studio.") or payload["features"] or payload.get("module")
-    ):
-        raise PackError("bad_signature", "the studio key signs studio furniture only")
-    if instance is not None and payload["instance"] is not None and payload["instance"] != instance:
-        raise PackError("wrong_instance", "the pack is bound to another installation")
-    return payload
+    source = {k: v for k, v in raw.items() if k not in _LEGACY_FIELDS}
+    return validate_payload(source), source
+
+
+def pack_source(entry: dict[str, Any]) -> dict[str, Any]:
+    """The payload of a stored or backed-up pack entry, without bookkeeping fields."""
+    stored = entry.get("source")
+    raw = stored if isinstance(stored, dict) else entry
+    return {k: v for k, v in raw.items() if k not in _BOOKKEEPING and k not in _LEGACY_FIELDS}
 
 
 def module_sha(pack: dict[str, Any] | None) -> str | None:

@@ -1,0 +1,23 @@
+{
+  "mode": "open-source",
+  "license": "MIT",
+  "features": [
+    { "id": "camera_cockpit", "enabled": true },
+    { "id": "weather", "enabled": true },
+    { "id": "screens", "enabled": true },
+    { "id": "energy_pro", "enabled": true },
+    { "id": "sound", "enabled": true },
+    { "id": "auto_pro", "enabled": true },
+    { "id": "time_travel", "enabled": true },
+    { "id": "pool", "enabled": true },
+    { "id": "household", "enabled": true },
+    { "id": "frames", "enabled": true },
+    { "id": "fridge_smart", "enabled": true },
+    { "id": "fun_pets", "enabled": true },
+    { "id": "fun_halloween", "enabled": true },
+    { "id": "fun_winter", "enabled": true },
+    { "id": "room_bar", "enabled": true },
+    { "id": "diagnostics", "enabled": true },
+    { "id": "locate", "enabled": true }
+  ]
+}

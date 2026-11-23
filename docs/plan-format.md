@@ -2,9 +2,9 @@
 
 *Deutsch weiter unten.*
 
-The **import page** – <https://neonplan3d.mastershort.de/import/> – turns plans from other programs into a HomePlan 3D plan. It reads Sweet Home 3D (`.sh3d`), iPhone/iPad LiDAR scans (RoomPlan JSON), CAD drawings (`.dxf`), 3D models (`.glb`, `.gltf`, `.obj`, `.stl`), Floorplanner exports, Valetudo robot vacuum maps – and the simple format described here. Everything runs in your browser; the file is uploaded nowhere. The result is a NeonPlan file you load in the editor under **Backup → Import …**.
+The editor's import turns plans from other programs into a HomePlan 3D plan. It reads Sweet Home 3D (`.sh3d`), iPhone/iPad LiDAR scans (RoomPlan JSON), CAD drawings (`.dxf`), 3D models (`.glb`, `.gltf`, `.obj`, `.stl`), Floorplanner exports, Valetudo robot vacuum maps – and the simple format described here. Everything stays in your browser; the file is uploaded nowhere. Load the result in the editor under **Backup → Import …**.
 
-The simple format is meant for anyone who writes a plan by hand, with a script or with an AI (see [ai-import.md](ai-import.md)): you describe rooms, doors and windows by plain coordinates, and the import page places everything properly (doors and windows on their walls, rooms joined, furniture mapped).
+The simple format is meant for anyone who writes a plan by hand, with a script or with an AI (see [ai-import.md](ai-import.md)): you describe rooms, doors and windows by plain coordinates, and the editor maps them into the plan.
 
 ## The file
 
@@ -59,9 +59,9 @@ Built-in furniture kinds: `sofa`, `sofa_l`, `sofa_u`, `armchair`, `stool`, `coff
 
 # NeonPlan-3D-Importformat
 
-Die **Import-Seite** – <https://neonplan3d.mastershort.de/import/> – macht aus Plänen anderer Programme einen NeonPlan-3D-Plan: Sweet Home 3D (`.sh3d`), iPhone-/iPad-LiDAR-Scans (RoomPlan-JSON), CAD-Zeichnungen (`.dxf`), 3D-Modelle (`.glb`, `.gltf`, `.obj`, `.stl`), Floorplanner-Exporte, Valetudo-Saugroboterkarten – und das hier beschriebene einfache Format. Alles läuft im Browser, die Datei wird nirgendwohin hochgeladen. Das Ergebnis lädst du im Editor unter **Sicherung → Importieren …**.
+Der Import des Editors macht aus Plänen anderer Programme einen NeonPlan-3D-Plan: Sweet Home 3D (`.sh3d`), iPhone-/iPad-LiDAR-Scans (RoomPlan-JSON), CAD-Zeichnungen (`.dxf`), 3D-Modelle (`.glb`, `.gltf`, `.obj`, `.stl`), Floorplanner-Exporte, Valetudo-Saugroboterkarten – und das hier beschriebene einfache Format. Alles läuft im Browser, die Datei wird nirgendwohin hochgeladen. Das Ergebnis lädst du im Editor unter **Sicherung → Importieren …**.
 
-Das einfache Format ist für alle, die einen Plan von Hand, mit einem Skript oder mit einer KI schreiben (siehe [ai-import.md](ai-import.md)). Aufbau wie oben:
+Das einfache Format ist für alle, die einen Plan von Hand, mit einem Skript oder mit einer KI schreiben (siehe [ai-import.md](ai-import.md)). Der Editor übernimmt die Datei direkt. Aufbau wie oben:
 
 - `units`: `"m"` (Standard), `"cm"` oder `"mm"`.
 - `rooms_at`: `"centre"` (Standard) = Raumumrisse auf der **Wandmitte**, Nachbarräume teilen sich die Kante; `"inner"` = an den **Innenkanten** gemessen, Räume im Wandabstand werden zusammengeführt.

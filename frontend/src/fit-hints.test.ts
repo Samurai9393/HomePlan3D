@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { boughtAnything, fitHints, fitText, offerFor } from "./fit-hints.ts";
+import { fitHints, fitText } from "./fit-hints.ts";
 import { emptyBuilding, newFloor } from "./model.ts";
 
 const st = (entity_id: string, attributes: Record<string, unknown> = {}) => [entity_id, { entity_id, attributes }] as const;
@@ -38,17 +38,6 @@ test("the plan counts too: a grid sensor set up, a parking spot", () => {
   const hints = fitHints({}, b);
   assert.equal(hints.get("energy_pro"), "⚡");
   assert.equal(hints.get("auto_pro"), "🚗");
-});
-
-test("a Pro add-on's offer is found by the shop's pack id, a key's purchase tells apart from free packs", () => {
-  const offers = [
-    { id: "mastershort.pro_energy", kind: "pro", price: "7,90 €" },
-    { id: "bundle_all", kind: "bundle", price: "49,90 €" },
-  ];
-  assert.equal(offerFor(offers, "energy_pro")?.price, "7,90 €");
-  assert.equal(offerFor(offers, "weather"), undefined);
-  assert.equal(boughtAnything([{ id: "mastershort.fun_winter" }, { id: "living_sample" }]), false);
-  assert.equal(boughtAnything([{ id: "fun_pets" }, { id: "living" }]), true);
 });
 
 test("the lines in German, English, and English while a further language is not fetched or unknown", () => {
