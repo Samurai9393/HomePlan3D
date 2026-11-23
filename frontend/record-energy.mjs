@@ -36,8 +36,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 await sleep(2500);
 
 const T = {
-  de: ["Energie Pro – dein Strom, sichtbar", "Glas-Hologramm mit Live-Bilanz", "Leitungen zeigen, wohin der Strom fließt", "Module leben mit der Sonne", "Geräte-Hologramme – auch ohne Solaranlage", "Antippen klappt zusammen", "Läuft auch auf alten Wandtablets · mastershort.de/homeplan3d"],
-  en: ["Energy Pro – your power, made visible", "Glass hologram with the live balance", "Cables show where the power flows", "Modules live with the sun", "Device holograms – also without solar", "Tap to fold", "Runs on old wall tablets too · mastershort.de/homeplan3d"],
+  de: ["Energie Pro – dein Strom, sichtbar", "Glas-Hologramm mit Live-Bilanz", "Leitungen zeigen, wohin der Strom fließt", "Module leben mit der Sonne", "Geräte-Hologramme – auch ohne Solaranlage", "Antippen klappt zusammen", "Läuft auch auf alten Wandtablets"],
+  en: ["Energy Pro – your power, made visible", "Glass hologram with the live balance", "Cables show where the power flows", "Modules live with the sun", "Device holograms – also without solar", "Tap to fold", "Runs on old wall tablets too"],
 }[lang];
 const captions = [];
 let n = 0;

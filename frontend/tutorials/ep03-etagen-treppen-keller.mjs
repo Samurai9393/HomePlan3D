@@ -7,7 +7,7 @@
 //      „Treppen & Geländer" (L, U, spiral to the cellar, space saver to the attic), „3D daneben" in detail, 3D check.
 // Starts from a small house like the end of episode 1 (loaded invisibly); part b starts where part a ends.
 // The stair pack is served from private/packs/src/stairs.json by request interception (the recorder itself does not
-// serve private/), only for this episode.
+// serve private/), only for this episode. Its old pack id is rewritten to demo.stairs while it is served.
 // Usage (from frontend/): node tutorials/ep03-etagen-treppen-keller.mjs <out-dir> a|b [<voice-dir de> [<voice-dir en>]]
 //   (voice dirs: private/tutorial-audio/ep03a/de and …/en, resp. ep03b)
 // Then: python ../tools/make-tutorial.py <out-dir> <out.mp4>
@@ -19,7 +19,7 @@ import { appVersion, narration, startRecorder } from "./recorder.mjs";
 const out = process.argv[2] ?? "tutorial-ep03";
 const PART = process.argv[3] === "b" ? "b" : "a";
 const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D ${appVersion()}</span>`;
-const STAIR_PACK = "pack:mastershort.stairs";
+const STAIR_PACK = "pack:demo.stairs";
 
 // ---------------------------------------------------------------- states (invented demo house, ep01 style)
 const rectRoom = (id, name, area_id, x0, z0, x1, z1, floor_material = "wood") => ({ id, name, area_id, points: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]], floor_material });
@@ -95,7 +95,7 @@ const { say, sayOver, chapter, catchUp } = N;
   R.page.on("request", (req) => {
     const u = req.url();
     if (u.includes("/private/packs/src/index.json")) return req.respond({ status: 200, contentType: "application/json", body: pack ? '["stairs.json"]' : "[]" });
-    if (u.includes("/private/packs/src/stairs.json") && pack) return req.respond({ status: 200, contentType: "application/json", body: pack });
+    if (u.includes("/private/packs/src/stairs.json") && pack) return req.respond({ status: 200, contentType: "application/json", body: pack.replace(/master.?short/gi, "demo") });
     if (u.includes("/private/")) return req.respond({ status: 404, body: "" });
     return req.continue();
   });

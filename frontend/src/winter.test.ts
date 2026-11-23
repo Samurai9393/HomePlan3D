@@ -6,7 +6,7 @@ import { fireworkNow, lawnSnow, roofLightsOn, snowLevel } from "./winter.ts";
 import type { HomeAssistant } from "./types.ts";
 
 // the pack unlocks the feature
-setPacks([{ id: "mastershort.fun_winter", name: "Winter", publisher: "Mastershort", licensee: null, items: [], features: ["fun_winter"] } as never]);
+setPacks([{ id: "local.fun_winter", name: "Winter", publisher: "Local", items: [], features: ["fun_winter"] } as never]);
 
 const plan = (winter: Building["settings"]["winter"] = {}): Building => {
   const b = emptyBuilding();

@@ -6,12 +6,11 @@
 //      to „Vorlage (Grundriss-Bild)“, the energy tool and the language.
 //   b) Sicherung, Umzug und Datenschutz: undo / redo, restore points, „Exportieren“ / „Als Vorlage teilen“ /
 //      „Importieren …“ (and what happens to areas and devices on another Home Assistant), „Komplett-Backup“, moving to
-//      a new Home Assistant step by step with the licence key and the installation binding (never a real key: the
-//      demo's shop mode and an invented key), what NeonPlan stores and sends (manual chapter 11), help links, and
-//      the end of the series.
+//      a new Home Assistant step by step, local JSON pack files, what NeonPlan stores locally (manual chapter 11),
+//      help links, and the end of the series.
 // The full demo house (invented data, mock Home Assistant). Setup steps before a scene are invisible. The preview
-// has no full-backup commands: this script answers them in the page (export: the plan and the packs; import: the
-// plan back, one pack skipped as bound to another installation – what a new Home Assistant really reports).
+// has no full-backup commands: this script answers them in the page (export: the plan and the installed local packs;
+// import: the plan and those pack files back). Packs are plain JSON files: no signature, no binding to an installation.
 // Downloads go into the recording folder, never into the user's Downloads.
 // Usage (from frontend/): node tutorials/ep12-einstellungen-sicherung.mjs <out-dir> a|b [<voice-dir de> [<voice-dir en>]]
 //   (voice dirs: private/tutorial-audio/ep12a/de and …/en, resp. ep12b)
@@ -806,28 +805,25 @@ if (PART === "b") {
     });
   /**
    * The preview has no full-backup commands: answer them in the page like a fresh Home Assistant would (export: the
-   * plan and the installed packs; import: the plan back, the living-room pack skipped as bound to the old
-   * installation). Also hides prices of the demo shop and starts it disconnected (like a new installation).
+   * plan and the installed local packs; import: the plan and those pack files back). Packs are plain JSON files:
+   * no signature, no binding to an installation.
    */
   const mockBackup = () =>
     R.page.evaluate(async () => {
       const p = window.fp3dPanel;
       const h = p.hass;
       const orig = h.callWS;
-      await orig({ type: "homeplan3d/license/remove" });
       h.callWS = async (m) => {
         if (m.type === "homeplan3d/backup/export") {
           const { building } = await orig({ type: "homeplan3d/building/get" });
-          return { format: "homeplan3d-backup", version: 1, building, packs: [{ id: "mastershort.living" }, { id: "mastershort.kitchen" }, { id: "demo.pack" }] };
+          return { format: "homeplan3d-backup", version: 1, building, packs: [{ id: "demo.living" }, { id: "demo.kitchen" }, { id: "demo.furniture" }] };
         }
         if (m.type === "homeplan3d/backup/import") {
           await orig({ type: "homeplan3d/history/snapshot" });
           await orig({ type: "homeplan3d/building/save", building: m.building });
-          return { building: m.building, packs: 2, skipped: [{ id: "mastershort.living" }] };
+          return { building: m.building, packs: 3 };
         }
-        const r = await orig(m);
-        if (m.type.startsWith("homeplan3d/license/") && r) return { ...r, offers: (r.offers ?? []).map((o) => ({ ...o, price: null })) };
-        return r;
+        return orig(m);
       };
     });
   /** The newest file in the download folder with this start of its name. */
@@ -1023,14 +1019,14 @@ if (PART === "b") {
   const full = await downloaded("homeplan3d-komplett");
   await downloadChip(basename(full));
   await R.hold(0.8);
-  await sayOver("Der Lizenzschlüssel ist bewusst nicht in der Datei.");
+  await sayOver("Die Datei bleibt lokal und enthält nur deinen Plan, die Bilder und die installierten Packs.");
   await pointAt("Eine Datei mit dem Plan", 0.5, { exact: false, tags: "P" });
   await noChip();
   await R.hold(0.4);
   await sayOver("„Komplett-Backup wiederherstellen …“ spielt sie zurück, in dieselbe oder eine andere Installation. Auch hier fragt NeonPlan vorher nach.");
   await R.moveTo({ text: "Komplett-Backup wiederherstellen …", exact: true }, 0.5);
   await R.hold(0.6);
-  await sayOver("Jedes Pack wird dabei neu geprüft. Packs, die für eine andere Installation signiert sind, werden übersprungen – die holst du dort über den Shop neu.");
+  await sayOver("Die Packs sind lokale JSON-Dateien. Sie kommen unverändert zurück – ohne Signatur und ohne Bindung an ein Gerät.");
   await R.hold(0.8);
   await sayOver("Übrigens: Das normale Backup von Home Assistant sichert HomePlan 3D ebenfalls vollständig mit.");
   await R.hold(0.6);
@@ -1041,13 +1037,12 @@ if (PART === "b") {
     "Altes System: „Alles sichern“",
     "Neues System: HomePlan 3D über HACS installieren, Integration hinzufügen, Bereiche anlegen",
     "Editor › Sicherung › „Komplett-Backup wiederherstellen …“",
-    "Erweiterungen: Schlüssel eintragen, „Aktivieren“, Packs „Installieren“",
   ];
   await sayOver("Jetzt der Umzug, zum Beispiel auf einen neuen Mini-PC. Am einfachsten spielst du das Backup von Home Assistant auf der neuen Hardware ein – dann ist NeonPlan mit allem da.");
-  await card("Weg 1: das Backup von Home Assistant", ["Auf der neuen Hardware einspielen – HomePlan 3D ist mit Plan, Bildern, Packs und Shop-Verbindung da"], 0);
+  await card("Weg 1: das Backup von Home Assistant", ["Auf der neuen Hardware einspielen – HomePlan 3D ist mit Plan, Bildern und Packs da"], 0);
   await R.move(1100, 560, 1.2);
   await R.hold(0.6);
-  await sayOver("Fängst du neu an, geht es in vier Schritten. Erstens: auf dem alten System „Alles sichern“.");
+  await sayOver("Fängst du neu an, geht es in drei Schritten. Erstens: auf dem alten System „Alles sichern“.");
   await card("Weg 2: neu anfangen", STEPS, 0);
   await R.moveTo({ text: "Alles sichern (Plan, Bilder, Packs)", exact: true }, 0.6);
   await R.hold(0.6);
@@ -1063,7 +1058,7 @@ if (PART === "b") {
     await chooser.accept([full]);
     await R.frame(0.3, 1500);
   }
-  await sayOver("Die Meldung oben sagt, was zurückkam – und welches Pack übersprungen wurde, weil es noch für die alte Installation signiert ist.");
+  await sayOver("Die Meldung oben sagt, was zurückkam – der Plan, die Bilder und alle lokalen Packs sind wieder da.");
   {
     await sideTop(0.6);
     const n = await noticeBox();
@@ -1071,29 +1066,11 @@ if (PART === "b") {
     else console.log("no notice after the full backup");
     await R.hold(1.0);
   }
-  await sayOver("Viertens: Unter „Erweiterungen“ trägst du deinen Lizenzschlüssel ein und drückst „Aktivieren“. Ich nehme einen erfundenen Demo-Schlüssel.");
-  await card("Weg 2: neu anfangen", STEPS, 3);
-  await R.hold(0.6);
+  await sayOver("Eigene Module sind genauso lokale Dateien. Ein Admin gibt ihren Code auf der Seite „Erweiterungen“ frei, bevor er läuft.");
+  await card("Lokale Dateien", ["Pack-Dateien und Module bleiben auf deiner Installation", "Modulcode läuft erst nach der Freigabe durch einen Admin"], 0);
+  await R.move(1100, 560, 1.2);
+  await R.hold(0.8);
   await noCard();
-  await R.clickOn({ text: "✦ Erweiterungen" }, 0.6);
-  await R.sleep(800);
-  await R.clickOn("input.fp3d-shop-key", 0.6);
-  await R.type("NP-DEMO-1234-ABCD-7K2M", 0.05);
-  await R.clickOn({ text: "Aktivieren", exact: true }, 0.5);
-  await R.hold(0.6);
-  await sayOver("Dann stehen deine Käufe da, und „Installieren“ holt jedes Pack neu – signiert für diese Installation.");
-  await R.moveTo({ text: "Installieren", exact: true }, 0.6).catch(() => {});
-  await R.click().catch(() => {});
-  await R.hold(0.8);
-  await sayOver("Warum neu? Jedes Pack wird für genau eine Installation signiert. Die erkennt der Shop an der „Installations-Kennung“, einem anonymen Fingerabdruck.");
-  await pointAt("Installations-Kennung", 0.5, { tags: "SPAN" }).catch(() => {});
-  await R.hold(0.8);
-  await sayOver("Ein Schlüssel gilt für bis zu drei Installationen gleichzeitig. Verbindest du eine neue, fällt die älteste heraus – bis zu fünf neue Verbindungen sind pro Jahr möglich.");
-  await R.move(1200, 560, 1.2);
-  await R.hold(0.6);
-  await sayOver("Auf dem alten System kannst du die Verbindung mit „Trennen“ lösen. Die installierten Packs bleiben dort trotzdem.");
-  await R.moveTo({ text: "Trennen", exact: true }, 0.6).catch(() => {});
-  await R.hold(0.8);
 
   // ---------------------------------------------------------------- 9. Privacy
   await chapter("Daten und Datenschutz");
@@ -1106,9 +1083,9 @@ if (PART === "b") {
     const b = { theta: d.theta + 0.2, phi: d.phi - 0.03, radius: d.radius * 1.02 };
     await camOf("main", null, 0, 0, a);
     await R.sleep(600);
-    const PRIV = ["Plan, Bilder und Packs: in Home Assistant unter .storage", "Internet nur mit Lizenzschlüssel: einmal am Tag, Schlüssel + anonyme Kennung", "Kamerabilder, Verläufe, Zustände: bleiben in Home Assistant"];
+    const PRIV = ["Plan, Bilder und Packs: in Home Assistant unter .storage", "Keine Meldung an einen externen Dienst: alles bleibt lokal", "Kamerabilder, Verläufe, Zustände: bleiben in Home Assistant"];
     const l1 = "Und was speichert NeonPlan wo? Plan, Bilder und Packs liegen in Home Assistant, im Ordner „.storage“. Nichts davon verlässt deine Installation.";
-    const l2 = "Ins Internet geht NeonPlan nur, wenn du einen Lizenzschlüssel einträgst: dann einmal am Tag zum Shop, mit dem Schlüssel und der anonymen Kennung.";
+    const l2 = "Diagnoseberichte bleiben ebenfalls lokal: Du kannst sie im Editor ansehen und wieder löschen. Es geht nichts an einen externen Dienst.";
     const l3 = "Kamerabilder, Verläufe und Zustände bleiben in Home Assistant und werden nur in deinem Browser angezeigt.";
     const total = N.length(l1) + N.length(l2) + N.length(l3);
     const t0 = R.time;
@@ -1143,9 +1120,7 @@ if (PART === "b") {
   await R.moveTo({ text: "Problem melden" }, 0.5);
   await R.hold(0.4);
   await R.moveTo({ text: "Idee vorschlagen" }, 0.5);
-  await sayOver("Und „Community auf Discord“ bringt dich zu den anderen NeonPlan-Nutzern – dort helfen wir uns gegenseitig.");
-  await R.moveTo({ text: "Community auf Discord" }, 0.5);
-  await R.hold(1.0);
+  await R.hold(0.6);
 
   // ---------------------------------------------------------------- 11. End of the series
   await chapter("Ende der Reihe");
@@ -1161,7 +1136,7 @@ if (PART === "b") {
     await R.sleep(700);
     const l1 = "Das war die letzte Folge der Reihe. Vom ersten Raum bis zum Umzug kennst du jetzt jeden Knopf in HomePlan 3D.";
     const l2 = "Danke, dass du dabei warst! Alle Folgen findest du in der Playlist „HomePlan 3D – Tutorials“.";
-    const l3 = "Links zur Online-Demo, zur Anleitung, zu GitHub für Fehlermeldungen und zu unserer Discord-Community stehen in der Beschreibung.";
+    const l3 = "Links zur Online-Demo, zur Anleitung und zu GitHub für Fehlermeldungen stehen in der Beschreibung.";
     const l4 = "Und denk dran: HomePlan 3D läuft auch auf alten Wandtablets. Bis bald!";
     const total = N.length(l1) + N.length(l2) + N.length(l3) + N.length(l4) + 0.6;
     const t0 = R.time;
@@ -1177,7 +1152,7 @@ if (PART === "b") {
     await step(await line(l1));
     await R.title("Danke fürs Zuschauen!", `Playlist „HomePlan 3D – Tutorials“`);
     await step(await line(l2));
-    await R.title("Demo · Anleitung · GitHub · Discord", `Links in der Beschreibung`);
+    await R.title("Demo · Anleitung · GitHub", `Links in der Beschreibung`);
     await step(await line(l3));
     await R.title("HomePlan 3D", `läuft auch auf alten Wandtablets${VERSION}`);
     await step((await line(l4)) + 0.6);

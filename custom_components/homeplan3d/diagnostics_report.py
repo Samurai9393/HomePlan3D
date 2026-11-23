@@ -1,11 +1,9 @@
-"""Opt-in "help improve NeonPlan" reports: anonymous usage counts and error messages.
+"""Opt-in local diagnostics: anonymous usage counts and error messages.
 
-Nothing is sent unless the user switched it on in the editor (off by default). Then one report a day
-(and at most one error batch an hour) goes to the NeonPlan server: versions, the language, the ids of
-installed Mastershort packs, the active Pro features, counts of the plan (no names, no geometry), the
-kinds of devices the plan is shown on (device class, browser, OS, frame rate) and scrubbed error
-messages of our own bundles. The id is random, made when the user switches it on; it is not Home
-Assistant's instance id and is forgotten when the user switches off or deletes the data.
+Nothing leaves the installation. When an admin switches diagnostics on in the editor, browser views
+contribute device aggregates and scrubbed error messages of our own bundles. The editor shows the exact
+JSON that is kept in Home Assistant's `.storage`; switching off or clearing deletes it. The id is a
+random local label made on switch-on, not Home Assistant's instance id.
 
 Not to be confused with Home Assistant's own diagnostics platform (diagnostics.py), which this
 integration does not have.
@@ -13,40 +11,24 @@ integration does not have.
 
 from __future__ import annotations
 
-import asyncio
 from collections.abc import Iterable, Mapping
-from datetime import timedelta
-import logging
 import re
 import sys
-import time
 from typing import Any
 import uuid
 
-import aiohttp
 from homeassistant.const import __version__ as HA_VERSION
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.storage import Store
 from homeassistant.loader import async_get_integration
 
 from .const import DOMAIN, STORAGE_KEY_DIAGNOSTICS, STORAGE_VERSION
-from .packs import KNOWN_FEATURES
+from .packs import ENABLED_FEATURES
 
-_LOGGER = logging.getLogger(__name__)
-
-TELEMETRY_API = "https://api.mastershort.de/telemetry/v1"
 PAYLOAD_VERSION = 1
-DAILY_INTERVAL = 24 * 3600
-ERROR_INTERVAL = 3600
-# a failed send waits this long before the next try
-RETRY_AFTER_FAILURE = 3600
-TICK = timedelta(minutes=10)
 MAX_CLIENTS = 10
 MAX_ERRORS = 20
 MAX_MESSAGE = 200
-MAX_FORMER_IDS = 5
 # what the frontend may name: device classes, GPU tiers and views
 DEVICES = ("tablet", "phone", "desktop")
 GPU_TIERS = ("low", "mid", "high")
@@ -55,23 +37,7 @@ _VIEW = re.compile(r"^[a-z0-9_]{1,20}$")
 _LABEL = re.compile(r"^[A-Za-z0-9 ._-]{1,40}$")
 _WHERE = re.compile(r"^homeplan3d[\w-]*\.js(:\d+){0,2}$")
 _VERSION = re.compile(r"^[0-9A-Za-z.+-]{1,20}$")
-_TIMEOUT = aiohttp.ClientTimeout(total=30)
 _SAVE_DELAY = 120
-# HTTP 429: wait and try again this often, in seconds
-RETRY_WAITS = (5.0, 15.0)
-_user_agent: str | None = None
-
-
-async def user_agent(hass: HomeAssistant) -> str:
-    """Our own User-Agent for the diagnostics server (the host throttles aiohttp's default one)."""
-    global _user_agent
-    if _user_agent is None:
-        try:
-            version = str((await async_get_integration(hass, DOMAIN)).version or "dev")
-        except Exception:
-            version = "dev"
-        _user_agent = f"HomePlan3D/{version} (Home Assistant; +https://github.com/Mastershort/neonplan3d)"
-    return _user_agent
 
 
 # ---------------------------------------------------------------------------- scrubbing
@@ -213,61 +179,42 @@ def plan_counts(building: Mapping[str, Any]) -> dict[str, int]:
 
 
 def pack_ids(packs: Iterable[Mapping[str, Any]]) -> list[str]:
-    """Ids of the installed Mastershort packs (a customer's own studio furniture is left out)."""
-    return sorted({str(p.get("id")) for p in packs if str(p.get("id") or "").startswith("mastershort.")})
-
-
-def pro_features(packs: Iterable[Mapping[str, Any]]) -> list[str]:
-    """The Pro features the installed packs unlock."""
-    return sorted({f for p in packs for f in p.get("features") or [] if f in KNOWN_FEATURES})
+    """Ids of the installed local packs."""
+    return sorted({str(p.get("id")) for p in packs if str(p.get("id") or "").strip()})
 
 
 def build_payload(
     state: Mapping[str, Any],
     *,
-    kind: str,
     building: Mapping[str, Any],
     packs: Iterable[Mapping[str, Any]],
     neonplan: str,
     ha: str,
     lang: str | None,
 ) -> dict[str, Any]:
-    """The report exactly as it is sent. `kind` "daily" carries the day's clients, "errors" only the errors."""
-    packs = list(packs)
+    """The local preview: counts, installed pack ids and scrubbed errors, with no names or geometry."""
     clients = [{k: v for k, v in c.items() if k != "fps_n"} for c in state.get("clients") or []]
     return {
         "v": PAYLOAD_VERSION,
         "id": state.get("id"),
-        "kind": kind,
         "neonplan": neonplan,
         "ha": ha,
         "python": f"{sys.version_info.major}.{sys.version_info.minor}",
         "lang": (lang or "en").split("-")[0][:5].lower(),
         "packs": pack_ids(packs),
-        "pro": pro_features(packs),
+        "features": sorted(ENABLED_FEATURES),
         "plan": plan_counts(building),
-        "clients": clients if kind == "daily" else [],
+        "clients": clients,
         "errors": [dict(e) for e in state.get("errors") or []],
     }
 
 
 def _empty_state() -> dict[str, Any]:
-    return {
-        "enabled": False,
-        "id": None,
-        "last_daily": None,
-        "last_errors": None,
-        "failed_at": None,
-        # whether a report went out under this id, and ids of earlier switch-ons that sent something
-        "sent": False,
-        "former_ids": [],
-        "clients": [],
-        "errors": [],
-    }
+    return {"enabled": False, "id": None, "clients": [], "errors": []}
 
 
 class DiagnosticsReporter:
-    """The setting, the random id, the day's aggregates and the sender."""
+    """The local setting, its random id and the aggregates collected while it is on."""
 
     def __init__(self, hass: HomeAssistant, data: Any) -> None:
         """Keep Home Assistant and the plan's data (FloorplanData: building and packs)."""
@@ -276,11 +223,10 @@ class DiagnosticsReporter:
         self.state: dict[str, Any] = _empty_state()
         self._store: Store[dict[str, Any]] = Store(hass, STORAGE_VERSION, STORAGE_KEY_DIAGNOSTICS)
         self._version = "dev"
-        self._sending = False
 
     @property
     def enabled(self) -> bool:
-        """Whether the user switched the reports on."""
+        """Whether the admin switched local diagnostics on."""
         return bool(self.state.get("enabled"))
 
     async def async_load(self) -> None:
@@ -293,19 +239,10 @@ class DiagnosticsReporter:
         except Exception:
             self._version = "dev"
 
-    def start(self) -> Any:
-        """Check every TICK whether a report is due; returns the function that stops it."""
-
-        async def _tick(_now: Any) -> None:
-            await self.async_tick()
-
-        return async_track_time_interval(self.hass, _tick, TICK)
-
-    def payload(self, kind: str = "daily") -> dict[str, Any]:
-        """What would be sent now."""
+    def payload(self) -> dict[str, Any]:
+        """The local preview of what has been collected."""
         return build_payload(
             self.state,
-            kind=kind,
             building=self.data.building,
             packs=self.data.packs,
             neonplan=self._version,
@@ -314,34 +251,23 @@ class DiagnosticsReporter:
         )
 
     def status(self) -> dict[str, Any]:
-        """The setting and the exact next daily report, for the editor."""
+        """The setting, the local preview and whether there is anything to clear, for the editor."""
         return {
             "enabled": self.enabled,
-            "last_daily": self.state.get("last_daily"),
-            "can_delete": bool(self._sent_ids()),
-            "preview": self.payload("daily"),
-            "endpoint": f"{TELEMETRY_API}/report",
+            "can_delete": bool(self.state.get("clients") or self.state.get("errors")),
+            "preview": self.payload(),
         }
 
     def _save(self) -> None:
         self._store.async_delay_save(lambda: self.state, _SAVE_DELAY)
 
-    def _sent_ids(self) -> list[str]:
-        """Ids under which reports went to the server and were not deleted yet (the current one first)."""
-        current = [self.state["id"]] if self.state.get("id") and self.state.get("sent") else []
-        return current + [i for i in self.state.get("former_ids") or [] if i not in current]
-
     async def async_set_enabled(self, on: bool) -> None:
-        """Switch on (with a new random id; the first report goes a day later, a first error batch an
-        hour later) or off (nothing is sent any more and the collected data is dropped; an id that sent
-        something is only kept so that "delete my data" can still reach its reports)."""
+        """Start or stop collecting locally; clearing on switch-off drops the aggregates and the id."""
         if on == self.enabled:
             return
         state = _empty_state()
-        state["former_ids"] = self._sent_ids()[:MAX_FORMER_IDS]
         if on:
-            now = time.time()
-            state.update(enabled=True, id=str(uuid.uuid4()), last_daily=now, last_errors=now)
+            state.update(enabled=True, id=str(uuid.uuid4()))
         self.state = state
         await self._store.async_save(self.state)
 
@@ -356,76 +282,6 @@ class DiagnosticsReporter:
         self._save()
 
     async def async_delete(self) -> None:
-        """Ask the server to delete everything sent under our ids, then forget them and switch off.
-        Raises DiagnosticsError when the server could not be reached (the ids not deleted yet are kept
-        for another try)."""
-        left = [report_id for report_id in self._sent_ids() if not await self._post("delete", {"id": report_id})]
+        """Clear the locally collected data, forget the id and switch off."""
         self.state = _empty_state()
-        self.state["former_ids"] = left
         await self._store.async_save(self.state)
-        if left:
-            raise DiagnosticsError("unreachable")
-
-    async def async_tick(self, now: float | None = None) -> None:
-        """Send the daily report or an error batch when one is due. Never runs while switched off."""
-        if not self.enabled or self._sending:
-            return
-        now = time.time() if now is None else now
-        failed_at = self.state.get("failed_at")
-        if failed_at and now - failed_at < RETRY_AFTER_FAILURE:
-            return
-        if now - (self.state.get("last_daily") or 0) >= DAILY_INTERVAL:
-            kind = "daily"
-        elif self.state.get("errors") and now - (self.state.get("last_errors") or 0) >= ERROR_INTERVAL:
-            kind = "errors"
-        else:
-            return
-        self._sending = True
-        try:
-            payload = self.payload(kind)
-            if not await self._post("report", payload):
-                self.state["failed_at"] = now
-            else:
-                self.state["failed_at"] = None
-                self.state["sent"] = True
-                # whatever came in while sending stays for the next report
-                sent = {(e["msg"], e["where"], e["version"]) for e in payload["errors"]}
-                self.state["errors"] = [
-                    e for e in self.state.get("errors") or [] if (e["msg"], e["where"], e["version"]) not in sent
-                ]
-                self.state["last_errors"] = now
-                if kind == "daily":
-                    self.state["clients"] = []
-                    self.state["last_daily"] = now
-            self._save()
-        finally:
-            self._sending = False
-
-    async def _post(self, path: str, body: dict[str, Any]) -> bool:
-        """One request to the NeonPlan server; True on success. Failures are only logged for debugging."""
-        session = async_get_clientsession(self.hass)
-        headers = {"User-Agent": await user_agent(self.hass)}
-        attempt = 0
-        try:
-            while True:
-                async with session.post(f"{TELEMETRY_API}/{path}", json=body, headers=headers, timeout=_TIMEOUT) as res:
-                    if res.status == 429 and attempt < len(RETRY_WAITS):
-                        await asyncio.sleep(RETRY_WAITS[attempt])
-                        attempt += 1
-                        continue
-                    if res.status >= 400:
-                        _LOGGER.debug("Diagnostics %s answered HTTP %s", path, res.status)
-                        return False
-                    return True
-        except (TimeoutError, aiohttp.ClientError, OSError) as err:
-            _LOGGER.debug("Diagnostics %s failed: %s", path, err)
-            return False
-
-
-class DiagnosticsError(Exception):
-    """The server could not be reached."""
-
-    def __init__(self, code: str) -> None:
-        """Keep the reason."""
-        super().__init__(code)
-        self.code = code

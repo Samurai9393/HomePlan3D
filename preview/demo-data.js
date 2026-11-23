@@ -767,14 +767,13 @@ DEMO_BUILDING.settings = {
 };
 
 
-// an invented furniture pack (the preview does not check signatures)
+// an invented furniture pack for the online preview
 export const DEMO_PACK = {
   format: "fp3dpack",
   version: 1,
   id: "demo.pack",
   name: "Demo-Pack",
   publisher: "Demo",
-  licensee: null,
   items: [
     {
       id: "cube_seat",

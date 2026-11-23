@@ -277,7 +277,6 @@ export interface ImportedPack {
   id: string;
   name: string;
   publisher: string;
-  licensee: string | null;
   items: number;
   /** Module code that waits for an admin's approval on the extensions page before it runs. */
   approval?: boolean;
@@ -288,7 +287,6 @@ export interface ModuleReview {
   id: string;
   name: string;
   publisher: string;
-  licensee: string | null;
   release: number;
   api: number;
   kind: string;
@@ -305,7 +303,7 @@ export async function approveModule(hass: HomeAssistant, packId: string, sha: st
   await hass.callWS({ type: "homeplan3d/modules/approve", pack_id: packId, sha });
 }
 
-/** Import a pack file; the backend checks its signature (errors carry a code, e.g. "bad_signature"). */
+/** Import a local JSON pack; the backend checks its content (errors carry a code, e.g. "not_a_pack"). */
 export async function importPack(hass: HomeAssistant, text: string): Promise<ImportedPack> {
   return hass.callWS<ImportedPack>({ type: "homeplan3d/packs/import", pack: text });
 }
@@ -314,7 +312,7 @@ export async function removePack(hass: HomeAssistant, packId: string): Promise<v
   await hass.callWS({ type: "homeplan3d/packs/remove", pack_id: packId });
 }
 
-/** A full backup file: the plan, the packs with their signatures and every stored picture. */
+/** A full backup file: the plan, the local JSON packs and every stored picture. */
 export interface BackupFile {
   format: "homeplan3d-backup";
   /** 2: with every floor plan (`building` stays the main plan, so a version-1 reader still restores that). */
@@ -334,11 +332,22 @@ export function fetchBackup(hass: HomeAssistant): Promise<Pick<BackupFile, "form
 /** Home Assistant takes 4 MiB in one message; a restore larger than this goes in pieces (characters, with room to spare). */
 export const RESTORE_WHOLE_MAX = 2_500_000;
 
+const PACK_BOOKKEEPING = new Set(["source", "signature", "imported_at", "approved", "pending", "licensee", "instance"]);
+
+/** The pack payload an older backup stored, without the fields the backend adds after an import. */
+function withoutBookkeeping(pack: FurniturePack): Record<string, unknown> {
+  const payload: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(pack)) {
+    if (!PACK_BOOKKEEPING.has(key)) payload[key] = value;
+  }
+  return payload;
+}
+
 /**
  * Replace plans and packs from a backup (pictures follow one by one); packs that fail their check are skipped.
  * A backup with many packs is larger than Home Assistant takes in one message – the connection dropped and the
  * restore failed (#1213): then the plans go first, without packs, and every pack follows on its own through the
- * ordinary import, which checks its signature and its installation as the restore does.
+ * ordinary import, which checks its content as the restore does. Old signed backups keep their source unchanged.
  */
 export async function restoreBackup(
   hass: HomeAssistant,
@@ -353,13 +362,18 @@ export async function restoreBackup(
   const skipped = [...res.skipped];
   let count = 0;
   for (const pack of packs) {
-    const { source, signature } = pack as FurniturePack & { source?: unknown; signature?: unknown };
-    if (!source || !signature) {
-      skipped.push({ id: pack.id, reason: "unsigned" });
-      continue;
-    }
+    const stored = pack as FurniturePack & { source?: unknown };
+    // Backups carry the original file as `source`; older ones wrapped it in a signature envelope, which the
+    // backend still accepts. A pack without `source` comes from an older backup: send its payload without the
+    // bookkeeping fields the backend adds after an import.
+    const text =
+      stored.source === undefined
+        ? JSON.stringify(withoutBookkeeping(pack))
+        : typeof stored.source === "string"
+          ? stored.source
+          : JSON.stringify(stored.source);
     try {
-      await importPack(hass, JSON.stringify({ payload: source, signature }));
+      await importPack(hass, text);
       count++;
     } catch (err) {
       const e = (err ?? {}) as { code?: string | number; error?: { code?: string | number } };
@@ -369,15 +383,12 @@ export async function restoreBackup(
   return { ...res, packs: count, skipped };
 }
 
-/** The opt-in reports ("help improve NeonPlan"): the setting and the exact next daily report. */
+/** The opt-in local diagnostics: the setting and the statistics collected in this installation. */
 export interface DiagnosticsStatus {
   enabled: boolean;
-  /** Unix time in seconds of the last daily report (or of switching on). */
-  last_daily: number | null;
-  /** Reports went out under this or an earlier id and can be deleted on the server. */
+  /** Whether local data has been collected and can be cleared. */
   can_delete: boolean;
   preview: Record<string, unknown>;
-  endpoint: string;
 }
 
 export async function getDiagnostics(hass: HomeAssistant): Promise<DiagnosticsStatus> {
@@ -388,7 +399,7 @@ export async function setDiagnostics(hass: HomeAssistant, enabled: boolean): Pro
   return hass.callWS<DiagnosticsStatus>({ type: "homeplan3d/diagnostics/set", enabled });
 }
 
-/** Ask the server to delete what was sent, forget the id and switch off (fails when the server is unreachable). */
+/** Clear the locally stored diagnostics data and switch collection off. */
 export async function deleteDiagnostics(hass: HomeAssistant): Promise<DiagnosticsStatus> {
   return hass.callWS<DiagnosticsStatus>({ type: "homeplan3d/diagnostics/delete" });
 }

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { bindValue, hasLiveParts, liveGroups, liveKey, slotEntity } from "./live-parts.ts";
 import { finishHex, finishRolesOf } from "./finishes.ts";
-import { buildIndex, filterEntries, type Previews } from "./library-index.ts";
+import { buildIndex, filterEntries } from "./library-index.ts";
 import type { HassEntity } from "./types.ts";
 import type { PackItem } from "./packs.ts";
 
@@ -57,27 +57,14 @@ test("finishes: the roles a built-in or a pack item is drawn with, and a placed 
   assert.equal(finishHex({}, "fabric"), null);
 });
 
-test("the shop's furniture joins the library locked, after the own items, and the chip hides it", () => {
-  const previews: Previews = {
-    base: "https://mastershort.de/np-previews/",
-    packs: [
-      { id: "mastershort.living", name: { de: "Wohnzimmer" }, price: { de: "5,90 €" }, url: { de: "https://mastershort.de/?p=1273" }, free: false },
-      { id: "mastershort.stairs", name: { de: "Treppen & Geländer", en: "Stairs & Railings" }, price: { de: "3,90 €", en: "€3.90" }, url: { de: "https://mastershort.de/?p=1334" }, free: false },
-    ],
-    items: [
-      { p: "mastershort.living", id: "sofa_3", name: { de: "Sofa 3-Sitzer" }, size: [2.1, 0.9, 0.8], group: "sofa", room: ["living"], tags: [], family: null, variant: null, electric: false, light: false },
-      { p: "mastershort.stairs", id: "spiral", name: { de: "Wendeltreppe", en: "Spiral staircase" }, size: [1.6, 1.6, 2.8], group: "stairs", room: [], tags: [], family: null, variant: null, electric: false, light: false },
-    ],
-    bundle: null,
-  };
-  const living = { id: "mastershort.living", name: "Wohnzimmer", publisher: "Mastershort", licensee: "x", items: [{ id: "sofa_3", name: { de: "Sofa 3-Sitzer" }, size: [2.1, 0.9, 0.8], parts: [] }] };
-  const entries = buildIndex({ packs: [living as never], basics: [], language: "de", basicName: (t) => t, basicNameEn: (t) => t, kindName: (k) => k, size: () => [1, 1, 1], previews });
-  const locked = entries.filter((e) => e.locked);
-  assert.deepEqual(locked.map((e) => e.type), ["pack:mastershort.stairs:spiral"], "the living room is owned: only the stairs are locked");
-  assert.equal(locked[0].locked?.price, "3,90 €");
-  assert.equal(locked[0].locked?.pic, "https://mastershort.de/np-previews/mastershort.stairs/spiral.webp");
-  assert.equal(entries.indexOf(locked[0]) > entries.findIndex((e) => !e.locked), true);
-  const f = { query: "wendel", room: null, electric: false, light: false, outdoor: false };
+test("the library indexes installed local packs with their items, sizes and search words", () => {
+  const living = { id: "mastershort.living", name: "Wohnzimmer", items: [{ id: "sofa_3", name: { de: "Sofa 3-Sitzer" }, size: [2.1, 0.9, 0.8], parts: [] }] };
+  const entries = buildIndex({ packs: [living as never], basics: [], language: "de", basicName: (t) => t, basicNameEn: (t) => t, kindName: (k) => k, size: () => [1, 1, 1] });
+  assert.deepEqual(entries.map((e) => e.type), ["pack:mastershort.living:sofa_3"]);
+  assert.equal(entries[0].label, "Sofa 3-Sitzer");
+  assert.equal(entries[0].pack, "mastershort.living");
+  assert.equal((entries[0] as { locked?: unknown }).locked, undefined);
+  const f = { query: "sofa", room: null, electric: false, light: false, outdoor: false };
   assert.equal(filterEntries(entries, f).length, 1);
-  assert.equal(filterEntries(entries, { ...f, locked: false }).length, 0);
+  assert.equal(filterEntries(entries, { ...f, query: "treppe" }).length, 0);
 });

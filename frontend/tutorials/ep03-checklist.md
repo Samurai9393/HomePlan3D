@@ -49,7 +49,7 @@ Bodenöffnungen“ (4:34). Zeit = Stelle im jeweiligen Entwurf (geschätztes Tim
 - [x] b 1:36 Die Öffnung muss oben ganz in einem Raum liegen
 - [x] b 1:09 Hinweistext im Formular („Die Treppe steigt nach hinten an …“)
 - [x] b 3:09 „Möbelstück“-Auswahl: Art tauschen ohne neu zu setzen (L → U)
-- [x] b 2:53 Pack „Treppen & Geländer“: gerade, freitragend, L, U, Wendel, Raumspar-, Außentreppe, Podest, Geländer (einmal als Erweiterung erwähnt, ohne Preis)
+- [x] b 2:53 Pack „Treppen & Geländer“: gerade, freitragend, L, U, Wendel, Raumspar-, Außentreppe, Podest, Geländer (einmal als Erweiterung erwähnt)
 - [x] b 3:00 L-Treppe: Richtung mit „Drehung“, andere Seite mit „Spiegeln“
 - [x] b 3:27 Pack-Treppen haben eine feste Höhe (3,80): „Höhe (m)“ auf den Etagenabstand stellen (häufiger Fehler)
 - [x] b 3:15–3:35 Wendeltreppe Keller → Erdgeschoss (Öffnung im Flur, in 3D gezeigt)

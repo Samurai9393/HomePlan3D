@@ -123,7 +123,7 @@ import { parkedVehicle, PRESENT_STATES, parkedVehicles, vehicleFurniture } from 
 import { TRAIL_ICON, TRAIL_WINDOW_MS, trailEvents, trailPoints, trailSources, trailTime, type HistoryRow } from "../trail.ts";
 import { limitEffects, weatherEntity, weatherState } from "../weather.ts";
 import { SHOW_PRESENCE } from "../flags.ts";
-import { hasFeature, manualUrl, projectionOn, released, shopUrl, type Feature } from "../features.ts";
+import { hasFeature, projectionOn } from "../features.ts";
 import { searchIndex, searchItems, type SearchItem } from "../search.ts";
 import type { Shown } from "../voice/targets.ts";
 import { anyModule, moduleAlerts, moduleCards, moduleMenuSheets, modulePools, moduleRoomSheets, moduleScene, moduleSettings, modulesWithSettings, moduleVoice, moduleWatched, modulePopups, syncModules, type ModuleCard, type ModuleField, type ModuleHost, type ModuleSheet, type PlanCamera, type PopupSection, type ScenePiece, type SpokenAlert, type SpokenCar, type SpokenDevice, type SpokenOpening, type VoiceAnswer } from "../modules.ts";
@@ -310,7 +310,6 @@ export class Fp3dView3d extends LitElement {
     sunFx: { attribute: false },
     weatherEntityId: { attribute: false },
     _flash: { state: true },
-    _proHint: { state: true },
     selectedFurniture: { attribute: false },
     selectedSet: { attribute: false },
     selectedDevice: { attribute: false },
@@ -489,8 +488,6 @@ export class Fp3dView3d extends LitElement {
   declare weatherEntityId: string | null;
   /** A lightning flash lights the stage for a moment. */
   private declare _flash: boolean;
-  /** A Pro feature was asked for without the Pro pack: a hint with the shop link. */
-  private declare _proHint: Feature | null;
   private flashTimer: ReturnType<typeof setTimeout> | undefined;
   private cloud = 0;
   /** The sun's way today, worked out once a day (see sunPathToday). */
@@ -804,7 +801,6 @@ export class Fp3dView3d extends LitElement {
     this.sunFx = true;
     this.weatherEntityId = null;
     this._flash = false;
-    this._proHint = null;
     this.showEnergy = true;
     this.flows = null;
     this.selectedFurniture = null;
@@ -899,7 +895,7 @@ export class Fp3dView3d extends LitElement {
   connectedCallback(): void {
     super.connectedCallback();
     this.listenReplay();
-    // the opt-in reports sample the frame rate the viewer measures for its stats anyway
+    // local diagnostics use the frame rate the viewer measures for its stats anyway
     this.unwatchDiag = watchDiagnostics((on) => this.viewer?.setStats(this.showStats || on));
     if (this.hasUpdated) {
       this.observeStage();
@@ -1801,7 +1797,7 @@ export class Fp3dView3d extends LitElement {
       ...lawnSnow(b, snow),
     ]);
     const roomSensors = SHOW_PRESENCE ? personsInRooms(hass, b) : [];
-    const persons = released("locate") && personsShown(b) ? [...roomSensors, ...locatedPersons(hass, b, new Set(roomSensors.map((p) => p.id)))] : roomSensors;
+    const persons = personsShown(b) ? [...roomSensors, ...locatedPersons(hass, b, new Set(roomSensors.map((p) => p.id)))] : roomSensors;
     v.setPersonLook(personLook(b) === "pin" ? "pin" : "figure");
     v.setPersons([...persons, ...this.moduleFigures(b)]);
     this.lastPersons = persons.map((p) => ({ id: p.id, floorId: p.floorId, roomId: p.roomId }));
@@ -1991,11 +1987,6 @@ export class Fp3dView3d extends LitElement {
         )
       : [];
     return { entities, openings: [...openings], furniture: [...furniture], low: this._low, cars, energy: hasFeature("energy_pro"), auto: hasFeature("auto_pro") };
-  }
-
-  /** Shows the hint of a Pro add-on that is not installed (with the shop link). */
-  proHint(feature: Feature): void {
-    this._proHint = feature;
   }
 
   /** Time travel: a tap shows the device's state at the replayed moment ("on · 60 % · since 07:42"). */
@@ -3708,9 +3699,8 @@ export class Fp3dView3d extends LitElement {
   private watchTrail(): void {
     clearInterval(this.trailTimer);
     this.trailTimer = undefined;
-    if (this.trail && !hasFeature("camera_cockpit")) this._proHint = "camera_cockpit";
     // time travel brings its own rows (see trailNow)
-    if (!this.trail || !hasFeature("camera_cockpit") || this.replay) {
+    if (!this.trail || this.replay) {
       this.trailRows = {};
       this.syncDevices(true);
       return;
@@ -5005,8 +4995,7 @@ export class Fp3dView3d extends LitElement {
         say("done", `“${text}” → ${name}`);
         this.directing.touch(Date.now());
         if (place.kind === "cameras") {
-          if (hasFeature("camera_cockpit")) this.dispatchEvent(new CustomEvent("camera-wall-open", { bubbles: true, composed: true }));
-          else this._proHint = "camera_cockpit";
+          this.dispatchEvent(new CustomEvent("camera-wall-open", { bubbles: true, composed: true }));
         } else if (place.kind === "device") {
           const item = items.get(place.id);
           // a camera is looked through (Kamera-Cockpit), any other device shown where it stands
@@ -5030,7 +5019,7 @@ export class Fp3dView3d extends LitElement {
         if (speak) void v.speak(hass, located.text, voicePipeline());
         return located.text;
       }
-      // a module of the house answers (installed from the shop): what to say and what to show
+      // a locally installed module answers: what to say and what to show
       const host = this.moduleHost(hass, b, v.SYNONYMS, (s) => v.showTarget(s, b, devices, (r) => (r.area_id ? hass.areas?.[r.area_id]?.name : null)));
       const own = await moduleVoice(text, host);
       if (own) {
@@ -5944,11 +5933,6 @@ export class Fp3dView3d extends LitElement {
     const v = this.viewer;
     const b = this.building;
     if (!v || !b || this.ro) return;
-    if (!hasFeature("camera_cockpit")) {
-      this._menu = null;
-      this._proHint = "camera_cockpit";
-      return;
-    }
     const floorId = b.floors.find((f) => f.placements.some((p) => p.entity_id === entityId))?.id;
     if (!floorId) return;
     this._menu = null;
@@ -5984,22 +5968,6 @@ export class Fp3dView3d extends LitElement {
     }
   }
 
-  /** The hint shown when a Pro feature is used without the Pro pack. */
-  private renderProHint() {
-    if (!this._proHint || !this.hass) return nothing;
-    return html`<div class="fp3d-pro" role="dialog">
-      <b>${translate(this.hass, "pro_title")}</b>
-      <span>${translate(this.hass, `pro_feature_${this._proHint}` as I18nKey)}</span>
-      <span class="fp3d-sub">${translate(this.hass, "pro_locked")}</span>
-      <div>
-        <a class="fp3d-chip fp3d-chip-on" href=${shopUrl(this.hass.language)} target="_blank" rel="noopener">${translate(this.hass, "pro_shop")}</a>
-        <a class="fp3d-chip" href=${manualUrl(this.hass.language, this._proHint)} target="_blank" rel="noopener">${translate(this.hass, "manual_more")}</a>
-        <button class="fp3d-chip" @click=${() => ((this._proHint = null), this.fire("open-extensions", null))}>${translate(this.hass, "ext_tab")}</button>
-        <button class="fp3d-chip" @click=${() => (this._proHint = null)}>${translate(this.hass, "close")}</button>
-      </div>
-    </div>`;
-  }
-
   /** Kamera-Cockpit: the camera wall – every placed camera's picture, refreshed every few seconds; a tap looks through it. */
   private renderCameraWall() {
     if (!this.cameraWall || !this.hass || !this.building || this.ro) return nothing;
@@ -6009,12 +5977,6 @@ export class Fp3dView3d extends LitElement {
       this.live = null;
       this.dispatchEvent(new CustomEvent("camera-wall-close", { bubbles: true, composed: true }));
     };
-    if (!hasFeature("camera_cockpit")) {
-      return html`<div class="fp3d-wall">
-        <div class="fp3d-wall-head"><span>${translate(hass, "camera_wall_title")}</span><button class="fp3d-chip" @click=${close}>✕</button></div>
-        <p class="fp3d-wall-pro">🔒 ${translate(hass, "pro_feature_camera_cockpit")}</p>
-      </div>`;
-    }
     const cameras = [...new Set(this.building.floors.flatMap((f) => f.placements.map((p) => p.entity_id)).filter((id) => kindOf(id) === "camera"))];
     this.watchCameras(true);
     const srcOf = (id: string) => {
@@ -6606,7 +6568,7 @@ export class Fp3dView3d extends LitElement {
       ${this._error ? html`<p class="fp3d-error">${this._error}</p>` : nothing} ${this.clean ? nothing : this.renderEnergy()} ${this.renderHologram()} ${this.clean ? nothing : this.renderLegend()}
       ${this.clean && this._find !== null && !this._walk ? this.renderFind() : nothing}
       ${this.renderClock()} ${this.renderAlerts()} ${this.clean || this._walk ? nothing : html`${this.renderHousehold()} ${this.renderThumbs()} ${this.renderScenes()} ${this.renderFind()} ${this.renderCentral()}`} ${this.clean ? nothing : this.renderWalk()} ${this.renderSwipe()} ${this.renderInfo()} ${this.renderBinInfo()} ${this.renderGangMenu()} ${this.renderThrough()} ${this.renderCamPop()} ${this.renderCameraWall()} ${this.renderSheet()} ${this.renderModulePopup()} ${this.renderSettings()} ${this.renderNote()}
-      ${this.clean ? nothing : this.renderProHint()} ${this.renderMenu()} ${this.renderEye()} ${this.building?.settings.surroundings?.on && this.surroundings ? html`<a class="fp3d-osm-credit" href=${OSM_COPYRIGHT} target="_blank" rel="noopener">© OpenStreetMap</a>` : nothing}
+      ${this.renderMenu()} ${this.renderEye()} ${this.building?.settings.surroundings?.on && this.surroundings ? html`<a class="fp3d-osm-credit" href=${OSM_COPYRIGHT} target="_blank" rel="noopener">© OpenStreetMap</a>` : nothing}
       ${this.renderMic()} ${this.renderFlyIn()}
       ${this._spotHint ? html`<button class="fp3d-spot-hint" @click=${() => this.viewer?.pickSpot(null)}>📍 ${this._spotHint} <span aria-hidden="true">✕</span></button>` : nothing}
       ${this._announce ? html`<div class="fp3d-announce" role="status" @click=${() => (this._announce = null)}>📢 ${this._announce}</div>` : nothing}
@@ -8377,31 +8339,6 @@ export class Fp3dView3d extends LitElement {
       .fp3d-wall-name b {
         color: #ff6b6b;
         font-weight: 600;
-      }
-      .fp3d-pro {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 6;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        /* left: 50% leaves only half the width to shrink into: a width of its own keeps the buttons inside */
-        width: min(320px, calc(100% - 60px));
-        padding: 16px 18px;
-        border-radius: 14px;
-        background: var(--fp3d-chrome-solid);
-        border: 1px solid var(--fp3d-accent);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
-      }
-      .fp3d-pro div {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-      .fp3d-pro a {
-        text-decoration: none;
       }
       .fp3d-flash::after {
         content: "";

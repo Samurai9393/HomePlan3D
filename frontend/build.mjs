@@ -162,7 +162,7 @@ function copyFonts() {
 // main 734 KB, 3D 841 KB, editor 958 KB, card editor 281 KB on 2026-11-01: gates in fences (#818), the plain floor plan without furniture, right click back – with their texts
 // editor 950 KB on 2026-10-31: templates leave out every entity, wherever it stands (#855), and the room-tap setting in the editor (#883)
 // main 728 KB, editor 949 KB, card editor 276 KB on 2026-10-31: the room of this device and of the card (`voice_area`) for sentences without a room ("Licht an") and their texts
-// main 739 KB, editor 968 KB, card editor 284 KB on 2026-11-01: NeonPlan Print for supporters (card on Extensions, "new" dot, "Print in 3D" in the editor) with its texts
+// main 739 KB, editor 968 KB, card editor 284 KB on 2026-11-01: editor texts and controls for 3D printing
 // main 738 KB, 3D 842 KB, editor 964 KB, card editor 283 KB on 2026-11-01 (2.2.0): sloping free walls (#834), terrace roofs at thick walls and an overhang per side (#863), the sun arc around the whole plot (#833), the cable hub and the inverter cable to the grid point (#841), light-well depth (#890), soft sun patches (#819) – with their texts
 // editor 982 KB on 2026-11-03: the fun packs in ⚙ Settings (moved from the extensions page)
 // main 764 KB, 3D 850 KB, editor 978 KB, card editor 290 KB on 2026-11-03: winter – fairy lights along the eaves, snow on roof and lawn, the New Year's firework, their settings and texts
@@ -173,8 +173,8 @@ function copyFonts() {
 // main 830 KB, 3D 870 KB, editor 1070 KB on 2026-11-05: duplicate floor, top-hung windows, camera pop-up, lift-and-slide doors
 // 3D 900 KB, editor 1100 KB, card editor 340 KB on 2026-11-11: the styles (palettes, natural materials, wall colours, contact shadows)
 // editor 1110 KB on 2026-11-15: the surroundings from the map – a small map to hide houses, starting an empty plan from the map, the picture aligned to the map – with their texts
-// editor 1120 KB on 2026-11-14: the extensions page lists the add-ons that fit the home first and shows their prices (two lines in every language)
-// editor 1140 KB, 3D 920 KB on 2026-11-15: furniture 3.4 – the shop's furniture as locked cards in the library, finishes (wood, fabric, fronts) and live parts of pack items (doors, drawers, levels, status lights)
+// editor 1120 KB on 2026-11-14: the extensions page lists the add-ons that fit the home first (two lines in every language)
+// editor 1140 KB, 3D 920 KB on 2026-11-15: furniture 3.4 – pack furniture as cards in the library, finishes (wood, fabric, fronts) and live parts of pack items (doors, drawers, levels, status lights)
 // main 709.8 KB on 2026-11-15 (was 870.0): the 1130 texts only the editor needs moved to i18n-editor.ts in the editor bundle; card editor 179 KB
 // 3D 926 KB on 2026-11-18: walls facing their own way (#1189), the sky's horizon beyond the map's far edge (#1203)
 // editor 1160 KB on 2026-11-19: the card form asks what a card is for (tablet / phone) and holds the phone bar's options and own places

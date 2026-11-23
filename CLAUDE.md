@@ -1,7 +1,7 @@
 # HomePlan 3D – notes for Claude
 
-- Spec and phase plan: `private/docs/plan.md` (German, not public). Unreleased docs (Pool Pro) live in `private/docs/pending/`. Talk to the user in German; code, identifiers and comments in English.
-- Domain `homeplan3d`, repo `Mastershort/neonplan3d`, minimum Home Assistant 2025.1.
+- Spec and phase plan: `private/docs/plan.md` (German, not public). Talk to the user in German; code, identifiers and comments in English.
+- Domain `homeplan3d`, repo `Samurai9393/HomePlan3D-main`, minimum Home Assistant 2025.1.
 - Frontend lives in `frontend/` (Lit 3 + TypeScript, no decorators; three.js in a separate lazily loaded bundle).
   Bundles are committed to `custom_components/homeplan3d/frontend/`, and CI fails when they are stale, so run `npm run build` before committing.
 - Checks: `npm test`, `npm run typecheck`, `npm run build` (size budgets), `ruff check` / `ruff format`.

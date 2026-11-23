@@ -1,6 +1,6 @@
-// Module loader: code the shop delivers as a signed pack (not part of this repository) runs inside NeonPlan through
-// a small, versioned interface. A module is an ES module whose default export is a `NeonModule`; the backend
-// checked its signature and binding like a furniture pack's, so what runs here is what we signed.
+// Module loader: code delivered in a local JSON pack (not part of this repository) runs inside HomePlan 3D through
+// a small, versioned interface. A module is an ES module whose default export is a `NeonModule`; the backend checks
+// the pack's content and an admin approves the exact code fingerprint before anything runs here.
 
 import type { Building, Floor, Furniture, OutdoorArea, PoolPipe, PoolPort, Room, Vec2 } from "./model.ts";
 import type { PipePlanner } from "./pipe-planner.ts";

@@ -175,13 +175,25 @@ ITEM_SCHEMA = vol.Schema(
     }
 )
 
-# Features this version knows; a pack with a newer one needs a newer HomePlan 3D. The single source of truth
-# is the shipped configuration, which enables every feature of the open-source build.
+# Features this version knows; a pack with a newer one needs a newer HomePlan 3D. The single source of truth is
+# the shipped configuration. All of its features are known even if one is switched off, so such a pack still
+# imports cleanly; the switch decides whether the feature runs.
 KNOWN_FEATURES: list[str] = [
+    str(f["id"])
+    for f in OPEN_SOURCE_CONFIG.get("features") or []
+    if isinstance(f, dict) and isinstance(f.get("id"), str)
+]
+ENABLED_FEATURES: list[str] = [
     str(f["id"])
     for f in OPEN_SOURCE_CONFIG.get("features") or []
     if isinstance(f, dict) and f.get("enabled") and isinstance(f.get("id"), str)
 ]
+
+
+def feature_enabled(feature: str) -> bool:
+    """Whether the shipped open-source configuration enables this feature."""
+    return feature in ENABLED_FEATURES
+
 
 # A module: code a local JSON pack carries, run by NeonPlan's module loader. `api` is the loader interface it was
 # written for, `kind` where it plugs in. voice: answers spoken questions; stage: draws in the house (water, cards,

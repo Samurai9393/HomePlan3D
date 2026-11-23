@@ -1133,9 +1133,9 @@ if (PART === "a") {
 
   // ---------------------------------------------------------------- outro
   await chapter("Wie geht es weiter");
-  await R.title("Nächste Folge: Erweiterungen und Möbel-Packs", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
+  await R.title("Nächste Folge: lokale Packs und Module", `HomePlan 3D – läuft auch auf alten Wandtablets${VERSION}`);
   await say("Das waren elektrische Möbel, Zustand und Hälften, der Stellplatz und der Saugroboter – alles mit den kostenlosen Möbeln.");
-  await say("In Folge fünf zeige ich dir die Erweiterungen: Shop verbinden und Möbel-Packs installieren – mit mehr Möbeln, und auch mit den Fahrzeugen.");
+  await say("In Folge fünf zeige ich dir lokale JSON-Packs: mehr Möbel und Fahrzeuge zum Importieren – und Module, die ein Admin freigibt.");
   await say("Links zur Online-Demo und zur Anleitung stehen in der Beschreibung. Und NeonPlan läuft auch auf alten Wandtablets. Bis zum nächsten Mal!");
   await R.hold(0.6);
 }

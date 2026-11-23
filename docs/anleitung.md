@@ -4,7 +4,7 @@
 
 HomePlan 3D zeichnet dein Zuhause direkt in Home Assistant und zeigt es als 3D-Modell im Neon-Look. Lichter leuchten in ihrer Farbe, Rollläden fahren, Fenster kippen, Türen schwingen auf, Kameras schauen in den Raum und der Fernseher zeigt, was läuft. Alles läuft lokal in Home Assistant, ohne Cloud und ohne externe Programme, und ist für Wandtablets gebaut.
 
-Diese Anleitung beschreibt alle Funktionen der aktuellen Version. HomePlan 3D ist vollständig MIT-open-source: Jede Funktion, einschließlich aller Pro-Erweiterungen, ist kostenlos und über `custom_components/homeplan3d/open-source-config.json` standardmäßig aktiviert. Kein Konto und kein Lizenzschlüssel nötig. Was sich in welcher Version geändert hat, steht im [Changelog](../CHANGELOG.md) und im Release-Archiv unter `docs/`. Die Bilder stammen aus der Demo mit erfundenen Daten.
+Diese Anleitung beschreibt alle Funktionen der aktuellen Version. HomePlan 3D ist vollständig MIT-open-source: Jede Funktion, einschließlich aller Pro-Erweiterungen, ist kostenlos und über `custom_components/homeplan3d/open-source-config.json` standardmäßig aktiviert. Was sich in welcher Version geändert hat, steht im [Changelog](../CHANGELOG.md) und im Release-Archiv unter `docs/`. Die Bilder stammen aus der Demo mit erfundenen Daten.
 
 ![Das Haus in der 3D-Ansicht](images/view-house.jpg)
 
@@ -47,7 +47,7 @@ Seit Home Assistant 2026.11 ist HACS als **Marketplace** eingebaut. Öffne **Ein
 
 Danach steht **HomePlan 3D** in der Seitenleiste. Die Dashboard-Karte ist ebenfalls sofort verfügbar, eine Ressource musst du nicht eintragen.
 
-**Home Assistant vor 2026.11:** Dort geht es genauso über **HACS**: HACS öffnen, **HomePlan 3D** suchen, herunterladen und neu starten, oder [direkt in HACS öffnen](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=homeplan3d&category=integration).
+**Home Assistant vor 2026.11:** Dort geht es genauso über **HACS**: HACS öffnen, **HomePlan 3D** suchen, herunterladen und neu starten, oder [direkt in HACS öffnen](https://my.home-assistant.io/redirect/hacs_repository/?owner=Samurai9393&repository=HomePlan3D-main&category=integration).
 
 Hast du HomePlan 3D früher über HACS installiert, auch als benutzerdefiniertes Repository, musst du nichts tun: Beim Update auf Home Assistant 2026.11 übernimmt der Marketplace es, und Updates kommen weiter wie gewohnt.
 
@@ -206,7 +206,7 @@ Alles, was zum ganzen Plan gehört und nicht zu einer Etage, einem Raum oder ein
 | | **Sprachsteuerung** | siehe [5.10](#510-sprachsteuerung-neu) |
 | | **Ortung** | siehe [5.11](#511-ortung-neu) |
 | **System** | **Sicherung** | Export, Import, Wiederherstellen, siehe Kapitel 9 |
-| | **Hilf mit** | Diagnose-Berichte |
+| | **Diagnose** | lokale Vorschau; nichts verlässt Home Assistant |
 
 Die **Dachform** (kein Dach, Flachdach, Satteldach, First, Neigung, Überstand) steht beim Dach-Werkzeug, siehe [4.19](#419-dach). Die **Startansicht** merkst du dir in der 3D-Ansicht: Haus drehen und zoomen, dann in den Ansicht-Einstellungen (Zahnrad oben rechts) **📌** antippen; **📌✕** setzt sie zurück. 3D-Ansicht, Karte und Kiosk öffnen das Haus dann so, und eine geöffnete Etage wird von derselben Seite gezeigt.
 
@@ -501,7 +501,7 @@ Felder lassen sich im Grundriss und in der **3D-Ansicht daneben** mit der Maus v
 | **Modulbreite** / **Modulhöhe** | Größe eines Moduls im Hochformat, Standard 1,13 × 1,72 m |
 | **Modulleistung (Wp)** | Spitzenleistung eines Moduls, Standard 400 – bestimmt die kWp des Feldes und des Strangs und wie hell die lebenden Module (Energie Pro) leuchten |
 | **Strang** | Felder, die zusammen verschaltet sind, auch auf verschiedenen Dächern: etwa 5 Module auf dem Haus und 5 auf der Garage in „Strang 1“. Der Strang hat einen Namen, einen PV-Sensor und ist **angeschlossen an** einen Wechselrichter – oder an einen Stromspeicher mit eigenem Solareingang (eine Powerstation wie EcoFlow); beide legst du unter **Geräte** an |
-| **PV-Leistung dieses Feldes** | Der Leistungssensor seines Strangs, für die kommende Pro-Erweiterung |
+| **PV-Leistung dieses Feldes** | Der Leistungssensor seines Strangs, verwendet von Energie Pro |
 | **Hochformat** / **Querformat** | Lage der Module (1,13 × 1,72 m) |
 | **Abstand vom Rand** / **von der Traufe** | Position des Feldes. Im Grundriss lässt es sich mit der Maus verschieben, auch auf eine andere Dachfläche; über den Rand der Fläche hinaus rutscht es nicht |
 | **Neigung der Aufständerung** | Flachdach und Garten: Winkel der Gestelle, dazu die Richtung |
@@ -515,7 +515,7 @@ Unter dem Feld steht die Leistung, gerechnet mit 400 W je Modul. Die Grundriss-S
 
 **Energiebilanz:** Netz, Solar und Akku holt NeonPlan von den Geräten im Plan (Zähler, Wechselrichter, Speicher; mehrere werden zusammengezählt, Ladestände gemittelt). Im Abschnitt **Energiebilanz** wählst du andere Sensoren, drehst Vorzeichen um und gibst den Hausverbrauch an. **Aus dem Energie-Dashboard übernehmen** holt die Sensoren, die du im Energie-Dashboard von Home Assistant eingetragen hast: zu jeder Energie-Statistik den Leistungssensor desselben Geräts, dazu Gas- und Wasserzähler. Prüfe danach die Vorzeichen. **Gaszähler** und **Wasserzähler** sind Zähler (Zählerstand, etwa in m³); mit Energie Pro zeigt die Haus-Karte, wie viel davon heute verbraucht wurde.
 
-Ganz unten kündigt eine Karte die kommende Pro-Erweiterung **Energie Pro** an. Alles, was du hier einrichtest, bleibt kostenlos und wird von ihr direkt genutzt.
+**Energie Pro** ist enthalten und standardmäßig aktiviert. Alles, was du hier einrichtest, fließt direkt in die Darstellung ein.
 
 ### 4.21 Keller und Gelände
 
@@ -566,7 +566,7 @@ Unter **Möbel → Haustechnik** (in der Wandansicht unter 🔌 **Schalter**) st
 
 Eine Installation kann mehrere Grundrisse haben: das Haus, die Garage, das Gartenhaus, eine Einliegerwohnung oder die Ferienwohnung am Meer. Jeder Grundriss hat eigene Etagen, Räume, Möbel, Geräte, Karten-Vorlagen und Wiederherstellungspunkte. Dein bisheriger Plan bleibt, wie er ist – er ist der erste Grundriss.
 
-- **Anlegen:** ⚙ Einstellungen → 🏘 **Grundrisse** → **Neuer Grundriss**: Namen eintippen, wählen woraus (**Leer**, **Kopie von …** oder **Aus einer Datei** – ein Export, auch einer von der Import-Seite) und **Anlegen**. Der neue Grundriss öffnet sich sofort im Editor.
+- **Anlegen:** ⚙ Einstellungen → 🏘 **Grundrisse** → **Neuer Grundriss**: Namen eintippen, wählen woraus (**Leer**, **Kopie von …** oder **Aus einer Datei** – ein Export oder ein aus dem Editor importierter Plan) und **Anlegen**. Der neue Grundriss öffnet sich sofort im Editor.
 - **Wechseln:** Oben neben „HomePlan 3D“ steht die Auswahl mit allen Grundrissen; dort legen Admins auch gleich mit **＋ Neuer Grundriss** einen an. Andere Benutzer sehen die Auswahl, sobald es zwei gibt. Jedes Gerät merkt sich, welcher zuletzt offen war. Ein Link mit `?plan=<ID>` öffnet direkt einen bestimmten.
 - **Verwalten:** In derselben Liste änderst du den Namen, wählst ein Symbol (🏠 🏡 🏢 🏖️ …), sortierst mit ↑ ↓ und öffnest mit **Öffnen**. 🗑 legt einen Grundriss in den **Papierkorb**: Er bleibt 30 Tage wiederherstellbar, erst dann wird er gelöscht. Der erste Grundriss lässt sich nicht löschen. Neben jedem Grundriss steht seine ID für die Dashboard-Karte.
 - **Alle Grundrisse:** In der Auswahl zeigt **▦ Alle Grundrisse** eine Kachel pro Grundriss mit den Lichtern, die an sind, offenen Fenstern und Türen, der Temperatur und Warnungen. Ein Tipp öffnet ihn.
@@ -861,7 +861,7 @@ NeonPlan zeigt, in welchem Raum du gerade bist – und wo dein iPhone oder dein 
 
 - **Bluetooth-Empfänger in Home Assistant** – was du schon hast, reicht:
   - **Shelly** der 2. und 3. Generation (Steckdosen, Unterputz). Im Shelly-Gerät unter **Konfigurieren → Bluetooth-Scan** auf **passiv** stellen.
-  - **ESPHome-Bluetooth-Proxys** (ein ESP32 für ein paar Euro). Sie melden häufiger als Shellys, Raumwechsel kommen damit schneller an.
+  - **ESPHome-Bluetooth-Proxys** (ein ESP32). Sie melden häufiger als Shellys, Raumwechsel kommen damit schneller an.
   - den Bluetooth-Stick am Home-Assistant-Rechner.
 
   Ideal ist ungefähr ein Empfänger pro Raum. Räume ohne eigenen Empfänger (Flur, Gäste-WC) erkennt NeonPlan trotzdem: Das Einlernen merkt sich, wie sie für die Empfänger in den Nachbarräumen aussehen.
@@ -922,7 +922,7 @@ actions:
 
 **Den Schlüssel (IRK) von iPhone und Apple Watch bekommen:** am einfachsten mit dem **NeonPlan Schlüssel-Helfer** – ohne Mac, auch für die Apple Watch:
 
-1. Einen **ESP32** (ESP32, ESP32-C3 oder ESP32-S3, ca. 5 €) per USB an den Computer stecken und mit einem lokalen Bluetooth-Schlüssel-Helfer in Chrome oder Edge flashen. Danach das WLAN eintragen.
+1. Einen **ESP32** (ESP32, ESP32-C3 oder ESP32-S3) per USB an den Computer stecken und mit einem lokalen Bluetooth-Schlüssel-Helfer in Chrome oder Edge flashen. Danach das WLAN eintragen.
 2. Home Assistant findet **NeonPlan Key** als ESPHome-Gerät: **Einstellungen → Geräte & Dienste → Entdeckt → Hinzufügen**.
 3. Im Assistenten unter **Geräte → 🔑 Schlüssel-Helfer** „Für Apple Watch“ oder „Für iPhone“ wählen und koppeln: auf der Uhr unter **Einstellungen → Bluetooth → Gesundheitsgeräte** „NeonPlan Key“ antippen, am Handy unter **Einstellungen → Bluetooth**. Der Schlüssel erscheint sofort – **Hinzufügen** tippen. Danach „NeonPlan Key“ in den Bluetooth-Einstellungen wieder entfernen.
 4. **Weitere Geräte:** vorher **🔄 Nächstes Gerät** tippen – der Helfer bekommt eine neue Bluetooth-Kennung, damit sich das zuvor gekoppelte Gerät nicht wieder dazwischen verbindet.
@@ -1079,7 +1079,7 @@ data:
 
 ## 6. Pro-Erweiterungen
 
-Jede Pro-Erweiterung in diesem Kapitel ist Teil des MIT-Repositories und über `custom_components/homeplan3d/open-source-config.json` standardmäßig aktiviert. Kein Konto, kein Lizenzschlüssel und keine gesonderte Installation nötig; die Schalter sind sofort nutzbar.
+Jede Pro-Erweiterung in diesem Kapitel ist Teil des MIT-Repositories und über `custom_components/homeplan3d/open-source-config.json` standardmäßig aktiviert. Die Schalter sind sofort nutzbar.
 
 ### 6.1 Kamera-Cockpit
 
@@ -1155,7 +1155,7 @@ Ohne diese Erweiterung leuchtet ein Fernseher nur, solange er an ist. Mit ihr:
 
 ### 6.4 Energie Pro
 
-Energie Pro macht aus dem Energie-Werkzeug ein lebendiges Bild deiner Anlage: Strom fließt sichtbar durchs Haus, die Solarmodule leben mit der Sonne, und ein Hologramm aus Glas zeigt die Bilanz. Alles, was du dafür einrichtest, ist kostenlos und steht in [4.20](#420-energie-solarfelder); Pro schaltet die Darstellung frei. Gas und Wasser stehen seit 1.14.0 mit dem heutigen Verbrauch auf der Haus-Karte (Gas in m³, Wasser in Litern); Wärme folgt als Update im selben Pack.
+Energie Pro macht aus dem Energie-Werkzeug ein lebendiges Bild deiner Anlage: Strom fließt sichtbar durchs Haus, die Solarmodule leben mit der Sonne, und ein Hologramm aus Glas zeigt die Bilanz. Energie Pro ist enthalten und standardmäßig aktiviert. Alles, was du dafür einrichtest, steht in [4.20](#420-energie-solarfelder). Gas und Wasser stehen seit 1.14.0 mit dem heutigen Verbrauch auf der Haus-Karte (Gas in m³, Wasser in Litern); Wärme folgt als Update im selben Pack.
 
 **In fünf Minuten eingerichtet**
 
@@ -1358,7 +1358,7 @@ Der Reiter **✦ Erweiterungen** bündelt alles, was du zu HomePlan 3D dazubekom
 
 ### 7.1 Lokale Packs
 
-Möbel- und Modul-Packs sind lokale JSON-Dateien. Importiere sie unter **Möbel-Packs importieren …** oder **Modul einspielen …**; mehrere Dateien lassen sich auf einmal wählen. Kein Konto, kein Lizenzschlüssel, keine Signatur und keine Server-Verbindung nötig.
+Möbel- und Modul-Packs sind lokale JSON-Dateien. Importiere sie unter **Möbel-Packs importieren …** oder **Modul einspielen …**; mehrere Dateien lassen sich auf einmal wählen. Sie lassen sich ohne Signatur und ohne Server-Verbindung importieren.
 
 - Importierte Packs bleiben installiert und funktionieren offline.
 - Eine neuere Version eines Packs ersetzt die alte, ohne dass im Plan etwas verloren geht.
@@ -1401,7 +1401,7 @@ Unten auf der Seite fasst ein **Balken** deine installierten Packs zusammen (Mö
 
 ### 7.4 Fun-Packs
 
-**Fun-Packs** sind enthaltene Extras zum Spaß. Sie sind standardmäßig aktiviert und brauchen kein Konto und keinen Schlüssel:
+**Fun-Packs** sind enthaltene Extras zum Spaß. Sie sind standardmäßig aktiviert:
 
 - Unter **Erweiterungen** stehen sie bei deinen Packs; Home Assistant meldet ein neues Fun-Pack höchstens einmal unter Benachrichtigungen.
 - Du schaltest sie im Editor unter **⚙ Einstellungen → 🎈 Fun-Packs** ein und aus (oder über den Hinweis in der 3D-Ansicht).
@@ -1431,7 +1431,7 @@ Alles läuft auch auf alten Wandtablets: Lichterkette und Schnee kosten kaum etw
 
 ### 7.5 Module
 
-Ein **Modul** ist ein lokales Pack, das Code mitbringt: NeonPlan lädt ihn und kann ihn im Haus laufen lassen. Module werden als JSON-Packs eingespielt; Signatur und Konto sind nicht nötig. Der Code läuft erst, wenn ein Administrator ihn gesehen und freigegeben hat.
+Ein **Modul** ist ein lokales Pack, das Code mitbringt: NeonPlan lädt ihn und kann ihn im Haus laufen lassen. Module werden als JSON-Packs eingespielt; eine Signatur ist nicht nötig. Der Code läuft erst, wenn ein Administrator ihn gesehen und freigegeben hat.
 
 **So funktioniert ein Modul – Schritt für Schritt:**
 
@@ -1603,7 +1603,7 @@ Unter **Sicherung** im Editor:
 - **Wiederherstellungspunkte** entstehen beim Bearbeiten höchstens alle 10 Minuten, die letzten 20 bleiben – bei mehreren Grundrissen für jeden eigene. **Wiederherstellen** holt einen Stand zurück, der aktuelle bleibt dabei selbst als Punkt erhalten.
 - **Exportieren** speichert den Plan als Datei, **Importieren …** lädt eine solche Datei.
 - **Als Vorlage teilen** exportiert ohne Bereiche, Geräte, Sensoren und Bilder. Das ist gut, um einen Grundriss weiterzugeben.
-- **🖨 In 3D drucken** (seit 2.2): lädt den Plan wie **Exportieren** herunter für einen lokalen 3D-Druck-Workflow: Etagen zum Abheben, Dach als Deckel, Bodenplatte mit eurem Namen. Für alle enthalten, nur privat und nicht kommerziell für deine eigenen Häuser.
+- **🖨 In 3D drucken** (seit 2.2): lädt den Plan wie **Exportieren** herunter für einen lokalen 3D-Druck-Workflow: Etagen zum Abheben, Dach als Deckel, Bodenplatte mit eurem Namen. Für alle enthalten, für deine eigenen Häuser.
 - **Komplett-Backup:** **Alles sichern (Plan, Bilder, Packs)** speichert eine Datei mit allen Grundrissen, allen Hintergrund- und Bildschirmbildern und den installierten Packs. **Komplett-Backup wiederherstellen …** spielt sie in dieselbe oder eine andere Installation zurück. Lokale JSON-Packs werden daraus wieder eingespielt.
 - **Zwei Geräte, ein Plan** (seit 3.1.1): Jede Speicherung weiß, auf welchem Stand des Plans sie gemacht wurde. Hat ein anderes Gerät inzwischen gespeichert – etwa der PC, während das Handy über Nacht im Hintergrund lag –, schreibt NeonPlan den alten Stand nicht darüber: Du siehst den neueren Plan, und deine Änderung wartet oben mit **Übernehmen und speichern** oder **Verwerfen**. Kommt die App aus dem Hintergrund zurück, lädt sie den Plan neu.
 
@@ -1616,20 +1616,20 @@ Das normale Backup von Home Assistant sichert HomePlan 3D ebenfalls vollständig
 ## 11. Daten und Datenschutz
 
 - Plan, Bilder und Packs liegen in Home Assistant unter `.storage`. Nichts davon verlässt deine Installation.
-- HomePlan 3D hat keinen Lizenz- oder Update-Dienst, den es kontaktieren muss. Es wird kein Schlüssel, kein Konto und keine Installations-Kennung gesendet.
+- HomePlan 3D hat keinen Update-Dienst, den es kontaktieren muss. Es wird keine Installations-Kennung gesendet.
 - Kamerabilder, Verlaufsdaten und Zustände bleiben in Home Assistant und werden nur im Browser angezeigt.
 - Die Zeitreise liest den Verlauf aus dem Recorder von Home Assistant, nur für die Geräte des Plans. Personen und ihre Tracker liest sie nie.
 - Die **Ortung** wertet die Bluetooth-Signale nur in Home Assistant aus. Nichts darüber, wer wo ist, verlässt dein Haus.
-- **Hilf mit, NeonPlan besser zu machen (freiwillig, standardmäßig aus):** Unter **⚙ Einstellungen → 🛟 Hilf mit** kannst du anonyme Nutzungs- und Fehlerberichte einschalten. Wer sie noch nicht eingeschaltet hat, bekommt als Admin im Editor einmal einen Hinweis; **Ansehen** öffnet die Einstellung, **Nicht jetzt** blendet ihn auf diesem Gerät für immer aus. Berichte werden erst nach dieser Zustimmung gesendet.
-  - **Gesendet wird:** eine zufällige Kennung (nicht die von Home Assistant, sie entsteht beim Einschalten), die Versionen von NeonPlan, Home Assistant und Python, die Sprache, die installierten Packs und Pro-Erweiterungen, Anzahlen aus dem Plan (Etagen, Räume, Möbel, verknüpfte Geräte, Kameras), Geräteart, Browser und System der Bildschirme mit Bildrate und Grafikklasse, wie oft welche Ansicht geöffnet wurde, und Fehlermeldungen von NeonPlan ohne Namen und Adressen.
-  - **Nie gesendet werden:** Namen, Entitäten, Bereiche, die Form deines Grundrisses, IP-Adressen, die Kennung deiner Home-Assistant-Installation, Benutzernamen, Kontodaten – und nichts aus der Ortung.
-  - **„Bericht ansehen“** zeigt genau den nächsten Bericht, bevor er gesendet wird. **„Daten löschen“** entfernt alles, was schon gesendet wurde. Ausschalten vergisst die Kennung.
+- **Lokale Diagnose (standardmäßig aus):** Unter **⚙ Einstellungen → Diagnose** kannst du als Admin anonyme Nutzungs- und Fehlerstatistiken einschalten. Es wird nichts versendet; die Daten bleiben in Home Assistant unter `.storage`.
+  - **Lokal gespeichert werden:** eine zufällige Kennung (nicht die von Home Assistant, sie entsteht beim Einschalten), die Versionen von HomePlan 3D, Home Assistant und Python, die Sprache, die installierten Packs und aktivierten Funktionen, Anzahlen aus dem Plan (Etagen, Räume, Möbel, verknüpfte Geräte, Kameras), Geräteart, Browser und System der Bildschirme mit Bildrate und Grafikklasse, wie oft welche Ansicht geöffnet wurde, und Fehlermeldungen ohne Namen und Adressen.
+  - **Nie enthalten sind:** Namen, Entitäten, Bereiche, die Form deines Grundrisses, IP-Adressen, die Kennung deiner Home-Assistant-Installation, Benutzernamen, Zugangsdaten – und nichts aus der Ortung.
+  - **„Bericht ansehen“** zeigt genau, was gespeichert ist. **„Daten löschen“** entfernt es und schaltet die Diagnose aus.
 
 ---
 
 ## 12. Häufige Fragen und Fehlerbehebung
 
-**Hilfe und Rückmeldung:** Einen Fehler meldest du am besten als Issue auf GitHub, eine Idee als Diskussion. So geht nichts verloren, alle sehen den Stand, und du wirst in den Release-Notizen genannt, wenn es umgesetzt ist. Die beiden Knöpfe dafür stehen auch im Editor unten in der Seitenleiste und auf der Seite Erweiterungen.
+**Hilfe und Rückmeldung:** Einen Fehler meldest du als Issue und eine Idee als Diskussion in diesem Repository. So geht nichts verloren, alle sehen den Stand, und du wirst in den Release-Notizen genannt, wenn es umgesetzt ist. Die beiden Knöpfe dafür stehen auch im Editor unten in der Seitenleiste und auf der Seite Erweiterungen.
 
 **Wie bekomme ich das neueste Update?**
 Einstellungen → System → Updates. Der Marketplace sucht nur alle paar Stunden nach neuen Versionen, deshalb fehlt ein frisches Update dort manchmal noch; dann etwas später noch einmal nachsehen. Mit HACS (Home Assistant vor 2026.11) geht es sofort: HACS → HomePlan 3D → ⋮ → **Informationen aktualisieren** → **Herunterladen**. Danach Home Assistant neu starten und die Seite neu laden (Strg+F5, in der Companion-App: Einstellungen → Companion-App → Frontend-Cache zurücksetzen).
@@ -1673,20 +1673,17 @@ Manche ältere Grafikchips scheitern an Sonnenbahn, Hausschatten oder dem Fenste
 **Das Sonnenlicht fällt durch die falschen Fenster.**
 Unter Einstellungen die **Nordrichtung** prüfen: Grad im Uhrzeigersinn von „oben“ im Plan.
 
-**Die Shop-Verbindung meldet „Limit erreicht“.**
-Der Schlüssel war in den letzten zwölf Monaten mit mehr als fünf neuen Installationen verbunden. Melde dich bei uns, wir helfen.
-
-**Die Aktivierung meldet „Der Shop ist gerade ausgelastet“ oder „HTTP 429“.**
-Der Webhoster des Shops bremst zu viele Anfragen von einer Adresse. NeonPlan versucht es seit 1.9.1 selbst noch zweimal mit Pause; wenn es danach immer noch hakt, eine Minute warten und noch einmal auf **Aktivieren** klicken. Ältere Versionen vor 1.9.1 wurden vom Hoster an ihrem Browserkennzeichen abgewiesen – dort hilft nur das Update.
+**Ein Pack-Import schlägt fehl.**
+Prüfe, dass die Datei ein gültiges lokales JSON-Pack ist, und importiere sie erneut.
 
 **Die Meldung „Diese Seite zeigt noch HomePlan 3D x.y, Home Assistant hat schon …“ bleibt.**
-Browser oder Companion-App halten noch ein altes NeonPlan-Bundle. Auf **Neu laden** tippen; in der Companion-App unter Einstellungen → Companion-App → **Frontend-Cache zurücksetzen**, dann die App ganz schließen und neu öffnen. Ein Neustart von Home Assistant hilft hier nicht. Dasselbe gilt, wenn eine gekaufte Pro-Erweiterung unter den Packs „braucht eine neuere NeonPlan-Version“ meldet.
+Browser oder Companion-App halten noch ein altes NeonPlan-Bundle. Auf **Neu laden** tippen; in der Companion-App unter Einstellungen → Companion-App → **Frontend-Cache zurücksetzen**, dann die App ganz schließen und neu öffnen. Ein Neustart von Home Assistant hilft hier nicht. Dasselbe gilt, wenn ein installiertes Pack „braucht eine neuere NeonPlan-Version“ meldet.
 
 **Am Dach hängen zwei Hologramme (Energie Pro).**
 Das ist gewollt: Das große ist die **Hausbilanz** (Solar & Energie), das kleinere die **Anlagenkarte** des Wechselrichters, dessen Feld das ist – bei mehreren Anlagen hat jede ihre eigene. Zu viel? Im Abschnitt **Hologramm** die Hausbilanz **Frei im Plan** hängen (Griff ◈), oder im Wechselrichter-Formular den Haken **Anlagenkarte zeigen** rausnehmen. Eine kleine Karte, die scheinbar am Dach klebt, ist oft das Geräte-Hologramm eines Geräts im Raum darunter – Kamera etwas drehen.
 
-**Der Shop ist nicht erreichbar.**
-Installierte Packs und Pro-Erweiterungen funktionieren weiter. Updates kommen, sobald der Shop wieder antwortet.
+**Eine Pack-Datei lässt sich nicht lesen.**
+Installierte Packs und Pro-Erweiterungen funktionieren weiter. Exportiere die Datei erneut oder nutze die aktuelle JSON-Datei.
 
 **Wo melde ich Fehler?**
 Im Issue-Tracker auf GitHub: 

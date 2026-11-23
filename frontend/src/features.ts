@@ -1,8 +1,8 @@
 /**
  * Open-source feature configuration. Every feature whose code lives in this repository is enabled by
- * `custom_components/homeplan3d/open-source-config.json`; a signed feature pack is no longer a licence.
+ * `custom_components/homeplan3d/open-source-config.json`; local JSON packs no longer gate features.
  */
-import config from "../../custom_components/homeplan3d/open-source-config.json";
+import config from "../../custom_components/homeplan3d/open-source-config.json" with { type: "json" };
 
 export type Feature = "camera_cockpit" | "weather" | "screens" | "energy_pro" | "sound" | "auto_pro" | "time_travel" | "pool" | "household" | "frames" | "fridge_smart" | "fun_pets" | "fun_halloween" | "fun_winter";
 

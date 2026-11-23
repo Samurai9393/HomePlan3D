@@ -681,13 +681,6 @@ export class Fp3dTimeBar extends LitElement {
       letter-spacing: 0.12em;
       color: var(--tt);
     }
-    .beta {
-      margin-left: 4px;
-      color: inherit;
-      opacity: 0.8;
-      text-decoration: none;
-      pointer-events: auto;
-    }
     .clock-time {
       font-family: var(--fp3d-title-font, inherit);
       font-size: 24px;

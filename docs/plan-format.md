@@ -52,8 +52,8 @@ Built-in furniture kinds: `sofa`, `sofa_l`, `sofa_u`, `armchair`, `stool`, `coff
 
 - Keep the corners exact: rooms that share a wall should share the same coordinates (with `rooms_at: "centre"`).
 - A door between two rooms is listed once.
-- The import page shows a preview and tells you what it had to leave out (a door that lies on no room edge, a room with too few corners).
-- A complete NeonPlan plan (an export from the editor, or one an AI wrote in that format) can be checked and repaired on the import page too.
+- The editor's import shows a preview and tells you what it had to leave out (a door that lies on no room edge, a room with too few corners).
+- A complete NeonPlan plan (an export from the editor, or one an AI wrote in that format) can be checked in the editor before you import it.
 
 ---
 

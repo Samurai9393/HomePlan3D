@@ -1,6 +1,6 @@
-// Five models from the shop packs "Garten" and "Fahrzeuge" for the online demo (which has no private/ packs):
-// three trees, a shrub and the van. Unsigned – a real NeonPlan only installs packs signed by the publisher.
-export const DEMO_SHOP_PACKS = [
+// Five models from the local garden and vehicle packs for the online demo (which has no private/ packs):
+// three trees, a shrub and the van, imported as plain local JSON.
+export const DEMO_LOCAL_PACKS = [
  {
   "format": "fp3dpack",
   "version": 1,
@@ -9,7 +9,6 @@ export const DEMO_SHOP_PACKS = [
   "publisher": "Mastershort",
   "description": "Lounge-Möbel, Essgruppen, Liegen, Hängesessel, Hollywoodschaukel, Sonnenschirme, Markise, Sonnensegel, Pergolen mit Lamellendach, Pavillon, Gas-, Kugel- und Pelletgrill, Outdoor-Küche, Hochbeete, Gewächshäuser, Gartenhäuser, Whirlpool, Feuerstellen, Schaukel, Sandkasten, Spielhaus, Mähroboter, Gartenleuchten, Zäune, Hecke – und Bäume, Palme, Olivenbaum, Sträucher.",
   "release": 5,
-  "licensee": null,
   "items": [
    {
     "id": "tree_oak",
@@ -464,7 +463,6 @@ export const DEMO_SHOP_PACKS = [
   "publisher": "Mastershort",
   "description": "Autos für Garage, Einfahrt und Grundstück im Neon-Look: Familien-Van, Kombi, SUV, Kleinwagen, Limousine, Coupé, Cabrio, Bus, Transporter, Pickup, Camper, Wohnmobil, Wohnwagen, Anhänger.",
   "release": 2,
-  "licensee": null,
   "items": [
    {
     "id": "van",

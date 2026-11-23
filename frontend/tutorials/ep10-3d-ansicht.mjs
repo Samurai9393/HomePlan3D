@@ -19,7 +19,7 @@ import { FPS, narration, startRecorder } from "./recorder.mjs";
 const out = process.argv[2] ?? "tutorial-ep10";
 const PART = process.argv[3] === "b" ? "b" : "a";
 const FAST = !!process.env.EP10_FAST;
-// the controls side (◧ / ◨) and „Ansicht halten“ (⌖) come with 1.12.7; the bundle recorded already has them
+// the controls side (◧ / ◨) and „Ansicht halten“ (⌖) come with 1.12.7; the recorded build already has them
 const VERSION = `<br><span style="font-size:20px;opacity:.7">aufgenommen mit HomePlan 3D 1.12.7</span>`;
 
 const R = await startRecorder({ outDir: out, width: 1920, height: 1080, lang: "de" });

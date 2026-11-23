@@ -1,7 +1,7 @@
 # Möbel- und Modul-Packs
 
 Packs bringen zusätzliche Möbel oder Code in HomePlan 3D. Sie werden lokal als JSON-Datei
-importiert. Eine Signatur, ein Herausgeber-Schlüssel, ein Kundenkonto oder ein Shop-Server
+importiert. Eine Signatur, ein Herausgeber-Schlüssel oder ein Server
 ist dafür nicht nötig: Alle Funktionen sind MIT-open-source und standardmäßig aktiviert.
 
 ## Import
@@ -94,5 +94,5 @@ und ein freigestelltes PNG pro Möbel (`items/<id>.png`).
 ## Updates
 
 Eine neuere Version derselben Pack-ID ersetzt die installierte Fassung, ohne etwas im Plan zu
-verlieren. Kurz gesagt: lokale JSON-Dateien, keine Signatur, kein Konto, kein Server – und bei
+verlieren. Kurz gesagt: lokale JSON-Dateien, keine Signatur, kein Server – und bei
 Modulen immer menschliche Freigabe vor dem Ausführen.

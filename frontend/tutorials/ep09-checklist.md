@@ -96,7 +96,7 @@ eingebaute Möbel.
 
 ## Pflanzen
 - [x] b 3:13 · Eingebaute „Pflanze“ (Wohnen) auf die Terrasse, „Höhe (m)“ 1,5
-- [x] b 3:22 · Ein Satz: Bäume, Sträucher, Gestrüpp im Pack „Garten & Terrasse“; Breite/Höhe = Krone/Wuchs (kein Preis)
+- [x] b 3:22 · Ein Satz: Bäume, Sträucher, Gestrüpp im Pack „Garten & Terrasse“; Breite/Höhe = Krone/Wuchs
 
 ## Stellplatz (4.14, Garten-Teil)
 - [x] b 3:30 · Abschnitt „Stellplätze“ aufklappen, „Stellplatz“, in die Einfahrt (X/Y, Drehung)

@@ -136,16 +136,17 @@ export interface FurniturePack {
   id: string;
   name: string;
   publisher: string;
-  licensee: string | null;
+  /** Legacy field from old signed packs; kept only so old backups still parse, never shown. */
+  licensee?: string | null;
   description?: string;
   /** Release number; a newer release of the same id replaces the installed one. */
   release?: number;
-  /** Fingerprint of the installation the pack is bound to (null = any). */
+  /** Legacy installation binding from old packs; ignored. */
   instance?: string | null;
-  /** Pro features the pack unlocks (see features.ts). */
+  /** Feature ids from the open-source configuration (see features.ts). */
   features?: string[];
   items: PackItem[];
-  /** A module (code the shop delivers; see modules.ts) – the code itself is fetched apart. It runs only once an
+  /** A module (code from a local pack; see modules.ts) – the code itself is fetched apart. It runs only once an
    * admin approved exactly this code (`approved`); `sha` is the code's fingerprint, `size` its length. */
   module?: { api: number; kind: string; approved?: boolean; size?: number; sha?: string };
   /** A new release of the module code that waits for an admin's approval (the approved one keeps running). */

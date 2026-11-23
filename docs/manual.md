@@ -4,7 +4,7 @@
 
 HomePlan 3D draws your home right inside Home Assistant and shows it as a 3D model in a neon look. Lights glow in their colours, blinds move, windows tilt, doors swing open, cameras look into the room and the TV shows what is playing. Everything runs locally in Home Assistant, without a cloud or external programs, and it is built for wall tablets.
 
-This manual describes every feature of the current version. HomePlan 3D is fully MIT open source: every feature, including all Pro add-ons, is free and enabled by default in `custom_components/homeplan3d/open-source-config.json`. No account or licence key is needed. What changed in which version is in the [changelog](../CHANGELOG.md) and in the release archive under `docs/`. The pictures come from the demo with invented data. The app follows the language of your Home Assistant user (profile → language); the labels below are the English ones. German and English are built in; French, Spanish, Dutch, Italian, Hungarian, Danish, Swedish, Norwegian (Bokmål and Nynorsk), Finnish, Czech, Polish, Romanian, Slovenian, Slovak, Portuguese, Turkish and Chinese (Simplified) are fetched when needed, so the bundles stay small for wall tablets. A text missing in a language shows in English.
+This manual describes every feature of the current version. HomePlan 3D is fully MIT open source: every feature, including all Pro add-ons, is free and enabled by default in `custom_components/homeplan3d/open-source-config.json`. What changed in which version is in the [changelog](../CHANGELOG.md) and in the release archive under `docs/`. The pictures come from the demo with invented data. The app follows the language of your Home Assistant user (profile → language); the labels below are the English ones. German and English are built in; French, Spanish, Dutch, Italian, Hungarian, Danish, Swedish, Norwegian (Bokmål and Nynorsk), Finnish, Czech, Polish, Romanian, Slovenian, Slovak, Portuguese, Turkish and Chinese (Simplified) are fetched when needed, so the bundles stay small for wall tablets. A text missing in a language shows in English.
 
 ![The house in the 3D view](images/view-house.jpg)
 
@@ -47,7 +47,7 @@ Since Home Assistant 2026.11, HACS is built in as the **Marketplace**. Open **Se
 
 **HomePlan 3D** now appears in the sidebar. The dashboard card is available right away, no resource needed.
 
-**Home Assistant before 2026.11:** it works the same with **HACS**: open HACS, search for **HomePlan 3D**, download it and restart, or [open it straight in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=Mastershort&repository=homeplan3d&category=integration).
+**Home Assistant before 2026.11:** it works the same with **HACS**: open HACS, search for **HomePlan 3D**, download it and restart, or [open it straight in HACS](https://my.home-assistant.io/redirect/hacs_repository/?owner=Samurai9393&repository=HomePlan3D-main&category=integration).
 
 If you installed HomePlan 3D with HACS before, also as a custom repository, there is nothing to do: when you update to Home Assistant 2026.11 the Marketplace takes it over, and updates keep coming as usual.
 
@@ -206,7 +206,7 @@ Everything that belongs to the whole plan rather than to a floor, a room or an i
 | | **Voice control** | see [5.10](#510-voice-control-new) |
 | | **Locating** | see [5.11](#511-locating-new) |
 | **System** | **Backup** | export, import, restore, see chapter 9 |
-| | **Help improve** | diagnostic reports |
+| | **Diagnostics** | local preview only; nothing leaves Home Assistant |
 
 The **roof shape** (none, flat, gable, ridge, pitch, overhang) sits with the roof tool, see [4.19](#419-roof). The **start view** is remembered in the 3D view: turn and zoom the house, then tap **📌** in the view settings (gear at the top right); **📌✕** resets it. The 3D view, the card and the kiosk then open the house like that, and an opened floor is shown from the same side.
 
@@ -501,7 +501,7 @@ Drag fields in the plan and in the **3D view beside it**, also onto another roof
 | **Module width** / **Module height** | Size of one module in portrait, 1.13 × 1.72 m by default |
 | **Module power (Wp)** | Peak power of one module, 400 by default – sets the kWp of the field and its string and how bright the living modules (Energy Pro) glow |
 | **String** | Fields wired together, also on different roofs: e.g. 5 modules on the house and 5 on the garage in "String 1". A string has a name, a PV sensor and is **connected to** an inverter – or to a battery with a solar input of its own (a power station such as EcoFlow); add both under **Devices** |
-| **PV power of this field** | The power sensor of its string, for the coming Pro add-on |
+| **PV power of this field** | The power sensor of its string, used by Energy Pro |
 | **Portrait** / **Landscape** | How the modules (1.13 × 1.72 m) lie |
 | **Distance from the edge** / **from the eave** | Position of the field. Drag it in the plan, also onto another roof face; it does not slide beyond the edge of its face |
 | **Tilt of the frames** | Flat roofs and the garden: the angle of the frames, plus the direction |
@@ -515,7 +515,7 @@ Below the field you see its power, counted with 400 W per module. The plan lock 
 
 **Energy balance:** NeonPlan takes grid, solar and battery from the devices in the plan (meter, inverters, batteries; several add up, charges are averaged). In the **Energy balance** section you choose other sensors, flip signs and set the house consumption. **Take over from the energy dashboard** fetches the sensors you set up in Home Assistant's energy dashboard: for every energy statistic the power sensor of the same device, plus the gas and water meters. Check the signs afterwards. **Gas meter** and **water meter** are counters (a meter reading, e.g. in m³); with Energy Pro the house card shows how much was used today.
 
-At the bottom, a card announces the coming Pro add-on **Energy Pro**. Everything you set up here stays free and is used by it directly.
+**Energy Pro** is included and enabled by default. Everything you set up here feeds its display directly.
 
 ### 4.21 Cellar and ground
 
@@ -566,7 +566,7 @@ Under **Furniture → Home technology** (in the wall view under 🔌 **Switches*
 
 One installation can hold several floor plans: the house, the garage, the garden house, a granny flat or the holiday flat by the sea. Each floor plan has its own floors, rooms, furniture, devices, card templates and restore points. Your plan so far stays as it is – it is the first floor plan.
 
-- **Create:** ⚙ Settings → 🏘 **Floor plans** → **New floor plan**: type a name, choose where it comes from (**Empty**, **Copy of …** or **From a file** – an export, also one from the import page) and **Create**. The new floor plan opens in the editor at once.
+- **Create:** ⚙ Settings → 🏘 **Floor plans** → **New floor plan**: type a name, choose where it comes from (**Empty**, **Copy of …** or **From a file** – an export or a converted plan from the editor's import) and **Create**. The new floor plan opens in the editor at once.
 - **Switch:** the picker with every floor plan sits at the top next to "HomePlan 3D"; admins also create one there with **＋ New floor plan**. Other users see the picker once there are two. Each device remembers which one was open last. A link with `?plan=<id>` opens a particular one.
 - **Manage:** in the same list you rename a plan, choose an icon (🏠 🏡 🏢 🏖️ …), sort with ↑ ↓ and open it with **Open**. 🗑 moves a floor plan to the **bin**: it can be restored for 30 days, only then is it deleted. The first floor plan cannot be deleted. Each floor plan shows its id for the dashboard card.
 - **All floor plans:** in the picker, **▦ All floor plans** shows a tile per floor plan with the lights that are on, open windows and doors, the temperature and warnings. A tap opens it.
@@ -861,7 +861,7 @@ NeonPlan shows which room you are in right now – and where your iPhone or your
 
 - **Bluetooth scanners in Home Assistant** – what you already have is enough:
   - **Shelly** Gen2 and Gen3 (plugs, in-wall). In the Shelly device set **Configure → Bluetooth scanning** to **passive**.
-  - **ESPHome Bluetooth proxies** (an ESP32 for a few euros). They report more often than Shellys, so room changes arrive faster.
+  - **ESPHome Bluetooth proxies** (an ESP32). They report more often than Shellys, so room changes arrive faster.
   - the Bluetooth adapter of the Home Assistant machine.
 
   About one scanner per room is ideal. Rooms without a scanner of their own (hall, guest toilet) are still recognised: learning remembers how they look to the scanners in the rooms next door.
@@ -922,7 +922,7 @@ actions:
 
 **Getting the key (IRK) of an iPhone or Apple Watch:** the easiest way is the **NeonPlan key helper** – no Mac needed, the Apple Watch too:
 
-1. Plug an **ESP32** (ESP32, ESP32-C3 or ESP32-S3, about 5 €) into the computer and flash it with a local Bluetooth-key helper in Chrome or Edge. Then enter your Wi-Fi.
+1. Plug an **ESP32** (ESP32, ESP32-C3 or ESP32-S3) into the computer and flash it with a local Bluetooth-key helper in Chrome or Edge. Then enter your Wi-Fi.
 2. Home Assistant finds **NeonPlan Key** as an ESPHome device: **Settings → Devices & services → Discovered → Add**.
 3. In the assistant under **Devices → 🔑 Key helper** pick "For an Apple Watch" or "For an iPhone" and pair: on the watch tap "NeonPlan Key" under **Settings → Bluetooth → Health devices**, on the phone under **Settings → Bluetooth**. The key appears at once – tap **Add**. Afterwards remove "NeonPlan Key" from the Bluetooth settings again.
 4. **More devices:** tap **🔄 Next device** first – the helper gets a new Bluetooth identity, so the device paired before does not connect in between.
@@ -1079,7 +1079,7 @@ data:
 
 ## 6. Pro add-ons
 
-Every Pro add-on in this chapter is part of the MIT repository and enabled by default in `custom_components/homeplan3d/open-source-config.json`. No account, licence key or separate installation is involved; the switches are ready to use.
+Every Pro add-on in this chapter is part of the MIT repository and enabled by default in `custom_components/homeplan3d/open-source-config.json`. The switches are ready to use.
 
 ### 6.1 Camera cockpit
 
@@ -1358,7 +1358,7 @@ The **✦ Extensions** tab gathers everything you can add to HomePlan 3D. All Pr
 
 ### 7.1 Local packs
 
-Furniture and module packs are local JSON files. Import them under **Import furniture packs …** or **Import a module …**; several files can be selected at once. No account, licence key, signature or server connection is needed.
+Furniture and module packs are local JSON files. Import them under **Import furniture packs …** or **Import a module …**; several files can be selected at once. They can be imported and used unsigned.
 
 - Imported packs stay installed and work offline.
 - A newer version of a pack replaces the old one without losing anything in the plan.
@@ -1401,7 +1401,7 @@ At the bottom of the page a **bar** sums up your installed packs (furniture pack
 
 ### 7.4 Fun packs
 
-**Fun packs** are included extras just for fun. They are enabled by default and need no account or key:
+**Fun packs** are included extras just for fun. They are enabled by default:
 
 - Under **Extensions** they are among your packs; Home Assistant may announce a new fun pack once under Notifications.
 - You switch them on and off in the editor under **⚙ Settings → 🎈 Fun packs** (or from the notice in the 3D view).
@@ -1431,7 +1431,7 @@ All of it runs on old wall tablets too: the fairy lights and the snow cost next 
 
 ### 7.5 Modules
 
-A **module** is a local pack that carries code: NeonPlan loads it and can run it in the house. Modules are imported as JSON packs; no signature or account is needed. Their code runs only after an administrator has reviewed and approved it.
+A **module** is a local pack that carries code: NeonPlan loads it and can run it in the house. Modules are imported as JSON packs; no signature is needed. Their code runs only after an administrator has reviewed and approved it.
 
 **How a module works – step by step:**
 
@@ -1603,7 +1603,7 @@ Under **Backup** in the editor:
 - **Restore points** are kept at most every 10 minutes while you edit, the last 20 stay – with several floor plans, each its own. **Restore** brings back a state, the current one is kept as a restore point itself.
 - **Export** saves the plan as a file, **Import …** loads such a file.
 - **Share as template** exports without areas, devices, sensors and pictures. Good for passing a floor plan on.
-- **🖨 Print in 3D** (since 2.2): downloads the plan like **Export** for a local 3D-print workflow: floors you lift off, the roof as a lid, a base plate with your name. Included for everyone, for private, non-commercial use with your own homes.
+- **🖨 Print in 3D** (since 2.2): downloads the plan like **Export** for a local 3D-print workflow: floors you lift off, the roof as a lid, a base plate with your name. Included for everyone, for your own homes.
 - **Full backup:** **Back up everything (plan, pictures, packs)** saves one file with every floor plan, every background and screen picture and the installed packs. **Restore a full backup …** brings it back into the same or another installation. Local JSON packs are imported again from the backup.
 - **Two devices, one plan** (since 3.1.1): every save knows which state of the plan it was made on. If another device saved meanwhile – the PC, say, while the phone slept in the background overnight – NeonPlan does not write the old state over it: you see the newer plan, and your change waits at the top with **Restore and save** or **Discard**. An app coming back from the background loads the plan again.
 
@@ -1616,14 +1616,14 @@ Home Assistant's own backup includes HomePlan 3D completely as well.
 ## 11. Data and privacy
 
 - The plan, pictures and packs are stored in Home Assistant under `.storage`. None of it leaves your installation.
-- HomePlan 3D has no licence or update service to contact. No key, account or installation id is sent anywhere.
+- HomePlan 3D has no update service to contact. No installation id is sent anywhere.
 - Camera pictures, history and states stay in Home Assistant and are only shown in the browser.
 - Time travel reads the history from Home Assistant's recorder, only for the devices of the plan. It never reads people or their trackers.
 - **Locating** evaluates the Bluetooth signals only in Home Assistant. Nothing about who is where leaves your house.
-- **Help make NeonPlan better (voluntary, off by default):** under **⚙ Settings → 🛟 Help improve** you can switch on anonymous usage and error reports. An admin who has not switched them on sees one invitation in the editor; **Have a look** opens the setting, **Not now** hides it for good on that device. Reports are sent only after this opt-in.
-  - **Sent:** a random id (not Home Assistant's, made when you switch it on), the versions of NeonPlan, Home Assistant and Python, the language, the installed packs and Pro add-ons, counts from the plan (floors, rooms, furniture, linked devices, cameras), device type, browser and system of the screens with frame rate and graphics class, how often each view was opened, and NeonPlan's error messages without names and addresses.
-  - **Never sent:** names, entities, areas, the shape of your floor plan, IP addresses, your Home Assistant installation's id, user names, account details – and nothing from locating.
-  - **"View report"** shows exactly the next report before it is sent. **"Delete data"** removes everything already sent. Switching off forgets the id.
+- **Local diagnostics (off by default):** under **⚙ Settings → Diagnostics** an admin can switch on anonymous usage and error statistics. Nothing is sent anywhere; the data stays in Home Assistant under `.storage`.
+  - **Collected locally:** a random id (not Home Assistant's, made when you switch it on), the versions of HomePlan 3D, Home Assistant and Python, the language, the installed packs and enabled features, counts from the plan (floors, rooms, furniture, linked devices, cameras), device type, browser and system of the screens with frame rate and graphics class, how often each view was opened, and error messages without names and addresses.
+  - **Never included:** names, entities, areas, the shape of your floor plan, IP addresses, your Home Assistant installation's id, user names, credentials – and nothing from locating.
+  - **"View report"** shows exactly what is stored. **"Clear data"** deletes it and switches diagnostics off.
 
 ---
 
@@ -1673,11 +1673,11 @@ Some older graphics chips fail on the sun's arc, the house shadow or the window 
 **Sunlight falls through the wrong windows.**
 Check **North** under Settings: degrees clockwise from "up" in the plan.
 
-**A pack import is throttled.**
-A transfer endpoint may limit repeated requests. Wait a minute and import the file again.
+**A pack import fails.**
+Check that the file is a valid local JSON pack and import it again.
 
 **The notice "This page still shows HomePlan 3D x.y, Home Assistant already has …" stays.**
-The browser or the companion app still holds an old NeonPlan bundle. Tap **Reload**; in the companion app go to Settings → Companion app → **Reset frontend cache**, then close the app completely and open it again. Restarting Home Assistant does not help here. The same applies when an installed Pro add-on says "needs a newer NeonPlan version" under the packs.
+The browser or the companion app still holds an old NeonPlan bundle. Tap **Reload**; in the companion app go to Settings → Companion app → **Reset frontend cache**, then close the app completely and open it again. Restarting Home Assistant does not help here. The same applies when an installed pack says "needs a newer NeonPlan version".
 
 **Two holograms hang on the roof (Energy Pro).**
 That is intended: the big one is the **house balance** (Solar & Energy), the smaller one the **plant card** of the inverter whose field that is – with several plants each has its own. Too much? In the **Hologram** section hang the house balance **Free in the plan** (handle ◈), or untick **Show the plant card** in the inverter form. A small card that seems to stick to the roof is often the device hologram of a device in the room below – turn the camera a little.

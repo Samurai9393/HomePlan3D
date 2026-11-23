@@ -256,7 +256,7 @@ export class BuildingController implements ReactiveController {
 
   private async start(): Promise<void> {
     if (!this.hass) return;
-    // the opt-in reports: one local call per page to learn whether they are on (see diagnostics.ts)
+    // the opt-in local diagnostics: one local call per page to learn whether collection is on (see diagnostics.ts)
     initDiagnostics(this.hass);
     await Promise.all([this.reloadPacks(), this.reloadPlans()]);
     this.planId = choosePlan(this.wanted ?? this.planId, this.plans);

@@ -1,20 +1,15 @@
-"""Opt-in diagnostics: the payload (counts only, scrubbed errors) and that nothing is sent while off."""
+"""Local diagnostics: counts only, scrubbed errors, and that nothing leaves the installation."""
 
 from __future__ import annotations
 
-import time
 import uuid
 
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import instance_id
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.homeplan3d import diagnostics_report as diag
 from custom_components.homeplan3d.const import DATA_DIAGNOSTICS, DOMAIN
-
-REPORT_URL = f"{diag.TELEMETRY_API}/report"
-DELETE_URL = f"{diag.TELEMETRY_API}/delete"
 
 BUILDING = {
     "floors": [
@@ -29,8 +24,7 @@ BUILDING = {
     ]
 }
 PACKS = [
-    {"id": "mastershort.pro_energy", "features": ["energy_pro"]},
-    {"id": "mastershort.pro_time", "features": ["time_travel", "teleport"]},
+    {"id": "local.energy", "features": ["energy_pro"]},
     {"id": "studio.anna-sofa", "features": []},
 ]
 
@@ -102,40 +96,30 @@ def test_payload_has_counts_and_ids_only() -> None:
         ],
         "errors": [],
     }
-    payload = diag.build_payload(
-        state, kind="daily", building=BUILDING, packs=PACKS, neonplan="1.17.0", ha="2026.10.1", lang="de-DE"
-    )
+    payload = diag.build_payload(state, building=BUILDING, packs=PACKS, neonplan="1.17.0", ha="2026.10.1", lang="de-DE")
     assert set(payload) == {
         "v",
         "id",
-        "kind",
         "neonplan",
         "ha",
         "python",
         "lang",
         "packs",
-        "pro",
+        "features",
         "plan",
         "clients",
         "errors",
     }
-    assert payload["v"] == 1 and payload["kind"] == "daily" and payload["lang"] == "de"
-    assert payload["packs"] == ["mastershort.pro_energy", "mastershort.pro_time"]
-    assert payload["pro"] == ["energy_pro", "time_travel"]
+    assert payload["v"] == 1 and payload["lang"] == "de"
+    assert payload["packs"] == ["local.energy", "studio.anna-sofa"]
+    assert payload["features"] == sorted(diag.ENABLED_FEATURES)
     assert payload["plan"] == {"floors": 2, "rooms": 3, "furniture": 1, "devices_linked": 2, "outdoor": 1, "cameras": 1}
     assert payload["clients"] == [
         {"device": "tablet", "browser": "Silk 120", "os": "Android 9", "fps": 24.0, "views": {}}
     ]
     text = repr(payload)
-    for private in ("Wohnzimmer", "Erdgeschoss", "light.", "camera.", "Anna", "studio."):
+    for private in ("Wohnzimmer", "Erdgeschoss", "light.", "camera."):
         assert private not in text
-    # an error batch carries no clients
-    assert (
-        diag.build_payload(state, kind="errors", building=BUILDING, packs=PACKS, neonplan="1", ha="1", lang="en")[
-            "clients"
-        ]
-        == []
-    )
 
 
 async def _setup(hass: HomeAssistant) -> diag.DiagnosticsReporter:
@@ -147,14 +131,14 @@ async def _setup(hass: HomeAssistant) -> diag.DiagnosticsReporter:
     return hass.data[DATA_DIAGNOSTICS]
 
 
-async def test_nothing_is_sent_while_off(hass: HomeAssistant, hass_ws_client, aioclient_mock) -> None:
+async def test_nothing_leaves_the_installation(hass: HomeAssistant, hass_ws_client, aioclient_mock) -> None:
     reporter = await _setup(hass)
-    aioclient_mock.post(REPORT_URL, json={"ok": True})
     client = await hass_ws_client(hass)
 
     await client.send_json_auto_id({"type": "homeplan3d/diagnostics/get"})
     status = (await client.receive_json())["result"]
     assert status["enabled"] is False and status["preview"]["id"] is None and status["can_delete"] is False
+    assert "endpoint" not in status
 
     # a frontend's aggregate is dropped and it is told not to collect
     await client.send_json_auto_id(
@@ -165,22 +149,18 @@ async def test_nothing_is_sent_while_off(hass: HomeAssistant, hass_ws_client, ai
     )
     assert (await client.receive_json())["result"] == {"enabled": False}
     assert reporter.state["clients"] == []
-
-    await reporter.async_tick(time.time() + 10 * 86400)
     assert aioclient_mock.call_count == 0
 
 
-async def test_daily_report_and_delete(hass: HomeAssistant, hass_ws_client, aioclient_mock) -> None:
+async def test_local_collection_and_clear(hass: HomeAssistant, hass_ws_client, aioclient_mock) -> None:
     reporter = await _setup(hass)
-    aioclient_mock.post(REPORT_URL, json={"ok": True})
-    aioclient_mock.post(DELETE_URL, json={"ok": True})
     client = await hass_ws_client(hass)
 
     await client.send_json_auto_id({"type": "homeplan3d/diagnostics/set", "enabled": True})
     status = (await client.receive_json())["result"]
     report_id = status["preview"]["id"]
     assert status["enabled"] is True and str(uuid.UUID(report_id)) == report_id
-    assert report_id != await instance_id.async_get(hass)
+    assert status["can_delete"] is False
 
     await client.send_json_auto_id(
         {
@@ -199,24 +179,15 @@ async def test_daily_report_and_delete(hass: HomeAssistant, hass_ws_client, aioc
         }
     )
     assert (await client.receive_json())["result"] == {"enabled": True}
+    assert reporter.state["clients"] and reporter.state["errors"]
 
-    # not due yet: the first report goes a day after switching on, errors at most once an hour
-    await reporter.async_tick(time.time() + 60)
-    assert aioclient_mock.call_count == 0
-    await reporter.async_tick(time.time() + diag.ERROR_INTERVAL + 60)
-    assert aioclient_mock.call_count == 1
-    sent = aioclient_mock.mock_calls[-1][2]
-    assert sent["kind"] == "errors" and sent["clients"] == []
-    assert sent["errors"] == [
+    await client.send_json_auto_id({"type": "homeplan3d/diagnostics/get"})
+    status = (await client.receive_json())["result"]
+    assert status["can_delete"] is True
+    assert status["preview"]["errors"] == [
         {"msg": "TypeError at <entity>", "where": "homeplan3d-3d.js:1:5", "count": 1, "version": "1.17.0"}
     ]
-    assert reporter.state["errors"] == []
-
-    await reporter.async_tick(time.time() + diag.DAILY_INTERVAL + 60)
-    assert aioclient_mock.call_count == 2
-    sent = aioclient_mock.mock_calls[-1][2]
-    assert sent["kind"] == "daily" and sent["id"] == report_id
-    assert sent["clients"] == [
+    assert status["preview"]["clients"] == [
         {
             "device": "tablet",
             "browser": "Silk 120",
@@ -228,14 +199,12 @@ async def test_daily_report_and_delete(hass: HomeAssistant, hass_ws_client, aioc
             "views": {"3d": 2},
         }
     ]
-    # once a day only
-    await reporter.async_tick(time.time() + diag.DAILY_INTERVAL + 120)
-    assert aioclient_mock.call_count == 2
+    assert aioclient_mock.call_count == 0
 
     await client.send_json_auto_id({"type": "homeplan3d/diagnostics/delete"})
     result = await client.receive_json()
     assert result["success"], result
-    assert aioclient_mock.mock_calls[-1][1].path.endswith("/telemetry/v1/delete")
-    assert aioclient_mock.mock_calls[-1][2] == {"id": report_id}
     assert result["result"]["enabled"] is False and result["result"]["can_delete"] is False
-    assert reporter.state["id"] is None
+    assert result["result"]["preview"]["id"] is None
+    assert reporter.state == diag._empty_state()
+    assert aioclient_mock.call_count == 0

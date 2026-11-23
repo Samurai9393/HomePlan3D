@@ -125,11 +125,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await data.async_load()
     hass.data[DOMAIN] = data
 
-    # opt-in usage and error reports: inert (nothing is sent) unless the user switched them on
+    # opt-in local diagnostics: inert unless an admin switches them on; nothing leaves the installation
     reporter = DiagnosticsReporter(hass, data)
     await reporter.async_load()
     hass.data[DATA_DIAGNOSTICS] = reporter
-    entry.async_on_unload(reporter.start())
 
     # locating (who and what is where, from the Bluetooth scanners): idle unless an admin switched it on
     locate = LocateService(hass)

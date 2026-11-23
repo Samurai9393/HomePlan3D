@@ -6,7 +6,7 @@ GitHub's side that breaks HACS installs is noticed within hours instead of from 
 Found the hard way: on 23 October 2026 GitHub's release download redirects started carrying a 9 KB
 header, aiohttp stops at 8 KB, and every HACS download of a release zip failed (hacs/integration#5643).
 
-Checks the path HACS uses for NeonPlan (the release zip with zip_release in hacs.json, otherwise single
+Checks the path HACS uses for HomePlan 3D (the release zip with zip_release in hacs.json, otherwise single
 files from raw.githubusercontent.com) and fails when it is broken. The other paths are only reported,
 so the log also says when the release zip works again and zip_release can be switched back on.
 """
@@ -21,7 +21,7 @@ import urllib.request
 
 import aiohttp
 
-REPO = "Mastershort/neonplan3d"
+REPO = "Samurai9393/HomePlan3D-main"
 ROOT = Path(__file__).resolve().parent.parent
 
 

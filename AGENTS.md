@@ -41,7 +41,7 @@
 - Main frontend entry is `frontend/src/main.ts`; dashboard card is `src/card.ts` (auto-loaded, no resource registration needed); admin editor is `src/components/editor.ts`; 3D viewer is `src/viewer/viewer3d.ts` in a lazy bundle.
 - The integration serves `custom_components/homeplan3d/frontend/` with no-cache and registers websocket commands. Built bundles are committed: never hand-edit them; rebuild from `frontend/`.
 - Build targets Safari 15/Chrome 94 and fails on `?.(...spread)`, `Object.hasOwn`, `findLast*`, `toSorted*`, or bare `dvh`; use older syntax guarded by build.
-- `npm test` includes `unreleased-guard.test.ts`: add-on names in `UNRELEASED` must not appear in `README.md`, `CHANGELOG.md`, `ROADMAP.md`, `docs/manual.md`, or `docs/anleitung.md`; Pool Pro stays gated until explicitly released.
+- `npm test` includes `features.test.ts`: every feature in `open-source-config.json` is enabled; there is no `UNRELEASED` gate or shop gating.
 - Never commit real floor plans, IPs, device names, `deploy.local.json`, `private/`, `frontend/_*.{mjs,mts,ts}`, or `preview/screenshots/`. The guard test specifically rejects tracked `private/` and `frontend/_*` files.
 - `preview/` is invented demo data with mock hass; `site/` is the GitHub Pages demo/import site, not integration code.
 

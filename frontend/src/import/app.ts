@@ -1,5 +1,5 @@
-// The import page (neonplan3d.mastershort.de/import/): a file from another program in, a NeonPlan plan out. Everything
-// runs in the browser – the file never leaves the computer.
+// The import page: a file from another program in, a NeonPlan plan out. Everything runs in the browser – the file
+// never leaves the computer.
 
 import type { Building, Floor, Vec2 } from "../model.ts";
 import { centroid, polygonArea } from "../model.ts";
@@ -10,7 +10,6 @@ import type { LayerRole } from "./dxf.ts";
 
 const DE = {
   title: "Plan importieren",
-  beta: "Beta – noch im Test. Klappt etwas nicht, schick uns die Datei gern mit einer kurzen Beschreibung auf GitHub (Issues) oder Discord.",
   lead: "Bring deinen Grundriss aus einem anderen Programm in HomePlan 3D – Räume, Wände, Türen, Fenster und Möbel. Die Datei bleibt auf deinem Computer: alles läuft hier im Browser.",
   drop: "Datei hierher ziehen oder klicken",
   formats: "Sweet Home 3D (.sh3d) · iPhone-/iPad-Scan mit RoomPlan (.json) · CAD (.dxf) · 3D-Modell aus Blender, SketchUp & Co. (.glb, .gltf, .obj, .stl) · Floorplanner (.json) · Valetudo-Saugroboterkarte (.json) · NeonPlan-Importformat oder ein NeonPlan-Plan von einer KI (.json)",
@@ -75,14 +74,13 @@ const DE = {
   e_gltf_external: "Die glTF-Datei verweist auf externe Dateien. Bitte als .glb (alles in einer Datei) exportieren.",
   e_zip_broken: "Die Datei ist beschädigt.",
   e_not_plan: "Das ist kein vollständiger NeonPlan-Plan.",
-  privacy: "Datenschutz: Die Datei wird nur in deinem Browser gelesen und nirgendwohin hochgeladen. Wir zählen nur anonym, wie oft die Seite genutzt wird und welche Formate – ohne Cookies, ohne IP-Adresse, ohne Inhalte.",
+  privacy: "Datenschutz: Die Datei wird nur in deinem Browser gelesen und nirgendwohin hochgeladen.",
   ai: "Plan mit KI erstellen: Vorlage",
   format_doc: "Importformat",
   floor_n: "Etage",
 };
 const EN: typeof DE = {
   title: "Import a plan",
-  beta: "Beta – still being tested. If something goes wrong, please send us the file with a short note on GitHub (issues) or Discord.",
   lead: "Bring your floor plan from another program into HomePlan 3D – rooms, walls, doors, windows and furniture. The file stays on your computer: everything runs here in the browser.",
   drop: "Drop a file here or click",
   formats: "Sweet Home 3D (.sh3d) · iPhone/iPad scan with RoomPlan (.json) · CAD (.dxf) · 3D model from Blender, SketchUp & co. (.glb, .gltf, .obj, .stl) · Floorplanner (.json) · Valetudo robot vacuum map (.json) · NeonPlan import format or a NeonPlan plan written by an AI (.json)",
@@ -147,7 +145,7 @@ const EN: typeof DE = {
   e_gltf_external: "The glTF file points to external files. Please export as .glb (all in one file).",
   e_zip_broken: "The file is damaged.",
   e_not_plan: "This is no complete NeonPlan plan.",
-  privacy: "Privacy: the file is only read in your browser and uploaded nowhere. We only count anonymously how often the page is used and which formats – no cookies, no IP address, no contents.",
+  privacy: "Privacy: the file is only read in your browser and uploaded nowhere.",
   ai: "Create a plan with AI: template",
   format_doc: "Import format",
   floor_n: "Floor",
@@ -157,7 +155,7 @@ let lang = new URLSearchParams(location.search).get("lang") ?? ((navigator.langu
 const T = () => (lang === "de" ? DE : EN);
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 const fill = (s: string, v: Record<string, string | number | undefined>) => s.replace(/\{(\w+)\}/g, (_, k) => String(v[k] ?? ""));
-const REPO = "https://github.com/Mastershort/neonplan3d/blob/main/docs";
+const REPO = "https://github.com/Samurai9393/HomePlan3D-main/blob/main/docs";
 
 interface State {
   name: string | null;
@@ -177,26 +175,7 @@ interface State {
 
 const state: State = { name: null, bytes: null, cache: {}, read: null, result: null, building: null, error: null, busy: false, floor: 0, names: {}, build: { square: true, furniture: true, mirror: false, turn: 0 }, readOpt: { roles: {}, dxfUnit: null, mesh: { up: "auto", unit: null, levels: null } }, levelsText: "" };
 
-/**
- * Anonymous usage counts (is the page worth it?): page opened, a file read (its format) or not (its extension), a plan
- * downloaded. Only an event name goes out – no file, no names, no cookie – and only from the published page.
- */
-function count(event: "open" | "read" | "fail" | "download", detail?: string): void {
-  if (location.hostname !== "neonplan3d.mastershort.de") return;
-  try {
-    navigator.sendBeacon?.("https://api.mastershort.de/stats/v1/hit", JSON.stringify({ page: "import", event, detail: detail ? detail.toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 16) : undefined }));
-  } catch {
-    /* counting is never worth an error */
-  }
-}
-
-/** Each file counts once (re-reading it with other options does not). */
-let counted = false;
-let downloaded = false;
-
 async function load(name: string, bytes: Uint8Array): Promise<void> {
-  counted = false;
-  downloaded = false;
   state.name = name;
   state.bytes = bytes;
   state.cache = {};
@@ -217,8 +196,6 @@ async function reread(): Promise<void> {
   await new Promise((r) => setTimeout(r, 30));
   try {
     state.read = await readFile(state.name, state.bytes, { ...state.readOpt, lang }, state.cache);
-    if (!counted) count("read", state.read.kind === "mesh" ? (state.name.split(".").pop() ?? "mesh") : state.read.kind);
-    counted = true;
     if (state.read.mesh && !state.levelsText) state.levelsText = state.read.mesh.levels.map((l) => String(l).replace(".", lang === "de" ? "," : ".")).join(lang === "de" ? "; " : ", ");
     rebuild();
   } catch (e) {
@@ -226,8 +203,6 @@ async function reread(): Promise<void> {
     state.result = null;
     state.building = null;
     const code = (e as Error).message;
-    if (!counted) count("fail", state.name.includes(".") ? state.name.split(".").pop() : "none");
-    counted = true;
     state.error = (T() as Record<string, unknown>)[`e_${code}`] ? String((T() as Record<string, unknown>)[`e_${code}`]) : `${code}`;
   }
   state.busy = false;
@@ -350,11 +325,10 @@ function render(): void {
   root.innerHTML = `
     <header>
       <a class="brand" href="../">HomePlan 3D</a>
-      <h1>${esc(t.title)} <span class="beta">Beta</span></h1>
+      <h1>${esc(t.title)}</h1>
       <button class="lang" data-lang="${lang === "de" ? "en" : "de"}">${lang === "de" ? "English" : "Deutsch"}</button>
     </header>
     <p class="lead">${esc(t.lead)}</p>
-    <p class="beta-note">${esc(t.beta)}</p>
     <label class="drop ${state.busy ? "busy" : ""}" id="drop">
       <input type="file" id="file" accept=".sh3d,.dxf,.json,.fml,.glb,.gltf,.obj,.stl">
       <span class="big">${esc(state.busy ? t.reading : state.name ? state.name : t.drop)}</span>
@@ -388,13 +362,11 @@ function render(): void {
           </section>`
         : ""
     }
-    <footer>${esc(t.privacy)} · <a href="https://github.com/Mastershort/neonplan3d" target="_blank" rel="noopener">GitHub</a></footer>`;
+    <footer>${esc(t.privacy)} · <a href="https://github.com/Samurai9393/HomePlan3D-main" target="_blank" rel="noopener">GitHub</a></footer>`;
 }
 
 function download(): void {
   if (!state.building) return;
-  if (!downloaded) count("download", state.read?.kind);
-  downloaded = true;
   const base = (state.name ?? "plan").replace(/\.[^.]+$/, "").replace(/[^\w\-äöüÄÖÜß]+/g, "_").slice(0, 40);
   const file = { format: EXPORT_FORMAT, version: 1, exported_at: new Date().toISOString(), building: state.building };
   const url = URL.createObjectURL(new Blob([JSON.stringify(file, null, 2)], { type: "application/json" }));
@@ -471,4 +443,3 @@ function wire(): void {
 
 wire();
 render();
-count("open");

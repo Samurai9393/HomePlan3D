@@ -26,7 +26,7 @@ from .const import (
     SIGNAL_RELOAD,
     SIGNAL_STYLE,
 )
-from .diagnostics_report import DiagnosticsError, DiagnosticsReporter
+from .diagnostics_report import DiagnosticsReporter
 from .locate.recorder import ws_locate_rec
 from .locate.ws import COMMANDS as LOCATE_COMMANDS
 from .packs import MAX_PACK_SIZE, PackError, module_sha, pack_source, read_pack, validate_payload
@@ -624,7 +624,7 @@ def _reporter(hass: HomeAssistant, connection: websocket_api.ActiveConnection, m
 @websocket_api.require_admin
 @callback
 def ws_diagnostics_get(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
-    """Whether the reports are on, and the exact next daily report."""
+    """Whether local diagnostics are on, and the exact data kept locally."""
     if (reporter := _reporter(hass, connection, msg)) is None:
         return
     connection.send_result(msg["id"], reporter.status())
@@ -636,7 +636,7 @@ def ws_diagnostics_get(hass: HomeAssistant, connection: websocket_api.ActiveConn
 async def ws_diagnostics_set(
     hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
 ) -> None:
-    """Switch the reports on or off."""
+    """Start or stop collecting local diagnostics."""
     if (reporter := _reporter(hass, connection, msg)) is None:
         return
     await reporter.async_set_enabled(msg["enabled"])
@@ -649,14 +649,10 @@ async def ws_diagnostics_set(
 async def ws_diagnostics_delete(
     hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]
 ) -> None:
-    """Delete what was sent under our id on the server, forget the id and switch off."""
+    """Clear the locally collected data, forget the id and switch off."""
     if (reporter := _reporter(hass, connection, msg)) is None:
         return
-    try:
-        await reporter.async_delete()
-    except DiagnosticsError as err:
-        connection.send_error(msg["id"], err.code, "The NeonPlan server could not be reached")
-        return
+    await reporter.async_delete()
     connection.send_result(msg["id"], reporter.status())
 
 
@@ -692,8 +688,8 @@ _DIAG_ERROR = vol.Schema(
 )
 @callback
 def ws_diagnostics_client(hass: HomeAssistant, connection: websocket_api.ActiveConnection, msg: dict[str, Any]) -> None:
-    """A frontend's aggregate and errors (any user: the wall tablets report too). Ignored while the
-    reports are off; the answer tells the frontend whether to collect at all."""
+    """A frontend's aggregate and errors (any user: the wall tablets report too). Ignored while local
+    diagnostics are off; the answer tells the frontend whether to collect at all."""
     reporter: DiagnosticsReporter | None = hass.data.get(DATA_DIAGNOSTICS)
     if reporter is None or not reporter.enabled:
         connection.send_result(msg["id"], {"enabled": False})

@@ -21,9 +21,9 @@ MAIN_PLAN = "main"
 # a deleted plan waits this many days in the bin before its stores are removed
 PLAN_TRASH_DAYS = 30
 MAX_PLANS = 50
-# opt-in usage and error reports (see diagnostics_report.py)
+# opt-in local diagnostics, kept in this installation (see diagnostics_report.py)
 STORAGE_KEY_DIAGNOSTICS = f"{DOMAIN}.diagnostics"
-# hass.data key of the reporter
+# hass.data key of the diagnostics store
 DATA_DIAGNOSTICS = f"{DOMAIN}_diagnostics"
 
 # restore points: at most this many, and a new one only after this pause since the last one

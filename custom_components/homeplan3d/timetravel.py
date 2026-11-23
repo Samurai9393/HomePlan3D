@@ -22,6 +22,7 @@ from homeassistant.util import dt as dt_util
 import voluptuous as vol
 
 from .const import DOMAIN
+from .packs import feature_enabled
 from .timetravel_rows import (
     ATTR_KEEP,
     MAX_SPAN,
@@ -31,8 +32,6 @@ from .timetravel_rows import (
     car_state,
     domain_of,
     entity_rows,
-    has_feature,
-    has_time_travel,
     location_like,
     oldest_data,
     read_row,
@@ -206,8 +205,8 @@ async def ws_timetravel_history(
     if data is None:
         connection.send_error(msg["id"], "not_loaded", "HomePlan 3D is not set up")
         return
-    if not has_time_travel(data.packs):
-        connection.send_error(msg["id"], "not_unlocked", "Time travel is a Pro add-on")
+    if not feature_enabled("time_travel"):
+        connection.send_error(msg["id"], "feature_disabled", "Time travel is disabled in open-source-config.json")
         return
     start, end = msg["start_time"], msg["end_time"]
     if not 0 < end - start <= MAX_SPAN:
@@ -222,7 +221,7 @@ async def ws_timetravel_history(
     # only the trackers of the plan's cars (Auto Pro), never a person's own, even when linked as a car's
     private = private_trackers(hass)
     configured: set[str] = set()
-    if has_feature(data.packs, "auto_pro"):
+    if feature_enabled("auto_pro"):
         # the cars of every floor plan (a garage of its own is a plan of its own)
         for plan in data.plans.values():
             configured |= car_trackers(hass, plan.building)

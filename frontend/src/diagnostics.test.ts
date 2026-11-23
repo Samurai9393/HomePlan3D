@@ -78,7 +78,7 @@ test("the GPU is reported as a rough class only", () => {
   assert.equal(gpuTier(null), null);
 });
 
-test("the reports are released (2.0.1): the switch shows for admins, off until they turn it on", async () => {
+test("local diagnostics are available: the switch shows for admins, off until they turn it on", async () => {
   const { released } = await import("./features.ts");
   assert.equal(released("diagnostics"), true);
 });

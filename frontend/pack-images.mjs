@@ -1,4 +1,4 @@
-// Shop pictures of furniture packs, drawn with the real 3D bundle (run `npm run build` first):
+// Pictures of furniture packs, drawn with the real 3D bundle (run `npm run build` first):
 // one transparent PNG per item and an overview sheet with all items of the pack.
 // Usage (from frontend/): node pack-images.mjs <pack source .json>... [--out <dir>]
 // Pictures go to <dir>/<pack id>/ (default: next to each source, in a folder named after the pack).
@@ -62,7 +62,7 @@ for (const source of sources) {
       const items = pack.items.map((it) => ({
         id: it.id,
         name: name(it),
-        url: mod.furniturePreview({ type: `pack:${pack.id}:${it.id}`, w: it.size[0], d: it.size[1], h: it.size[2], variant: null, lamp: null }, 480, [{ licensee: null, ...pack }], 1.9),
+        url: mod.furniturePreview({ type: `pack:${pack.id}:${it.id}`, w: it.size[0], d: it.size[1], h: it.size[2], variant: null, lamp: null }, 480, [pack], 1.9),
       }));
       const load = (src) => new Promise((ok) => {
         const img = new Image();

@@ -40,7 +40,7 @@ Zeit = Stelle im fertigen Video (a = ep06a.mp4, 7:11; b = ep06b.mp4, 5:18).
 - [x] a 4:40 / 4:50 – „Symbol in 3D“: Automatisch / Immer zeigen / Ohne Watt / Ausblenden
 - [x] a 5:46 / 5:53 – Schalter „Symbole“ in der 3D-Ansicht (⚙): Keine / Wichtige / Alle; „Wichtige“ lässt Lampen und Möbel-Geräte weg, Sensoren/Watt bleiben; „Keine“ schlägt alles
 - [x] a 4:32 / 4:50 – Leistungssensor am Gerät: Pin zeigt die Watt (Kaffeemaschine), „Ohne Watt“ lässt sie weg; elektrische Möbel haben „Leistungssensor (W)“ (Folge 4)
-- [x] a 4:58 – Energie Pro: „Hologramm über dem Gerät“ (ein Satz, keine Preise)
+- [x] a 4:58 – Energie Pro: „Hologramm über dem Gerät“ (ein Satz)
 - [x] a 5:05 / 5:14 – „Eigenes Symbol (Material-Design-Icon)“: Name wie in HA (mdi:thermometer), Vorschau daneben, leer = Standard; gilt auch für elektrische Möbel
 - [x] a 5:19–5:35 – „Eigener Name (optional)“ + „Name unter dem Symbol in 3D zeigen“ (drei Thermometer im Garten); Haken erscheint erst mit Namen; Karten-Option `marker_names: true` (gesagt)
 - [x] a 6:21 / 6:32 – „Als Möbel darstellen“: Pin → passendes Möbel (Lautsprecher, Leuchte, Heizkörper, Saugroboter), schon verknüpft; Liste nur passende Möbel
@@ -75,7 +75,7 @@ Zeit = Stelle im fertigen Video (a = ep06a.mp4, 7:11; b = ep06b.mp4, 5:18).
 - [x] b 4:23 – 3D: Kameramodell an Wand/Decke, Kegel auf dem Boden
 - [x] b 4:29 (in der Demo kaum sichtbar, siehe Hinweis) – Bewegungs-/Präsenzsensor der Kamera meldet → Kegel rot
 - [x] b 4:34 / 4:43 – Tipp auf Kamera oder Kegel: Standbild, erneuert sich; Tipp aufs Bild: Livebild von HA; Kegel = große Tippfläche
-- [x] b 4:46 – Kamera-Cockpit (Pro): Erkennungs-Hinweis im Formular, Durch die Kamera schauen, Kamera-Wand – ein Satz, keine Preise
+- [x] b 4:46 – Kamera-Cockpit (Pro): Erkennungs-Hinweis im Formular, Durch die Kamera schauen, Kamera-Wand – ein Satz
 
 ## Rahmen
 - [x] a 0:00 / 6:50, b 0:00 / 4:56 – Teaser, „In diesem Video …“, Outro mit Rückblick, nächste Folge, Links, alte Wandtablets

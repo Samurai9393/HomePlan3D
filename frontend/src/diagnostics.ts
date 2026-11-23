@@ -1,9 +1,9 @@
-// Opt-in "help improve NeonPlan" reports (custom_components/homeplan3d/diagnostics_report.py).
+// Opt-in local diagnostics (custom_components/homeplan3d/diagnostics_report.py).
 //
 // Off by default. Only while the user switched it on in the editor, this page collects: its device class,
 // browser and OS (name and major version), the 3D view's quality level, frame rate and GPU tier, how often
 // the views were opened, and errors thrown by our own bundles (scrubbed). It pushes that to the backend at
-// most every 10 minutes and when the page is hidden; the backend sends one report a day. Nothing here
+// most every 10 minutes and when the page is hidden; the backend only stores it locally. Nothing here
 // talks to the internet.
 
 import type { HomeAssistant } from "./types.ts";
@@ -11,7 +11,7 @@ import type { HomeAssistant } from "./types.ts";
 declare const __FP3D_VERSION__: string;
 const VERSION = typeof __FP3D_VERSION__ === "string" ? __FP3D_VERSION__ : "dev";
 
-/** Window event the editor (a bundle of its own) fires after switching the reports on or off. */
+/** Window event the editor (a bundle of its own) fires after switching local collection on or off. */
 export const DIAGNOSTICS_EVENT = "homeplan3d-diagnostics";
 const PUSH_INTERVAL = 10 * 60 * 1000;
 const MAX_ERRORS = 20;
@@ -101,7 +101,7 @@ export function osOf(ua: string, touchPoints = 0): string {
   return "other";
 }
 
-/** A rough GPU class from the WebGL renderer string (only the class is reported, never the name). */
+/** A rough GPU class from the WebGL renderer string (only the class is stored, never the name). */
 export function gpuTier(renderer: string | null | undefined): "low" | "mid" | "high" | null {
   const r = renderer ?? "";
   if (!r.trim()) return null;
@@ -132,18 +132,18 @@ let gpu: "low" | "mid" | "high" | null = null;
 let errors: ErrorEntry[] = [];
 const watchers = new Set<(on: boolean) => void>();
 
-/** Whether the reports are on (this page collects). */
+/** Whether local collection is on (this page collects). */
 export function diagnosticsActive(): boolean {
   return active;
 }
 
-/** Be told when the reports are switched on or off; returns the function that stops it. */
+/** Be told when local collection is switched on or off; returns the function that stops it. */
 export function watchDiagnostics(cb: (on: boolean) => void): () => void {
   watchers.add(cb);
   return () => watchers.delete(cb);
 }
 
-/** Learn once per page whether the reports are on (one local websocket call; nothing else while off). */
+/** Learn once per page whether local collection is on (one local websocket call; nothing else while off). */
 export function initDiagnostics(hass: HomeAssistant): void {
   hassRef = hass;
   if (checked) return;

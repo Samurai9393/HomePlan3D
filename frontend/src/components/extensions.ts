@@ -82,8 +82,8 @@ export class Extensions extends LitElement {
         <h2>${this.t("ext_title")}</h2>
         <p class="fp3d-sub">${this.t("ext_intro")}</p>
         <div class="fp3d-ext-actions">
-          <a class="fp3d-btn" href="https://github.com/Mastershort/neonplan3d/issues/new/choose" target="_blank" rel="noopener">🐞 ${this.t("help_issue")}</a>
-          <a class="fp3d-btn" href="https://github.com/Mastershort/neonplan3d/discussions/categories/ideas" target="_blank" rel="noopener">💡 ${this.t("help_idea")}</a>
+          <a class="fp3d-btn" href="https://github.com/Samurai9393/HomePlan3D-main/issues/new/choose" target="_blank" rel="noopener">🐞 ${this.t("help_issue")}</a>
+          <a class="fp3d-btn" href="https://github.com/Samurai9393/HomePlan3D-main/discussions/categories/ideas" target="_blank" rel="noopener">💡 ${this.t("help_idea")}</a>
         </div>
       </header>
       <section class="fp3d-ext-card">
@@ -126,7 +126,7 @@ export class Extensions extends LitElement {
           <div>
             <b>${packName(p, this.hass?.language ?? "de")}</b>
             <span class="fp3d-sub">${p.module ? this.t("pack_module", { publisher: p.publisher }) : p.features?.length ? this.t("pack_features", { publisher: p.publisher, n: p.features.length }) : this.t("pack_by", { publisher: p.publisher, n: p.items.length })}</span>
-            ${p.licensee ? html`<span class="fp3d-sub">${this.t("pack_licensed", { name: p.licensee })}${p.release && p.release > 1 ? ` · v${p.release}` : ""}</span>` : nothing}
+            ${p.release && p.release > 1 ? html`<span class="fp3d-sub">v${p.release}</span>` : nothing}
             ${(p.features ?? []).some((f) => !knownFeature(f)) ? html`<span class="fp3d-sub fp3d-pack-error">${this.t("pack_needs_update")}</span>` : nothing}
           </div>
           <button class="fp3d-btn fp3d-danger" @click=${() => this.deletePack(p)}>${this.t("pack_remove")}</button>
@@ -142,7 +142,7 @@ export class Extensions extends LitElement {
     </section>`;
   }
 
-  /** Modules: signed packs that carry code – and the feature packs, which become modules. */
+  /** Modules: local packs that carry code – and the feature packs, which become modules. */
   private renderModules() {
     const modules = (this.packs ?? []).filter((p) => p.module || p.features?.length);
     const pro = modules.filter((p) => !p.module).length;
@@ -169,7 +169,6 @@ export class Extensions extends LitElement {
                 <b>${packName(p, this.hass?.language ?? "de")}</b>
                 <span class="fp3d-sub">${p.module ? this.t("pack_module", { publisher: p.publisher }) : this.t((p.features ?? []).every((f) => f.startsWith("fun_")) ? "pack_fun_module" : "pack_pro_module", { publisher: p.publisher })}${p.release && p.release > 1 ? ` · v${p.release}` : ""}</span>
                 ${(p.features ?? []).some((f) => !knownFeature(f)) ? html`<span class="fp3d-sub fp3d-pack-error">${this.t("pack_needs_update")}</span>` : nothing}
-                ${p.licensee ? html`<span class="fp3d-sub">${this.t("pack_licensed", { name: p.licensee })}</span>` : nothing}
                 ${p.module && p.module.approved !== true
                   ? html`<span class="fp3d-sub fp3d-module-waits">${this.t("module_waits")}</span>`
                   : p.pending

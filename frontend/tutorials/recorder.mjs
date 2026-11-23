@@ -12,7 +12,7 @@ import puppeteer from "puppeteer-core";
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".png": "image/png", ".jpg": "image/jpeg", ".json": "application/json", ".svg": "image/svg+xml" };
 
 /**
- * Copy preview/ and the built app bundles into `dir` (for TUTORIAL_ROOT) and return the app version from the
+ * Copy preview/ and the built app files into `dir` (for TUTORIAL_ROOT) and return the app version from the
  * manifest, for the "aufgenommen mit HomePlan 3D …" line.
  */
 export function snapshot(dir) {

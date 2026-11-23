@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { sunPath, sunPosition } from "./sun-path.ts";
 
+// sunPath uses the browser's local midnight; pin the test process so the fixed UTC times below stay meaningful.
+process.env.TZ = "UTC";
+
 // Berlin, midsummer: the sun stands about 61° high in the south at noon and rises in the north-east before 5:00 local time
 const BERLIN: [number, number] = [52.52, 13.405];
 

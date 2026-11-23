@@ -436,7 +436,6 @@ if (PART === "a") {
   await R.hold(0.6);
   await rowMove("Pool Spot", "name", 0.5);
   await R.hold(0.6);
-  await rowMove("Strompreis", "name", 0.6);
   await sayOver("Werden es zu viele, sagt die Liste, wie viele noch fehlen – dann grenzt du mit der Suche ein.");
   await R.moveTo('input[type="search"]', 0.6);
 

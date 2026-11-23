@@ -7,7 +7,7 @@
 **Draw your home right inside Home Assistant – and live in it as a glowing neon house, or in any style you like.**<br>
 Lights glow in their colours, blinds move, doors open, cameras watch, energy flows through the walls – and you can simply talk to it.
 
-**MIT open source · 100 % local · no account, no licence key, no cloud**
+**MIT open source · 100 % local · no cloud**
 
 **[📖 Manual](docs/manual.md)** · **[📖 Anleitung](docs/anleitung.md)** · **[Changelog](CHANGELOG.md)** · **[Roadmap](ROADMAP.md)**
 
@@ -162,7 +162,7 @@ Plus **Auto** (day while the sun is up, neon after sunset), an accent colour of 
 
 ## 💚 Everything that is free
 
-**Fully MIT open source. No account, no licence key, no cloud.** Every feature below is included and enabled by default.
+**Fully MIT open source. Everything runs locally.** Every feature below is included and enabled by default.
 
 | Area | What you get for free |
 |---|---|
@@ -182,9 +182,9 @@ Plus **Auto** (day while the sun is up, neon after sunset), an accent colour of 
 | 📍 **Live Presence** | Room-level locating of people, phones and key tags · no Bermuda, no ESPresense · setup assistant, 90 s per room · Android phones found by themselves · key helper for iPhones and Apple Watches · glowing figures in 3D · a room sensor per device · "Where is my iPhone?" |
 | 🚨 **Safety** | Smoke, gas, CO, water, alarm, power outage · window open in the rain · contacts gone silent · the room pulses red, a banner with a jump there · **Window watch** module (open in the cold) |
 | 🎈 **Fun packs** | Pets (cat, rabbit, dogs, fish) · Halloween · Winter & Christmas with fairy lights, snow and a New Year firework – enabled by default |
-| 🔁 **Import & backup** | Restore points per plan · export and import, share as a template · full backup of every plan, picture and pack · import page for Sweet Home 3D, LiDAR scans, DXF, glTF/OBJ/STL, Floorplanner, Valetudo · AI import template |
+| 🔁 **Import & backup** | Restore points per plan · export and import, share as a template · full backup of every plan, picture and pack · editor import for Sweet Home 3D, LiDAR scans, DXF, glTF/OBJ/STL, Floorplanner, Valetudo · AI import template |
 | 🎨 **Styles & languages** | 11 styles: Neon, Blueprint, Day, Night, Synthwave, Homely, Homely evening, Winter evening, Architect's model, Pastel, Warm · own styles · wall and facade colours · styles by time of day, voice, automation or helper · own accent colour · own background · 20 languages |
-| 🛡️ **Privacy** | Everything stays in Home Assistant · voice and locating stay local · reports only if you switch them on, each one viewable and deletable · local packs · module code runs only after admin approval · open source |
+| 🛡️ **Privacy** | Everything stays in Home Assistant · voice and locating stay local · diagnostics stay local, off until an admin switches them on, viewable and deletable · local packs · module code runs only after admin approval · open source |
 
 **Everything is free and enabled by default. Safety included.**
 
@@ -192,7 +192,7 @@ Plus **Auto** (day while the sun is up, neon after sunset), an accent colour of 
 
 ## ⭐ Included Pro features
 
-Everything here is part of this MIT repository and enabled by default in `custom_components/homeplan3d/open-source-config.json`. There is no purchase, licence key, customer account or shop connection involved.
+Everything here is part of this MIT repository and enabled by default in `custom_components/homeplan3d/open-source-config.json`.
 
 | Feature | What it brings |
 |---|---|
@@ -245,7 +245,7 @@ Every option is described in the manual, chapter 8 *The dashboard card*.
 
 ## 🔒 Privacy
 
-HomePlan 3D stores the plans, their pictures and the packs in Home Assistant's `.storage`. It does not contact a licence or update service: no key, account or installation fingerprint is sent anywhere. Voice control uses only your own Assist pipeline; the microphone is open only while you speak. Locating works only inside Home Assistant – nothing about who is where leaves the house. Anonymous usage and error reports are off unless you switch them on (⚙ Settings → 🛟 Help improve); you can view every report before it is sent and delete the data at any time.
+HomePlan 3D stores the plans, their pictures and the packs in Home Assistant's `.storage`. It does not contact an update service: no installation fingerprint is sent anywhere. Voice control uses only your own Assist pipeline; the microphone is open only while you speak. Locating works only inside Home Assistant – nothing about who is where leaves the house. Optional diagnostics are off by default, stay in this installation and are never sent anywhere; an admin can preview the data and delete it at any time under ⚙ Settings → Diagnostics.
 
 ## 💬 Ideas, questions and bugs
 
@@ -274,4 +274,4 @@ MIT – see [LICENSE](LICENSE). HomePlan 3D and every feature in this repository
 
 ## 🤝 Contributing
 
-Issues, discussions and pull requests in this repository are welcome. No account or supporter status is needed to use or contribute to any feature.
+Issues, discussions and pull requests in this repository are welcome.

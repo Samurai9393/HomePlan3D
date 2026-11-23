@@ -10,7 +10,8 @@ function fakeHass(fail: string[] = []) {
     callWS: async (msg: Record<string, unknown>) => {
       sent.push(msg);
       if (msg.type === "homeplan3d/backup/import") return { revision: 2, building: msg.building, packs: (msg.packs as unknown[]).length, skipped: [] };
-      const id = (JSON.parse(msg.pack as string) as { payload: { id: string } }).payload.id;
+      const pack = JSON.parse(msg.pack as string) as { id?: string; payload?: { id?: string } };
+      const id = pack.payload?.id ?? pack.id ?? "unknown";
       if (fail.includes(id)) throw { code: "wrong_instance" };
       return { id };
     },
@@ -18,7 +19,8 @@ function fakeHass(fail: string[] = []) {
   return { hass, sent };
 }
 
-const pack = (id: string, size: number) => ({ id, name: id, source: { id, blob: "x".repeat(size) }, signature: { key: "k", value: "v" } }) as never;
+// A stored pack keeps the original unsigned file as `source`; older backups may still carry a signature envelope.
+const pack = (id: string, size: number) => ({ id, name: id, source: { id, blob: "x".repeat(size) }, imported_at: 1 }) as never;
 
 test("a small backup is restored in one message, as before", async () => {
   const { hass, sent } = fakeHass();
@@ -27,13 +29,24 @@ test("a small backup is restored in one message, as before", async () => {
   assert.equal(res.packs, 2);
 });
 
-test("a backup too large for one message sends the plan first and every pack on its own (#1213)", async () => {
+test("a backup too large for one message sends the plan first and every unsigned pack on its own (#1213)", async () => {
   const { hass, sent } = fakeHass(["b"]);
   const big = Math.ceil(RESTORE_WHOLE_MAX / 2);
-  const res = await restoreBackup(hass, { building: emptyBuilding(), packs: [pack("a", big), pack("b", big), pack("c", big), { id: "bare", name: "bare" } as never] });
-  assert.deepEqual(sent.map((m) => m.type), ["homeplan3d/backup/import", "homeplan3d/packs/import", "homeplan3d/packs/import", "homeplan3d/packs/import"]);
+  const bare = { id: "bare", name: "bare" } as never;
+  const legacy = { id: "legacy", name: "legacy", source: { payload: { id: "legacy", blob: "x" }, signature: { key: "k", value: "v" } } } as never;
+  const res = await restoreBackup(hass, { building: emptyBuilding(), packs: [pack("a", big), pack("b", big), bare, legacy] });
+  assert.deepEqual(sent.map((m) => m.type), [
+    "homeplan3d/backup/import",
+    "homeplan3d/packs/import",
+    "homeplan3d/packs/import",
+    "homeplan3d/packs/import",
+    "homeplan3d/packs/import",
+  ]);
   assert.deepEqual(sent[0].packs, []);
   assert.ok(sent.every((m) => JSON.stringify(m).length <= RESTORE_WHOLE_MAX));
-  assert.equal(res.packs, 2);
-  assert.deepEqual(res.skipped, [{ id: "b", reason: "wrong_instance" }, { id: "bare", reason: "unsigned" }]);
+  assert.deepEqual(JSON.parse(sent[1].pack as string), { id: "a", blob: "x".repeat(big) });
+  assert.deepEqual(JSON.parse(sent[3].pack as string), { id: "bare", name: "bare" });
+  assert.deepEqual(JSON.parse(sent[4].pack as string), (legacy as { source: unknown }).source);
+  assert.equal(res.packs, 3);
+  assert.deepEqual(res.skipped, [{ id: "b", reason: "wrong_instance" }]);
 });

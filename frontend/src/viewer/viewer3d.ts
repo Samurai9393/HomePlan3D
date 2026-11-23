@@ -321,7 +321,7 @@ export interface ViewerStats {
   /** The low quality level is active (tablet). */
   low: boolean;
   pixelRatio: number;
-  /** The WebGL renderer's name (read once; only its rough class leaves the browser, with opt-in reports). */
+  /** The WebGL renderer's name (read once; only its rough class is stored locally, with opt-in diagnostics). */
   gpu: string | null;
 }
 

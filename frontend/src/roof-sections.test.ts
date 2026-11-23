@@ -523,7 +523,7 @@ test("a dormer on a turned section turns with it and still finds its parent and 
 
 test("a cross gable at an angle on a bigger roof is cut by that roof like a wing, not given a dormer's hole", () => {
   const main = section({ x1: 14, z1: 10 });
-  // a gable turned 35° standing on the main roof's slope (a bay's roof at an angle, the 45° gable from Discord)
+  // a gable turned 35° standing on the main roof's slope (a bay's roof at an angle, the 45° gable from the community)
   const bay = section({ id: "b", x0: 3.5, z0: 6, x1: 6, z1: 11, axis: "z", eave_a: 5.5, eave_b: 5.5, base: 5.4, rotation: 35, pivot: [4.75, 8.5] });
   assert.equal(dormerParent([main, bay], bay), main);
   assert.equal(turnedDormer([main, bay], bay), true);

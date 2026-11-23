@@ -1,14 +1,14 @@
 # Folge 12 – Einstellungen, Sicherung und Umzug: Coverage-Checkliste
 
 Quellen: `docs/anleitung.md` 4.5 (Einstellungen), 4.1 (🔒 Grundriss, Rückgängig/Wiederholen, Tasten), 5.7/5.8
-(Sonnenlicht, Regenwarnung), 6.2 (Wetter-Effekte), 7.1 (Schlüssel, Installationen), 10 (Sicherung und Umzug),
-11 (Daten und Datenschutz), 12 (Hilfe und Rückmeldung); die Seitenleiste in `frontend/src/components/editor.ts`
+(Sonnenlicht, Regenwarnung), 6.2 (Wetter-Effekte), 10 (Sicherung und Umzug), 11 (Daten und Datenschutz),
+12 (Hilfe und Rückmeldung); die Seitenleiste in `frontend/src/components/editor.ts`
 (`renderSide` → `renderStartView`, `renderFavorites` mit `renderOwnButtons` und `renderMediaPresets`,
 `renderHelpLinks`, `renderBackgroundForm`, `renderSettings`, `renderBackup`), `transfer.ts` (Export, Vorlage ohne
 Bereiche/Geräte/Bilder), Labels aus `frontend/src/i18n.ts`. Zu viel für 8 Minuten → zwei Teile: **a** = Teil 1
 „Alle Einstellungen“, **b** = Teil 2 „Sicherung, Umzug und Datenschutz“ (mit dem Abschluss der Serie).
-Zeit = Stelle im fertigen Video (Zeilenbeginn, echte Stimme). Demo-Haus der Online-Demo (erfundene Daten), nie ein
-echter Lizenzschlüssel. Versionszeile 1.12.7.
+Zeit = Stelle im fertigen Video (Zeilenbeginn, echte Stimme). Demo-Haus der Online-Demo mit erfundenen Daten.
+Versionszeile 1.12.7.
 
 Fertige Videos: **Teil 1** (`ep12a`, 6:49), **Teil 2** (`ep12b`, 5:27). Zeit vor dem Punkt = Stelle im jeweiligen Teil (a = Teil 1, b = Teil 2).
 
@@ -81,7 +81,7 @@ Fertige Videos: **Teil 1** (`ep12a`, 6:49), **Teil 2** (`ep12b`, 5:27). Zeit vor
 - [x] 6:06 a · „Vorlage (Grundriss-Bild)“: Grundriss-Bild als Vorlage → Folge 2
 - [x] 6:11 a · Energie-Sensoren (Netz, Solar, Akku) stehen im Werkzeug „Energie“ → Folge zu Energie Pro
 - [x] 6:19 a · Sprache folgt dem Home-Assistant-Profil
-- [x] 4:43 b · „Hilfe und Rückmeldung“: „Problem melden“, „Idee vorschlagen“, „Community auf Discord“
+- [x] 4:43 b · „Hilfe und Rückmeldung“: „Problem melden“, „Idee vorschlagen“
 
 ## Rückgängig (4.1)
 - [x] 0:26 b · „Rückgängig“ / „Wiederholen“ oben in der Werkzeugleiste
@@ -106,27 +106,25 @@ Fertige Videos: **Teil 1** (`ep12a`, 6:49), **Teil 2** (`ep12b`, 5:27). Zeit vor
 ## Komplett-Backup (10)
 - [x] 2:22 b · „Komplett-Backup“: „Alles sichern (Plan, Bilder, Packs)“
 - [x] 2:22 b · enthält Plan, alle Hintergrund- und Bildschirmbilder, die installierten Packs
-- [x] 2:36 b · der Lizenzschlüssel ist nicht in der Datei
+- [x] 2:36 b · die Datei bleibt lokal und enthält nur Plan, Bilder und installierte Packs
 - [x] 2:39 b · „Komplett-Backup wiederherstellen …“ mit Rückfrage; dieselbe oder eine andere Installation
-- [x] 2:48 b · jedes Pack wird erneut geprüft; für eine andere Installation signierte Packs werden übersprungen
+- [x] 2:48 b · Packs sind lokale JSON-Dateien: ohne Signatur, ohne Bindung an ein Gerät
 - [x] 2:56 b · Das Backup von Home Assistant sichert HomePlan 3D ebenfalls vollständig
 
-## Umzug auf ein neues Home Assistant (10, 7.1)
+## Umzug auf ein neues Home Assistant (10)
 - [x] 3:03 b · Weg 1: Home-Assistant-Backup auf der neuen Hardware einspielen → alles da
 - [x] 3:13 b · Weg 2 Schritt 1: altes System „Alles sichern“
 - [x] 3:18 b · Schritt 2: neues System HomePlan 3D über HACS installieren, Integration hinzufügen, Bereiche anlegen
 - [x] 3:27 b · Schritt 3: Editor → „Sicherung“ → „Komplett-Backup wiederherstellen …“
-- [x] 3:38 b · Schritt 4: „Erweiterungen“ → Schlüssel eintragen → „Aktivieren“ → Packs „Installieren“
-- [x] 3:53 b · Installationsbindung: Packs sind für genau eine Installation signiert („Installations-Kennung“, anonymer Fingerabdruck)
-- [x] 4:03 b · Ein Schlüssel: höchstens drei Installationen gleichzeitig, die älteste fällt heraus; bis zu fünf neue Verbindungen pro Jahr
-- [x] 4:13 b · „Trennen“ auf dem alten System (optional), installierte Packs bleiben
+- [x] 3:38 b · Meldung oben: Plan, Bilder und alle lokalen Packs sind zurück
+- [x] 3:53 b · Eigene Module sind lokale Dateien; ein Admin gibt ihren Code auf „Erweiterungen“ frei, bevor er läuft
 
 ## Daten und Datenschutz (11)
 - [x] 4:19 b · Plan, Bilder, Packs liegen in Home Assistant unter .storage, nichts verlässt die Installation
-- [x] 4:28 b · Internet nur mit Lizenzschlüssel: einmal am Tag mastershort.de, Schlüssel + anonyme Kennung
+- [x] 4:28 b · Diagnoseberichte bleiben lokal und sind im Editor löschbar; keine Meldung an einen externen Dienst
 - [x] 4:37 b · Kamerabilder, Verlauf, Zustände bleiben in Home Assistant, nur im Browser angezeigt
 
 ## Abschluss der Serie
 - [x] 5:07 b · Dank an die Zuschauer, Playlist „HomePlan 3D – Tutorials“
-- [x] 5:13 b · Online-Demo, Anleitung, GitHub für Fehler, Discord-Community
+- [x] 5:13 b · Online-Demo, Anleitung, GitHub für Fehler
 - [x] 5:21 b · läuft auch auf alten Wandtablets

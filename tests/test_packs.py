@@ -78,12 +78,22 @@ def test_bad_json_and_foreign_files_are_rejected() -> None:
     assert err.value.code == "too_large"
 
 
-def test_known_features_come_from_the_open_source_config() -> None:
+def test_features_come_from_the_open_source_config() -> None:
     config = json.loads(packs.CONFIG_FILE.read_text(encoding="utf-8"))
     assert config == packs.OPEN_SOURCE_CONFIG
-    assert [f["id"] for f in config["features"] if f["enabled"]] == packs.KNOWN_FEATURES
-    assert "pool" in packs.KNOWN_FEATURES
+    assert [f["id"] for f in config["features"]] == packs.KNOWN_FEATURES
+    assert [f["id"] for f in config["features"] if f["enabled"]] == packs.ENABLED_FEATURES
+    assert "pool" in packs.ENABLED_FEATURES
     assert "some_future_addon" not in packs.KNOWN_FEATURES
+    assert packs.feature_enabled("pool")
+    assert not packs.feature_enabled("some_future_addon")
+
+
+def test_a_disabled_config_feature_still_validates_but_does_not_run(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(packs, "ENABLED_FEATURES", [f for f in packs.KNOWN_FEATURES if f != "pool"])
+    pack = {**PAYLOAD, "id": "test.disabled", "items": [], "features": ["pool"]}
+    assert packs.validate_payload(pack)["features"] == ["pool"]
+    assert not packs.feature_enabled("pool")
 
 
 def test_sloped_and_lying_parts_are_accepted() -> None:

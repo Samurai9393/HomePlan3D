@@ -29,7 +29,6 @@ jobs:
               "Sound & Cinema": "pro: sound",
               "Car Pro": "pro: car",
               "Live Screens": "pro: screens",
-              "Shop & licence": "part: shop & licence",
               "Installation & update": "part: install & update",
             };
             const body = context.payload.issue.body ?? "";
