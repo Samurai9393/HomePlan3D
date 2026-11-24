@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("StlToFp3dPack")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3dfc48be2dbd50d69f7db569d606c232a054ebfe")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fb572f859aeec5765b1dd1cbbcec258a497653e6")]
 [assembly: System.Reflection.AssemblyProductAttribute("StlToFp3dPack")]
 [assembly: System.Reflection.AssemblyTitleAttribute("StlToFp3dPack")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
