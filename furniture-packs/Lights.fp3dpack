@@ -1,0 +1,230 @@
+{
+  "format": "fp3dpack",
+  "version": 1,
+  "id": "lights",
+  "name": "Lights",
+  "publisher": "local",
+  "description": "Lighting items for the Lights category.",
+  "release": 1,
+  "items": [
+    {
+      "id": "table_lamp",
+      "name": {
+        "en": "Table lamp"
+      },
+      "size": [0.3, 0.3, 0.55],
+      "group": "lighting",
+      "room": ["living", "office", "bedroom"],
+      "tags": ["lamp", "table", "glow"],
+      "electric": true,
+      "mount": "surface",
+      "light": "table",
+      "surface": false,
+      "hole": false,
+      "parts": [
+        {
+          "shape": "cyl",
+          "x": 0,
+          "z": 0,
+          "w": 0.5,
+          "d": 0.5,
+          "y": 0,
+          "h": 0.03,
+          "color": "dark"
+        },
+        {
+          "shape": "cyl",
+          "x": 0,
+          "z": 0,
+          "w": 0.08,
+          "d": 0.08,
+          "y": 0.03,
+          "h": 0.5,
+          "color": "metal"
+        },
+        {
+          "shape": "loft",
+          "x": 0,
+          "z": 0,
+          "w": 0.7,
+          "d": 0.7,
+          "y": 0.55,
+          "h": 0.22,
+          "tx": 0,
+          "tz": 0,
+          "tw": 0.4,
+          "td": 0.4,
+          "color": "white",
+          "glow": true
+        },
+        {
+          "shape": "cyl",
+          "x": 0,
+          "z": 0,
+          "w": 0.08,
+          "d": 0.08,
+          "y": 0.78,
+          "h": 0.06,
+          "color": "metal"
+        }
+      ],
+      "symbol": [
+        {
+          "shape": "circle",
+          "x": 0,
+          "z": 0,
+          "r": 0.35
+        }
+      ]
+    },
+    {
+      "id": "floor_lamp",
+      "name": {
+        "en": "Floor lamp"
+      },
+      "size": [0.4, 0.4, 1.6],
+      "group": "lighting",
+      "room": ["living", "office", "bedroom"],
+      "tags": ["lamp", "floor", "glow"],
+      "electric": true,
+      "mount": "floor",
+      "light": "floor",
+      "surface": false,
+      "hole": false,
+      "parts": [
+        {
+          "shape": "cyl",
+          "x": 0,
+          "z": 0,
+          "w": 0.7,
+          "d": 0.7,
+          "y": 0,
+          "h": 0.03,
+          "color": "dark"
+        },
+        {
+          "shape": "cyl",
+          "x": 0,
+          "z": 0,
+          "w": 0.06,
+          "d": 0.06,
+          "y": 0.03,
+          "h": 0.9,
+          "color": "metal"
+        },
+        {
+          "shape": "loft",
+          "x": 0,
+          "z": 0,
+          "w": 0.6,
+          "d": 0.6,
+          "y": 0.9,
+          "h": 0.08,
+          "tx": 0,
+          "tz": 0,
+          "tw": 0.4,
+          "td": 0.4,
+          "color": "white",
+          "glow": true
+        },
+        {
+          "shape": "box",
+          "x": 0,
+          "z": 0,
+          "w": 0.12,
+          "d": 0.12,
+          "y": 0.93,
+          "h": 0.06,
+          "color": "glass",
+          "glow": true
+        }
+      ],
+      "symbol": [
+        {
+          "shape": "circle",
+          "x": 0,
+          "z": 0,
+          "r": 0.3
+        },
+        {
+          "shape": "line",
+          "x1": 0,
+          "z1": 0,
+          "x2": 0.2,
+          "z2": 0.2
+        }
+      ]
+    },
+    {
+      "id": "ceiling_light",
+      "name": {
+        "en": "Ceiling light"
+      },
+      "size": [0.6, 0.6, 0.25],
+      "group": "lighting",
+      "room": ["living", "dining", "hall", "office"],
+      "tags": ["lamp", "ceiling", "glow"],
+      "electric": true,
+      "mount": "ceiling",
+      "light": "ceiling",
+      "surface": false,
+      "hole": false,
+      "parts": [
+        {
+          "shape": "cyl",
+          "x": 0,
+          "z": 0,
+          "w": 0.4,
+          "d": 0.4,
+          "y": 0.75,
+          "h": 0.06,
+          "color": "metal"
+        },
+        {
+          "shape": "cyl",
+          "x": 0,
+          "z": 0,
+          "w": 0.05,
+          "d": 0.05,
+          "y": 0.55,
+          "h": 0.2,
+          "color": "metal"
+        },
+        {
+          "shape": "loft",
+          "x": 0,
+          "z": 0,
+          "w": 0.9,
+          "d": 0.9,
+          "y": 0.25,
+          "h": 0.1,
+          "tx": 0,
+          "tz": 0,
+          "tw": 0.6,
+          "td": 0.6,
+          "color": "white",
+          "glow": true
+        },
+        {
+          "shape": "box",
+          "x": 0,
+          "z": 0,
+          "w": 0.6,
+          "d": 0.6,
+          "y": 0.18,
+          "h": 0.04,
+          "color": "glass",
+          "glow": true
+        }
+      ],
+      "symbol": [
+        {
+          "shape": "circle",
+          "x": 0,
+          "z": 0,
+          "r": 0.45
+        }
+      ]
+    }
+  ]
+}
