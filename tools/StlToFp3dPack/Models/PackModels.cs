@@ -147,6 +147,28 @@ public sealed class PackItem
     [JsonPropertyName("slots")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<PackSlot>? Slots { get; set; }
+
+    public PackItem Clone() => new()
+    {
+        Id = Id,
+        Name = Name is null ? new Dictionary<string, string>() : new Dictionary<string, string>(Name),
+        Size = Size is null ? Array.Empty<double>() : (double[])Size.Clone(),
+        Electric = Electric,
+        Mount = Mount,
+        WallY = WallY,
+        Surface = Surface,
+        Vehicle = Vehicle,
+        Hole = Hole,
+        Light = Light,
+        Parts = Parts?.Select(part => part.Clone()).ToList() ?? new List<PackPart>(),
+        Symbol = Symbol?.Select(symbol => symbol.Clone()).ToList(),
+        Group = Group,
+        Room = Room is null ? null : new List<string>(Room),
+        Tags = Tags is null ? null : new List<string>(Tags),
+        Family = Family,
+        Variant = Variant is null ? null : new Dictionary<string, string>(Variant),
+        Slots = Slots?.Select(slot => slot.Clone()).ToList(),
+    };
 }
 
 public sealed class PackPart
@@ -234,6 +256,33 @@ public sealed class PackPart
     [JsonPropertyName("bind")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public PartBind? Bind { get; set; }
+
+    public PackPart Clone() => new()
+    {
+        Shape = Shape,
+        X = X,
+        Z = Z,
+        W = W,
+        D = D,
+        Y = Y,
+        H = H,
+        Color = Color,
+        Top = Top,
+        Finish = Finish,
+        Edges = Edges,
+        Glow = Glow,
+        Screen = Screen,
+        Tx = Tx,
+        Tz = Tz,
+        Tw = Tw,
+        Td = Td,
+        Axis = Axis,
+        Rot = Rot,
+        Fix = Fix,
+        Advent = Advent,
+        Spin = Spin,
+        Bind = Bind?.Clone(),
+    };
 }
 
 public sealed class PartBind
@@ -255,6 +304,15 @@ public sealed class PartBind
     [JsonPropertyName("amount")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? Amount { get; set; }
+
+    public PartBind Clone() => new()
+    {
+        Slot = Slot,
+        Kind = Kind,
+        Hinge = Hinge,
+        Axis = Axis,
+        Amount = Amount,
+    };
 }
 
 public sealed class PackSymbol
@@ -301,6 +359,21 @@ public sealed class PackSymbol
     [JsonPropertyName("z2")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? Z2 { get; set; }
+
+    public PackSymbol Clone() => new()
+    {
+        Shape = Shape,
+        X = X,
+        Z = Z,
+        W = W,
+        D = D,
+        Fill = Fill,
+        R = R,
+        X1 = X1,
+        Z1 = Z1,
+        X2 = X2,
+        Z2 = Z2,
+    };
 }
 
 public sealed class PackSlot
@@ -314,4 +387,11 @@ public sealed class PackSlot
     [JsonPropertyName("domains")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<string>? Domains { get; set; }
+
+    public PackSlot Clone() => new()
+    {
+        Id = Id,
+        Name = Name is null ? new Dictionary<string, string>() : new Dictionary<string, string>(Name),
+        Domains = Domains is null ? null : new List<string>(Domains),
+    };
 }

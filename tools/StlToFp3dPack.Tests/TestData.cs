@@ -39,6 +39,21 @@ internal static class TestData
         },
     };
 
+    public static PackItemEdit EditFor(PackItem item, string? id = null) => new(
+        id ?? item.Id,
+        item.Name.GetValueOrDefault("en", ""),
+        (double[])item.Size.Clone(),
+        item.Group,
+        item.Room is null ? null : new List<string>(item.Room),
+        item.Tags is null ? null : new List<string>(item.Tags),
+        item.Electric ?? false,
+        item.Mount ?? "floor",
+        item.WallY ?? 1,
+        item.Surface ?? false,
+        item.Vehicle ?? false,
+        item.Hole ?? false,
+        item.Light);
+
     public static byte[] AsciiStl() => Encoding.UTF8.GetBytes(
         "solid test\n" +
         "facet normal 0 0 0\n" +

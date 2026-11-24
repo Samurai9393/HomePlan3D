@@ -22,7 +22,7 @@ dotnet test tools/StlToFp3dPack.Tests/StlToFp3dPack.Tests.csproj -c Release
 - `File > New pack` starts a new pack with default metadata.
 - `File > Open pack…` loads an existing `.fp3dpack` or `.json` file. Envelope-style files with a `payload` object are accepted.
 - Edit `Id`, `Name`, `Publisher`, `Release`, `Description`, comma-separated `Features`, and optional `Module` in **Pack metadata**. `format` and `version` stay fixed at `fp3dpack` and `1`.
-- The **Validation** panel shows pack and current-item errors before saving.
+- The **Validation** panel shows pack, selected-item and current-import errors before saving.
 
 ## Convert one STL into one item
 
@@ -33,10 +33,17 @@ dotnet test tools/StlToFp3dPack.Tests/StlToFp3dPack.Tests.csproj -c Release
 5. A single bounding-box part is seeded automatically. Add, edit, duplicate, delete, and reorder parts to fit the shape, using the blue STL wireframe in the preview as a guide. The preview supports drag to orbit, wheel to zoom, `Reset view`, and `Fit model`.
 6. Set `Item id / name`, then click `Add item to pack`. Duplicate item ids are rejected.
 
+## Edit an existing item
+
+- Select an item under **Pack items**. Its id, name, size, group, room, tags, mount, light, wall y, flags, parts and preview load into the editor.
+- Edit the fields under **Selected item**, then click `Apply to item`. Duplicate item ids are rejected and invalid changes are rolled back.
+- Part edits apply to the selected item through `Apply to part`; unexposed fields such as `symbol`, variants, slots and loft fields are preserved.
+- Opening an STL switches back to import mode. `Add item to pack` appends a new item and then selects it for further editing.
+
 ## Part colors and glass-like looks
 
 - Select a part in **Primitive parts** or click it in the shaded preview.
-- Edit `shape`, `x`, `z`, `w`, `d`, `y`, `h`, `axis`, `rot`, and `color`, then click `Apply to part`.
+- Edit `shape` (`box`, `cyl` or `loft`), `x`, `z`, `w`, `d`, `y`, `h`, `axis`, `rot`, and `color`, then click `Apply to part`.
 - Choose a palette role from the color dropdown, enter a `#rrggbb` value, or use `Pick…` for the Windows color picker.
 - `Glass-like look` sets the exported color role to `glass`. `fp3dpack` v1 cannot store real transparency, opacity, alpha, textures, or UVs; the preview uses a pale cyan shade only as a visual hint.
 

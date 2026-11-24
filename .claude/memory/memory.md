@@ -7,4 +7,4 @@
 - `domain/palette-roles.md` — Pack color roles are validated in `packs.py` and defined/resolved in the viewer palette; 2D symbols use CSS (2026-11-23)
 - `domain/english-only.md` — English-only product: no language catalogues or locale branches; stable IDs kept; branch and verification baseline (2026-11-23)
 - `domain/floor-selection.md` — `floorId` drives 2D filtering, 3D group opacity/height, floor pins, offscreen thumbnails and `floorStack` modes (2026-11-24)
-- `domain/stl-converter-tool.md` — Steps 1–7 on branch `tool/stl-to-fp3dpack-guided`: C# foundation, OpenTK viewport, part editor, 55 xUnit tests, README, no-sample-data audit, schema caveat, build results (2026-11-24)
+- `domain/stl-converter-tool.md` — Branched STL converter: C# foundation, OpenTK viewport, part editor, selected-item in-place editing, 61 xUnit tests, README, schema caveat and build results (2026-11-24)
