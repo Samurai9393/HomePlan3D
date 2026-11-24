@@ -10,6 +10,10 @@ preview/screenshots/
 private/
 *.pem
 *.key
+tools/StlToFp3dPack/bin/
+tools/StlToFp3dPack/obj/
+tools/StlToFp3dPack.Tests/bin/
+tools/StlToFp3dPack.Tests/obj/
 
 # local test harnesses (screenshots, probes) – never in the repository
 frontend/_*.mjs

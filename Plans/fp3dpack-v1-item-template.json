@@ -1,0 +1,102 @@
+{
+  "format": "fp3dpack",
+  "version": 1,
+  "id": "template_pack",
+  "name": "TEMPLATE pack - replace me",
+  "publisher": "your_name",
+  "description": "TEMPLATE only - replace pack id, names, size, parts and symbol before importing. For stairs use group stairs and hole true; for cars use group vehicle and vehicle true; for couches use group sofa; for chairs use group seating.",
+  "release": 1,
+  "items": [
+    {
+      "id": "template_item",
+      "name": {
+        "en": "TEMPLATE item - replace me"
+      },
+      "size": [0.5, 0.5, 0.9],
+      "group": "seating",
+      "room": ["living", "dining"],
+      "tags": ["template", "replace"],
+      "electric": false,
+      "mount": "floor",
+      "surface": false,
+      "vehicle": false,
+      "hole": false,
+      "parts": [
+        {
+          "shape": "box",
+          "x": 0,
+          "z": 0,
+          "w": 0.8,
+          "d": 0.8,
+          "y": 0.45,
+          "h": 0.12,
+          "color": "fabric"
+        },
+        {
+          "shape": "box",
+          "x": 0,
+          "z": -0.36,
+          "w": 0.8,
+          "d": 0.12,
+          "y": 0.55,
+          "h": 0.4,
+          "color": "fabric"
+        },
+        {
+          "shape": "box",
+          "x": -0.32,
+          "z": -0.32,
+          "w": 0.08,
+          "d": 0.08,
+          "y": 0,
+          "h": 0.45,
+          "color": "wood",
+          "fix": "h"
+        },
+        {
+          "shape": "box",
+          "x": 0.32,
+          "z": -0.32,
+          "w": 0.08,
+          "d": 0.08,
+          "y": 0,
+          "h": 0.45,
+          "color": "wood",
+          "fix": "h"
+        },
+        {
+          "shape": "box",
+          "x": -0.32,
+          "z": 0.32,
+          "w": 0.08,
+          "d": 0.08,
+          "y": 0,
+          "h": 0.45,
+          "color": "wood",
+          "fix": "h"
+        },
+        {
+          "shape": "box",
+          "x": 0.32,
+          "z": 0.32,
+          "w": 0.08,
+          "d": 0.08,
+          "y": 0,
+          "h": 0.45,
+          "color": "wood",
+          "fix": "h"
+        }
+      ],
+      "symbol": [
+        {
+          "shape": "rect",
+          "x": 0,
+          "z": 0,
+          "w": 1,
+          "d": 1,
+          "fill": false
+        }
+      ]
+    }
+  ]
+}
