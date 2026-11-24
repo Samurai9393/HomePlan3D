@@ -10,6 +10,7 @@ preview/screenshots/
 private/
 *.pem
 *.key
+tools/StlToFp3dPack/.vs/
 tools/StlToFp3dPack/bin/
 tools/StlToFp3dPack/obj/
 tools/StlToFp3dPack.Tests/bin/
