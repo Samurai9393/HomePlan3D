@@ -35,10 +35,13 @@ public sealed class PreviewScene
 
     public bool HasGeometry => StlTriangles.Count > 0 || Parts.Count > 0;
 
-    public static PreviewScene Create(NormalizedMesh? mesh, IReadOnlyList<PackPart>? parts)
+    public static PreviewScene Create(
+        NormalizedMesh? mesh,
+        IEnumerable<PackPart>? parts,
+        double[]? sizeMetres = null)
     {
         var triangles = mesh?.Triangles ?? Array.Empty<Triangle>();
-        double[] size = mesh?.SizeMetres ?? new double[3] { 1, 1, 1 };
+        double[] size = sizeMetres ?? mesh?.SizeMetres ?? new double[3] { 1, 1, 1 };
         var previewParts = new List<PreviewPart>();
         if (parts is not null)
         {

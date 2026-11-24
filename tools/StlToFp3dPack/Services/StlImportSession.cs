@@ -197,30 +197,5 @@ public sealed class StlImportSession
         return cleaned.Length <= 40 ? cleaned : cleaned.Substring(0, 40).TrimEnd('_');
     }
 
-    private static PackPart ClonePart(PackPart source) => new()
-    {
-        Shape = source.Shape,
-        X = source.X,
-        Z = source.Z,
-        W = source.W,
-        D = source.D,
-        Y = source.Y,
-        H = source.H,
-        Color = source.Color,
-        Top = source.Top,
-        Finish = source.Finish,
-        Edges = source.Edges,
-        Glow = source.Glow,
-        Screen = source.Screen,
-        Tx = source.Tx,
-        Tz = source.Tz,
-        Tw = source.Tw,
-        Td = source.Td,
-        Axis = source.Axis,
-        Rot = source.Rot,
-        Fix = source.Fix,
-        Advent = source.Advent,
-        Spin = source.Spin,
-        Bind = source.Bind,
-    };
+    private static PackPart ClonePart(PackPart source) => source.Clone();
 }

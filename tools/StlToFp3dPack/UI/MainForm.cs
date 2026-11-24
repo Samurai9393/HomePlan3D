@@ -14,8 +14,17 @@ public sealed class MainForm : Form
         "body", "fabric", "cushion", "wood", "white", "front", "metal", "dark", "glass", "plant", "pot", "accent",
     };
 
+    private static readonly string[] Mounts = { "floor", "surface", "wall", "ceiling" };
+
+    private static readonly string[] LightKinds =
+    {
+        "ceiling", "downlight", "spot", "panel", "pendant", "floor", "uplight", "table", "wall", "strip", "bollard",
+        "garden",
+    };
+
     private readonly PackEditor _editor = new();
     private readonly StlImportSession _session = new();
+    private PackItem? _editingItem;
 
     private readonly TextBox _packId = new();
     private readonly TextBox _packName = new();
@@ -37,6 +46,24 @@ public sealed class MainForm : Form
     private readonly Label _rawExtents = new();
     private readonly TextBox _itemId = new();
     private readonly TextBox _itemName = new();
+
+    private readonly TextBox _selectedItemId = new();
+    private readonly TextBox _selectedItemName = new();
+    private readonly NumericUpDown _selectedW = NewMetre();
+    private readonly NumericUpDown _selectedD = NewMetre();
+    private readonly NumericUpDown _selectedH = NewMetre();
+    private readonly TextBox _selectedGroup = new();
+    private readonly TextBox _selectedRoom = new();
+    private readonly TextBox _selectedTags = new();
+    private readonly ComboBox _selectedMount = new();
+    private readonly ComboBox _selectedLight = new();
+    private readonly NumericUpDown _selectedWallY = NewMetre(0m, 3m, 1m);
+    private readonly CheckBox _selectedElectric = new() { Text = "Electric" };
+    private readonly CheckBox _selectedSurface = new() { Text = "Surface" };
+    private readonly CheckBox _selectedVehicle = new() { Text = "Vehicle" };
+    private readonly CheckBox _selectedHole = new() { Text = "Hole" };
+    private readonly Button _applyItem = new() { Text = "Apply to item" };
+
     private readonly ListBox _parts = new();
     private readonly Button _addBox = new() { Text = "Add box" };
     private readonly Button _addCyl = new() { Text = "Add cyl" };
@@ -66,6 +93,7 @@ public sealed class MainForm : Form
     private readonly Button _fitView = new() { Text = "Fit model" };
 
     private bool _loadingParts;
+    private bool _loadingItems;
 
     public MainForm()
     {
@@ -96,9 +124,9 @@ public sealed class MainForm : Form
         root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 52));
 
         var left = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 3, ColumnCount = 1 };
-        left.RowStyles.Add(new RowStyle(SizeType.Absolute, 285));
+        left.RowStyles.Add(new RowStyle(SizeType.Absolute, 250));
         left.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-        left.RowStyles.Add(new RowStyle(SizeType.Absolute, 130));
+        left.RowStyles.Add(new RowStyle(SizeType.Absolute, 110));
         left.Controls.Add(BuildMetadataGroup(), 0, 0);
         left.Controls.Add(BuildItemsGroup(), 0, 1);
         left.Controls.Add(BuildStatusGroup(), 0, 2);
@@ -123,7 +151,7 @@ public sealed class MainForm : Form
         grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 110));
         grid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         for (int i = 0; i < 7; i++)
-            grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 34));
+            grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
 
         AddRow(grid, 0, "Id", _packId);
         AddRow(grid, 1, "Name", _packName);
@@ -159,10 +187,12 @@ public sealed class MainForm : Form
     private GroupBox BuildItemsGroup()
     {
         var group = new GroupBox { Text = "Pack items", Dock = DockStyle.Fill };
-        var grid = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 2, Padding = new Padding(8) };
-        grid.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        var grid = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 1, RowCount = 3, Padding = new Padding(8) };
+        grid.RowStyles.Add(new RowStyle(SizeType.Percent, 38));
         grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
+        grid.RowStyles.Add(new RowStyle(SizeType.Percent, 62));
         _items.Dock = DockStyle.Fill;
+        _items.SelectedIndexChanged += (_, _) => LoadSelectedItem();
         grid.Controls.Add(_items, 0, 0);
 
         var buttons = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.LeftToRight };
@@ -170,6 +200,62 @@ public sealed class MainForm : Form
         remove.Click += (_, _) => RemoveItem();
         buttons.Controls.Add(remove);
         grid.Controls.Add(buttons, 0, 1);
+        grid.Controls.Add(BuildSelectedItemGroup(), 0, 2);
+        group.Controls.Add(grid);
+        return group;
+    }
+
+    private GroupBox BuildSelectedItemGroup()
+    {
+        var group = new GroupBox { Text = "Selected item", Dock = DockStyle.Fill, Padding = new Padding(4) };
+        var grid = new TableLayoutPanel { Dock = DockStyle.Fill, ColumnCount = 4, RowCount = 7, Padding = new Padding(4) };
+        grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 54));
+        grid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+        grid.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 54));
+        grid.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+        for (int i = 0; i < 6; i++)
+            grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 24));
+        grid.RowStyles.Add(new RowStyle(SizeType.Absolute, 34));
+
+        _selectedMount.DropDownStyle = ComboBoxStyle.DropDownList;
+        _selectedMount.Items.AddRange(Mounts.Cast<object>().ToArray());
+        _selectedMount.SelectedIndex = 0;
+        _selectedLight.DropDownStyle = ComboBoxStyle.DropDownList;
+        _selectedLight.Items.AddRange(LightKinds.Cast<object>().ToArray());
+        _selectedLight.SelectedIndex = -1;
+        _selectedRoom.PlaceholderText = "comma-separated room ids";
+        _selectedTags.PlaceholderText = "comma-separated tags";
+
+        AddRow(grid, 0, 0, "Id", _selectedItemId);
+        AddRow(grid, 0, 2, "Name", _selectedItemName);
+        AddRow(grid, 1, 0, "W", _selectedW);
+        AddRow(grid, 1, 2, "D", _selectedD);
+        AddRow(grid, 2, 0, "H", _selectedH);
+        AddRow(grid, 2, 2, "Group", _selectedGroup);
+        AddRow(grid, 3, 0, "Room", _selectedRoom);
+        AddRow(grid, 3, 2, "Tags", _selectedTags);
+        AddRow(grid, 4, 0, "Mount", _selectedMount);
+        AddRow(grid, 4, 2, "Light", _selectedLight);
+        AddRow(grid, 5, 0, "Wall y", _selectedWallY);
+
+        var flags = new FlowLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            FlowDirection = FlowDirection.LeftToRight,
+            WrapContents = true,
+        };
+        flags.Controls.Add(_selectedElectric);
+        flags.Controls.Add(_selectedSurface);
+        flags.Controls.Add(_selectedVehicle);
+        flags.Controls.Add(_selectedHole);
+        grid.Controls.Add(new Label { Text = "Flags", AutoSize = true, Padding = new Padding(0, 8, 0, 0) }, 0, 6);
+        grid.Controls.Add(flags, 1, 6);
+        grid.SetColumnSpan(flags, 2);
+        _applyItem.AutoSize = true;
+        _applyItem.Click += (_, _) => ApplyItem();
+        grid.Controls.Add(_applyItem, 3, 6);
+
+        SetSelectedItemControlsEnabled(false);
         group.Controls.Add(grid);
         return group;
     }
@@ -290,7 +376,7 @@ public sealed class MainForm : Form
             grid.RowStyles.Add(new RowStyle(SizeType.Absolute, i is 10 or 11 ? 42 : 26));
 
         _partShape.DropDownStyle = ComboBoxStyle.DropDownList;
-        _partShape.Items.AddRange(new object[] { "box", "cyl" });
+        _partShape.Items.AddRange(new object[] { "box", "cyl", "loft" });
         _partShape.SelectedIndex = 0;
         AddRow(grid, 0, "Shape", _partShape);
         AddRow(grid, 1, "x", _partX);
@@ -434,6 +520,25 @@ public sealed class MainForm : Form
         grid.Controls.Add(control, 1, row);
     }
 
+    private static void AddRow(TableLayoutPanel grid, int row, int labelColumn, string label, Control control)
+    {
+        grid.Controls.Add(new Label { Text = label, AutoSize = true, Padding = new Padding(0, 8, 0, 0) }, labelColumn, row);
+        control.Dock = DockStyle.Fill;
+        grid.Controls.Add(control, labelColumn + 1, row);
+    }
+
+    private static NumericUpDown NewMetre(decimal minimum = 0.01m, decimal maximum = 10m, decimal initial = 0.5m)
+    {
+        return new NumericUpDown
+        {
+            Minimum = minimum,
+            Maximum = maximum,
+            DecimalPlaces = 4,
+            Increment = 0.01m,
+            Value = Math.Max(minimum, Math.Min(maximum, initial)),
+        };
+    }
+
     private static NumericUpDown NewFraction()
     {
         return new NumericUpDown
@@ -497,22 +602,49 @@ public sealed class MainForm : Form
         RefreshValidation();
     }
 
-    private void RefreshItems()
+    private IList<PackPart> CurrentParts => _editingItem?.Parts ?? _session.Parts;
+
+    private double[] CurrentSizeMetres =>
+        _editingItem?.Size is { Length: 3 } size
+            ? size
+            : _session.Normalized?.SizeMetres ?? new double[3] { 1, 1, 1 };
+
+    private void RefreshItems(string? selectId = null)
     {
+        string? wantedId = selectId
+            ?? _editingItem?.Id
+            ?? (_items.SelectedIndex >= 0 && _items.SelectedIndex < _editor.Document.Items.Count
+                ? _editor.Document.Items[_items.SelectedIndex].Id
+                : null);
+
+        _loadingItems = true;
         _items.Items.Clear();
         foreach (PackItem item in _editor.Document.Items)
         {
             _items.Items.Add($"{item.Id} — {item.Name.GetValueOrDefault("en", "")} — {item.Parts.Count} parts");
         }
-        if (_items.Items.Count > 0)
-            _items.SelectedIndex = 0;
+
+        int selected = wantedId is null
+            ? -1
+            : _editor.Document.Items.FindIndex(item => string.Equals(item.Id, wantedId, StringComparison.Ordinal));
+        if (selected < 0 && _items.Items.Count > 0)
+            selected = 0;
+        if (selected >= 0)
+            _items.SelectedIndex = selected;
+        _loadingItems = false;
+
+        if (selected >= 0)
+            LoadSelectedItem();
+        else
+            SwitchToImportMode();
     }
 
     private void RefreshParts()
     {
+        IList<PackPart> parts = CurrentParts;
         _loadingParts = true;
         _parts.Items.Clear();
-        foreach (PackPart part in _session.Parts)
+        foreach (PackPart part in parts)
         {
             _parts.Items.Add($"{part.Shape}: x={part.X:0.###} z={part.Z:0.###} y={part.Y:0.###} w={part.W:0.###} d={part.D:0.###} h={part.H:0.###} {part.Color}");
         }
@@ -529,7 +661,8 @@ public sealed class MainForm : Form
 
     private void UpdateViewport()
     {
-        _viewport.SetScene(PreviewScene.Create(_session.Normalized, _session.Parts));
+        NormalizedMesh? mesh = _editingItem is null ? _session.Normalized : null;
+        _viewport.SetScene(PreviewScene.Create(mesh, CurrentParts, CurrentSizeMetres));
     }
 
     private void RefreshValidation()
@@ -537,7 +670,15 @@ public sealed class MainForm : Form
         var lines = new List<string>();
         ValidationResult packResult = _editor.Validate();
         lines.Add(packResult.IsValid ? "Pack: valid." : "Pack errors:\n- " + string.Join("\n- ", packResult.Errors));
-        if (_session.HasMesh || _session.HasSize)
+        if (_editingItem is not null)
+        {
+            var single = new PackDocument { Items = new List<PackItem> { _editingItem } };
+            ValidationResult itemResult = PackValidator.Validate(single);
+            lines.Add(itemResult.IsValid
+                ? $"Selected item '{_editingItem.Id}': valid."
+                : $"Selected item '{_editingItem.Id}' errors:\n- " + string.Join("\n- ", itemResult.Errors));
+        }
+        else if (_session.HasMesh || _session.HasSize)
         {
             ValidationResult itemResult = _session.ValidateCurrent();
             lines.Add(itemResult.IsValid ? "Current item: valid." : "Current item errors:\n- " + string.Join("\n- ", itemResult.Errors));
@@ -545,10 +686,148 @@ public sealed class MainForm : Form
         _status.Text = string.Join("\n\n", lines);
     }
 
+    private void LoadSelectedItem()
+    {
+        if (_loadingItems)
+            return;
+
+        int index = _items.SelectedIndex;
+        _editingItem = index >= 0 && index < _editor.Document.Items.Count
+            ? _editor.Document.Items[index]
+            : null;
+        SetSelectedItemControlsEnabled(_editingItem is not null);
+        if (_editingItem is null)
+        {
+            ClearSelectedItemControls();
+            RefreshParts();
+            RefreshValidation();
+            return;
+        }
+
+        PackItem item = _editingItem;
+        _selectedItemId.Text = item.Id;
+        _selectedItemName.Text = item.Name.GetValueOrDefault("en", "");
+        _selectedW.Value = Clamp(_selectedW, ItemSize(item, 0));
+        _selectedD.Value = Clamp(_selectedD, ItemSize(item, 1));
+        _selectedH.Value = Clamp(_selectedH, ItemSize(item, 2));
+        _selectedGroup.Text = item.Group ?? "";
+        _selectedRoom.Text = string.Join(", ", item.Room ?? new List<string>());
+        _selectedTags.Text = string.Join(", ", item.Tags ?? new List<string>());
+        SetComboValue(_selectedMount, item.Mount ?? "floor");
+        SetComboValue(_selectedLight, item.Light);
+        _selectedWallY.Value = Clamp(_selectedWallY, item.WallY ?? 1.0);
+        _selectedElectric.Checked = item.Electric ?? false;
+        _selectedSurface.Checked = item.Surface ?? false;
+        _selectedVehicle.Checked = item.Vehicle ?? false;
+        _selectedHole.Checked = item.Hole ?? false;
+
+        RefreshParts();
+        RefreshValidation();
+    }
+
+    private void SwitchToImportMode()
+    {
+        _loadingItems = true;
+        _items.SelectedIndex = -1;
+        _loadingItems = false;
+        _editingItem = null;
+        SetSelectedItemControlsEnabled(false);
+        ClearSelectedItemControls();
+        RefreshParts();
+        RefreshValidation();
+    }
+
+    private void SetSelectedItemControlsEnabled(bool enabled)
+    {
+        foreach (Control control in new Control[]
+        {
+            _selectedItemId, _selectedItemName, _selectedW, _selectedD, _selectedH,
+            _selectedGroup, _selectedRoom, _selectedTags, _selectedMount, _selectedLight,
+            _selectedWallY, _selectedElectric, _selectedSurface, _selectedVehicle, _selectedHole, _applyItem,
+        })
+            control.Enabled = enabled;
+    }
+
+    private void ClearSelectedItemControls()
+    {
+        _selectedItemId.Text = "";
+        _selectedItemName.Text = "";
+        _selectedW.Value = _selectedW.Minimum;
+        _selectedD.Value = _selectedD.Minimum;
+        _selectedH.Value = _selectedH.Minimum;
+        _selectedGroup.Text = "";
+        _selectedRoom.Text = "";
+        _selectedTags.Text = "";
+        _selectedMount.SelectedIndex = 0;
+        _selectedLight.SelectedIndex = -1;
+        _selectedWallY.Value = Clamp(_selectedWallY, 1.0);
+        _selectedElectric.Checked = false;
+        _selectedSurface.Checked = false;
+        _selectedVehicle.Checked = false;
+        _selectedHole.Checked = false;
+    }
+
+    private static double ItemSize(PackItem item, int index) =>
+        item.Size is not null && index >= 0 && index < item.Size.Length ? item.Size[index] : 0.01;
+
+    private static void SetComboValue(ComboBox combo, string? value)
+    {
+        if (value is null)
+        {
+            combo.SelectedIndex = -1;
+            return;
+        }
+        if (combo.Items.Contains(value))
+        {
+            combo.SelectedItem = value;
+            return;
+        }
+        combo.Items.Add(value);
+        combo.SelectedItem = value;
+    }
+
+    private void ApplyItem()
+    {
+        PackItem? item = _editingItem;
+        if (item is null)
+            return;
+
+        CaptureMetadata();
+        string oldId = item.Id;
+        var edit = new PackItemEdit(
+            _selectedItemId.Text.Trim(),
+            _selectedItemName.Text,
+            new[] { (double)_selectedW.Value, (double)_selectedD.Value, (double)_selectedH.Value },
+            _selectedGroup.Text.Trim(),
+            SplitList(_selectedRoom.Text),
+            SplitList(_selectedTags.Text),
+            _selectedElectric.Checked,
+            _selectedMount.SelectedItem?.ToString() ?? "floor",
+            (double)_selectedWallY.Value,
+            _selectedSurface.Checked,
+            _selectedVehicle.Checked,
+            _selectedHole.Checked,
+            _selectedLight.SelectedItem?.ToString());
+
+        ValidationResult result = _editor.UpdateItem(oldId, edit);
+        RefreshItems(result.IsValid ? edit.Id : oldId);
+        RefreshValidation();
+        if (!result.IsValid)
+            MessageBox.Show(this, string.Join("\n", result.Errors), "Item not updated", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+    }
+
+    private static List<string>? SplitList(string text)
+    {
+        var values = text
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .ToList();
+        return values.Count == 0 ? null : values;
+    }
+
     private PackPart? SelectedPart()
     {
         int index = _parts.SelectedIndex;
-        return index >= 0 && index < _session.Parts.Count ? _session.Parts[index] : null;
+        return index >= 0 && index < CurrentParts.Count ? CurrentParts[index] : null;
     }
 
     private void LoadSelectedPart()
@@ -660,24 +939,39 @@ public sealed class MainForm : Form
     private void MovePart(int delta)
     {
         PackPart? part = SelectedPart();
-        if (part is null || !_session.MovePart(part, delta))
+        if (part is null)
             return;
+        IList<PackPart> parts = CurrentParts;
+        int index = parts.IndexOf(part);
+        int target = index + Math.Sign(delta);
+        if (index < 0 || target < 0 || target >= parts.Count)
+            return;
+        parts.RemoveAt(index);
+        parts.Insert(target, part);
         RefreshParts();
         RefreshValidation();
     }
 
     private void AddPart(string shape)
     {
-        try
+        if (shape is not ("box" or "cyl"))
         {
-            _session.AddPart(shape);
-            RefreshParts();
-            RefreshValidation();
+            MessageBox.Show(this, "This tool creates box or cylinder parts only.", "Cannot add part", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
         }
-        catch (InvalidOperationException ex)
+        if (_editingItem is null && !_session.HasSize)
         {
-            MessageBox.Show(this, ex.Message, "Cannot add part", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show(this, "Enter the target longest extent first.", "Cannot add part", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
         }
+        if (CurrentParts.Count >= PackValidator.MaxParts)
+        {
+            MessageBox.Show(this, $"An item can have at most {PackValidator.MaxParts} parts.", "Cannot add part", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+        CurrentParts.Add(new PackPart { Shape = shape });
+        RefreshParts();
+        RefreshValidation();
     }
 
     private void DuplicatePart()
@@ -685,16 +979,18 @@ public sealed class MainForm : Form
         PackPart? part = SelectedPart();
         if (part is null)
             return;
-        try
+        IList<PackPart> parts = CurrentParts;
+        int index = parts.IndexOf(part);
+        if (index < 0)
+            return;
+        if (parts.Count >= PackValidator.MaxParts)
         {
-            _session.DuplicatePart(part);
-            RefreshParts();
-            RefreshValidation();
+            MessageBox.Show(this, $"An item can have at most {PackValidator.MaxParts} parts.", "Cannot duplicate part", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
         }
-        catch (InvalidOperationException ex)
-        {
-            MessageBox.Show(this, ex.Message, "Cannot duplicate part", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-        }
+        parts.Insert(index + 1, part.Clone());
+        RefreshParts();
+        RefreshValidation();
     }
 
     private void DeletePart()
@@ -702,7 +998,7 @@ public sealed class MainForm : Form
         PackPart? part = SelectedPart();
         if (part is null)
             return;
-        _session.RemovePart(part);
+        CurrentParts.Remove(part);
         RefreshParts();
         RefreshValidation();
     }
@@ -748,6 +1044,7 @@ public sealed class MainForm : Form
         {
             UpAxis axis = _upAxis.SelectedIndex == 1 ? UpAxis.Y : UpAxis.Z;
             _session.LoadStl(dialog.FileName, axis);
+            SwitchToImportMode();
             _itemId.Text = _session.ItemId;
             _itemName.Text = _session.ItemName;
             double[] extents = _session.RawExtents();
@@ -768,10 +1065,11 @@ public sealed class MainForm : Form
         try
         {
             _session.ApplySize((double)_target.Value);
+            SwitchToImportMode();
             RefreshParts();
             RefreshValidation();
         }
-        catch (ArgumentException ex)
+        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException)
         {
             MessageBox.Show(this, ex.Message, "Cannot apply size", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
@@ -786,7 +1084,8 @@ public sealed class MainForm : Form
         {
             PackItem item = _session.CreateItem();
             ValidationResult result = _editor.AddItem(item);
-            RefreshItems();
+            SwitchToImportMode();
+            RefreshItems(result.IsValid ? item.Id : null);
             RefreshValidation();
             if (!result.IsValid)
                 MessageBox.Show(this, string.Join("\n", result.Errors), "Item not added", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -803,11 +1102,16 @@ public sealed class MainForm : Form
         if (index < 0 || index >= _editor.Document.Items.Count)
             return;
         string id = _editor.Document.Items[index].Id;
+        string? nextId = _editor.Document.Items.Count > 1
+            ? (index + 1 < _editor.Document.Items.Count
+                ? _editor.Document.Items[index + 1].Id
+                : _editor.Document.Items[index - 1].Id)
+            : null;
         if (MessageBox.Show(this, $"Remove item '{id}' from the pack?", "Remove item", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
             return;
         CaptureMetadata();
         ValidationResult result = _editor.RemoveItem(id);
-        RefreshItems();
+        RefreshItems(result.IsValid ? nextId : id);
         RefreshValidation();
         if (!result.IsValid)
             MessageBox.Show(this, string.Join("\n", result.Errors), "Item not removed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
