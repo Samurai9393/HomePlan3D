@@ -130,6 +130,24 @@ test("of the turns that fit, the one closest to the north set so far wins", () =
   assert.equal(placeUnderPlan(base([{ p: tilted, h: 7 }]), 0, house([[0, 0, 12, 8]], 0)).north, 350);
 });
 
+test("a terrace: the own map building shown by hand stands beside the house, not through it", () => {
+  // the map keeps the row of five houses (30 × 8 m) as one building; the plan is the middle one (6 × 8 m)
+  const b = house([[12, 0, 18, 8]]);
+  const s: Surroundings = { ...base([{ p: [[-15, -4], [15, -4], [15, 4], [-15, 4]], h: 7 }]), x: 15, z: 4, own: 0 };
+  assert.equal(placedSurroundings({ ...b, settings: { ...b.settings, surroundings: s } })!.buildings.length, 0, "hidden unless shown");
+  const shown = placedSurroundings({ ...b, settings: { ...b.settings, surroundings: { ...s, show: [0] } } })!.buildings;
+  assert.equal(shown.length, 2, "the neighbours on the left and on the right");
+  const ext = b.settings.wall_exterior ?? 0;
+  const xs = shown.map((q) => [Math.min(...q.p.map((v) => v[0])), Math.max(...q.p.map((v) => v[0]))]).sort((p, q) => p[0] - q[0]);
+  assert.ok(Math.abs(xs[0][0] - 0) < 1e-6 && Math.abs(xs[0][1] - (12 - ext)) < 1e-6);
+  assert.ok(Math.abs(xs[1][0] - (18 + ext)) < 1e-6 && Math.abs(xs[1][1] - 30) < 1e-6);
+  assert.ok(shown.every((q) => q.h === 7));
+  // a detached house whose outline on the map is a little bigger than the plan leaves no slivers standing
+  const lone = house([[0, 0, 12, 8]]);
+  const big: Surroundings = { ...base([{ p: [[-6.6, -4.5], [6.6, -4.5], [6.6, 4.5], [-6.6, 4.5]], h: 7 }]), x: 6, z: 4, own: 0, show: [0] };
+  assert.equal(placedSurroundings({ ...lone, settings: { ...lone.settings, surroundings: big } })!.buildings.length, 0);
+});
+
 test("the own building and buildings standing in the plan's rooms are not drawn", () => {
   const b = house([[0, 0, 12, 8]]);
   const s: Surroundings = {
@@ -291,4 +309,20 @@ test("cutting a line at a circle keeps the parts inside, each crossing cut at th
   assert.equal(parts.length, 2);
   assert.deepEqual(parts[0].map((p) => p.map((v) => Math.round(v))), [[-100, 0], [100, 0]]);
   assert.equal(Math.round(parts[1][0][0]), 99);
+});
+
+test("the ground under the map: one square around the home, with a hole only around what lies below the ground (#1320)", () => {
+  const b = house([[0, 0, 12, 8]]);
+  const s: Surroundings = { ...base([]), x: 6, z: 4, radius: 100 };
+  const flat = placedSurroundings({ ...b, settings: { ...b.settings, surroundings: s } })!.ground!;
+  // areas of the map are cut at 1.5 radii: the ground reaches as far
+  assert.deepEqual(flat.outer.map(([x, z]) => [Math.round(x), Math.round(z)]), [[-144, 154], [156, 154], [156, -146], [-144, -146]]);
+  assert.deepEqual(flat.holes, []);
+  // a pool in the lawn and a cut-out patch beside it share one hole; a pool standing on the ground needs none
+  const pool = (id: string, x: number, above = false) => ({ id, type: "pool" as const, points: [[x, 10], [x + 4, 10], [x + 4, 13], [x, 13]] as Vec2[], above });
+  const garden: Building = { ...b, floors: [{ ...b.floors[0], outdoor: [pool("p", 0), { id: "c", type: "lawn", points: [[4.1, 10], [6, 10], [6, 12], [4.1, 12]], cut: true }, pool("a", 30, true)] }] };
+  const holes = placedSurroundings({ ...garden, settings: { ...garden.settings, surroundings: s } })!.ground!.holes;
+  assert.equal(holes.length, 1);
+  const xs = holes[0].map((p) => p[0]);
+  assert.ok(Math.min(...xs) < 0 && Math.max(...xs) > 6 && Math.max(...xs) < 7, JSON.stringify(holes[0]));
 });

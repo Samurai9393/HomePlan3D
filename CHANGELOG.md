@@ -8,6 +8,30 @@ historical archive under `docs/release-*.md`. Ideas and bugs are tracked in this
 > Pool Pro and the room bar. Local JSON packs are unsigned and everything runs locally.
 > Older entries below describe the original project history.
 
+## 4.0.2
+
+Another fix round: dormers no longer stand in the room below, a garage roof stops at the house wall, the surroundings from the map lie on solid ground, and a card can have its own start view for a screen held upright.
+
+### New
+- **A start view for a screen held upright:** a card may have a second start view, `start_view_portrait`, beside `start_view`. Turning the tablet moves the house view to the one that fits; without the line nothing changes (idea and proposal: bpaludo, #1228).
+
+### Fixed
+- **A camera's view cone over a small step in the ground** – a terrace a few centimetres above the lawn, a path beside a bed – showed a jagged pale strip along that edge: the cone ran slanting through the step. It is now cut along the edge and lies flat on each side (#1115, reported by RobertSorgenfrei).
+- **A low roof beside a higher storey ran on through the house** – a garage's roof next to the upper floor, say: as soon as its width lay within the length of the roof above, it was taken for a wing of that roof, drawn on to its ridge line and lost its overhang. A roof whose ridge stays below the other roof's eave now ends at the wall under it (#1280, reported by TRusselo).
+- **A hedge, fence or pergola lifted by a height offset** grew into a solid block down to the ground since 4.0.1. Lifted by hand it keeps its underside where it was put; only standing on the ground it reaches into a falling lawn (#1303, reported by murilokasper).
+- **A door in a free wall along the house's outside** swung and hung the other way round in the plan than in 3D when the wall was drawn with the rooms on its right: 3D takes the side with the rooms as inside, the plan took the side as drawn. The plan (and the camera spot of the lock) now agree with 3D (#1225, reported by Atomiiik).
+- **A wall painted dark blue turned grey** in the homely styles, or grey in a band where it is shaded (`#254369`, say): a rule that turns dark navy leftovers of the neon look neutral took the wall's own colour for one. Walls are left out of it (#1306, reported by AxelBlomTH).
+- **A thin line across the whole 3D picture** under the real sky, most visible at night: the sky above the horizon and the haze below it are two fills, and where they met between two pixels the background showed through. They now meet on a whole pixel (#1305, reported by murilokasper).
+- **A towel radiator from the bath pack** glowed only as a narrow strip on its top with a "state from" entity, and not at all on a switch alone. It now glows warm on the wall behind it, all over – with either (#1311, reported by milandrzej). Other flat pack items on the wall glow behind them too instead of on their top edge.
+- **Full screen on a phone:** a card in the phone view has no full-screen button, but while the page loaded it showed for a moment – tapped then, there was no way back. In full screen the button now stays there too (#1261, reported by 1970lexi).
+- **A robot vacuum with maps of several floors** drove its lanes on its dock's floor while it cleaned on another one. It now cleans on the floor of the room it reports – unless that floor has a dock of its own for the same vacuum (idea and proposal: akobza, #1132).
+- **A robot vacuum in a U- or L-shaped room** drove straight through the wall to its first lane when 3D opened while it cleaned. It now appears at the lane, as a robot reported in another room does (idea and proposal: bscholer, #1210).
+- **A dormer's side walls stood in the room below** as dark slabs, through the bed, when the dormer is wider or deeper than the room's bay under it: they were built from the roof's base up. They now stand on the slope, as on a real house (#1315, reported by Atomiiik).
+- **A room listed the power of another room's lamp** – the bathroom lamp's meter in the office and the hallways: with several lamps on one device (an actuator with many channels) and PowerCalc meters named after the lamps' names, every lamp drawn as furniture took the device's first meter. Each lamp now takes the meter that carries its name, and none when it has none of its own (#743, reported by daene85).
+- **A long press on an add-on's marker** (the heat pump's status, say) opened Home Assistant's details for `module:…`, an entity that does not exist. It now does what a tap does (#1314, reported by Atomiiik).
+- **The sky showed through the ground of the surroundings** in the homely styles, wherever the map knows no area between streets and lawns – blue by day, pink in the evening. A plain ground now lies under the whole map; it leaves out what the plan draws below the ground (a pool, a lowered drive, the floors below). The neon looks keep their grid (#1320, reported by MarkTu75).
+- **A terraced house and the surroundings from the map:** the map often keeps the whole row as one building, which HomePlan 3D hides as your own house – so the row was missing, and shown by hand (⚙ Settings → Surroundings → Show and hide houses) it stood as a block through the house. Shown by hand, it now leaves out what the plan builds there: the neighbours' houses stand to the left and right of yours. Nothing changes unless you tap it.
+
 ## 4.0.1
 
 A fix round after 4.0: the phone's list no longer calls a closed garage door open, a second plan stops flooding the log, and thin things on the wall are as thin as the plan says.

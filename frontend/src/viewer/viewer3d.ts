@@ -52,7 +52,7 @@ export type { Theme } from "./theme.ts";
 import { ALWAYS, DEG, GeoBuffer, LineBuffer, pushPrism, triangulate } from "./geo.ts";
 import { buildLightSurface, lightColors, roomIndexAt, shadowed, spillLength, windowCast, type LightKind, type LightSource, type LightSurface, zoneOf } from "./lighting.ts";
 import { buildOpeningParts, CLOSED, lightCover, type OpeningState } from "./openings.ts";
-import { circlePath, cleaningPath, stepRobot, type RobotInfo, type RobotMotion } from "./robot.ts";
+import { circlePath, cleaningPath, crossesOutline, stepRobot, type RobotInfo, type RobotMotion } from "./robot.ts";
 import { decorDelay, lowEndDevice, petDelay, SLOW_KEY, SLOW_SAMPLES, SLOW_WARMUP_MS, slowFrames } from "./pace.ts";
 import { SkyLayer } from "./sky.ts";
 
@@ -3117,7 +3117,7 @@ export class FloorplanViewer {
       pattern: patternMaterial(this.patternTexture, this.themeUniform),
       // the walls sit a hair behind their glowing edges in depth: lines lying on a wall's top or face no longer
       // flicker in and out at corners and joints as the view turns (#417)
-      wall: themed(makeFoldable(new MeshBasicMaterial({ vertexColors: true, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 }), mask, "solid"), this.themeUniform),
+      wall: Object.assign(themed(makeFoldable(new MeshBasicMaterial({ vertexColors: true, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 }), mask, "solid"), this.themeUniform), { defines: { FP3D_WALL: "" } }),
       glassWall: makeFoldable(new MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false }), mask, "glass"),
       // result = floor colour * vertex colour (white leaves the floor untouched)
       shadow: new MeshBasicMaterial({
@@ -4178,7 +4178,6 @@ export class FloorplanViewer {
         // in rings about half a metre apart, each point on the ground beneath it: from the camera to its far edge in
         // one piece, the wedge ran under a terrace higher than the lawn and only a patch of it showed (#1115)
         const rings = Math.min(10, Math.max(1, Math.ceil(reach / 0.5)));
-        const fade = (k: number) => (k < rings ? new Color(near.r * (1 - k / rings), near.g * (1 - k / rings), near.b * (1 - k / rings)) : far);
         const baseY = dropped ? ahead : Math.max(groundAt(d.x, d.z), dome ? -Infinity : groundAt(d.x + dir[0] * 0.3, d.z + dir[1] * 0.3));
         // the wedge ends at the edge of the ground the camera looks along: where the ground drops away more than 40 cm
         // (a terrace above the drive), it no longer runs down the step and on across the lower ground (#1167)
@@ -4208,22 +4207,56 @@ export class FloorplanViewer {
           const t = -half + (2 * half * i) / n;
           return edgeAt(t, reachAt(t));
         });
-        const at = (i: number, k: number) => {
+        // a corner of the wedge: where it lies, how far out (in rings, for its fading) and the ground under it
+        type Corner = { x: number; z: number; k: number; y: number };
+        const corner = (x: number, z: number, k: number, y = groundAt(x, z)): Corner => ({ x, z, k, y });
+        const at = (i: number, k: number): Corner => {
           const t = -half + (2 * half * i) / n;
           const r = (reaches[i] * k) / rings;
-          const x = d.x + (dir[0] * Math.cos(t) - dir[1] * Math.sin(t)) * r;
-          const z = d.z + (dir[1] * Math.cos(t) + dir[0] * Math.sin(t)) * r;
-          return [x, groundAt(x, z), z];
+          return corner(d.x + (dir[0] * Math.cos(t) - dir[1] * Math.sin(t)) * r, d.z + (dir[1] * Math.cos(t) + dir[0] * Math.sin(t)) * r, k);
         };
-        const apex = [d.x, baseY, d.z];
+        const fadeAt = (k: number) => (k < rings ? new Color(near.r * (1 - k / rings), near.g * (1 - k / rings), near.b * (1 - k / rings)) : far);
+        // a piece of the wedge over a small step (a terrace a few centimetres above the lawn, a path beside a bed) is
+        // cut along that step, each part flat on its own ground: in one piece it ran slanting through the edge and
+        // showed as a jagged pale strip along it (#1115). Sloping ground has no step and stays in one piece.
+        const piece = (poly: Corner[], depth = 0): void => {
+          const lo = Math.min(...poly.map((c) => c.y));
+          const hi = Math.max(...poly.map((c) => c.y));
+          if (hi - lo > 0.015 && depth < 3) {
+            const up = (c: Corner) => c.y > (hi + lo) / 2;
+            const high: Corner[] = [];
+            const low: Corner[] = [];
+            let cuts = 0;
+            let step = false;
+            poly.forEach((a, i) => {
+              const b = poly[(i + 1) % poly.length];
+              (up(a) ? high : low).push(a);
+              if (up(a) === up(b)) return;
+              cuts++;
+              let [p, q] = [a, b];
+              for (let j = 0; j < 7; j++) {
+                const m = corner((p.x + q.x) / 2, (p.z + q.z) / 2, (p.k + q.k) / 2);
+                if (up(m) === up(a)) p = m;
+                else q = m;
+              }
+              if (Math.abs(p.y - q.y) > 0.01) step = true;
+              (up(a) ? high : low).push(p);
+              (up(a) ? low : high).push(q);
+            });
+            if (cuts === 2 && step) {
+              piece(high, depth + 1);
+              piece(low, depth + 1);
+              return;
+            }
+          }
+          const pos = (c: Corner) => [c.x, c.y, c.z];
+          for (let i = 1; i < poly.length - 1; i++) cones.tri(pos(poly[0]), pos(poly[i]), pos(poly[i + 1]), fadeAt(poly[0].k), fadeAt(poly[i].k), fadeAt(poly[i + 1].k));
+        };
+        const apex = corner(d.x, d.z, 0, baseY);
         const start = cones.count;
         for (let i = 0; i < n; i++) {
-          cones.tri(apex, at(i + 1, 1), at(i, 1), near, fade(1), fade(1));
-          for (let k = 1; k < rings; k++) {
-            const [a, b, c, e] = [at(i + 1, k), at(i + 1, k + 1), at(i, k + 1), at(i, k)];
-            cones.tri(a, b, c, fade(k), fade(k + 1), fade(k + 1));
-            cones.tri(a, c, e, fade(k), fade(k + 1), fade(k));
-          }
+          piece([apex, at(i + 1, 1), at(i, 1)]);
+          for (let k = 1; k < rings; k++) piece([at(i + 1, k), at(i + 1, k + 1), at(i, k + 1), at(i, k)]);
         }
         coneTris.push({ id: d.id, start, end: cones.count });
         continue;
@@ -4545,6 +4578,25 @@ export class FloorplanViewer {
               const [bx, bz] = corners[(i + 1) % 4];
               buf.tri(ring(ax, az, 0), ring(bx, bz, 0), ring(bx, bz, out), col, col, dark);
               buf.tri(ring(ax, az, 0), ring(bx, bz, out), ring(ax, az, out), col, dark, dark);
+            }
+            continue;
+          }
+          if (face.part === "all" && packItem(f.type)?.mount === "wall" && h >= d * 3) {
+            // a flat pack item on the wall (a towel radiator, a mirror): its top is a narrow strip, so it glows on the
+            // wall behind it, all over, with a soft halo round it – like a radiator on the wall (#1311)
+            const col = new Color(...face.color.map((v) => Math.min(1, v * (0.3 + 0.5 * face.level))) as [number, number, number]);
+            const dark = new Color(0, 0, 0);
+            const hw = Math.abs(w) / 2;
+            const zb = -d / 2 + 0.004;
+            const g = 0.1 + 0.08 * face.level;
+            const inner = [P(-hw, base, zb), P(hw, base, zb), P(hw, base + h, zb), P(-hw, base + h, zb)];
+            const outer = [P(-hw - g, base - g, zb), P(hw + g, base - g, zb), P(hw + g, base + h + g, zb), P(-hw - g, base + h + g, zb)];
+            buf.tri(inner[0], inner[1], inner[2], col);
+            buf.tri(inner[0], inner[2], inner[3], col);
+            for (let i = 0; i < 4; i++) {
+              const j = (i + 1) % 4;
+              buf.tri(inner[i], outer[i], outer[j], col, dark, dark);
+              buf.tri(inner[i], outer[j], inner[j], col, dark, col);
             }
             continue;
           }
@@ -5582,8 +5634,9 @@ export class FloorplanViewer {
         });
         r.motion.path = path2;
         r.motion.next = best;
-        // a robot reported in another room appears there instead of driving through the walls
-        if (info.room && !pointInPolygon(r.motion.pos, info.room)) r.motion.pos = [path2[best][0], path2[best][1]];
+        // a robot reported in another room appears there instead of driving through the walls – and so does one whose
+        // straight way to the first lane would cross a wall of its own room (a U- or L-shaped room; idea: bscholer, #1210)
+        if (info.room && (!pointInPolygon(r.motion.pos, info.room) || crossesOutline(info.room, r.motion.pos, path2[best]))) r.motion.pos = [path2[best][0], path2[best][1]];
       }
       r.led.color.setHex(ROBOT_LED[info.mode]);
     }
